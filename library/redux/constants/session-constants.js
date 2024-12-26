@@ -1,0 +1,13 @@
+export const SESSION_STATE = "session";
+export const SESSION_AUTHENTICATED = "authenticated";
+export const SESSION_IS_AUTHENTICATING = "SESSION_IS_AUTHENTICATING";
+export const SESSION_AUTH_PROVIDER = "auth_provider";
+export const SESSION_AUTH_PROVIDER_USER_ID = "auth_provider_user_id";
+export const SESSION_PASSWORD_RESET_KEY = "passwordResetKey";
+export const SESSION_USER = "user";
+export const SESSION_USER_ID = "id";
+export const SESSION_USER_EMAIL = "email";
+export const SESSION_USER_FIRSTNAME = "firstName";
+export const SESSION_USER_LASTNAME = "lastName";
+export const SESSION_USER_TOKEN = "token";
+export const SESSION_ERROR = "error";
