@@ -1,5 +1,4 @@
 import store from "../store"
-import React from "react";
 import {
     setAuthenticated, setIsAuthenticating,
     setPasswordResetKey,
@@ -17,8 +16,6 @@ import {
     SESSION_USER_TOKEN
 } from "../constants/session-constants";
 import {isSet} from "@/helpers/utils";
-import {wpApiConfig} from "../../config/wp-api-config";
-import {wpResourceRequest} from "@/truvoicer-base/library/api/wordpress/middleware";
 
 export function setSessionUserAction(data, authenticated) {
     let sessionUserState = {...store.getState().session.user};

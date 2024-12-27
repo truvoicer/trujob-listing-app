@@ -1,5 +1,4 @@
 //Api config and endpoints
-import {setSessionLocalStorage, setSessionState} from "../../redux/actions/session-actions";
 import {setIsAuthenticatingAction, setSessionUserAction} from "@/library/redux/actions/session-actions";
 
 export default {
@@ -7,9 +6,19 @@ export default {
     endpoints: {
         settings: '/settings',
         page: '/page',
-        login: '/login',
+        login: '/auth/login',
         checkToken: '/auth/token/user',
-        tokenRefresh: '/session/api-token/generate',
+        tokenRefresh: '/auth/api-token/generate',
+        user: {
+            profile: '/user/profile',
+            update: '/admin/user/update',
+            delete: '/admin/user/delete',
+            create: '/admin/user/create',
+            forgotPassword: '/user/forgot-password',
+            resetPassword: '/user/reset-password',
+            verifyEmail: '/user/verify-email',
+            resendVerificationEmail: '/user/resend-verification-email',
+        }
     },
     tokenResponseHandler: async (response) => {
         const responseData = await response.json();

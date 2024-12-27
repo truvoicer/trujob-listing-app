@@ -1,13 +1,13 @@
-import HomeView from "@/components/view/HomeView";
+import PageView from "@/components/view/PageView";
 
 export class ViewFactory {
     constructor() {
         this.viewMap = new Map();
     }
-    renderView(view) {
-        switch (view) {
-            case 'home':
-                return <HomeView />;
+    renderView(data) {
+        switch (data?.view) {
+            case 'page':
+                return <PageView data={data} />;
             default:
                 return null;
         }

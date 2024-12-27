@@ -1,6 +1,6 @@
 import {connect} from "react-redux";
 import React, {useContext, useEffect, useState} from "react";
-import {SESSION_AUTHENTICATED} from "@/truvoicer-base/redux/constants/session-constants";
+import {SESSION_AUTHENTICATED} from "@/library/redux/constants/session-constants";
 
 const Footer = (props) => {
     const {session, fluidContainer = false} = props;

@@ -1,5 +1,5 @@
 
-import "./globals.css";
+import "@/assets/sass/style.scss";
 import TruLayout from "@/components/layout/TruLayout";
 import {isNotEmpty} from "@/helpers/utils";
 import {ApiMiddleware} from "@/library/middleware/api/ApiMiddleware";

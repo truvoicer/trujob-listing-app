@@ -1,17 +1,18 @@
-import {fetcherApiConfig} from "../../../../../trujob-app/truvoicer-base/config/fetcher-api-config";
-import {isEmpty, isNotEmpty} from "../../../../../trujob-app/truvoicer-base/library/utils";
-import store from "../../../../../trujob-app/truvoicer-base/redux/store";
-import {REQUEST_GET, REQUEST_POST} from "../../../../../trujob-app/truvoicer-base/library/constants/request-constants";
 import {isObject, isObjectEmpty} from "@/helpers/utils";
 import {
     getSessionObject,
     setIsAuthenticatingAction, setSessionErrorAction,
-    setSessionUserAction
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import {getSignedJwt} from "@/helpers/jwt-helpers";
+import {AppManager} from "@/library/AppManager";
 
 export class ApiMiddleware {
+
+    static REQUEST_GET = 'GET';
+    static REQUEST_POST = 'POST';
+
+    errors = [];
+
     buildQueryString(queryObject = false) {
         if (queryObject.length === 0) {
             return "";
@@ -65,7 +66,7 @@ export class ApiMiddleware {
     }
 
     buildPublicBearerToken() {
-       return truJobApiConfig?.appSecret;
+        return truJobApiConfig?.appSecret;
     }
 
     getAuthHeader(protectedReq = false) {
@@ -128,16 +129,21 @@ export class ApiMiddleware {
         if (!method) {
             throw new Error('Method not set');
         }
-        return await this.runRequest({
-            config: truJobApiConfig,
-            method: method,
-            endpoint,
-            query,
-            data,
-            upload,
-            protectedReq,
-            headers
-        });
+        try {
+                return await this.runRequest({
+                    config: truJobApiConfig,
+                    method: method,
+                    endpoint,
+                    query,
+                    data,
+                    upload,
+                    protectedReq,
+                    headers
+                });
+        } catch (error) {
+            console.error(error);
+            return false;
+        }
     }
 
     getProtectedSessionToken() {
@@ -158,7 +164,7 @@ export class ApiMiddleware {
         config,
         headers = null,
     }) {
-        let buildHeadersData = isObject(headers)? headers : this.getHeaders(config, upload);
+        let buildHeadersData = (headers && isObject(headers)) ? headers : this.getHeaders(config, upload);
         const authHeader = this.getAuthHeader(protectedReq);
         if (!authHeader) {
             return false;
@@ -205,15 +211,15 @@ export class ApiMiddleware {
             body = JSON.stringify(data);
         }
         switch (method) {
-            case REQUEST_GET:
-            case 'get':
+            case ApiMiddleware.REQUEST_GET.toUpperCase():
+            case ApiMiddleware.REQUEST_GET.toLowerCase():
                 request = {
                     ...request,
                     method: 'GET',
                 };
                 break;
-            case REQUEST_POST:
-            case 'post':
+            case ApiMiddleware.REQUEST_POST.toUpperCase():
+            case ApiMiddleware.REQUEST_POST.toLowerCase():
                 request = {
                     ...request,
                     method: 'POST',
@@ -224,9 +230,15 @@ export class ApiMiddleware {
                 throw new Error(`Method not supported ${method}`);
         }
 
-        return await fetch(
+        if (AppManager.getInstance().isDebug()) {
+            console.log('ApiMiddleware.runRequest', {requestUrl, request});
+        }
+        return await this.handleResponse(
             requestUrl,
-            request,
+            await fetch(
+                requestUrl,
+                request,
+            )
         );
     }
 
@@ -236,6 +248,37 @@ export class ApiMiddleware {
             queryString = `/?${this.buildQueryString(queryObject)}`;
         }
         return `${url}${queryString}`;
+    }
+
+    async handleResponse(requestUrl, response) {
+        if (!response) {
+            return false;
+        }
+        const responseData = await response;
+        switch (responseData?.status) {
+            case 200:
+            case 202:
+                return await response.json();
+            default:
+                this.addError(responseData?.status, responseData?.statusText, {requestUrl});
+                return false;
+        }
+    }
+
+    addError(code, message = null, data = {}) {
+        this.errors.push({
+            code,
+            message,
+            data
+        });
+    }
+
+    getErrors() {
+        return this.errors;
+    }
+
+    hasErrors() {
+        return this.errors.length > 0;
     }
 
     static getInstance() {

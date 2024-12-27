@@ -2,7 +2,7 @@ import {
     configureStore,
 } from "@reduxjs/toolkit";
 
-import thunk from "redux-thunk";
+import {thunk}  from "redux-thunk";
 import {pageReducer} from "@/library/redux/reducers/page-reducer";
 import {sessionReducer} from "@/library/redux/reducers/session-reducer";
 import {APP_STATE} from "@/library/redux/constants/app-constants";
@@ -20,7 +20,7 @@ const reducer = {
 };
 const store = configureStore({
     reducer,
-    middleware,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(middleware),
 });
 
 export default store;

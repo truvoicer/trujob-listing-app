@@ -9,10 +9,14 @@ export async function generateMetadata({params, searchParams}, parent) {
   const page = await truJobApiMiddleware.pageRequest(
       'home',
   );
-  if (!settings?.data) {
+
+  if (truJobApiMiddleware.apiMiddleware.hasErrors()) {
+    throw new Error(
+        `Failed to load data | ${JSON.stringify(truJobApiMiddleware.apiMiddleware.getErrors())}`,
+    );
     return;
   }
-  if (!page?.data) {
+  if (!page) {
     return;
   }
   let title = [];
