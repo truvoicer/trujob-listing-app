@@ -7,7 +7,7 @@ function RadiusFilterWidget(props) {
                 <p>Radius around selected destination</p>
             </div>
             <div className="form-group">
-                <input type="range" min="0" max="100" value="20" data-rangeslider/>
+                <input type="range" min="0" max="100"  />
             </div>
         </form>
     );

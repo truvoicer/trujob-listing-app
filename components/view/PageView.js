@@ -25,7 +25,8 @@ const blockConfig = [
         }
     },
 ]
-function PageView(props) {
+function PageView({data}) {
+    console.log(data);
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {

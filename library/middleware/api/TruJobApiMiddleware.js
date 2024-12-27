@@ -34,6 +34,14 @@ export class TruJobApiMiddleware {
             data
         })
     }
+    async itemRequest(page, query = {}, data = {}) {
+        return await this.apiMiddleware.resourceRequest({
+            endpoint: `${this.config.endpoints.page}/${page}`,
+            method: 'GET',
+            query,
+            data
+        })
+    }
 
 
     async getSessionToken(url, requestData, headers = {}) {
