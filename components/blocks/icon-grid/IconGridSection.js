@@ -1,5 +1,5 @@
 import React from 'react';
-import IconGridItem from "@/components/listings/icon-grid/IconGridItem";
+import IconGridItem from "@/components/blocks/icon-grid/IconGridItem";
 const iconGridConfig = [
     {
         icon: 'flaticon-car',

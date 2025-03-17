@@ -13,9 +13,9 @@ export async function generateMetadata({params, searchParams}, parent) {
       routeParams.item,
   );
 
-  if (truJobApiMiddleware.apiMiddleware.hasErrors()) {
+  if (truJobApiMiddleware.getApiMiddleware().hasErrors()) {
     throw new Error(
-        `Failed to load data | ${JSON.stringify(truJobApiMiddleware.apiMiddleware.getErrors())}`,
+        `Failed to load data | ${JSON.stringify(truJobApiMiddleware.getApiMiddleware().getErrors())}`,
     );
     return;
   }

@@ -1,5 +1,5 @@
 import React from 'react';
-import FeaturedCard from "@/components/listings/featured/FeaturedCard";
+import FeaturedCard from "@/components/blocks/featured/FeaturedCard";
 
 function FeaturedSection(props) {
     return (

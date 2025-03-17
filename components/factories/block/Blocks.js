@@ -1,7 +1,7 @@
-import FeaturedSection from "@/components/listings/featured/FeaturedSection";
-import IconGridSection from "@/components/listings/icon-grid/IconGridSection";
+import FeaturedSection from "@/components/blocks/featured/FeaturedSection";
+import IconGridSection from "@/components/blocks/icon-grid/IconGridSection";
 import ListingsGrid from "@/components/listings/grid/ListingsGrid";
-import HeroSection from "@/components/listings/hero/HeroSection";
+import HeroSection from "@/components/blocks/hero/HeroSection";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';

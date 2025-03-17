@@ -8,17 +8,14 @@ import {
 import {isNotEmpty} from "@/helpers/utils";
 
 export class TruJobApiMiddleware {
-    apiMiddleware = null;
     config = null;
 
     constructor() {
         this.config = truJobApiConfig;
-        this.apiMiddleware = ApiMiddleware.getInstance();
     }
 
-
     async settingsRequest(query = {}, data = {}) {
-        return await this.apiMiddleware.resourceRequest({
+        return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.settings}`,
             method: 'GET',
             query,
@@ -27,7 +24,7 @@ export class TruJobApiMiddleware {
     }
 
     async pageRequest(page, query = {}, data = {}) {
-        return await this.apiMiddleware.resourceRequest({
+        return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.page}/${page}`,
             method: 'GET',
             query,
@@ -35,7 +32,7 @@ export class TruJobApiMiddleware {
         })
     }
     async itemRequest(page, query = {}, data = {}) {
-        return await this.apiMiddleware.resourceRequest({
+        return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.page}/${page}`,
             method: 'GET',
             query,
@@ -46,7 +43,7 @@ export class TruJobApiMiddleware {
 
     async getSessionToken(url, requestData, headers = {}) {
         try {
-            const response = await this.apiMiddleware.resourceRequest({
+            const response = await ApiMiddleware.getInstance().resourceRequest({
                 endpoint: url,
                 method: 'POST',
                 data: requestData
@@ -91,7 +88,7 @@ export class TruJobApiMiddleware {
     async createUser(data) {
         try {
             return await this.handleResponse(
-                this.apiMiddleware.resourceRequest({
+                ApiMiddleware.getInstance().resourceRequest({
                     endpoint: this.config.endpoints.user.create,
                     method: ApiMiddleware.REQUEST_POST,
                     data: data
@@ -104,7 +101,7 @@ export class TruJobApiMiddleware {
     }
 
     getApiMiddleware() {
-        return this.apiMiddleware;
+        return ApiMiddleware.getInstance();
     }
 
     static getInstance() {

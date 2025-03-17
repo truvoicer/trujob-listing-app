@@ -26,13 +26,14 @@ const blockConfig = [
     },
 ]
 function PageView({data}) {
-    console.log(data);
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
             let itemProps = item?.props || {};
-
-            const getBlock = blockFactory.renderBlock(item?.name);
+            const getBlock = blockFactory.renderBlock(item?.type);
+            itemProps = {
+                ...item,
+            }
             if (getBlock?.props) {
                 itemProps = {
                     ...getBlock.props,
@@ -72,7 +73,9 @@ function PageView({data}) {
     }
     return (
         <ListingsLayout>
-            {renderBlocks(buildBlocks(blockConfig))}
+            {renderBlocks(buildBlocks(
+                Array.isArray(data?.blocks) ? data.blocks : []
+            ))}
         </ListingsLayout>
     );
 }

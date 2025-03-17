@@ -1,11 +1,12 @@
+import { StyleBuilder } from '@/library/StyleBuilder';
 import React from 'react';
 
 function HeroSection(props) {
     return (
         <div className="site-blocks-cover overlay"
-             style={{backgroundImage: "url('/images/hero_2.jpg')"}}
-             data-aos="fade"
-             data-stellar-background-ratio="0.5">
+            style={StyleBuilder.getInstance().addBackgroundImage(props?.properties?.background_image)}
+            data-aos="fade"
+            data-stellar-background-ratio="0.5">
 
             {/*<div className="site-blocks-cover inner-page-cover overlay"*/}
             {/*     style={{backgroundImage: 'url(/images/hero_2.jpg)'}}*/}
@@ -36,11 +37,16 @@ function HeroSection(props) {
 
                         <div className="row justify-content-center mb-4">
                             <div className="col-md-8 text-center">
-                                <h1 className="" data-aos="fade-up">
-                                    Welcome To DirectoryAds</h1>
+                                {props?.properties?.title &&
+                                    <h1 className="" data-aos="fade-up">
+                                        {props.properties.title}
+                                    </h1>
+                                }
+                                {props?.properties?.subtitle &&
                                 <p data-aos="fade-up" data-aos-delay="100">
-                                    Lorem ipsum dolor sit amet, consectetur
-                                    adipisicing elit. </p>
+                                    {props.properties.subtitle}
+                                    </p>
+}
                             </div>
                         </div>
 
@@ -49,20 +55,20 @@ function HeroSection(props) {
                                 <div className="row align-items-center">
                                     <div className="col-lg-12 mb-4 mb-xl-0 col-xl-4">
                                         <input type="text" className="form-control rounded"
-                                               placeholder="What are you looking for?"/>
+                                            placeholder="What are you looking for?" />
                                     </div>
                                     <div className="col-lg-12 mb-4 mb-xl-0 col-xl-3">
                                         <div className="wrap-icon">
                                             <span className="icon icon-room"></span>
                                             <input type="text" className="form-control rounded"
-                                                   placeholder="Location"/>
+                                                placeholder="Location" />
                                         </div>
 
                                     </div>
                                     <div className="col-lg-12 mb-4 mb-xl-0 col-xl-3">
                                         <div className="select-wrap">
-                                                <span className="icon"><span
-                                                    className="icon-keyboard_arrow_down"></span></span>
+                                            <span className="icon"><span
+                                                className="icon-keyboard_arrow_down"></span></span>
                                             <select className="form-control rounded" name="" id="">
                                                 <option value="">All Categories</option>
                                                 <option value="">Real Estate</option>
@@ -76,7 +82,7 @@ function HeroSection(props) {
                                     </div>
                                     <div className="col-lg-12 col-xl-2 ml-auto text-right">
                                         <input type="submit" className="btn btn-primary btn-block rounded"
-                                               value="Search"/>
+                                            value="Search" />
                                     </div>
 
                                 </div>
