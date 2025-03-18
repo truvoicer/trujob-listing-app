@@ -1,7 +1,7 @@
 import FeaturedSection from "@/components/blocks/featured/FeaturedSection";
 import IconGridSection from "@/components/blocks/icon-grid/IconGridSection";
-import ListingsGrid from "@/components/listings/grid/ListingsGrid";
 import HeroSection from "@/components/blocks/hero/HeroSection";
+import ListingsBlock from "@/components/listings/ListingsBlock";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -33,7 +33,7 @@ export class Blocks {
                 title: 'Listings Grid Block',
                 description: 'This is the listings grid block',
                 icon: 'listings-grid-block-icon',
-                component: ListingsGrid,
+                component: ListingsBlock,
             },
         };
     }

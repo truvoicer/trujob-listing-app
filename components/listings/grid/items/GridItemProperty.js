@@ -1,6 +1,6 @@
-import React from 'react';
-
-function ListingGridItem({ data }) {
+function GridItemProperty({
+    data
+ }) {
     return (
         <div className="d-block d-md-flex listing vertical">
             <a href="#" className="img d-block"
@@ -30,4 +30,4 @@ function ListingGridItem({ data }) {
     );
 }
 
-export default ListingGridItem;
+export default GridItemProperty;
