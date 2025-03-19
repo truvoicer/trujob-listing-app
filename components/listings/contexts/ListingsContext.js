@@ -26,6 +26,7 @@ export const listingsContextData = {
     query: {},
     post: {},
     update: () => {},
+    fetch: () => {}
 };
 
 export const ListingsContext = React.createContext(listingsContextData);

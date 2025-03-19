@@ -17,6 +17,7 @@ function ListingsProvider({
                 setStateObj: StateService.getSetStateData(listingsContextState)
             })
         },
+        fetch: initFetch
     });
 
     const core = Core.getInstance();
@@ -26,10 +27,10 @@ function ListingsProvider({
     
 
     async function initFetch() {
-        const response = await listingsService.getFetchService().fetchListings({
-            query: listingsContextState.query,
-            data: listingsContextState.post
-        });
+        const response = await listingsService.getFetchService().fetchListings(
+            listingsContextState.query,
+            listingsContextState.post
+        );
         if (!response) {
             listingsService.contextService.updateContext({
                 status: ListingsFetch.STATUS.ERROR
@@ -45,7 +46,7 @@ function ListingsProvider({
 
     useEffect(() => {
         initFetch();
-    }, [listingsContextState.query, listingsContextState.post]);
+    }, []);
     
     return (
         <ListingsContext.Provider value={StateService.getStateData(listingsContextState)}>

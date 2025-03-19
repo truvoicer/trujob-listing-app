@@ -17,8 +17,6 @@ function ListingsGrid({
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
 
-    console.log(listingsService.contextService.context.status, listingsContext);
-
     function renderGrid() {
         return (
             <div className="site-section">

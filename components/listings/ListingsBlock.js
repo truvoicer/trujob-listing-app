@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from 'react';
 import ListingsGrid from './grid/ListingsGrid';
-import ListingsProvider from './ListingsProvider';
+import ListingsContainer from './ListingsContainer';
 
 function ListingsBlock(props) {
     return (
-        <ListingsProvider>
+        <ListingsContainer>
             <ListingsGrid {...props} />
-        </ListingsProvider>
+        </ListingsContainer>
     );
 }
 
