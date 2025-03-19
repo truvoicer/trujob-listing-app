@@ -24,6 +24,7 @@ export const listingsContextData = {
         },
     },
     query: {},
+    post: {},
     update: () => {},
 };
 

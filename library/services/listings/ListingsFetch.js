@@ -9,6 +9,24 @@ export class ListingsFetch {
         ERROR: 'error'
     };
 
+     static PAGINATION = {
+        CURRENT_PAGE: 'current_page',
+        PAGE: 'page',
+        PAGE_SIZE: 'page_size',
+        TOTAL_ITEMS: 'total_items',
+        TOTAL_PAGES: 'total_pages',
+        LAST_PAGE: 'last_page',
+        OFFSET: 'offset',
+        HAS_MORE: 'has_more',
+        TYPE: 'pagination_type',
+    };
+
+    static KEYS = {
+        SORT_BY: 'sort_by',
+        SORT_ORDER: 'sort_order',
+        DATE_KEY: 'date_key',
+    };
+
     async fetchListings(query = {}, data = {}) {
         const apiMiddleware = new TruJobApiMiddleware();
         return await apiMiddleware.getApiMiddleware().resourceRequest({
