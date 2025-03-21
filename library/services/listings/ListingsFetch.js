@@ -27,6 +27,12 @@ export class ListingsFetch {
         DATE_KEY: 'date_key',
     };
 
+    static FETCH_TYPE = 'load_type';
+
+    static FETCH_TYPE_APPEND = 'append';
+    static FETCH_TYPE_PREPEND = 'prepend';
+    static FETCH_TYPE_REPLACE = 'replace';
+
     async fetchListings(query = {}, data = {}) {
         const apiMiddleware = new TruJobApiMiddleware();
         return await apiMiddleware.getApiMiddleware().resourceRequest({

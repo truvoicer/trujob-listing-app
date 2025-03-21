@@ -2,30 +2,12 @@
 import React from 'react';
 import ListingsLayout from "@/components/layout/Listings/ListingsLayout";
 import sidebarConfig from "@/components/listings/sidebar/config/sidebar-config";
-import {BlockFactory} from "@/components/factories/block/BlockFactory";
+import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import WidgetGroup from "@/components/listings/sidebar/partials/WidgetGroup";
-import {Blocks} from "@/components/factories/block/Blocks";
-const blockConfig = [
-    {
-        name: Blocks.HERO_BLOCK,
-    },
-    {
-        name: Blocks.FEATURED_BLOCK,
-    },
-    {
-        name: Blocks.ICON_GRID_BLOCK,
-    },
-    {
-        name: Blocks.LISTINGS_GRID_BLOCK,
-        props: {
-            title: "Featured Listings",
-            subTitle: 'Choose product you want',
-            sidebarData: sidebarConfig,
-            itemContainerClass: 'col-lg-6',
-        }
-    },
-]
-function PageView({data}) {
+import { Blocks } from "@/components/factories/block/Blocks";
+import BlockComponent from '../blocks/BlockComponent';
+
+function PageView({ data }) {
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
@@ -34,10 +16,10 @@ function PageView({data}) {
             itemProps = {
                 ...item,
             }
-            if (getBlock?.props) {
+            if (typeof getBlock?.props === 'object') {
                 itemProps = {
-                    ...getBlock.props,
                     ...itemProps,
+                    ...getBlock.props,
                 }
             }
             return {
@@ -60,13 +42,7 @@ function PageView({data}) {
                         return null;
                     }
 
-                    if (!item?.component) {
-                        return null;
-                    }
-                    const BlockComponent = item.component;
-                    const blockProps = item?.props || {};
-
-                    return <BlockComponent key={index} {...blockProps} />;
+                    return <BlockComponent key={index} component={item.component} {...item.props} />;
                 })}
             </>
         )

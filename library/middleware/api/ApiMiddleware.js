@@ -18,7 +18,7 @@ export class ApiMiddleware {
             return "";
         }
         let esc = encodeURIComponent;
-        return "?" + Object.keys(queryObject)
+        return  Object.keys(queryObject)
             .map(k => esc(k) + '=' + esc(queryObject[k]))
             .join('&');
     }
@@ -230,9 +230,9 @@ export class ApiMiddleware {
                 throw new Error(`Method not supported ${method}`);
         }
 
-        if (AppManager.getInstance().isDebug()) {
-            console.log('ApiMiddleware.runRequest', {requestUrl, request});
-        }
+        // if (AppManager.getInstance().isDebug()) {
+        //     console.log('ApiMiddleware.runRequest', {requestUrl, request});
+        // }
         return await this.handleResponse(
             requestUrl,
             await fetch(

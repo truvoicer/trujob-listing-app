@@ -3,26 +3,99 @@ import React, { useContext, useEffect } from 'react';
 import { ListingsContext } from './contexts/ListingsContext';
 import { Core } from '@/library/services/core/Core';
 import ListingsProvider from './ListingsProvider';
+import { useSearchParams } from 'next/navigation';
+import { ListingsFetch } from '@/library/services/listings/ListingsFetch';
+import { isObjectEmpty } from '@/helpers/utils';
 
 function ListingsContainer({
     children,
 }) {
-    
-    const core = Core.getInstance();
     const listingsContext = useContext(ListingsContext);
-    const listingsService = core.getListingsService();
-    const listingsContextState = listingsService.contextService.context;
-    
+    const searchParams = useSearchParams();
+    const pageQueryVal = searchParams?.get('page');
+
+    const core = Core.getInstance();
+    const listingsService = core.getListingsService(listingsContext);
+
+
     useEffect(() => {
-        console.log('fetching');
         listingsContext.fetch();
-    }, [listingsContext.query, listingsContext.post]);
-    console.log('listingsContextState', listingsContext);
-    return (
-        <ListingsProvider>
-            {children}
-        </ListingsProvider>
-    );
+    }, []);
+
+    useEffect(() => {
+        if (!pageQueryVal) {
+            return;
+        }
+        const currentPage = listingsService.getContextService().context?.results?.meta?.[
+            ListingsFetch.PAGINATION.CURRENT_PAGE
+        ];
+        
+        if (currentPage && (parseInt(currentPage) === parseInt(pageQueryVal))) {
+            return;
+        }
+
+        listingsContext.fetch({
+            query: {
+                ...listingsContext.query,
+                [ListingsFetch.PAGINATION.PAGE]: pageQueryVal
+            },
+            post: listingsContext.post
+        });
+    }, [pageQueryVal]);
+
+    useEffect(() => {
+        if (isObjectEmpty(listingsContext?.query)) {
+            return
+        }
+        const currentPage = listingsService.getContextService().context?.results?.meta?.[
+            ListingsFetch.PAGINATION.CURRENT_PAGE
+        ];
+        if (
+            listingsContext?.query?.[ListingsFetch.PAGINATION.PAGE] &&
+            (
+                listingsContext?.query?.[ListingsFetch.PAGINATION.PAGE] === parseInt(pageQueryVal) ||
+                listingsContext?.query?.[ListingsFetch.PAGINATION.PAGE] === parseInt(currentPage)
+            )
+
+        ) {
+            return;
+        }
+
+        listingsContext.fetch({
+            query: listingsContext?.query || {},
+            post: listingsContext?.post || {},
+            options: listingsContext?.options || {},
+            context: listingsContext
+        });
+    }, [listingsContext.query]);
+
+    useEffect(() => {
+        if (isObjectEmpty(listingsContext?.post)) {
+            return
+        }
+        const currentPage = listingsService.getContextService().context?.results?.meta?.[
+            ListingsFetch.PAGINATION.CURRENT_PAGE
+        ];
+        if (
+            listingsContext?.post?.[ListingsFetch.PAGINATION.PAGE] &&
+            (
+                listingsContext?.post?.[ListingsFetch.PAGINATION.PAGE] === parseInt(pageQueryVal) ||
+                listingsContext?.post?.[ListingsFetch.PAGINATION.PAGE] === parseInt(currentPage)
+            )
+
+        ) {
+            return;
+        }
+
+        listingsContext.fetch({
+            query: listingsContext?.query || {},
+            post: listingsContext?.post || {},
+            options: listingsContext?.options || {},
+            context: listingsContext
+        });
+    }, [listingsContext.post]);
+
+    return children;
 }
 
 export default ListingsContainer;

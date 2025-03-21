@@ -10,7 +10,7 @@ export const SEARCH_REQUEST_NEW = "SEARCH_REQUEST_NEW";
 export const SEARCH_REQUEST_APPEND = "SEARCH_REQUEST_APPEND";
 
 export const SEARCH_RESET = "SEARCH_RESET";
-export const PAGE_CONTROL_HAS_MORE = "hasMore";
+export const PAGE_CONTROL_HAS_MORE = "has_more";
 export const PAGE_CONTROL_PAGINATION_REQUEST = "paginationRequest";
 export const PAGE_CONTROL_REQ_PAGINATION_TYPE = "pagination_type";
 export const PAGE_CONTROL_REQ_PAGINATION_OFFSET = "offset";

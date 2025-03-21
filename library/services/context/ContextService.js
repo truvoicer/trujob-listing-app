@@ -12,11 +12,13 @@ export class ContextService {
 
     dataStore = ContextService.DATA_STORE_CONTEXT;
     setState = null;
-
+    context = null;
     constructor(context) {
         this.context = context;
     }
-
+    getContext() {
+        return this.context;
+    }
     setSetState(setState) {
         this.setState = setState;
     }

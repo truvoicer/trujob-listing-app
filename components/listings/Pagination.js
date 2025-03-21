@@ -15,6 +15,7 @@ const Pagination = (props) => {
     const [padding, setPadding] = useState(2);
     const [pageNumber, setPageNumber] = useState(1);
     const searchParams = useSearchParams();
+    const pageQueryVal = searchParams.get('page');
 
     const core = Core.getInstance();
     const listingsService = core.getListingsService(useContext(ListingsContext));
@@ -43,6 +44,7 @@ const Pagination = (props) => {
         }
         return 1;
     }
+
     function getCurrentPageNumber() {
         const pageQueryVal = searchParams.get('page');
         if (pageQueryVal) {
@@ -64,7 +66,7 @@ const Pagination = (props) => {
             }
         } else if (currentPage <= 1) {
             left = [];
-            for (let i = currentPage + 1; i < currentPage + padding + 1; i++) {
+            for (let i = currentPage; i < currentPage + padding + 1; i++) {
                 if (i > 1 && i < lastPageNumber) {
                     right.push(i)
                 }
@@ -103,26 +105,24 @@ const Pagination = (props) => {
 
     useEffect(() => {
         setPageNumber(getCurrentPageNumber());
-    }, [listingsService.contextService.context.results.meta?.[ListingsFetch.PAGINATION.PAGE]]);
+    }, [listingsService.contextService.context.results.meta?.[ListingsFetch.PAGINATION.PAGE], pageQueryVal]);
 
     let { left, right } = getpadding(pageNumber);
-    
+    console.log({ left, right, pageNumber });
     return (
         <>
             {children}
 
             <div className="custom-pagination text-center">
-                {/* <span>1</span>
-                <a href="#">2</a>
-                <a href="#">3</a>
-                <span className="more-page">...</span>
-                <a href="#">10</a> */}
                 <Link
                     className={""}
                     {...getPageLinkProps(1)}
                 >
                     <span>1</span>
                 </Link>
+                {left.length > 1 &&
+                <span className="more-page">...</span>
+                }
                 {left.map((num, index) => (
                     <Link
                         key={index}
@@ -141,6 +141,9 @@ const Pagination = (props) => {
                         <span>{num}</span>
                     </Link>
                 ))}
+                {right.length > 1 &&
+                    <span className="more-page">...</span>
+                }
                 {lastPageNumber > 1 &&
                     <Link
                         {...getPageLinkProps(lastPageNumber)}
@@ -148,11 +151,11 @@ const Pagination = (props) => {
                         <span>{lastPageNumber}</span>
                     </Link>
                 }
-                {/* {showIndicator &&
+                {showIndicator &&
                     <span className="page-numbers">
                         {`Page ${pageNumber} of ${lastPageNumber}`}
                     </span>
-                } */}
+                }
             </div>
         </>
     );

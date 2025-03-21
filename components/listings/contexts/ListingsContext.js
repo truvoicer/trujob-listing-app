@@ -4,6 +4,7 @@ import React from 'react'
 
 export const listingsContextData = {
     status: ListingsFetch.STATUS.IDLE,
+    loading: false,
     results: {
         data: [],
         links: {
@@ -13,7 +14,7 @@ export const listingsContextData = {
             next: null
         },
         meta: {
-            current_page: 1,
+            current_page: null,
             from: null,
             last_page: null,
             links: [],
@@ -26,7 +27,7 @@ export const listingsContextData = {
     query: {},
     post: {},
     update: () => {},
-    fetch: () => {}
+    fetch: ({ query, post, options = {} }) => {}
 };
 
 export const ListingsContext = React.createContext(listingsContextData);

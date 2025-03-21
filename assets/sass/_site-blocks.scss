@@ -998,6 +998,11 @@
 		background: $primary;
 		color: $white;
 	}
+	.page-numbers {
+		margin-left: 10px;
+		background: none;
+		width: auto;
+	}
 	span {
 		background: lighten(#ccc, 10%);
 		color: $black;

@@ -1,22 +1,19 @@
 import React, { useContext, useEffect } from 'react';
 import Sidebar from "@/components/listings/sidebar/Sidebar";
-import ListingGridItem from "@/components/listings/grid/items/ListingGridItem";
-import ListingsContainer from '../ListingsProvider';
 import { ListingsContext } from '../contexts/ListingsContext';
 import { Core } from '@/library/services/core/Core';
 import { ListingsFetch } from '@/library/services/listings/ListingsFetch';
 import Pagination from '../Pagination';
+import InfiniteScroll from '../InfiniteScroll';
+import { BlockContext } from '@/contexts/BlockContext';
 
-function ListingsGrid({
-    title = 'Listings',
-    subTitle = 'Choose product you want',
-    sidebarData = [],
-    itemContainerClass = 'col-lg-6',
-}) {
+function ListingsGrid(props) {
     const listingsContext = useContext(ListingsContext);
+    const blockContext = useContext(BlockContext);
+    
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
-
+    
     function renderGrid() {
         return (
             <div className="site-section">
@@ -39,7 +36,7 @@ function ListingsGrid({
                                 <div className="row">
                                     {listingsService.contextService.context.results.data.map((item, index) => {
                                         return (
-                                            <div key={index} className={itemContainerClass}>
+                                            <div key={index} className={''}>
                                                 {listingsService.getViewService().renderGridItem(
                                                     item?.listingType?.slug,
                                                     item,
@@ -53,7 +50,7 @@ function ListingsGrid({
 
                         </div>
                         <div className="col-lg-3 ml-auto">
-                            <Sidebar data={sidebarData} />
+                            <Sidebar data={[]} />
                         </div>
 
                     </div>
@@ -63,9 +60,17 @@ function ListingsGrid({
     }
     return (
         <>
+        {blockContext?.pagination && blockContext?.pagination_type === 'infinite-scroll' && (
+            <InfiniteScroll>
+                {renderGrid()}
+            </InfiniteScroll>
+        )}
+        {!blockContext?.pagination && renderGrid()}
+        {blockContext?.pagination && blockContext?.pagination_type === 'page' && (
             <Pagination>
                 {renderGrid()}
             </Pagination>
+        )}
         </>
     );
 }
