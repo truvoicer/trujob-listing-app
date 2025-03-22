@@ -17,7 +17,6 @@ function BlockComponent(props) {
     function getBlockProps() {
         let blockProps = {
             ref: blockRef,
-            ...otherProps,
         };
         return blockProps;
     }

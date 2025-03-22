@@ -1,72 +1,91 @@
 // AUTH STATE
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 import {
-    PAGE_DATA,
-    PAGE_SEARCH_PARAMS,
+    PAGE_VIEW,
+    PAGE_SLUG,
+    PAGE_TITLE,
+    PAGE_CONTENT,
+    PAGE_BLOCKS,
+    PAGE_HAS_SIDEBAR,
+    PAGE_SIDEBAR_WIDGETS,
     PAGE_SETTINGS,
-    PAGE_STATUS,
-    PAGE_STATUS_IDLE
-} from "@/library/redux/constants/page-constants";
+    PAGE_SETTINGS_META_TITLE,
+    PAGE_SETTINGS_META_DESCRIPTION,
+    PAGE_SETTINGS_META_KEYWORDS,
+    PAGE_SETTINGS_META_ROBOTS,
+    PAGE_SETTINGS_META_CANONICAL,
+    PAGE_SETTINGS_META_AUTHOR,
+    PAGE_SETTINGS_META_PUBLISHER,
+    PAGE_SETTINGS_META_OG_TITLE,
+    PAGE_SETTINGS_META_OG_DESCRIPTION,
+    PAGE_SETTINGS_META_OG_TYPE,
+    PAGE_SETTINGS_META_OG_URL,
+    PAGE_SETTINGS_META_OG_IMAGE,
+    PAGE_SETTINGS_META_OG_SITE_NAME,
+    PAGE_IS_ACTIVE,
+    PAGE_IS_HOME,
+    PAGE_IS_FEATURED,
+    PAGE_IS_PROTECTED,
+    PAGE_DELETED_AT,
+    PAGE_CREATED_AT,
+    PAGE_UPDATED_AT,
+    ERROR,
+    DATA,
+    PAGE_STATE,
+} from '../constants/page-constants';
 
-const defaultState = {
-    [PAGE_STATUS]: PAGE_STATUS_IDLE,
-    [PAGE_SEARCH_PARAMS]: {
-        page: null,
-        sort_by: null,
-        sort_order: null,
-        page_size: null,
-        query: null,
+export const pageStateData = {
+    [ERROR]: null,
+    [PAGE_VIEW]: null,
+    [PAGE_SLUG]: null,
+    [PAGE_TITLE]: null,
+    [PAGE_CONTENT]: null,
+    [PAGE_IS_ACTIVE]: true,
+    [PAGE_IS_HOME]: false,
+    [PAGE_IS_FEATURED]: false,
+    [PAGE_IS_PROTECTED]: false,
+    [PAGE_HAS_SIDEBAR]: false,
+    [PAGE_SIDEBAR_WIDGETS]: [],
+    [PAGE_BLOCKS]: [],
+    [PAGE_SETTINGS]: {
+        [PAGE_SETTINGS_META_TITLE]: null,
+        [PAGE_SETTINGS_META_DESCRIPTION]: null,
+        [PAGE_SETTINGS_META_KEYWORDS]: null,
+        [PAGE_SETTINGS_META_ROBOTS]: null,
+        [PAGE_SETTINGS_META_CANONICAL]: null,
+        [PAGE_SETTINGS_META_AUTHOR]: null,
+        [PAGE_SETTINGS_META_PUBLISHER]: null,
+        [PAGE_SETTINGS_META_OG_TITLE]: null,
+        [PAGE_SETTINGS_META_OG_DESCRIPTION]: null,
+        [PAGE_SETTINGS_META_OG_TYPE]: null,
+        [PAGE_SETTINGS_META_OG_URL]: null,
+        [PAGE_SETTINGS_META_OG_IMAGE]: null,
+        [PAGE_SETTINGS_META_OG_SITE_NAME]: null
     },
-    [PAGE_DATA]: {},
-    [PAGE_SETTINGS]: {},
-    error: {}
+    [PAGE_DELETED_AT]: null,
+    [PAGE_CREATED_AT]: null,
+    [PAGE_UPDATED_AT]: null,
+
+
 };
 const defaultReducers = {
-    setPageStatus: (state, action) => {
-        state[PAGE_STATUS] = action.payload;
-    },
-    setPageData: (state, action) => {
-        state[PAGE_SEARCH_PARAMS] = action.payload;
-    },
-    setPageSettings: (state, action) => {
-        state[PAGE_SETTINGS] = action.payload;
-    },
-    setSearchParamPage: (state, action) => {
-        state.searchParams.page = action.payload;
-    },
-    setSearchParamSortOrder: (state, action) => {
-        state.searchParams.sort_order = action.payload;
-    },
-    setSearchParamSortBy: (state, action) => {
-        state.searchParams.sort_by = action.payload;
-    },
-    setSearchParamQuery: (state, action) => {
-        state.searchParams.query = action.payload;
-    },
-    setSearchParamPageSize: (state, action) => {
-        state.searchParams.page_size = action.payload;
+    setPage: (state, action) => {
+        state = action.payload;
     },
     setPageError: (state, action) => {
-        state.error = action.payload;
+        state[ERROR] = action.payload;
         console.error(state.error)
     },
 };
 
 export const pageSlice = createSlice({
-    name: "page",
-    initialState: defaultState,
+    name: [PAGE_STATE],
+    initialState: pageStateData,
     reducers: defaultReducers
 });
 
 export const pageReducer = pageSlice.reducer;
 export const {
-    setPageStatus,
-    setPageData,
-    setPageSettings,
-    setSearchParamPage,
-    setSearchParamSortOrder,
-    setSearchParamSortBy,
-    setSearchParamQuery,
-    setSearchParamPageSize,
+    setPage,
     setPageError
 } = pageSlice.actions;

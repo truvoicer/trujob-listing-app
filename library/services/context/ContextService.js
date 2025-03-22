@@ -23,8 +23,12 @@ export class ContextService {
         this.setState = setState;
     }
 
-    updateContext(data) {
-        this.context.update(data);
+    updateDataStoreContext(data) {
+        if (typeof this.context?.update === 'function') {
+            this.context.update(data);
+        } else {
+            console.warn('Context does not have an update method');
+        }
     }
 
     setDataStore(dataStore) {
@@ -40,7 +44,7 @@ export class ContextService {
     updateContext(data) {
         switch (this.dataStore) {
             case ContextService.DATA_STORE_CONTEXT:
-                this.context.update(data);
+                this.updateDataStoreContext(data);
                 break;
             case ContextService.DATA_STORE_STATE:
                 StateService.updateStateObject({
@@ -60,7 +64,7 @@ export class ContextService {
     updateContextItem({key, value}) {
         switch (this.dataStore) {
             case ContextService.DATA_STORE_CONTEXT:
-                this.context.update({key, value})
+                this.updateDataStoreContext({key, value})
                 break;
             case ContextService.DATA_STORE_STATE:
                 StateService.updateStateObject({
