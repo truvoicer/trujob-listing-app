@@ -9,7 +9,7 @@ const Sidebar = ({data = []}) => {
     const widgetFactory = new WidgetFactory();
     function buildWidgets(widgetData) {
         return widgetData.map((item, index) => {
-            return widgetFactory.renderWidget(item?.name);
+            return widgetFactory.renderWidget(item?.type);
         });
     }
 

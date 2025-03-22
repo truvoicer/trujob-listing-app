@@ -14,12 +14,19 @@ function ListingsGrid(props) {
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
     console.log(blockContext)
+    function getContentClass() {
+        let contentClass = 'col-12';
+        if (blockContext?.has_sidebar) {
+            contentClass = 'col-12 col-lg-8';
+        }
+        return contentClass;
+    }
     function renderGrid() {
         return (
             <div className="site-section">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-8">
+                        <div className={getContentClass()}>
                             {listingsService.contextService.context.status === ListingsFetch.STATUS.LOADING && (
                                 <div className="text-center">
                                     <div className="spinner-border" role="status">
@@ -46,12 +53,12 @@ function ListingsGrid(props) {
                                     })}
                                 </div>
                             )}
-
-
                         </div>
-                        <div className="col-lg-3 ml-auto">
-                            <Sidebar data={[]} />
-                        </div>
+                        {blockContext?.has_sidebar && (
+                            <div className="col-lg-3 ml-auto">
+                                <Sidebar data={blockContext?.sidebar_widgets || []} />
+                            </div>
+                        )}
 
                     </div>
                 </div>

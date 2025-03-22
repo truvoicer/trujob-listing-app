@@ -4,9 +4,9 @@ import CategoryFilterWidget from "@/components/listings/sidebar/widgets/Category
 
 
 export class Widgets {
-    static SEARCH_FILTER_WIDGET = 'searchFilterWidget';
-    static PROXIMITY_FILTER_WIDGET = 'proximityFilterWidget';
-    static CATEGORY_FILTER_WIDGET = 'categoryFilterWidget';
+    static SEARCH_FILTER_WIDGET = 'search_filter';
+    static PROXIMITY_FILTER_WIDGET = 'proximity_filter';
+    static CATEGORY_FILTER_WIDGET = 'category_filter';
 
     static getWidgets() {
         return {
