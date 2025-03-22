@@ -21,6 +21,7 @@ const InfiniteScroll = ({ children }) => {
         if (![ ListingsFetch.STATUS.SUCCESS, ListingsFetch.STATUS.IDLE].includes(searchObj.status)) {
             return false;
         }
+        
         listingsService.getContextService().updateContext({
             query: {
                 ...searchObj.query,

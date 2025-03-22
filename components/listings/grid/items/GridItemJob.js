@@ -7,7 +7,7 @@ function GridItemJob({
                 style={{ backgroundImage: 'url("/images/img_1.jpg")' }}
             ></a>
             <div className="lh-content">
-                <span className="category">Cars &amp; Vehicles</span>
+                <span className="category">Job</span>
                 <a href="#" className="bookmark">
                     <span className="icon-heart"></span>
                 </a>

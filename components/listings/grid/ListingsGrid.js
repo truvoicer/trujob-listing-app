@@ -13,7 +13,7 @@ function ListingsGrid(props) {
     
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
-    
+    console.log(blockContext)
     function renderGrid() {
         return (
             <div className="site-section">
@@ -36,7 +36,7 @@ function ListingsGrid(props) {
                                 <div className="row">
                                     {listingsService.contextService.context.results.data.map((item, index) => {
                                         return (
-                                            <div key={index} className={''}>
+                                            <div key={index} className={blockContext?.properties?.grid_item_class || 'col-12 col-lg-6'}>
                                                 {listingsService.getViewService().renderGridItem(
                                                     item?.listingType?.slug,
                                                     item,

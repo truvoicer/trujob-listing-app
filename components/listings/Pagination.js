@@ -108,7 +108,7 @@ const Pagination = (props) => {
     }, [listingsService.contextService.context.results.meta?.[ListingsFetch.PAGINATION.PAGE], pageQueryVal]);
 
     let { left, right } = getpadding(pageNumber);
-    console.log({ left, right, pageNumber });
+    
     return (
         <>
             {children}
