@@ -31,5 +31,5 @@ export default {
         },
         upload: {}
     },
-    appSecret: process.env.NEXT_PUBLIC_FETCHER_API_APP_SECRET,
+    token: process.env.NEXT_PUBLIC_FETCHER_API_TOKEN,
 }

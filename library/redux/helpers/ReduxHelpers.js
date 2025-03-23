@@ -1,16 +1,23 @@
 export class ReduxHelpers {
-    
-    static buildValidatedObject(data, pageData) {
-        let newData = {};
+
+    static buildValidatedObject(data, origData, stateData) {
+        if (!data || !origData || !stateData) {
+            return {};
+        }
+
         Object.keys(data).forEach(key => {
-            if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
-                newData[key] = ReduxHelpers.buildValidatedObject(data[key], pageData[key]);
+            if (data[key] === null) {
+                stateData[key] = null;
                 return;
             }
-            if (pageData.hasOwnProperty(key)) {
-                newData[key] = data[key];
+            if (typeof data[key] === 'object' && !Array.isArray(data[key])) {
+                stateData[key] = ReduxHelpers.buildValidatedObject(data[key], origData[key], stateData[key]);
+                return;
+            }
+            if (origData.hasOwnProperty(key) && data.hasOwnProperty(key)) {
+                stateData[key] = data[key];
             }
         })
-        return newData;
+        return stateData;
     }
 }

@@ -33,6 +33,7 @@ import {
     DATA,
     PAGE_STATE,
 } from '../constants/page-constants';
+import { ReduxHelpers } from '../helpers/ReduxHelpers';
 
 export const pageStateData = {
     [ERROR]: null,
@@ -70,7 +71,7 @@ export const pageStateData = {
 };
 const defaultReducers = {
     setPage: (state, action) => {
-        state = action.payload;
+        state = ReduxHelpers.buildValidatedObject(action.payload, pageStateData, state);
     },
     setPageError: (state, action) => {
         state[ERROR] = action.payload;

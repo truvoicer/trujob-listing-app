@@ -9,9 +9,23 @@ import {isNotEmpty} from "@/helpers/utils";
 
 export class TruJobApiMiddleware {
     config = null;
+    apiMiddleware = null;
 
     constructor() {
         this.config = truJobApiConfig;
+        this.apiMiddleware = ApiMiddleware.getInstance();
+    }
+
+    async siteRequest(slug, query = {}, data = {}) {
+        if (!slug || slug === '') {
+            throw new Error('Site slug is required');
+        }
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.site}/${slug}`,
+            method: 'GET',
+            query,
+            data
+        })
     }
 
     async settingsRequest(query = {}, data = {}) {
@@ -24,6 +38,9 @@ export class TruJobApiMiddleware {
     }
 
     async pageRequest(page, query = {}, data = {}) {
+        if (!page || page === '') {
+            throw new Error('Page slug is required');
+        }
         return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.page}/${page}`,
             method: 'GET',

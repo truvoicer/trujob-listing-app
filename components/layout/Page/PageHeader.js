@@ -3,7 +3,7 @@ import {connect} from "react-redux";
 import {APP_STATE} from "@/library/redux/constants/app-constants";
 import {PAGE_STATE} from "@/library/redux/constants/page-constants";
 
-const ListingsHeader = ({app, page}) => {
+const PageHeader = ({app, page}) => {
     const [isSticky, setSticky] = useState(false);
     const ref = useRef(null);
 
@@ -87,4 +87,4 @@ export default connect(
         page: state[PAGE_STATE],
     }),
     null
-)(ListingsHeader);
+)(PageHeader);

@@ -1,11 +1,14 @@
 'use client';
 import React from 'react';
-import ListingsLayout from "@/components/layout/Listings/ListingsLayout";
 import sidebarConfig from "@/components/listings/sidebar/config/sidebar-config";
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import WidgetGroup from "@/components/listings/sidebar/partials/WidgetGroup";
 import { Blocks } from "@/components/factories/block/Blocks";
 import BlockComponent from '../blocks/BlockComponent';
+import { connect } from 'react-redux';
+import { PAGE_STATE } from '@/library/redux/constants/page-constants';
+import PageFullWidthLayout from '@/components/layout/Page/PageFullWidthLayout';
+import PageSidebarLayout from '../layout/Page/PageSidebarLayout';
 
 function PageView({ data }) {
     const blockFactory = new BlockFactory();
@@ -47,13 +50,33 @@ function PageView({ data }) {
             </>
         )
     }
-    return (
-        <ListingsLayout>
-            {renderBlocks(buildBlocks(
-                Array.isArray(data?.blocks) ? data.blocks : []
-            ))}
-        </ListingsLayout>
+    function renderView(blocks) {
+        if (data?.has_sidebar) {
+            return (
+                <PageSidebarLayout>
+                    {blocks}
+                </PageSidebarLayout>
+            )
+        }
+        return (
+            <PageFullWidthLayout>
+                {blocks}
+            </PageFullWidthLayout>
+        );
+    }
+
+
+    return renderView(
+        renderBlocks(
+            buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
+        )
     );
 }
 
-export default PageView;
+export default connect(
+    (state) => {
+        return {
+            page: state[PAGE_STATE],
+        }
+    }
+)(PageView);

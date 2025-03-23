@@ -1,6 +1,6 @@
 import {connect} from "react-redux";
 
-const ListingsFooter = (props) => {
+const PageFooter = (props) => {
     const {session, fluidContainer = false} = props;
 
         return (
@@ -69,4 +69,4 @@ function mapStateToProps(state) {
 export default connect(
     mapStateToProps,
     null
-)(ListingsFooter);
+)(PageFooter);

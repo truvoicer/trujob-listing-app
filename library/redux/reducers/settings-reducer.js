@@ -1,22 +1,14 @@
 // AUTH STATE
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
     SETTINGS_STATE,
-    SETTINGS_SITE_NAME,
-    SETTINGS_SITE_DESCRIPTION,
-    SETTINGS_SITE_LOGO,
-    SETTINGS_SITE_KEYWORDS,
-    SETTINGS_SITE_AUTHOR,
-    ERROR
+    ERROR,
+    SETTINGS_TIMEZONE
 } from "@/library/redux/constants/settings-constants";
+import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
 export const settingsStateData = {
-    [SETTINGS_STATE]: null,
-    [SETTINGS_SITE_NAME]: null,
-    [SETTINGS_SITE_DESCRIPTION]: null,
-    [SETTINGS_SITE_LOGO]: null,
-    [SETTINGS_SITE_KEYWORDS]: null,
-    [SETTINGS_SITE_AUTHOR]: null,
+        [SETTINGS_TIMEZONE]: null,
     [ERROR]: {
         show: false,
         message: "",
@@ -25,7 +17,7 @@ export const settingsStateData = {
 };
 const defaultReducers = {
     setSettings: (state, action) => {
-        state = action.payload;
+        state = ReduxHelpers.buildValidatedObject(action.payload, settingsStateData, state);
     },
     setError: (state, action) => {
         state.error = action.payload;
@@ -40,4 +32,4 @@ export const settingsSlice = createSlice({
 });
 
 export const settingsReducer = settingsSlice.reducer;
-export const {setSettings, setError} = settingsSlice.actions;
+export const { setSettings, setError } = settingsSlice.actions;

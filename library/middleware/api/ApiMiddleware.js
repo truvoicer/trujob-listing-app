@@ -66,7 +66,7 @@ export class ApiMiddleware {
     }
 
     buildPublicBearerToken() {
-        return truJobApiConfig?.appSecret;
+        return truJobApiConfig?.token;
     }
 
     getAuthHeader(protectedReq = false) {
@@ -230,9 +230,9 @@ export class ApiMiddleware {
                 throw new Error(`Method not supported ${method}`);
         }
 
-        // if (AppManager.getInstance().isDebug()) {
-        //     console.log('ApiMiddleware.runRequest', {requestUrl, request});
-        // }
+        if (AppManager.getInstance().isDebug()) {
+            console.log('ApiMiddleware.runRequest', {requestUrl, request});
+        }
         return await this.handleResponse(
             requestUrl,
             await fetch(

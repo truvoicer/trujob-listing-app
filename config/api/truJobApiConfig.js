@@ -5,6 +5,7 @@ export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
         settings: '/settings',
+        site: '/site',
         page: '/page',
         login: '/auth/login',
         checkToken: '/auth/token/user',
@@ -36,5 +37,5 @@ export default {
         },
         upload: {}
     },
-    appSecret: process.env.NEXT_PUBLIC_TRU_JOB_API_APP_SECRET,
+    token: process.env.NEXT_PUBLIC_TRU_JOB_API_TOKEN,
 }

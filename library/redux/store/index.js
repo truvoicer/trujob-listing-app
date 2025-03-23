@@ -11,6 +11,8 @@ import {SESSION_STATE} from "@/library/redux/constants/session-constants";
 import {PAGE_STATE} from "@/library/redux/constants/page-constants";
 import { SETTINGS_STATE } from "../constants/settings-constants";
 import { settingsReducer } from "../reducers/settings-reducer";
+import { SITE_STATE } from "../constants/site-constants";
+import { siteReducer } from "../reducers/site-reducer";
 
 const middleware = [
     thunk
@@ -20,6 +22,7 @@ const reducer = {
     [PAGE_STATE]: pageReducer,
     [SESSION_STATE]: sessionReducer,
     [SETTINGS_STATE]: settingsReducer,
+    [SITE_STATE]: siteReducer
 };
 const store = configureStore({
     reducer,
