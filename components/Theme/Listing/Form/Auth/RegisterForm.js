@@ -11,6 +11,25 @@ function RegisterForm() {
                 <div className="col-md-12">
                     <label
                         className="text-black"
+                        htmlFor="username">
+                        Username
+                    </label>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        className="form-control"
+                        value={formContext?.values?.username || ""}
+                        onChange={formContext.onChange}
+                    />
+                    {errors?.username && <span className="text-danger">{errors?.username || ''}</span>}
+                </div>
+            </div>
+            <div className="row form-group">
+
+                <div className="col-md-12">
+                    <label
+                        className="text-black"
                         htmlFor="email">
                         Email
                     </label>
@@ -49,18 +68,18 @@ function RegisterForm() {
                 <div className="col-md-12">
                     <label
                         className="text-black"
-                        htmlFor="confirm_password">
+                        htmlFor="password_confirmation">
                         Re-type Password
                     </label>
                     <input
                         type="password"
-                        id="confirm_password"
-                        name="confirm_password"
+                        id="password_confirmation"
+                        name="password_confirmation"
                         className="form-control"
-                        value={formContext?.values?.confirm_password || ""}
+                        value={formContext?.values?.password_confirmation || ""}
                         onChange={formContext.onChange}
                     />
-                    {errors?.confirm_password && <span className="text-danger">{errors?.confirm_password || ''}</span>}
+                    {errors?.password_confirmation && <span className="text-danger">{errors?.password_confirmation || ''}</span>}
                 </div>
             </div>
 

@@ -12,6 +12,7 @@ export const VALIDATION_MAX = 'max';
 export const VALIDATION_NUMERIC = 'numeric';
 export const VALIDATION_ALPHA = 'alpha';
 export const VALIDATION_ALPHA_NUMERIC = 'alpha_numeric';
+export const VALIDATION_ALPHA_NUMERIC_HYPHENS = 'alpha_numeric_hyphens';
 export const VALIDATION_ALPHA_NUMERIC_SYMBOLS = 'alpha_numeric_symbols';
 export const VALIDATION_REGEX = 'regex';
 export const VALIDATION_MATCH = 'match';
@@ -162,6 +163,11 @@ function FormProvider({
                     case VALIDATION_ALPHA_NUMERIC:
                         if (!values[key].match(/^[a-zA-Z0-9]+$/)) {
                             validationErrors[key] = rule.message || `Only alphanumeric values are allowed`;
+                        }
+                        break;
+                    case VALIDATION_ALPHA_NUMERIC_HYPHENS:
+                        if (!values[key].match(/^[a-zA-Z0-9-_]+$/)) {
+                            validationErrors[key] = rule.message || `Only alphanumeric and hyphens values are allowed`;
                         }
                         break;
                     case VALIDATION_ALPHA_NUMERIC_SYMBOLS:

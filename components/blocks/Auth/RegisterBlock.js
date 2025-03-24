@@ -1,25 +1,30 @@
 import Form from "@/components/form/Form";
-import { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
+import { VALIDATION_ALPHA_NUMERIC, VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
 import RegisterForm from "@/components/Theme/Listing/Form/Auth/RegisterForm";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { setIsAuthenticatingAction, setSessionLocalStorage } from "@/library/redux/actions/session-actions";
 
 function RegisterBlock() {
 
-    function requestCallback(error, data) {
-        if (!error && data.status === 'success' && data?.token) {
-            setSessionLocalStorage(data.token, data.expiresAt)
-            setIsAuthenticatingAction(false)
-        }
-        if (typeof props.requestCallback === "function") {
-            props.requestCallback(error, data)
-        }
-    }
 
     const formSubmitHandler = (values, errors) => {
         let requestData = {...values};
         requestData.auth_provider = "local";
-        const response = TruJobApiMiddleware.getInstance().registerUserRequest(requestData);
-        console.log({ response });
+        const response = TruJobApiMiddleware.getInstance().registerUserRequest({}, requestData);
+        const token = response?.data?.token?.plainTextToken;
+        const tokenExpiry = response?.data?.token?.accessToken?.expires_at_timestamp;
+        const user = response?.data?.user;
+        if (!token) {
+            console.error('Token not found');
+            return;
+        }
+        if (!user) {
+            console.error('User not found');
+            return;
+        }
+        setSessionLocalStorage(token, tokenExpiry)
+        setIsAuthenticatingAction(false)
+        console.log({ response, requestData });
     }
 
     return (
@@ -33,11 +38,16 @@ function RegisterBlock() {
                         className="p-5 bg-white" 
                         onSubmit={formSubmitHandler}
                         initialValues={{
+                            username: "",
                             email: "",
                             password: "",
-                            confirm_password: ""
+                            password_confirmation: ""
                         }}
                         validation={{
+                            username: [
+                                { type: VALIDATION_ALPHA_NUMERIC_HYPHENS },
+                                { type: VALIDATION_REQUIRED }
+                            ],
                             email: [
                                 { type: VALIDATION_EMAIL},
                                 { type: VALIDATION_REQUIRED }
@@ -46,7 +56,7 @@ function RegisterBlock() {
                                 { type: VALIDATION_ALPHA_NUMERIC_SYMBOLS},
                                 { type: VALIDATION_REQUIRED }
                             ],
-                            confirm_password: [
+                            password_confirmation: [
                                 { type: VALIDATION_ALPHA_NUMERIC_SYMBOLS},
                                 { type: VALIDATION_REQUIRED },
                                 { type: VALIDATION_MATCH, field: 'password' },
