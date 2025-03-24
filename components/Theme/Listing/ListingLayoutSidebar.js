@@ -1,12 +1,12 @@
 import React from 'react';
-import PageHeader from "@/components/layout/Page/PageHeader";
-import PageFooter from "@/components/layout/Page/PageFooter";
+import ListingHeader from "@/components/Theme/Listing/ListingHeader";
+import ListingFooter from "@/components/Theme/Listing/ListingFooter";
 
-function PageSidebarLayout({ children }) {
+function ListingLayoutSidebar({ children }) {
     return (
 
         <div className="site-wrap">
-            <PageHeader />
+            <ListingHeader />
             <div className="row">
                 <div className="col-lg-8">
                     {children}
@@ -15,9 +15,9 @@ function PageSidebarLayout({ children }) {
                     <h1>Sidebar</h1>
                 </div>
             </div>
-            <PageFooter />
+            <ListingFooter />
         </div>
     );
 }
 
-export default PageSidebarLayout;
+export default ListingLayoutSidebar;

@@ -2,8 +2,9 @@ import {useEffect, useRef, useState} from "react";
 import {connect} from "react-redux";
 import {APP_STATE} from "@/library/redux/constants/app-constants";
 import {PAGE_STATE} from "@/library/redux/constants/page-constants";
+import MenuList from "./Menu/MenuList";
 
-const PageHeader = ({app, page}) => {
+const ListingHeader = ({app, page}) => {
     const [isSticky, setSticky] = useState(false);
     const ref = useRef(null);
 
@@ -41,31 +42,7 @@ const PageHeader = ({app, page}) => {
                     </div>
                     <div className="col-12 col-md-10 d-none d-xl-block">
                         <nav className="site-navigation position-relative text-right" role="navigation">
-
-                            <ul className="site-menu js-clone-nav mr-auto d-none d-lg-block">
-                                <li className="active"><a href="index.html">Home</a></li>
-                                <li><a href="listings.html">Ads</a></li>
-                                <li className="has-children">
-                                    <a href="about.html">About</a>
-                                    <ul className="dropdown">
-                                        <li><a href="#">The Company</a></li>
-                                        <li><a href="#">The Leadership</a></li>
-                                        <li><a href="#">Philosophy</a></li>
-                                        <li><a href="#">Careers</a></li>
-                                    </ul>
-                                </li>
-                                <li><a href="blog.html">Blog</a></li>
-                                <li className="mr-5"><a href="contact.html">Contact</a></li>
-
-                                <li className="ml-xl-3 login"><a href="login.html"><span
-                                    className="border-left pl-xl-4"></span>Log In</a></li>
-
-                                <li>
-                                    <a href="register.html" className="cta">
-                                        <span className="bg-primary text-white rounded">Register</span>
-                                    </a>
-                                </li>
-                            </ul>
+                            <MenuList name="header-menu" />
                         </nav>
                     </div>
 
@@ -87,4 +64,4 @@ export default connect(
         page: state[PAGE_STATE],
     }),
     null
-)(PageHeader);
+)(ListingHeader);

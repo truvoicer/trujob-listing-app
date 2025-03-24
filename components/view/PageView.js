@@ -7,8 +7,8 @@ import { Blocks } from "@/components/factories/block/Blocks";
 import BlockComponent from '../blocks/BlockComponent';
 import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
-import PageFullWidthLayout from '@/components/layout/Page/PageFullWidthLayout';
-import PageSidebarLayout from '../layout/Page/PageSidebarLayout';
+import ListingLayoutFull from '@/components/Theme/Listing/ListingLayoutFull';
+import ListingLayoutSidebar from '../Theme/Listing/ListingLayoutSidebar';
 
 function PageView({ data }) {
     const blockFactory = new BlockFactory();
@@ -53,15 +53,15 @@ function PageView({ data }) {
     function renderView(blocks) {
         if (data?.has_sidebar) {
             return (
-                <PageSidebarLayout>
+                <ListingLayoutSidebar>
                     {blocks}
-                </PageSidebarLayout>
+                </ListingLayoutSidebar>
             )
         }
         return (
-            <PageFullWidthLayout>
+            <ListingLayoutFull>
                 {blocks}
-            </PageFullWidthLayout>
+            </ListingLayoutFull>
         );
     }
 

@@ -5,6 +5,7 @@ export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
         settings: '/settings',
+        menu: '/menu',
         site: '/site',
         page: '/page',
         login: '/auth/login',

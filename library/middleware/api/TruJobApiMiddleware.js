@@ -16,6 +16,18 @@ export class TruJobApiMiddleware {
         this.apiMiddleware = ApiMiddleware.getInstance();
     }
 
+    async menuRequest(name, query = {}, data = {}) {
+        if (!name || name === '') {
+            throw new Error('Menu name is required');
+        }
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.menu}/${name}`,
+            method: 'GET',
+            query,
+            data
+        })
+    }
+
     async siteRequest(slug, query = {}, data = {}) {
         if (!slug || slug === '') {
             throw new Error('Site slug is required');
