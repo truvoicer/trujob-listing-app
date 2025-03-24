@@ -2,6 +2,8 @@ import React from 'react'
 
 export const blockContextData = {
     ref: null,
+    first_block: false,
+    last_block: false,
     properties: {},
     has_sidebar: false,
     sidebar_widgets: [],

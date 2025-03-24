@@ -24,7 +24,6 @@ const ListingHeader = ({app, page}) => {
 
     return (
         <>
-
             <div className="site-mobile-menu">
                 <div className="site-mobile-menu-header">
                     <a href="#" className="site-menu-toggle js-menu-toggle text-white">
@@ -34,7 +33,6 @@ const ListingHeader = ({app, page}) => {
             </div>
             <header className="site-navbar container py-0 " role="banner" ref={ref} id="header">
                 <div className="row align-items-center">
-
                     <div className="col-6 col-xl-2">
                         <h1 className="mb-0 site-logo">
                             <a href="index.html" className="text-white mb-0">DirectoryAds</a>

@@ -10,7 +10,9 @@ function BlockComponent(props) {
     const blockProps = props || {};
 
     const [blockConTextState, setBlockContextState] = useState({
-        ...blockContextData
+        ...blockContextData,
+        first_block: props?.firstBlock || false,
+        last_block: props?.lastBlock || false,
     });
     const blockRef = useRef(null);
 
@@ -18,6 +20,13 @@ function BlockComponent(props) {
         let blockProps = {
             ref: blockRef,
         };
+        if (props?.firstBlock) {
+            blockProps = {
+                ...blockProps,
+                className: 'site-blocks-cover overlay',
+            }
+        }
+
         return blockProps;
     }
 

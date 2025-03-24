@@ -3,7 +3,7 @@ import React from 'react';
 
 function HeroSection(props) {
     return (
-        <div className="site-blocks-cover overlay"
+        <div className=""
             style={StyleBuilder.getInstance().addBackgroundImage(props?.properties?.background_image)}
             data-aos="fade"
             data-stellar-background-ratio="0.5">
@@ -30,7 +30,7 @@ function HeroSection(props) {
             {/*    </div>*/}
             {/*</div>*/}
             <div className="container">
-                <div className="row align-items-center justify-content-center text-center">
+                <div className="row align-items-center justify-content-center text-center z-index-1">
 
                     <div className="col-md-12">
 

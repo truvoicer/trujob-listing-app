@@ -35,17 +35,14 @@ function PageView({ data }) {
         return (
             <>
                 {blockData.map((item, index) => {
-                    if (Array.isArray(item) && item.length > 0) {
-                        return (
-                            <WidgetGroup key={index} widgets={item} />
-                        )
-                    }
-
                     if (!item) {
                         return null;
                     }
-
-                    return <BlockComponent key={index} component={item.component} {...item.props} />;
+                    return <BlockComponent key={index} 
+                        firstBlock={index === 0}
+                        lastBlock={index === blockData.length - 1}
+                        component={item.component} 
+                        {...item.props} />;
                 })}
             </>
         )
@@ -64,7 +61,7 @@ function PageView({ data }) {
             </ListingLayoutFull>
         );
     }
-
+    console.log(data);
 
     return renderView(
         renderBlocks(

@@ -16,6 +16,15 @@ export class TruJobApiMiddleware {
         this.apiMiddleware = ApiMiddleware.getInstance();
     }
 
+    async registerUserRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.auth.register}`,
+            method: 'POST',
+            query,
+            data
+        })
+    }
+    
     async menuRequest(name, query = {}, data = {}) {
         if (!name || name === '') {
             throw new Error('Menu name is required');

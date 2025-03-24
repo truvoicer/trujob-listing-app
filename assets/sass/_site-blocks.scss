@@ -21,7 +21,7 @@
 		bottom: -250px;
 		width: 100%;
 	}
-	&, & > .container > .row {
+	&, & > .container > .row, & > div > .container > .row {
 		min-height: 600px;
 		height: calc(100vh);
 	}
@@ -35,7 +35,7 @@
 	h1 {
 		font-size: 3rem;
 		font-weight: 400;
-		color: $white;
+		// color: $white;
 		// line-height: 1.5;
 		@include media-breakpoint-down(md) {
 			font-size: 2rem;	
