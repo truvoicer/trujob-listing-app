@@ -23,6 +23,7 @@ function App({data, settings, site, page}) {
     }, [site]);
 
     const view = viewFactory.renderView(page);
+    
     return (
         <div>
             {view? view : 'No view found'}
