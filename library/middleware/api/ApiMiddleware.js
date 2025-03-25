@@ -148,6 +148,7 @@ export class ApiMiddleware {
 
     getProtectedSessionToken() {
         const sessionObject = getSessionObject();
+        console.log('sessionObject', sessionObject);
         if (!sessionObject) {
             return false;
         }

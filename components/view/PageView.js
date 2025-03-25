@@ -9,6 +9,7 @@ import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import ListingLayoutFull from '@/components/Theme/Listing/ListingLayoutFull';
 import ListingLayoutSidebar from '../Theme/Listing/ListingLayoutSidebar';
+import SessionLayout from '../Theme/Listing/SessionLayout';
 
 function PageView({ data }) {
     const blockFactory = new BlockFactory();
@@ -38,10 +39,10 @@ function PageView({ data }) {
                     if (!item) {
                         return null;
                     }
-                    return <BlockComponent key={index} 
+                    return <BlockComponent key={index}
                         firstBlock={index === 0}
                         lastBlock={index === blockData.length - 1}
-                        component={item.component} 
+                        component={item.component}
                         {...item.props} />;
                 })}
             </>
@@ -50,15 +51,19 @@ function PageView({ data }) {
     function renderView(blocks) {
         if (data?.has_sidebar) {
             return (
-                <ListingLayoutSidebar>
-                    {blocks}
-                </ListingLayoutSidebar>
+                <SessionLayout>
+                    <ListingLayoutSidebar>
+                        {blocks}
+                    </ListingLayoutSidebar>
+                </SessionLayout>
             )
         }
         return (
-            <ListingLayoutFull>
-                {blocks}
-            </ListingLayoutFull>
+            <SessionLayout>
+                <ListingLayoutFull>
+                    {blocks}
+                </ListingLayoutFull>
+            </SessionLayout>
         );
     }
     console.log(data);

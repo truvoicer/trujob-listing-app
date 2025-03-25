@@ -13,6 +13,7 @@ export default {
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',
         auth: {
+            view: '/auth/view',
             login: '/auth/login',
             logout: '/auth/logout',
             register: '/auth/register',
