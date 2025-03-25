@@ -4,6 +4,7 @@ import {
     setSessionLocalStorage,
     setSessionUserAction
 } from "@/library/redux/actions/session-actions";
+import { SessionService } from "@/library/services/session/SessionService";
 
 export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_FETCHER_API_URL,
@@ -17,11 +18,12 @@ export default {
     },
     tokenResponseHandler: async (response) => {
         const responseData = await response.json();
-        if (responseData?.status === 'success') {
-            setSessionUserAction(response.data, true)
-        } else {
-            // removeLocalSession()
-        }
+        setSessionUserAction(
+            SessionService.extractUserData(responseData?.data?.user),
+            responseData?.data?.token?.plainTextToken,
+            responseData?.data?.token?.accessToken?.expires_at_timestamp,
+            true
+        )
         setIsAuthenticatingAction(false)
     },
     headers: {

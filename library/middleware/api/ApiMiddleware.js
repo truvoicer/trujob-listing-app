@@ -1,10 +1,10 @@
-import {isObject, isObjectEmpty} from "@/helpers/utils";
+import { isObject, isObjectEmpty } from "@/helpers/utils";
 import {
     getSessionObject,
     setIsAuthenticatingAction, setSessionErrorAction,
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import {AppManager} from "@/library/AppManager";
+import { AppManager } from "@/library/AppManager";
 
 export class ApiMiddleware {
 
@@ -18,7 +18,7 @@ export class ApiMiddleware {
             return "";
         }
         let esc = encodeURIComponent;
-        return  Object.keys(queryObject)
+        return Object.keys(queryObject)
             .map(k => esc(k) + '=' + esc(queryObject[k]))
             .join('&');
     }
@@ -91,7 +91,7 @@ export class ApiMiddleware {
         };
     }
 
-    handleTokenResponse({result, config, appKey}) {
+    handleTokenResponse({ result, config, appKey }) {
         if (typeof config?.tokenResponseHandler !== 'function') {
             return false;
         }
@@ -130,16 +130,16 @@ export class ApiMiddleware {
             throw new Error('Method not set');
         }
         try {
-                return await this.runRequest({
-                    config: truJobApiConfig,
-                    method: method,
-                    endpoint,
-                    query,
-                    data,
-                    upload,
-                    protectedReq,
-                    headers
-                });
+            return await this.runRequest({
+                config: truJobApiConfig,
+                method: method,
+                endpoint,
+                query,
+                data,
+                upload,
+                protectedReq,
+                headers
+            });
         } catch (error) {
             console.error(error);
             return false;
@@ -169,7 +169,7 @@ export class ApiMiddleware {
         if (!authHeader) {
             return false;
         }
-        buildHeadersData = {...buildHeadersData, ...authHeader};
+        buildHeadersData = { ...buildHeadersData, ...authHeader };
 
         if (upload) {
             buildHeadersData = {
@@ -231,7 +231,7 @@ export class ApiMiddleware {
         }
 
         if (AppManager.getInstance().isDebug()) {
-            console.log('ApiMiddleware.runRequest', {requestUrl, request});
+            console.log('ApiMiddleware.runRequest', { requestUrl, request });
         }
         return await this.handleResponse(
             requestUrl,
@@ -260,7 +260,7 @@ export class ApiMiddleware {
             case 202:
                 return await response.json();
             default:
-                this.addError(responseData?.status, responseData?.statusText, {requestUrl});
+                this.addError(responseData?.status, responseData?.statusText, { requestUrl });
                 return false;
         }
     }

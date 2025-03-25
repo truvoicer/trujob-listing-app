@@ -5,35 +5,29 @@ import {
     setSessionError,
     setUser, setUserId
 } from "../reducers/session-reducer";
-import {produce} from "immer";
+import { produce } from "immer";
 import {
-    SESSION_AUTH_PROVIDER,
-    SESSION_AUTH_PROVIDER_USER_ID,
-    SESSION_USER_EMAIL,
-    SESSION_USER_FIRSTNAME,
-    SESSION_USER_ID,
-    SESSION_USER_LASTNAME,
-    SESSION_USER_TOKEN
+    SESSION_USER_TOKEN,
+    SESSION_USER_TOKEN_EXPIRY,
 } from "../constants/session-constants";
-import {isSet} from "@/helpers/utils";
+import { isSet } from "@/helpers/utils";
+import { SessionService } from "@/library/services/session/SessionService";
 
-export function setSessionUserAction(data, authenticated) {
-    let sessionUserState = {...store.getState().session.user};
+export function setSessionUserAction(data, token, tokenExpiry, authenticated = false) {
+    let sessionUserState = { ...store.getState().session.user };
     const nextState = produce(sessionUserState, (draftState) => {
-        draftState[SESSION_AUTH_PROVIDER] = data?.auth_provider;
-        draftState[SESSION_AUTH_PROVIDER_USER_ID] = data?.auth_provider_user_id;
-        draftState[SESSION_USER_TOKEN] = data?.token;
-        draftState[SESSION_USER_ID] = data?.id;
-        draftState[SESSION_USER_EMAIL] = data?.email;
-        draftState[SESSION_USER_FIRSTNAME] = data?.first_name;
-        draftState[SESSION_USER_LASTNAME] = data?.last_name;
+        Object.keys(SessionService.extractUserData(data)).forEach((key) => {
+            draftState[key] = data[key];
+        });
+        draftState[SESSION_USER_TOKEN] = token;
+        draftState[SESSION_USER_TOKEN_EXPIRY] = tokenExpiry;
     })
     store.dispatch(setUser(nextState))
     store.dispatch(setAuthenticated(authenticated))
 }
 
 export function resetSessionErrorAction() {
-    let sessionErrorState = {...store.getState().session.error};
+    let sessionErrorState = { ...store.getState().session.error };
     const nextState = produce(sessionErrorState, (draftState) => {
         draftState.show = false;
         draftState.message = "";
@@ -43,7 +37,7 @@ export function resetSessionErrorAction() {
 }
 
 export function setSessionErrorAction(error) {
-    let sessionErrorState = {...store.getState().session.error};
+    let sessionErrorState = { ...store.getState().session.error };
     const nextState = produce(sessionErrorState, (draftState) => {
         draftState.show = true;
         if (isSet(error.response) && isSet(error.response.data) && isSet(error.response.data.message)) {
@@ -57,23 +51,20 @@ export function setSessionErrorAction(error) {
 
 
 export function getSessionUserAction() {
-    return {...store.getState().session.user};
+    return { ...store.getState().session.user };
 }
 
 export function getSessionAction() {
-    return {...store.getState().session};
+    return { ...store.getState().session };
 }
 
 export function logout() {
-    const data = {};
-    data[SESSION_AUTH_PROVIDER] = "";
-    data[SESSION_AUTH_PROVIDER_USER_ID] = "";
-    data[SESSION_USER_ID] = null;
-    data[SESSION_USER_EMAIL] = "";
-    data[SESSION_USER_FIRSTNAME] = "";
-    data[SESSION_USER_LASTNAME] = "";
-    data[SESSION_USER_TOKEN] = "";
-    setSessionUserAction(data, false);
+    setSessionUserAction(
+        SessionService.initUserData(),
+        null,
+        null,
+        false
+    );
     removeLocalSession();
 }
 

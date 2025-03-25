@@ -1,13 +1,23 @@
 import Form from "@/components/form/Form";
 import { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
 import LoginForm from "@/components/Theme/Listing/Form/Auth/LoginForm";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { SessionService } from "@/library/services/session/SessionService";
+import { connect } from "react-redux";
 
-function LoginBlock() {
+function LoginBlock({session}) {
 
-    const formSubmitHandler = (values) => {
-        // values.auth_provider = "wordpress";
-        console.log({ values });
+    const formSubmitHandler = (values, errors) => {
+        let requestData = { ...values };
+        requestData.auth_provider = "local";
+        const response = TruJobApiMiddleware.getInstance().loginRequest({}, requestData);
+        if (!SessionService.handleTokenResponse(response)) {
+            return;
+        }
+        console.log({ response, requestData });
     }
+    console.log(session);
     return (
         <div className="container">
             <div className="row align-items-center justify-content-center">
@@ -39,4 +49,8 @@ function LoginBlock() {
         </div>
     );
 }
-export default LoginBlock;
+export default connect(
+    state => ({
+        session: state[SESSION_STATE]
+    })
+)(LoginBlock);

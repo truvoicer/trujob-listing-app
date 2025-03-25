@@ -1,11 +1,12 @@
-import {ApiMiddleware} from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import {
     setIsAuthenticatingAction,
     setSessionErrorAction,
     setSessionLocalStorage, setSessionUserAction
 } from "@/library/redux/actions/session-actions";
-import {isNotEmpty} from "@/helpers/utils";
+import { isNotEmpty } from "@/helpers/utils";
+import { SessionService } from "@/library/services/session/SessionService";
 
 export class TruJobApiMiddleware {
     config = null;
@@ -16,6 +17,15 @@ export class TruJobApiMiddleware {
         this.apiMiddleware = ApiMiddleware.getInstance();
     }
 
+    async loginRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.auth.login}`,
+            method: 'POST',
+            query,
+            data
+        })
+    }
+
     async registerUserRequest(query = {}, data = {}) {
         return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.auth.register}`,
@@ -24,7 +34,7 @@ export class TruJobApiMiddleware {
             data
         })
     }
-    
+
     async menuRequest(name, query = {}, data = {}) {
         if (!name || name === '') {
             throw new Error('Menu name is required');
@@ -81,40 +91,34 @@ export class TruJobApiMiddleware {
 
     async getSessionToken(url, requestData, headers = {}) {
         try {
-            const response = await ApiMiddleware.getInstance().resourceRequest({
+            const responseData = await ApiMiddleware.getInstance().resourceRequest({
                 endpoint: url,
                 method: 'POST',
                 data: requestData
             })
-
-            const responseData = await response.json();
-
-            switch (responseData?.status) {
-                case 'success':
-                    if (!isNotEmpty(responseData?.data?.token)) {
-                        setSessionErrorAction('Token not found')
-                        setIsAuthenticatingAction(false)
-                        return false;
-                    }
-                    if (!isNotEmpty(responseData?.expiresAt)) {
-                        setSessionErrorAction('Token expiry not found')
-                        setIsAuthenticatingAction(false)
-                        return false;
-                    }
-                    setSessionLocalStorage(responseData.data.token, responseData.expiresAt)
-                    setSessionUserAction(
-                        isObject(responseData?.data)
-                            ? responseData.data
-                            : {},
-                        true
-                    )
-                    setIsAuthenticatingAction(false)
-                    break;
-                default:
-                    setSessionErrorAction(responseData.data)
-                    setIsAuthenticatingAction(false)
-                    break;
+            const token = responseData?.data?.token?.plainTextToken;
+            const expiresAt = responseData?.data?.token?.accessToken?.expires_at_timestamp;
+            if (!isNotEmpty(token)) {
+                setSessionErrorAction('Token not found')
+                setIsAuthenticatingAction(false)
+                return false;
             }
+            if (!isNotEmpty(expiresAt)) {
+                setSessionErrorAction('Token expiry not found')
+                setIsAuthenticatingAction(false)
+                return false;
+            }
+            setSessionLocalStorage(
+                token,
+                expiresAt
+            );
+            setSessionUserAction(
+                SessionService.extractUserData(responseData?.data?.user),
+                token,  
+                expiresAt,
+                true
+            )
+            setIsAuthenticatingAction(false)
             return responseData;
         } catch (error) {
             setSessionErrorAction(error)

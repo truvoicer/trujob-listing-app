@@ -7,34 +7,38 @@ import {
     SESSION_USER,
     SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME,
     SESSION_USER_ID, SESSION_USER_LASTNAME,
-    SESSION_USER_TOKEN
+    SESSION_USER_ROLES,
+    SESSION_USER_TOKEN,
+    SESSION_USER_USERNAME
 } from "../constants/session-constants";
 
 const defaultState = {
     [SESSION_USER]: {
-        [SESSION_AUTH_PROVIDER]: "",
-        [SESSION_AUTH_PROVIDER_USER_ID]: "",
+        [SESSION_AUTH_PROVIDER]: null,
+        [SESSION_AUTH_PROVIDER_USER_ID]: null,
         [SESSION_USER_ID]: null,
-        [SESSION_USER_EMAIL]: "",
-        [SESSION_USER_FIRSTNAME]: "",
-        [SESSION_USER_LASTNAME]: "",
-        [SESSION_USER_TOKEN]: "",
+        [SESSION_USER_USERNAME]: null,
+        [SESSION_USER_EMAIL]: null,
+        [SESSION_USER_FIRSTNAME]: null,
+        [SESSION_USER_LASTNAME]: null,
+        [SESSION_USER_TOKEN]: null,
+        [SESSION_USER_ROLES]: []
     },
-    [SESSION_PASSWORD_RESET_KEY]: "",
+    [SESSION_PASSWORD_RESET_KEY]: null,
     [SESSION_AUTHENTICATED]: false,
     [SESSION_IS_AUTHENTICATING]: true,
     [SESSION_ERROR]: {
         show: false,
-        message: "",
+        message: null,
         data: {}
     }
 };
 const defaultReducers = {
     setUser: (state, action) => {
-        state.user = action.payload;
+        state[SESSION_USER] = action.payload;
     },
     setUserId: (state, action) => {
-        state.user[SESSION_USER_ID] = action.payload;
+        state[SESSION_USER][SESSION_USER_ID] = action.payload;
     },
     setToken: (state, action) => {
         state.token = action.payload;
