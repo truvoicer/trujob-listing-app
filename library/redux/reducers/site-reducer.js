@@ -1,6 +1,8 @@
 // AUTH STATE
 import { createSlice } from "@reduxjs/toolkit";
 import {
+    SITE_MEDIA, 
+    SITE_STATE,
     SITE_SLUG,
     SITE_TITLE,
     SITE_DESCRIPTION,
@@ -26,8 +28,7 @@ import {
     SITE_X_FOLLOW_URL,
     SITE_TIMEZONE,
     ERROR
-} from "@/library/redux/constants/site-constants";
-import { SITE_STATE } from "../constants/site-constants";
+} from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
 export const siteStateData = {
@@ -55,6 +56,7 @@ export const siteStateData = {
     [SITE_PINTEREST_FOLLOW_URL]: null,
     [SITE_X_FOLLOW_URL]: null,
     [SITE_TIMEZONE]: null,
+    [SITE_MEDIA]: [],
     [ERROR]: {
         show: false,
         message: "",

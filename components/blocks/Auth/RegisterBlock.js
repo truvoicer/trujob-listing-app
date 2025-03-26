@@ -2,7 +2,6 @@ import Form from "@/components/form/Form";
 import { VALIDATION_ALPHA_NUMERIC, VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
 import RegisterForm from "@/components/Theme/Listing/Form/Auth/RegisterForm";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { setIsAuthenticatingAction, setSessionLocalStorage, setSessionUserAction } from "@/library/redux/actions/session-actions";
 import { SessionService } from "@/library/services/session/SessionService";
 
 function RegisterBlock() {

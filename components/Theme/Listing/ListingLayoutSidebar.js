@@ -4,7 +4,6 @@ import ListingFooter from "@/components/Theme/Listing/ListingFooter";
 
 function ListingLayoutSidebar({ children }) {
     return (
-
         <div className="site-wrap">
             <ListingHeader />
             <div className="row">

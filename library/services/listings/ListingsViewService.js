@@ -8,7 +8,7 @@ export class ListingsViewService {
 
     renderGridItem(type, props = {}) {
         const config = gridConfig;
-        const findConfig = config.find((item) => item?.type === type);
+        const findConfig = config.find((item) => item?.type?.slug === type);
         if (!findConfig) {
             console.warn('No config found for type: ' + type);
             return null;

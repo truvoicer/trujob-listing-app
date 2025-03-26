@@ -24,3 +24,4 @@ export const SITE_TIKTOK_FOLLOW_URL = "tiktok_follow_url";
 export const SITE_PINTEREST_FOLLOW_URL = "pinterest_follow_url";
 export const SITE_X_FOLLOW_URL = "x_follow_url";
 export const SITE_TIMEZONE = "timezone";
+export const SITE_MEDIA = "media";

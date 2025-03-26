@@ -58,52 +58,6 @@ export function getSessionAction() {
     return { ...store.getState().session };
 }
 
-export function logout() {
-    setSessionUserAction(
-        SessionService.initUserData(),
-        null,
-        null,
-        false
-    );
-    removeLocalSession();
-}
-
-export function setSessionLocalStorage(token, expiresAt) {
-    localStorage.setItem('token', token);
-    localStorage.setItem('expires_at', expiresAt);
-}
-
-
-// removes user details from localStorage
-export const removeLocalSession = () => {
-    // Clear access token and ID token from local storage
-    localStorage.removeItem('token');
-    localStorage.removeItem('expires_at');
-}
-
-export const getSessionObject = () => {
-    if (typeof localStorage === 'undefined') {
-        return false;
-    }
-    try {
-        let expiresAt = localStorage.getItem('expires_at');
-        let token = localStorage.getItem('token');
-        if (!isSet(expiresAt) || expiresAt === null || expiresAt === "" ||
-            !isSet(token) || token === null || token === "") {
-            return false;
-        }
-        const expiry = JSON.parse(expiresAt);
-        return {
-            token: localStorage.getItem('token'),
-            expires_at: expiry
-        }
-    } catch (error) {
-        console.error(error);
-        logout();
-        return false;
-    }
-}
-
 export function setSessionUserIdAction(userId) {
     store.dispatch(setUserId(userId));
 }

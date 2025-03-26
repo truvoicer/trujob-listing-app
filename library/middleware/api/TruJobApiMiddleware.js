@@ -3,7 +3,8 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import {
     setIsAuthenticatingAction,
     setSessionErrorAction,
-    setSessionLocalStorage, setSessionUserAction
+    setSessionLocalStorage, 
+    setSessionUserAction
 } from "@/library/redux/actions/session-actions";
 import { isNotEmpty } from "@/helpers/utils";
 import { SessionService } from "@/library/services/session/SessionService";
@@ -98,45 +99,6 @@ export class TruJobApiMiddleware {
         })
     }
 
-
-    async getSessionToken(url, requestData, headers = {}) {
-        try {
-            const responseData = await ApiMiddleware.getInstance().resourceRequest({
-                endpoint: url,
-                method: 'POST',
-                data: requestData
-            })
-            const token = responseData?.data?.token?.plainTextToken;
-            const expiresAt = responseData?.data?.token?.accessToken?.expires_at_timestamp;
-            if (!isNotEmpty(token)) {
-                setSessionErrorAction('Token not found')
-                setIsAuthenticatingAction(false)
-                return false;
-            }
-            if (!isNotEmpty(expiresAt)) {
-                setSessionErrorAction('Token expiry not found')
-                setIsAuthenticatingAction(false)
-                return false;
-            }
-            setSessionLocalStorage(
-                token,
-                expiresAt
-            );
-            setSessionUserAction(
-                SessionService.extractUserData(responseData?.data?.user),
-                token,  
-                expiresAt,
-                true
-            )
-            setIsAuthenticatingAction(false)
-            return responseData;
-        } catch (error) {
-            setSessionErrorAction(error)
-            setIsAuthenticatingAction(false)
-            return false;
-        }
-    }
-
     async createUser(data) {
         try {
             return await this.handleResponse(
@@ -151,6 +113,20 @@ export class TruJobApiMiddleware {
             return false;
         }
     }
+
+    
+    static async handleTokenResponse(response) {
+        if (!response) {
+            setIsAuthenticatingAction(false)
+            return false;
+        }
+        const token = response?.data?.token?.plainTextToken;
+        const tokenExpiry = response?.data?.token?.accessToken?.expires_at_timestamp;
+        const user = response?.data?.user;
+        return SessionService.handleTokenResponse(token, tokenExpiry, user);
+    }
+
+
 
     getApiMiddleware() {
         return ApiMiddleware.getInstance();

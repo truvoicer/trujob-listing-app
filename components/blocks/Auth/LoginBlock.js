@@ -4,20 +4,21 @@ import LoginForm from "@/components/Theme/Listing/Form/Auth/LoginForm";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { SessionService } from "@/library/services/session/SessionService";
+import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 
 function LoginBlock({session}) {
-
-    const formSubmitHandler = (values, errors) => {
+    const router = useRouter();
+     async function formSubmitHandler(values, errors) {
         let requestData = { ...values };
         requestData.auth_provider = "local";
-        const response = TruJobApiMiddleware.getInstance().loginRequest({}, requestData);
+        const response = await TruJobApiMiddleware.getInstance().loginRequest({}, requestData);
         if (!SessionService.handleTokenResponse(response)) {
             return;
         }
-        console.log({ response, requestData });
+        router.push("/");
     }
-    console.log(session);
+    
     return (
         <div className="container">
             <div className="row align-items-center justify-content-center">

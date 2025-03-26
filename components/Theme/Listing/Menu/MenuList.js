@@ -1,9 +1,13 @@
+import siteConfig from "@/config/site-config";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { SETTINGS_STATE } from "@/library/redux/constants/settings-constants";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { connect } from "react-redux";
 
-function MenuList({ name }) {
+function MenuList({ name, className = '', session }) {
     const [data, setData] = useState([]);
 
     async function menuItemsInit(name) {
@@ -22,13 +26,13 @@ function MenuList({ name }) {
                     {item?.title || ''}
                 </Link>
                 <ul className="dropdown">
-                {Array.isArray(item?.menus) && item.menus.map((item, index) => {
-                    return (
-                        <React.Fragment key={index}>
-                            {renderMenuItems(item?.menuItems, root)}
-                        </React.Fragment>
-                    );
-                })}
+                    {Array.isArray(item?.menus) && item.menus.map((item, index) => {
+                        return (
+                            <React.Fragment key={index}>
+                                {renderMenuItems(item?.menuItems, root)}
+                            </React.Fragment>
+                        );
+                    })}
                 </ul>
             </li>
         );
@@ -53,6 +57,14 @@ function MenuList({ name }) {
         }
         let liClass = item?.li_class || '';
         const aClass = item?.a_class || '';
+        console.log(item?.type)
+        if (
+            !session[SESSION_IS_AUTHENTICATING] && 
+            session[SESSION_AUTHENTICATED] &&
+            siteConfig.site.menu.types.auth.unauthenticated.includes(item?.type)
+        ) {
+            return null;
+        }
         switch (item?.type) {
             case 'register':
                 return (
@@ -85,11 +97,16 @@ function MenuList({ name }) {
         }
         menuItemsInit(name);
     }, [name]);
-    
+    console.log(session)
     return (
-        <ul className="site-menu js-clone-nav mr-auto d-none d-lg-block">
-            {renderMenuItems(data, true)}
-        </ul>
+            <ul className={className}>
+                {renderMenuItems(data, true)}
+            </ul>
     );
 }
-export default MenuList;
+export default connect(
+    state => ({
+        session: state[SESSION_STATE],
+        settings: state[SETTINGS_STATE]
+    })
+)(MenuList);

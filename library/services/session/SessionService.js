@@ -1,4 +1,5 @@
-import { setIsAuthenticatingAction, setSessionLocalStorage, setSessionUserAction } from "@/library/redux/actions/session-actions";
+import { isSet } from "@/helpers/utils";
+import { setIsAuthenticatingAction, setSessionUserAction } from "@/library/redux/actions/session-actions";
 import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
 
 export class SessionService {
@@ -34,16 +35,10 @@ export class SessionService {
         return userData;
     }
 
-    static handleTokenResponse(response) {
-        if (!response) {
-            setIsAuthenticatingAction(false)
-            return false;
-        }
-        const token = response?.data?.token?.plainTextToken;
-        const tokenExpiry = response?.data?.token?.accessToken?.expires_at_timestamp;
-        const user = response?.data?.user;
+    static async handleTokenResponse(token, tokenExpiry, user) {
         if (!token) {
             console.error('Token not found');
+            console.log(response);
             setIsAuthenticatingAction(false)
             return false;
         }
@@ -52,13 +47,58 @@ export class SessionService {
             setIsAuthenticatingAction(false)
             return false;
         }
-        setSessionLocalStorage(token, tokenExpiry);
+        SessionService.setSessionLocalStorage(token, tokenExpiry);
         setSessionUserAction(SessionService.extractUserData(user), token, tokenExpiry, true);
         setIsAuthenticatingAction(false)
         return true;
     }
 
-    getInstance() {
+    static logout() {
+        setSessionUserAction(
+            SessionService.initUserData(),
+            null,
+            null,
+            false
+        );
+        SessionService.removeLocalSession();
+    }
+    
+    static setSessionLocalStorage(token, expiresAt) {
+        localStorage.setItem('token', token);
+        localStorage.setItem('expires_at', expiresAt);
+    }
+    
+    // removes user details from localStorage
+    static removeLocalSession()  {
+        // Clear access token and ID token from local storage
+        localStorage.removeItem('token');
+        localStorage.removeItem('expires_at');
+    }ß
+    
+    static getSessionObject() {
+        if (typeof localStorage === 'undefined') {
+            return false;
+        }
+        try {
+            let expiresAt = localStorage.getItem('expires_at');
+            let token = localStorage.getItem('token');
+            if (!isSet(expiresAt) || expiresAt === null || expiresAt === "" ||
+                !isSet(token) || token === null || token === "") {
+                return false;
+            }
+            const expiry = JSON.parse(expiresAt);
+            return {
+                token: localStorage.getItem('token'),
+                expires_at: expiry
+            }
+        } catch (error) {
+            console.error(error);
+            SessionService.logout();
+            return false;
+        }
+    }
+
+    static getInstance() {
         return new SessionService();
     }
 }

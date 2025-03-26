@@ -1,12 +1,19 @@
-import {useEffect, useRef, useState} from "react";
-import {connect} from "react-redux";
-import {APP_STATE} from "@/library/redux/constants/app-constants";
-import {PAGE_STATE} from "@/library/redux/constants/page-constants";
+import { useEffect, useRef, useState } from "react";
+import { connect } from "react-redux";
+import { APP_STATE } from "@/library/redux/constants/app-constants";
+import { PAGE_STATE } from "@/library/redux/constants/page-constants";
 import MenuList from "./Menu/MenuList";
+import Branding from "@/components/Branding/Branding";
 
-const ListingHeader = ({app, page}) => {
+const ListingHeader = ({ app, page }) => {
     const [isSticky, setSticky] = useState(false);
+    const [showMobileMenu, setShowMobileMenu] = useState(false);
     const ref = useRef(null);
+
+    function toggleMobile() {
+        console.log('toggleMobile')
+        setShowMobileMenu(!showMobileMenu);
+    }
 
     useEffect(() => {
         window.addEventListener('scroll', handleScroll);
@@ -21,34 +28,46 @@ const ListingHeader = ({app, page}) => {
             // setSticky(ref.current.getBoundingClientRect().top <= -50);
         }
     }
-
+    console.log(showMobileMenu)
     return (
         <>
-            <div className="site-mobile-menu">
-                <div className="site-mobile-menu-header">
-                    <a href="#" className="site-menu-toggle js-menu-toggle text-white">
+            <div className={`site-mobile-menu ${showMobileMenu ? 'show' : ''}`}>
+                <div className={`site-mobile-menu-header`}>
+                    <a
+                        href="#"
+                        className="site-menu-toggle js-menu-toggle text-black"
+                        onClick={() => toggleMobile()}
+                    >
                         <span className="icon-menu h3"></span></a>
                 </div>
-                <div className="site-mobile-menu-body"></div>
+                <div className="site-mobile-menu-body">
+                    <MenuList name="header-menu" className="site-nav-wrap" />
+                </div>
             </div>
             <header className="site-navbar container py-0 " role="banner" ref={ref} id="header">
                 <div className="row align-items-center">
                     <div className="col-6 col-xl-2">
-                        <h1 className="mb-0 site-logo">
-                            <a href="index.html" className="text-white mb-0">DirectoryAds</a>
-                        </h1>
+                        <Branding />
                     </div>
                     <div className="col-12 col-md-10 d-none d-xl-block">
+
                         <nav className="site-navigation position-relative text-right" role="navigation">
-                            <MenuList name="header-menu" />
+                            <MenuList name="header-menu" className="site-menu js-clone-nav mr-auto" />
                         </nav>
                     </div>
 
 
-                    <div className="d-inline-block d-xl-none ml-auto py-3 col-6 text-right"
-                         style={{position: 'relative', top: '3px'}}>
-                        <a href="#" className="site-menu-toggle js-menu-toggle text-white"><span
-                            className="icon-menu h3"></span></a>
+                    <div
+                        className="d-inline-block d-xl-none ml-auto py-3 col-6 text-right"
+                        style={{ position: 'relative', top: '3px' }}
+                    >
+                        <a
+                            href="#"
+                            className={`site-menu-toggle js-menu-toggle text-white float-end ${showMobileMenu ? 'd-none' : 'd-block'}`}
+                            onClick={() => toggleMobile()}
+                        >
+                            <span className="icon-menu h3"></span>
+                        </a>
                     </div>
                 </div>
             </header>

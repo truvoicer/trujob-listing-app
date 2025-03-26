@@ -11,47 +11,13 @@ export default {
             textColor: "#000000",
             backgroundColor: "#ffffff"
         },
-        settings: {
-            header: {
-                logo: {
-                    src: "https://via.placeholder.com/150",
-                    alt: "logo"
+        menu: {
+            types: {
+                auth: {
+                    authenticated: ['account', "logout"],
+                    unauthenticated: ['login', 'register']
                 },
-                menu: [
-                    {
-                        label: "Home",
-                        url: "/"
-                    },
-                    {
-                        label: "About",
-                        url: "/about"
-                    },
-                    {
-                        label: "Contact",
-                        url: "/contact"
-                    }
-                ]
             },
-            footer: {
-                logo: {
-                    src: "https://via.placeholder.com/150",
-                    alt: "logo"
-                },
-                menu: [
-                    {
-                        label: "Home",
-                        url: "/"
-                    },
-                    {
-                        label: "About",
-                        url: "/about"
-                    },
-                    {
-                        label: "Contact",
-                        url: "/contact"
-                    }
-                ]
-            }
         }
     }
 }

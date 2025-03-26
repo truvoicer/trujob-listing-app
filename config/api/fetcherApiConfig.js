@@ -1,7 +1,6 @@
 //Api config and endpoints
 import {
     setIsAuthenticatingAction,
-    setSessionLocalStorage,
     setSessionUserAction
 } from "@/library/redux/actions/session-actions";
 import { SessionService } from "@/library/services/session/SessionService";

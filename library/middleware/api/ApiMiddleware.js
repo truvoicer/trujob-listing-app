@@ -1,10 +1,10 @@
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import {
-    getSessionObject,
     setIsAuthenticatingAction, setSessionErrorAction,
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppManager } from "@/library/AppManager";
+import { SessionService } from "@/library/services/session/SessionService";
 
 export class ApiMiddleware {
 
@@ -99,7 +99,7 @@ export class ApiMiddleware {
     }
 
     async validateToken() {
-        if (!getSessionObject()) {
+        if (!SessionService.getSessionObject()) {
             setIsAuthenticatingAction(false)
             return false;
         }
@@ -147,7 +147,7 @@ export class ApiMiddleware {
     }
 
     getProtectedSessionToken() {
-        const sessionObject = getSessionObject();
+        const sessionObject = SessionService.getSessionObject();
         console.log('sessionObject', sessionObject);
         if (!sessionObject) {
             return false;

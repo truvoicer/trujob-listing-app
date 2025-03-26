@@ -1,4 +1,5 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { setIsAuthenticatingAction } from "@/library/redux/actions/session-actions";
 import { SESSION_IS_AUTHENTICATING, SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { SessionService } from "@/library/services/session/SessionService";
 import { useEffect } from "react";
@@ -7,11 +8,26 @@ import { connect } from "react-redux";
 function SessionLayout({ children, session }) {
 
     async function authViewRequest() {
-        // Check if user is logged in
-        // If not, redirect to login page
+        
         const response = await TruJobApiMiddleware.getInstance().authViewRequest();
-        console.log({ response });
-        if (!SessionService.handleTokenResponse(response)) {
+
+        if (!response) {
+            setIsAuthenticatingAction(false)
+            return;
+        }
+
+        const sessionObject = SessionService.getSessionObject();
+        if (!sessionObject) {
+            return false;
+        }
+
+        if (
+            !SessionService.handleTokenResponse(
+                sessionObject?.token,
+                sessionObject?.expires_at,
+                response?.data?.user
+            )
+        ) {
             return;
         }
 
