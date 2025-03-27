@@ -5,22 +5,27 @@ import { Core } from '@/library/services/core/Core';
 import ListingsProvider from './ListingsProvider';
 import { useSearchParams } from 'next/navigation';
 import { ListingsFetch } from '@/library/services/listings/ListingsFetch';
-import { isObjectEmpty } from '@/helpers/utils';
+import { isObject, isObjectEmpty } from '@/helpers/utils';
+import { BlockContext } from '@/contexts/BlockContext';
 
 function ListingsContainer({
     children,
 }) {
     const listingsContext = useContext(ListingsContext);
+    const blockContext = useContext(BlockContext);
     const searchParams = useSearchParams();
     const pageQueryVal = searchParams?.get('page');
 
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
 
-
     useEffect(() => {
-        listingsContext.fetch();
-    }, []);
+        listingsContext.fetch({
+            query: (isObject(blockContext?.properties?.init) && !isObjectEmpty(blockContext.properties?.init))
+                ? blockContext.properties?.init
+                : {}
+        });
+    }, [blockContext?.properties?.init]);
 
     useEffect(() => {
         if (!pageQueryVal) {
