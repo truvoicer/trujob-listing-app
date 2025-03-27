@@ -51,7 +51,7 @@ const Pagination = (props) => {
             return parseInt(pageQueryVal);
         }
         const pageControls = listingsService.contextService.context.results.meta;
-        return pageControls[ListingsFetch.PAGINATION.CURRENT_PAGE];
+        return pageControls?.[ListingsFetch.PAGINATION.CURRENT_PAGE] || 1;
     }
 
     const getpadding = (currentPage) => {

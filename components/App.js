@@ -1,13 +1,14 @@
 'use client';
 import React, { useEffect } from 'react';
-import {ViewFactory} from "@/library/view/ViewFactory";
+import { ViewFactory } from "@/library/view/ViewFactory";
 import { setPageAction } from '@/library/redux/actions/page-actions';
 import { setSettingsAction } from '@/library/redux/actions/settings-actions';
 import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import { setSiteAction } from '@/library/redux/actions/site-actions';
+import Loader from './Loader';
 
-function App({data, settings, site, page}) {
+function App({ data, settings, site, page }) {
     const viewFactory = new ViewFactory();
 
     useEffect(() => {
@@ -23,10 +24,13 @@ function App({data, settings, site, page}) {
     }, [site]);
 
     const view = viewFactory.renderView(page);
-    
+
     return (
         <div>
-            {view? view : 'No view found'}
+            {view
+                ? view
+                : <Loader fullScreen />
+            }
         </div>
     );
 }

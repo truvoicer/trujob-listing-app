@@ -37,7 +37,7 @@ export class ListingsFetch {
         const apiMiddleware = new TruJobApiMiddleware();
         return await apiMiddleware.getApiMiddleware().resourceRequest({
             endpoint: '/listing',
-            method: 'GET',
+            method: 'POST',
             query,
             data
         });

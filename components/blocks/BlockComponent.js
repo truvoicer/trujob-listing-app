@@ -14,6 +14,8 @@ function BlockComponent(props) {
         first_block: props?.firstBlock || false,
         last_block: props?.lastBlock || false,
     });
+    const [blockLoaded, setBlockLoaded] = useState(false);
+
     const blockRef = useRef(null);
 
     function getBlockProps() {
@@ -35,16 +37,22 @@ function BlockComponent(props) {
             ref: blockRef,
             ...blockProps,
         });
+        setBlockLoaded(true);
     }, [blockRef]);
 
     return (
         <BlockContext.Provider value={blockConTextState}>
-            <div {...getBlockProps()}>
-                {(typeof component !== 'undefined' && component !== null)
-                    ? <Component {...blockProps} />
-                    : null
-                }
-            </div>
+            {blockLoaded
+                ? (
+                    <div {...getBlockProps()}>
+                        {(typeof component !== 'undefined' && component !== null)
+                            ? <Component {...blockProps} />
+                            : null
+                        }
+                    </div>
+                )
+                : null
+            }
         </BlockContext.Provider>
     );
 }

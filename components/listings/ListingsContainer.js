@@ -21,9 +21,12 @@ function ListingsContainer({
 
     useEffect(() => {
         listingsContext.fetch({
-            query: (isObject(blockContext?.properties?.init) && !isObjectEmpty(blockContext.properties?.init))
-                ? blockContext.properties?.init
-                : {}
+            post: (isObject(blockContext?.properties?.init) && !isObjectEmpty(blockContext.properties?.init))
+                ? {
+                    ...listingsContext.post,
+                    ...blockContext.properties?.init
+                }
+                : listingsContext.post
         });
     }, [blockContext?.properties?.init]);
 
@@ -34,7 +37,7 @@ function ListingsContainer({
         const currentPage = listingsService.getContextService().context?.results?.meta?.[
             ListingsFetch.PAGINATION.CURRENT_PAGE
         ];
-        
+
         if (currentPage && (parseInt(currentPage) === parseInt(pageQueryVal))) {
             return;
         }
@@ -42,6 +45,9 @@ function ListingsContainer({
         listingsContext.fetch({
             query: {
                 ...listingsContext.query,
+            },
+            post: {
+                ...listingsContext.post,
                 [ListingsFetch.PAGINATION.PAGE]: pageQueryVal
             },
             post: listingsContext.post

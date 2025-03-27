@@ -66,7 +66,6 @@ function PageView({ data }) {
             </SessionLayout>
         );
     }
-    console.log(data);
 
     return renderView(
         renderBlocks(
