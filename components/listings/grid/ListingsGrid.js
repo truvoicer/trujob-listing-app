@@ -45,7 +45,7 @@ function ListingsGrid(props) {
                                         return (
                                             <div key={index} className={blockContext?.properties?.grid_item_class || 'col-12 col-lg-6'}>
                                                 {listingsService.getViewService().renderGridItem(
-                                                    item?.listingType?.slug,
+                                                    item?.type?.slug,
                                                     item,
                                                 )}
                                             </div>

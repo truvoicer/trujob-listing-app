@@ -1,8 +1,7 @@
 import Form from "@/components/form/Form";
-import { VALIDATION_ALPHA_NUMERIC, VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
+import { VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/FormProvider";
 import RegisterForm from "@/components/Theme/Listing/Form/Auth/RegisterForm";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { SessionService } from "@/library/services/session/SessionService";
 
 function RegisterBlock() {
 
@@ -11,7 +10,7 @@ function RegisterBlock() {
         let requestData = { ...values };
         requestData.auth_provider = "local";
         const response = TruJobApiMiddleware.getInstance().registerUserRequest({}, requestData);
-        if (!SessionService.handleTokenResponse(response)) {
+        if (!TruJobApiMiddleware.handleTokenResponse(response)) {
             return;
         }
         console.log({ response, requestData });

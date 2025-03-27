@@ -3,22 +3,23 @@ import { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED
 import LoginForm from "@/components/Theme/Listing/Form/Auth/LoginForm";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
-import { SessionService } from "@/library/services/session/SessionService";
 import { useRouter } from "next/navigation";
 import { connect } from "react-redux";
 
-function LoginBlock({session}) {
+function LoginBlock({ session }) {
     const router = useRouter();
-     async function formSubmitHandler(values, errors) {
+    async function formSubmitHandler(values, errors) {
         let requestData = { ...values };
         requestData.auth_provider = "local";
         const response = await TruJobApiMiddleware.getInstance().loginRequest({}, requestData);
-        if (!SessionService.handleTokenResponse(response)) {
+        if (!TruJobApiMiddleware.handleTokenResponse(
+            response
+        )) {
             return;
         }
         router.push("/");
     }
-    
+
     return (
         <div className="container">
             <div className="row align-items-center justify-content-center">

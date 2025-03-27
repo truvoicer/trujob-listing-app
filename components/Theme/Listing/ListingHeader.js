@@ -47,7 +47,9 @@ const ListingHeader = ({ app, page }) => {
             <header className="site-navbar container py-0 " role="banner" ref={ref} id="header">
                 <div className="row align-items-center">
                     <div className="col-6 col-xl-2">
-                        <Branding />
+                        <div className="site-logo site-logo--image">
+                            <Branding />
+                        </div>
                     </div>
                     <div className="col-12 col-md-10 d-none d-xl-block">
 

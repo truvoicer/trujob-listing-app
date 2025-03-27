@@ -1,3 +1,4 @@
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import siteConfig from "@/config/site-config";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
@@ -16,25 +17,29 @@ function MenuList({ name, className = '', session }) {
             console.warn(`Menu data is not an array | name: ${name}`);
             return;
         }
-        setData(menuFetch.data.menuItems);
+        setData(menuFetch.data);
     }
 
     function renderMenus(item, root = true) {
         return (
-            <li className="has-children">
-                <Link href={item?.url || '#'}>
-                    {item?.title || ''}
-                </Link>
-                <ul className="dropdown">
-                    {Array.isArray(item?.menus) && item.menus.map((item, index) => {
-                        return (
-                            <React.Fragment key={index}>
-                                {renderMenuItems(item?.menuItems, root)}
-                            </React.Fragment>
-                        );
-                    })}
-                </ul>
-            </li>
+            <AccessControlComponent
+                roles={item?.roles}
+            >
+                <li className="has-children">
+                    <Link href={item?.url || '#'}>
+                        {item?.title || ''}
+                    </Link>
+                    <ul className="dropdown">
+                        {Array.isArray(item?.menus) && item.menus.map((item, index) => {
+                            return (
+                                <React.Fragment key={index}>
+                                    {renderMenuItems(item?.menuItems, root)}
+                                </React.Fragment>
+                            );
+                        })}
+                    </ul>
+                </li>
+            </AccessControlComponent>
         );
     }
     function renderMenuItems(items, root = true) {
@@ -57,9 +62,9 @@ function MenuList({ name, className = '', session }) {
         }
         let liClass = item?.li_class || '';
         const aClass = item?.a_class || '';
-        console.log(item?.type)
+        
         if (
-            !session[SESSION_IS_AUTHENTICATING] && 
+            !session[SESSION_IS_AUTHENTICATING] &&
             session[SESSION_AUTHENTICATED] &&
             siteConfig.site.menu.types.auth.unauthenticated.includes(item?.type)
         ) {
@@ -68,27 +73,34 @@ function MenuList({ name, className = '', session }) {
         switch (item?.type) {
             case 'register':
                 return (
-                    <li className={liClass}>
-                        <Link
-                            href={item?.url || '#'}
-                            className={aClass}
-                        >
-                            <span className="bg-primary text-white rounded">{item.title}</span>
-                        </Link>
-                    </li>
+                    <AccessControlComponent
+                        roles={item?.roles}
+                    >
+                        <li className={liClass}>
+                            <Link
+                                href={item?.url || '#'}
+                                className={aClass}
+                            >
+                                <span className="bg-primary text-white rounded">{item.title}</span>
+                            </Link>
+                        </li>
+                    </AccessControlComponent>
                 );
         }
         return (
-            <li className={liClass}>
-                <Link
-                    href={item?.url || '#'}
-                    className={aClass}
-                >
-                    {item.title}
-                </Link>
-            </li>
-        )
-
+            <AccessControlComponent
+                roles={item?.roles}
+            >
+                <li className={liClass}>
+                    <Link
+                        href={item?.url || '#'}
+                        className={aClass}
+                    >
+                        {item.title}
+                    </Link>
+                </li>
+            </AccessControlComponent>
+        );
     }
 
     useEffect(() => {
@@ -97,11 +109,15 @@ function MenuList({ name, className = '', session }) {
         }
         menuItemsInit(name);
     }, [name]);
-    console.log(session)
+    
     return (
-            <ul className={className}>
-                {renderMenuItems(data, true)}
-            </ul>
+        <ul className={className}>
+            <AccessControlComponent
+                roles={data?.roles}
+            >
+                {renderMenuItems(data?.menuItems, true)}
+            </AccessControlComponent>
+        </ul>
     );
 }
 export default connect(

@@ -19,7 +19,7 @@ function ImageLoader({ category = null, media = [], fallback = null }) {
         <>
             {isNotEmpty(image?.url)
                 ? (
-                    <img className="w-100" src={image.url} alt={image?.alt || 'Logo'} />
+                    <img className="" src={image.url} alt={image?.alt || 'Logo'} />
                 )
                 : getFallback()}
         </>
