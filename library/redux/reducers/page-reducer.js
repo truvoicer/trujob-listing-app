@@ -2,7 +2,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {
     PAGE_VIEW,
-    PAGE_SLUG,
+    PAGE_NAME,
     PAGE_TITLE,
     PAGE_CONTENT,
     PAGE_BLOCKS,
@@ -38,7 +38,7 @@ import { ReduxHelpers } from '../helpers/ReduxHelpers';
 export const pageStateData = {
     [ERROR]: null,
     [PAGE_VIEW]: null,
-    [PAGE_SLUG]: null,
+    [PAGE_NAME]: null,
     [PAGE_TITLE]: null,
     [PAGE_CONTENT]: null,
     [PAGE_IS_ACTIVE]: true,

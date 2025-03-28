@@ -39,7 +39,7 @@ async function Home({params}) {
   const page = await truJobApiMiddleware.pageRequest(
       'home',
   );
-  
+  console.log(site, settings, page);
   if (!settings?.data) {
     return;
   }

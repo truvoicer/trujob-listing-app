@@ -58,12 +58,12 @@ export class TruJobApiMiddleware {
         })
     }
 
-    async siteRequest(slug, query = {}, data = {}) {
-        if (!slug || slug === '') {
-            throw new Error('Site slug is required');
+    async siteRequest(name, query = {}, data = {}) {
+        if (!name || name === '') {
+            throw new Error('Site name is required');
         }
         return await ApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${this.config.endpoints.site}/${slug}`,
+            endpoint: `${this.config.endpoints.site}/${name}`,
             method: 'GET',
             query,
             data
@@ -81,7 +81,7 @@ export class TruJobApiMiddleware {
 
     async pageRequest(page, query = {}, data = {}) {
         if (!page || page === '') {
-            throw new Error('Page slug is required');
+            throw new Error('Page name is required');
         }
         return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.page}/${page}`,

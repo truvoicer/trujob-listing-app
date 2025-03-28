@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {
     SITE_MEDIA, 
     SITE_STATE,
-    SITE_SLUG,
+    SITE_NAME,
     SITE_TITLE,
     SITE_DESCRIPTION,
     SITE_SEO_TITLE,
@@ -32,7 +32,7 @@ import {
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
 export const siteStateData = {
-    [SITE_SLUG]: null,
+    [SITE_NAME]: null,
     [SITE_TITLE]: null,
     [SITE_DESCRIPTION]: null,
     [SITE_SEO_TITLE]: null,

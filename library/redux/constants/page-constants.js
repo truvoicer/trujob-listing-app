@@ -1,6 +1,6 @@
 export const PAGE_STATE = "page";
 export const PAGE_VIEW = "view";
-export const PAGE_SLUG = "slug";
+export const PAGE_NAME = "name";
 export const PAGE_TITLE = "title";
 export const PAGE_CONTENT = "content";
 export const PAGE_BLOCKS = "blocks";

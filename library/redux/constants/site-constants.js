@@ -1,6 +1,6 @@
 export const SITE_STATE = "site";
 export const ERROR = "error";
-export const SITE_SLUG = "slug";
+export const SITE_NAME = "name";
 export const SITE_TITLE = "title";
 export const SITE_DESCRIPTION = "description";
 export const SITE_SEO_TITLE = "seo_title";

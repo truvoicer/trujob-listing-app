@@ -27,7 +27,7 @@ function MenuList({ name, className = '', session }) {
             >
                 <li className="has-children">
                     <Link href={item?.url || '#'}>
-                        {item?.title || ''}
+                        {item?.label || ''}
                     </Link>
                     <ul className="dropdown">
                         {Array.isArray(item?.menus) && item.menus.map((item, index) => {
@@ -81,7 +81,7 @@ function MenuList({ name, className = '', session }) {
                                 href={item?.url || '#'}
                                 className={aClass}
                             >
-                                <span className="bg-primary text-white rounded">{item.title}</span>
+                                <span className="bg-primary text-white rounded">{item.label}</span>
                             </Link>
                         </li>
                     </AccessControlComponent>
@@ -96,7 +96,7 @@ function MenuList({ name, className = '', session }) {
                         href={item?.url || '#'}
                         className={aClass}
                     >
-                        {item.title}
+                        {item.label}
                     </Link>
                 </li>
             </AccessControlComponent>
