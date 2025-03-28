@@ -1,0 +1,48 @@
+.form-control {
+	&.api-password {
+		width: 58%;
+		line-height: 20px;
+		letter-spacing: 0.3em;
+        text-transform: uppercase;
+        border: 1px dashed $border-color;
+        margin: 0 25px;
+	}
+}
+@media (max-width: 1399px) {
+    .form-control {
+        &.api-password {
+            width: 52%;
+        }
+    }
+}
+@media (max-width: 1199px) {
+    .form-control {
+        &.api-password {
+            width: 43%;
+        }
+    }
+}
+@media (max-width: 991px) {
+    .form-control {
+        &.api-password {
+            width: auto;
+        }
+    }
+}
+@media (max-width: 767px) {
+    .form-control {
+        &.api-password {
+            margin: 0 0 1rem;
+
+        }
+    }
+}
+@media (max-width: 400px) {
+    .api-link {
+        a{
+            &:first-child {
+                margin-bottom: 1rem;
+            }
+        }
+    }
+}

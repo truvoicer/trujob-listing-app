@@ -1,0 +1,143 @@
+.event-detail {
+	border: 2px solid transparent;
+	border-bottom: 8px solid transparent;
+	@if $enable-transitions == true {
+		@include transition-mixin(all 0.3s ease-in-out);
+	}
+	p {
+		i {
+			font-size: 18px;
+			vertical-align: text-bottom;
+		}
+	}
+	&.disabled {
+		filter: grayscale(100%);
+	}
+	
+	.card-description {
+		overflow: hidden;
+		display: -webkit-box;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+	}
+}
+
+@each $color, $value in $theme-colors {
+	@include border-card(".event-detail-#{$color}", $value);
+}
+
+.work-detail {
+	border: 2px solid transparent;
+	border-bottom: 8px solid transparent;
+	@if $enable-transitions == true {
+		@include transition-mixin(all 0.3s ease-in-out);
+	}
+	.icon {
+		border: 2px solid transparent;		
+		@if $enable-transitions == true {
+			@include transition-mixin(all 0.3s ease-in-out);
+		}
+	}
+	.btn {
+		border: 2px solid transparent;
+		@if $enable-transitions == true {
+			@include transition-mixin(all 0.3s ease-in-out);
+		}
+	}
+	&.disabled {
+		border-color: $secondary !important;
+	}
+}
+
+@each $color, $value in $theme-colors {
+	@include border-card(".work-detail-#{$color}", $value, true);
+}
+
+.event-content {
+	.tab-pane {
+		&.fade {
+			display: none;
+			&.active {
+				&.show {
+					display: block;
+				}
+			}
+		}
+	}
+	#event3 {
+		.view-btn {
+			background: $white;
+			color: $primary;
+
+			&:hover {
+				background: $primary;
+				color: $white;
+			}
+		}
+	}
+}
+.schedule-tab {
+	line-height: 38px;
+}
+#event2 {
+	.tab-pane {
+		&.fade {
+			display: none;
+			&.active {
+				&.show {
+					display: block;
+				}
+			}
+		}
+	}
+	.nav-pills {		
+		.nav-item {
+			&:first-child {
+				.nav-link {
+					margin-left: 0;
+				}
+			}
+		}
+		.nav-link {
+			padding: 0;
+			margin: 0px 15px;
+			font-weight: 500;
+			
+			&.active {
+				color: $primary;
+				background-color: transparent;
+			}
+		}
+	}
+	.list-action {
+		.badge {
+			background-color: $bodybg;
+			color: $bodytext;
+			font-size: 16px;
+			padding-top: 8px;
+		}
+	}
+	.filter-dropdown {
+		.selet-caption {
+			padding: .375rem 1.35rem;			
+			&.dropdown-toggle {
+				&:after {
+					margin-left: 12px;
+					vertical-align: middle;
+				}
+			}
+		}
+		ul {
+			&.dropdown-menu {
+				width: 195px;
+			}
+		}
+	}
+}
+.badge-color {
+	background: $bodybg;
+	padding: 5px 15px;
+	margin-top: 2px;
+	font-size: 14px;
+	font-weight: 500;
+}

@@ -1,0 +1,126 @@
+.login-content {
+	position: relative;
+	height: 100vh;
+	z-index: 99;
+	.floating-label {
+		label {
+			color: $body-text;
+			font-size: 14px;
+			font-weight: 400;
+			position: absolute;
+			pointer-events: none;
+			left: 12px;
+			top: 50%;
+			@include transform-mixin( translateY(-50%));
+			@if $enable-transitions == true {
+				@include transition-mixin(all 0.3s ease-in-out);
+			}
+		}
+	}
+	.form-control {
+		&:focus {
+			border-color: $primary;
+		}
+		border-color: $light;
+	}
+	.custom-control-label {
+		&::before {
+			background-color: $body-bg;
+		}
+	}
+	.sign-user_card {
+		padding: 30px;
+		text-align: center;
+		background: $white;
+		@if $enable-shadows == true {
+			@include shadow-mixin($box-shadow);
+		}
+		@if $enable-rounded == true {
+			@include radius-mixin($border-radius);
+		}
+		.custom-control-label {
+			color: $body-text;
+		}
+		.signup__field {
+			display: flex;
+			flex-direction: column;
+			width: 100%;
+			position: relative;
+			margin-bottom: 30px;
+			&:before {
+				content: "";
+				display: inline-block;
+				position: absolute;
+				width: 0px;
+				height: 2px;
+				background: $primary;
+				bottom: 0;
+				left: 50%;
+				transform: translateX(-50%);
+				@if $enable-transitions == true {
+					@include transition-mixin(all 0.3s ease-in-out);
+				}
+			}
+			&:hover {
+				&:before {
+					width: 100%;
+				}
+			}
+		}
+		.signup__input {
+			width: 100%;
+			height: 100%;
+			padding: 10px;
+			background: $white;
+			border: 0;
+			border-bottom: 2px solid $border-color;
+		}
+		.signup__label {
+			color: $body-text;
+			position: absolute;
+			top: 50%;
+			padding: 0px 5px;
+			transform: translateY(-50%);
+			left: 5px;
+			@if $enable-rounded == true {
+				@include radius-mixin($border-radius);
+			}
+			@if $enable-transitions == true {
+				@include transition-mixin(all 0.3s ease-in-out);
+			}
+		}
+		.signup__input:focus + .signup__label,
+		.signup__input:valid + .signup__label {
+			top: 0;
+			font-size: 12px;
+			background-color: $white;
+			padding: 0px;
+		}
+	}
+}
+
+@media (min-width:992px) {
+	.lb-img{
+    position:absolute;
+    bottom:0;
+    left:0;    
+    width:213px;
+	}
+	.rb-img{
+		position:absolute;
+		bottom:0;
+		right:0;    
+		width:194px;
+	}
+	.cnf-mail{width:80%;}
+}
+
+@media (max-width:991px){
+	.lb-img {
+	display: none;
+}
+.rb-img {
+	display: none;
+}
+
+}

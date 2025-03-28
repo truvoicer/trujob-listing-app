@@ -1,0 +1,111 @@
+.my-schedule {
+    &.create-workform {
+        .btn-group {
+            .dropdown-menu {
+                li {
+                    &:first-child {
+                        .item {
+                            padding-bottom: 5px;
+                        }
+                    }
+                }
+            }
+        }
+        .form-control {
+            line-height: 26px;
+            height: 30px;
+        }
+    }
+    .plus-btn { 
+        font-size: 18px;
+        color: $body-text;    
+        padding-top: 5px;
+    }
+    .search-query {
+        &.dropdown-toggle {
+            &:after {
+                border: 0;
+            }
+        }
+        
+        &.btn-edit {
+            background: $white;
+            padding: 3px 10px 5px 10px;
+            font-size: 18px;
+            height: 38px;
+            width: 38px;
+        }
+    }
+    .search-input {
+        width: 225px;
+        height: 38px;
+        font-weight: normal; 
+    }    
+    .btn-group {
+        i {
+            &.search-arrow {
+                position: absolute;
+                right: 15px;
+                top: 11px;
+            }
+        }
+        li {
+            .item {
+                color: $body-title;
+            }
+        }
+        .search-replace {
+            .item {
+                display: none;
+            }
+        }
+    }
+    .item {
+        i {
+            vertical-align: middle;
+        }
+    }
+    .view-btn {
+        background: $white;
+    }
+    .add-btn {
+        padding: 7px 5px 4px 10px;
+        height: 38px;
+        text-align: center;
+        position: absolute;
+        right: 0;
+        top: -1px;
+        background: $primary-dark;
+        @if $enable-rounded == true {
+            @include radius-mixin($border-radius-right);
+        }
+    }
+    .bootstrap-select {
+		& > .dropdown-toggle {
+			height: 38px;
+			line-height: 37px;
+			background: $white;
+			width: 225px;
+			vertical-align: top;
+            margin-right: 15px;
+            
+            &:focus {
+                outline: unset !important;
+            }
+        }
+        .dropdown-menu {
+            li {
+                a {
+                    line-height: 32px;
+                    &:hover {
+                        background: $body-bg;
+                    }
+                    &.active {
+                        background: $body-bg;
+                        color: $body-title;
+                    }
+                }
+            }
+        }
+	}
+}

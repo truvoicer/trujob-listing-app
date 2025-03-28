@@ -1,0 +1,44 @@
+@mixin border-card ($parent, $color, $condition: false) {
+    @if $condition == true {
+        #{$parent} {
+            border-bottom-color: $color;
+            .icon {
+                border-color: $color;
+                color: $color;
+            }
+            &:hover {
+                border-color: $color;
+                .btn {
+                    border-color: $color;
+                    color: $color;
+                    background: transparent;
+    
+                    &.btn-calendify {
+                        background: $color !important;
+                        color: $white;
+                    }
+                }
+                .icon {
+                    background-color: $color;
+                    color: $white;
+                }
+            }					
+            .btn { 
+                &.btn-calendify { 
+                    &:hover {
+                        border-color: $color;
+                        color: $color;
+                        background: transparent !important;	
+                    }
+                }
+            }
+        }
+    } @else {
+        #{$parent}{
+            border-bottom-color: $color;
+            &:hover {
+                border-color: $color;
+            }
+        }
+    }
+}

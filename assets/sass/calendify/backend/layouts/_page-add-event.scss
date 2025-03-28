@@ -1,0 +1,18 @@
+.i-icon {
+    height: 30px;
+    width: 30px;
+    line-height: 30px;
+    font-size: 20px;
+}
+.form-title {
+    h4 {
+        line-height: 38px;
+    }
+}
+@media (max-width: 480px) {
+    .form-title {
+        h4 {
+            font-size: 20px;
+        }
+    }
+}

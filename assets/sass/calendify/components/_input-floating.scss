@@ -1,0 +1,60 @@
+.floating-input{
+    &.form-group {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        position: relative;
+        margin-bottom: 30px;
+        border:unset !important;
+        &:before {
+            content: "";
+            display: inline-block;
+            position: absolute;
+            width: 0px;
+            height: 2px;
+            background: $primary;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            @if $enable-transitions == true {
+                @include transition-mixin(all 0.3s ease-in-out);
+            }
+        }
+        &:hover {
+            &:before {
+                width: 100%;
+            }
+        }
+
+        
+    }
+    .form-control {
+        width: 100%;
+        height: 100%;
+        padding: 10px 0;
+        border:unset;
+        background: unset;
+        border-radius: 0;
+        border-bottom: 2px solid $border-color;
+    }
+    .form-label {
+        position: absolute;
+        top: 50%;
+        padding: 0px 5px;
+        transform: translateY(-50%);
+        left: 5px;
+        @if $enable-rounded == true {
+            @include radius-mixin($border-radius);
+        }
+        @if $enable-transitions == true {
+            @include transition-mixin(all 0.3s ease-in-out);
+        }
+    }
+    .form-control:focus + .form-label,
+    .form-control:valid + .form-label {
+        top: 0;
+        left: 0;
+        font-size: 12px;
+        padding: 0px;
+    }
+}

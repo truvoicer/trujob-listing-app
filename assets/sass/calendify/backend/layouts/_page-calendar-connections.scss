@@ -1,0 +1,40 @@
+.calender-account {
+    .iq-icon-box-2 {
+        background: #fff;
+        color: #465af7;
+        line-height: 62px;
+        height: 55px;
+        width: 55px;
+        min-width: 55px;
+        @if $enable-shadows == true {
+            @include shadow-mixin(0px 0px 10px 0px rgba(0, 0, 0, 0.15));
+        }        
+    }
+    .disconnect-btn {
+        color: $body-text;
+        font-size: 17px;
+        text-decoration: none;
+        &:hover {
+            color: $danger;
+            text-decoration: underline;
+        }
+        i {
+            vertical-align: text-bottom;
+        }
+    }
+}
+@media (max-width: 460px) {
+    .calender-account {
+        .title {
+            margin-bottom: 15px;
+        }
+        .disconnect-btn {
+            margin-top: 15px;
+        }
+    }
+}
+@media (max-width: 350px) {
+    .iq-icon-box-2 {
+        margin-bottom: 15px !important;
+    }
+}
