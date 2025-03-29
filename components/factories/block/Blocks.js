@@ -4,6 +4,8 @@ import HeroSection from "@/components/blocks/hero/HeroSection";
 import ListingsBlock from "@/components/listings/ListingsBlock";
 import LoginBlock from "@/components/blocks/Auth/LoginBlock";
 import RegisterBlock from "@/components/blocks/Auth/RegisterBlock";
+import ManagePage from "@/components/blocks/Admin/Page/ManagePage";
+import ManageListing from "@/components/blocks/Admin/Listing/ManageListing";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -12,6 +14,8 @@ export class Blocks {
     static LISTINGS_GRID_BLOCK = 'listings-grid-block';
     static LOGIN_BLOCK = 'login-block';
     static REGISTER_BLOCK = 'register-block';
+    static MANAGE_PAGES_BLOCK = 'manage-pages-block';
+    static MANAGE_LISTINGS_BLOCK = 'manage-listings-block';
 
     static getBlocks() {
         return {
@@ -50,6 +54,18 @@ export class Blocks {
                 description: 'This is the register block',
                 icon: 'register-block-icon',
                 component: RegisterBlock,
+            },
+            [Blocks.MANAGE_PAGES_BLOCK]: {
+                title: 'Manage Pages Block',
+                description: 'This is the manage pages block',
+                icon: 'manage-pages-block-icon',
+                component: ManagePage,
+            },
+            [Blocks.MANAGE_LISTINGS_BLOCK]: {
+                title: 'Manage Listings Block',
+                description: 'This is the manage listings block',
+                icon: 'manage-listings-block-icon',
+                component: ManageListing,
             },
         };
     }

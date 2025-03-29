@@ -40,6 +40,7 @@ function PageView({ data }) {
                         firstBlock={index === 0}
                         lastBlock={index === blockData.length - 1}
                         component={item.component}
+                        className={'site-blocks-cover overlay'}
                         {...item.props} />;
                 })}
             </>

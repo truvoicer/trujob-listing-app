@@ -1,3 +1,4 @@
+import "@/assets/sass/style.scss";
 import React from 'react';
 import ListingHeader from "@/components/Theme/Listing/ListingHeader";
 import ListingFooter from "@/components/Theme/Listing/ListingFooter";

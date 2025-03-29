@@ -1,12 +1,11 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import AdminLayout from '../Layouts/AdminLayout';
 import SessionLayout from '../../Listing/SessionLayout';
-import '@/assets/sass/calendify/intro.scss';
 
 function AdminPageView({ data }) {
     const blockFactory = new BlockFactory();
@@ -54,7 +53,7 @@ function AdminPageView({ data }) {
             </SessionLayout>
         );
     }
-
+    console.log('AdminPageView', buildBlocks(Array.isArray(data?.blocks) ? data.blocks : []));
     return renderView(
         renderBlocks(
             buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])

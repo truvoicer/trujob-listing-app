@@ -2,7 +2,7 @@ import { BlockContext, blockContextData } from "@/contexts/BlockContext";
 import { useEffect, useRef, useState } from "react";
 
 function BlockComponent(props) {
-    const { component, ...otherProps } = props;
+    const { component, className = '', ...otherProps } = props;
     if (!component) {
         return null;
     }
@@ -25,7 +25,7 @@ function BlockComponent(props) {
         if (props?.firstBlock) {
             blockProps = {
                 ...blockProps,
-                className: 'site-blocks-cover overlay',
+                className: className,
             }
         }
 

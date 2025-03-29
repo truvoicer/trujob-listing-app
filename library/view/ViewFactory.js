@@ -6,7 +6,6 @@ export class ViewFactory {
         this.viewMap = new Map();
     }
     renderView(data) {
-        console.log('ViewFactory renderView', data);
         switch (data?.view) {
             case 'page':
                 return <PageView data={data} />;
