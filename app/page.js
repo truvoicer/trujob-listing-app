@@ -9,7 +9,7 @@ export async function generateMetadata({params, searchParams}, parent) {
   const site = await truJobApiMiddleware.siteRequest(siteConfig.site.name);
   const settings = await truJobApiMiddleware.settingsRequest();
   const page = await truJobApiMiddleware.pageRequest(
-      'home',
+      '/',
   );
   
   if (truJobApiMiddleware.apiMiddleware.hasErrors()) {
@@ -37,7 +37,7 @@ async function Home({params}) {
   const site = await truJobApiMiddleware.siteRequest(siteConfig.site.name);
   const settings = await truJobApiMiddleware.settingsRequest();
   const page = await truJobApiMiddleware.pageRequest(
-      'home',
+      '/',
   );
   console.log(site, settings, page);
   if (!settings?.data) {

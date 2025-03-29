@@ -1,17 +1,14 @@
 'use client';
 import React from 'react';
-import sidebarConfig from "@/components/listings/sidebar/config/sidebar-config";
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
-import WidgetGroup from "@/components/listings/sidebar/partials/WidgetGroup";
-import { Blocks } from "@/components/factories/block/Blocks";
-import BlockComponent from '../blocks/BlockComponent';
+import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
-import ListingLayoutFull from '@/components/Theme/Listing/ListingLayoutFull';
-import ListingLayoutSidebar from '../Theme/Listing/ListingLayoutSidebar';
-import SessionLayout from '../Theme/Listing/SessionLayout';
+import AdminLayout from '../Layouts/AdminLayout';
+import SessionLayout from '../../Listing/SessionLayout';
+import '@/assets/sass/calendify/intro.scss';
 
-function PageView({ data }) {
+function AdminPageView({ data }) {
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
@@ -49,20 +46,11 @@ function PageView({ data }) {
         )
     }
     function renderView(blocks) {
-        if (data?.has_sidebar) {
-            return (
-                <SessionLayout>
-                    <ListingLayoutSidebar>
-                        {blocks}
-                    </ListingLayoutSidebar>
-                </SessionLayout>
-            )
-        }
         return (
             <SessionLayout>
-                <ListingLayoutFull>
+                <AdminLayout>
                     {blocks}
-                </ListingLayoutFull>
+                </AdminLayout>
             </SessionLayout>
         );
     }
@@ -80,4 +68,4 @@ export default connect(
             page: state[PAGE_STATE],
         }
     }
-)(PageView);
+)(AdminPageView);

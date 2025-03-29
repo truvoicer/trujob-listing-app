@@ -12,10 +12,11 @@ export async function generateMetadata({ params, searchParams }, parent) {
   }
   return globalMeta;
 }
-export default function RootLayout({ children }) {
+export default async function RootLayout(props) {
+  const { children } = props;
   return (
     <html lang="en">
-      <TruLayout>
+      <TruLayout {...props}>
         {children}
       </TruLayout>
     </html>

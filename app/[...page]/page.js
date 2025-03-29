@@ -9,14 +9,14 @@ export async function generateMetadata({params, searchParams}, parent) {
   const routeParams = await params;
   let uri;
   if (Array.isArray(routeParams.page)) {
-    uri = encodeURIComponent(routeParams.page.join("/"));
+    uri = routeParams.page.join("/");
   }
 
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.siteRequest(siteConfig.site.name);
   const settings = await truJobApiMiddleware.settingsRequest();
   const page = await truJobApiMiddleware.pageRequest(
-      uri,
+      `/${uri}`,
   );
 
   if (truJobApiMiddleware.apiMiddleware.hasErrors()) {
@@ -44,14 +44,15 @@ async function Home({params}) {
   const routeParams = await params;
   let uri;
   if (Array.isArray(routeParams.page)) {
-    uri = encodeURIComponent(routeParams.page.join("/"));
+    uri = routeParams.page.join("/");
   }
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.siteRequest(siteConfig.site.name);
   const settings = await truJobApiMiddleware.settingsRequest();
   const page = await truJobApiMiddleware.pageRequest(
-      uri,
+      `/${uri}`,
   );
+  console.log(site, settings, page, `/${uri}`);
   if (!settings?.data) {
     return;
   }

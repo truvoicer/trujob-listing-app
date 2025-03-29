@@ -9,7 +9,7 @@
     color: $dark-body-text;
     @include transition-mixin(all 0.3s ease-in-out);
     #loading-center{
-        background-image: url(../images/dark-loader.gif);
+        background-image: url(/images/dark-loader.gif);
     }
     h1, h2, h3, h4, h5, h6 {
         color: $dark-title-text;

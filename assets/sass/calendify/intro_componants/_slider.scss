@@ -10,7 +10,7 @@
 
 
 .slider-top-banner {
-	background: url(../images/intro/slider/banner.png) no-repeat top 50px right 0;
+	background: url(/images/intro/slider/banner.png) no-repeat top 50px right 0;
 	background-size: contain;
     height: 100vh;
 
@@ -18,7 +18,7 @@
 		content: "";
 		height: 100%;
 		width: 100%;
-		background: url(../images/intro/slider/banner-bg.png) no-repeat top left;
+		background: url(/images/intro/slider/banner-bg.png) no-repeat top left;
 		position: absolute;
 		z-index: -1;
 		top: -30px;
@@ -34,7 +34,7 @@
 		.slider-1 {
 			height: 100%;
 			width: 100%;
-			background: url(../images/intro/slider/banner/01.png) no-repeat top;
+			background: url(/images/intro/slider/banner/01.png) no-repeat top;
 			background-size: 100%;
 			position: absolute;
 			top: 48%;
@@ -44,7 +44,7 @@
 		.slider-2 {
 			height: 100%;
 			width: 100%;
-			background: url(../images/intro/slider/banner/02.png) no-repeat top;
+			background: url(/images/intro/slider/banner/02.png) no-repeat top;
 			background-size: 100%;
 			position: absolute;
 			top: 27%;
@@ -54,7 +54,7 @@
 		.slider-3 {
 			height: 100%;
 			width: 100%;
-			background: url(../images/intro/slider/banner/03.png) no-repeat top;
+			background: url(/images/intro/slider/banner/03.png) no-repeat top;
 			background-size: 100%;
 			position: absolute;
 			top: 20px;
