@@ -3,7 +3,10 @@ import {
     setError,
     setAppCurrentRoute,
     setAppLoaded,
-    setAppRequestedRoute
+    setAppRequestedRoute,
+    setAppMode,
+    setAppSettings,
+    setAppSidebarOpen
 } from "../reducers/app-reducer";
 
 export function setAppErrorAction(error) {
@@ -18,4 +21,14 @@ export function setAppCurrentRouteAction(route) {
 }
 export function setAppRequestedRouteAction(route) {
     store.dispatch(setAppRequestedRoute(route))
+}
+
+export function setAppSettingsAction(settings) {
+    store.dispatch(setAppSettings(settings))
+}
+export function setAppModeAction(mode) {
+    store.dispatch(setAppMode(mode))
+}
+export function setAppSidebarOpenAction(open) {
+    store.dispatch(setAppSidebarOpen(open))
 }

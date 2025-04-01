@@ -1,16 +1,69 @@
+import React, { useEffect } from "react";
 import MenuList from "./Menu/MenuList";
+import { connect } from "react-redux";
+import { APP_MODE, APP_SIDEBAR_OPEN, APP_STATE } from "@/library/redux/constants/app-constants";
+import { setAppModeAction, setAppSidebarOpenAction } from "@/library/redux/actions/app-actions";
+import { Dropdown } from "react-bootstrap";
+import Link from "next/link";
+import DropDownMenuList from "./Menu/DropDownMenuList";
 
-function AdminNavBar() {
+function AdminNavBar({ app }) {
+    function addClass(classes, className) {
+        if (classes.indexOf(className) === -1) {
+            classes.push(className);
+        }
+        return classes;
+    }
+
+
+    function toggleIconClass(dir) {
+        let classes = [];
+        switch (dir) {
+            case 'left':
+                classes = ['a-left', 'ri-moon-clear-line'];
+                if (app[APP_MODE] === 'dark') {
+                    addClass(classes, 'ri-moon-clear-line');
+                } else if (app[APP_MODE] === 'light') {
+                    //remove ri-moon-clear-line class
+                    const findIndex = classes.indexOf('ri-moon-clear-line');
+                    if (findIndex > -1) {
+                        classes.splice(findIndex, 1);
+                    }
+                }
+                break;
+            case 'right':
+                classes = ['a-right', 'ri-sun-line'];
+                if (app[APP_MODE] === 'dark') {
+                    const findIndex = classes.indexOf('ri-sun-line');
+                    if (findIndex > -1) {
+                        classes.splice(findIndex, 1);
+                    }
+                } else if (app[APP_MODE] === 'light') {
+                    addClass(classes, 'ri-sun-line');
+                }
+                break;
+        }
+        return classes.join(' ');
+    }
     return (
         <div className="iq-top-navbar">
             <div className="container">
                 <div className="iq-navbar-custom">
                     <div className="d-flex align-items-center justify-content-between">
                         <div className="iq-navbar-logo d-flex align-items-center justify-content-between">
-                            <i className="ri-menu-line wrapper-menu"></i>
+                            <i
+                                className="ri-menu-line wrapper-menu"
+                                onClick={() => {
+                                    setAppSidebarOpenAction(!app[APP_SIDEBAR_OPEN]);
+                                }}
+                            ></i>
                             <a href="index.html" className="header-logo" >
-                                <img src="/images/logo.png" className="img-fluid rounded-normal light-logo" alt="logo" />
-                                <img src="/images/logo-white.png" className="img-fluid rounded-normal darkmode-logo" alt="logo" />
+                                <img src="/images/logo.png"
+                                    className={`img-fluid rounded-normal light-logo ${app[APP_MODE] === 'dark' ? 'd-none' : ''}`}
+                                    alt="logo" />
+                                <img src="/images/logo-white.png"
+                                    className={`img-fluid rounded-normal darkmode-logo ${app[APP_MODE] === 'light' ? 'd-none' : ''}`}
+                                    alt="logo" />
                             </a>
                         </div>
                         <div className="iq-menu-horizontal">
@@ -20,10 +73,15 @@ function AdminNavBar() {
                                         <img src="/images/logo.png" className="img-fluid rounded-normal" alt="logo" />
                                     </a>
                                     <div className="iq-menu-bt-sidebar">
-                                        <i className="las la-bars wrapper-menu"></i>
+                                        <i
+                                            className={`ri-menu-line wrapper-menu ${app[APP_SIDEBAR_OPEN] ? '' : 'd-none'}`}
+                                            onClick={() => {
+                                                setAppSidebarOpenAction(!app[APP_SIDEBAR_OPEN]);
+                                            }}
+                                        ></i>
                                     </div>
                                 </div>
-                                <MenuList name="admin-header-menu" className="iq-menu d-flex"/>
+                                <MenuList name="admin-header-menu" className="iq-menu d-flex" />
                             </nav>
                         </div>
                         <nav className="navbar navbar-expand-lg navbar-light p-0">
@@ -31,10 +89,27 @@ function AdminNavBar() {
                                 <div className="custom-control custom-switch custom-switch-icon custom-control-indivne">
                                     <div className="custom-switch-inner">
                                         <p className="mb-0"> </p>
-                                        <input type="checkbox" className="custom-control-input" id="dark-mode" data-active="true" />
-                                        <label className="custom-control-label" htmlFor="dark-mode" data-mode="toggle">
-                                            <span className="switch-icon-left"><i className="a-left ri-moon-clear-line"></i></span>
-                                            <span className="switch-icon-right"><i className="a-right ri-sun-line"></i></span>
+                                        <input type="checkbox"
+                                            className="custom-control-input"
+                                            id="dark-mode"
+                                            data-active={app[APP_MODE] === 'dark' ? 'false' : 'true'}
+                                            checked={app[APP_MODE] === 'dark' ? true : false}
+                                            onChange={(e) => {
+                                                if (e.target.checked) {
+                                                    setAppModeAction('dark');
+                                                } else {
+                                                    setAppModeAction('light');
+                                                }
+                                            }} />
+                                        <label
+                                            className="custom-control-label"
+                                            htmlFor="dark-mode" data-mode="toggle">
+                                            <span className="switch-icon-left">
+                                                <i className={toggleIconClass('left')}></i>
+                                            </span>
+                                            <span className="switch-icon-right">
+                                                <i className={toggleIconClass('right')}></i>
+                                            </span>
                                         </label>
                                     </div>
                                 </div>
@@ -166,54 +241,18 @@ function AdminNavBar() {
                                         </div>
                                     </li>
                                     <li className="caption-content">
-                                        <a href="#" className="search-toggle dropdown-toggle d-flex align-items-center" id="dropdownMenuButton3" data-toggle="dropdown"
-                                            aria-haspopup="true" aria-expanded="false">
-                                            <img src="/images/user/01.jpg" className="avatar-40 img-fluid rounded" alt="user" />
+                                        <DropDownMenuList name={"admin-header-user-dropdown-menu"}>
+                                            <img src="/images/user/01.jpg"
+                                                className="avatar-40 img-fluid rounded"
+                                                alt="user" />
                                             <div className="caption ml-3">
-                                                <h6 className="mb-0 line-height">Rick O'shea<i className="las la-angle-down ml-3"></i></h6>
+                                                <h6 className="mb-0 line-height">
+                                                    Rick O'shea
+                                                    <i className="las la-angle-down ml-3"></i>
+                                                </h6>
                                             </div>
-                                        </a>
-                                        <div className="iq-sub-dropdown dropdown-menu user-dropdown" aria-labelledby="dropdownMenuButton3">
-                                            <div className="card m-0">
-                                                <div className="card-body p-0">
-                                                    <div className="py-3">
-                                                        <a href="../app/user-profile.html" className="iq-sub-card">
-                                                            <div className="media align-items-center">
-                                                                <i className="ri-user-line mr-3"></i>
-                                                                <h6>Account Settings</h6>
-                                                            </div>
-                                                        </a>
-                                                        <a href="../backend/page-calendar-connections.html" className="iq-sub-card">
-                                                            <div className="media align-items-center">
-                                                                <i className="ri-calendar-line mr-3"></i>
-                                                                <h6>Calender Connections</h6>
-                                                            </div>
-                                                        </a>
-                                                        <a href="../backend/page-users.html" className="iq-sub-card">
-                                                            <div className="media align-items-center">
-                                                                <i className="ri-group-line mr-3"></i>
-                                                                <h6>Users</h6>
-                                                            </div>
-                                                        </a>
-                                                        <a href="../backend/privacy-policy.html" className="iq-sub-card">
-                                                            <div className="media align-items-center">
-                                                                <i className="ri-lock-line mr-3"></i>
-                                                                <h6>Privacy & Security Settings</h6>
-                                                            </div>
-                                                        </a>
-                                                        <a href="#popup1" data-toggle="modal" data-target="#exampleModalCenter" className="iq-sub-card">
-                                                            <div className="media align-items-center">
-                                                                <i className="ri-links-line mr-3"></i>
-                                                                <h6>Share Your Link</h6>
-                                                            </div>
-                                                        </a>
-                                                    </div>
-                                                    <a className="right-ic p-3 border-top btn-block position-relative text-center" href="auth-sign-in.html" role="button">
-                                                        Logout
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        </DropDownMenuList>
+
                                     </li>
                                 </ul>
                             </div>
@@ -224,4 +263,9 @@ function AdminNavBar() {
         </div>
     );
 }
-export default AdminNavBar;
+export default connect(
+    state => ({
+        app: state[APP_STATE]
+    }),
+    null
+)(AdminNavBar);

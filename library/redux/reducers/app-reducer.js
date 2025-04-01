@@ -1,9 +1,12 @@
 // AUTH STATE
-import {createSlice} from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import {
     APP_CURRENT_ROUTE,
     APP_LOADED,
-    APP_REQUESTED_ROUTE, APP_SETTINGS,
+    APP_MODE,
+    APP_REQUESTED_ROUTE,
+    APP_SETTINGS,
+    APP_SIDEBAR_OPEN,
     APP_STATE,
     ERROR
 } from "@/library/redux/constants/app-constants";
@@ -13,6 +16,8 @@ const defaultState = {
     [APP_CURRENT_ROUTE]: null,
     [APP_REQUESTED_ROUTE]: null,
     [APP_SETTINGS]: {},
+    [APP_MODE]: "light",
+    [APP_SIDEBAR_OPEN]: false,
     [ERROR]: {
         show: false,
         message: "",
@@ -32,6 +37,12 @@ const defaultReducers = {
     setAppSettings: (state, action) => {
         state[APP_SETTINGS] = action.payload;
     },
+    setAppMode: (state, action) => {
+        state[APP_MODE] = action.payload;
+    },
+    setAppSidebarOpen: (state, action) => {
+        state[APP_SIDEBAR_OPEN] = action.payload;
+    },
     setError: (state, action) => {
         state.error = action.payload;
         console.error(state.error)
@@ -45,4 +56,12 @@ export const appSlice = createSlice({
 });
 
 export const appReducer = appSlice.reducer;
-export const {setAppLoaded, setAppCurrentRoute, setAppRequestedRoute, setError} = appSlice.actions;
+export const {
+    setAppLoaded,
+    setAppCurrentRoute, 
+    setAppRequestedRoute,
+    setAppSettings,
+    setAppMode,
+    setAppSidebarOpen,
+    setError
+} = appSlice.actions;

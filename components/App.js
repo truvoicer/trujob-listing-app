@@ -7,9 +7,14 @@ import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import { setSiteAction } from '@/library/redux/actions/site-actions';
 import Loader from './Loader';
+import { setAppModeAction } from '@/library/redux/actions/app-actions';
 
 function App({ data, settings, site, page }) {
     const viewFactory = new ViewFactory();
+    function getAppMode() {
+        const dark = localStorage.getItem('dark');
+        return dark === 'true' ? 'dark' : 'light';
+    }
 
     useEffect(() => {
         setPageAction(data);
@@ -23,8 +28,12 @@ function App({ data, settings, site, page }) {
         setSiteAction(site);
     }, [site]);
 
-    const view = viewFactory.renderView(page);
+    useEffect(() => {
+        setAppModeAction(getAppMode());
+    }, []);
 
+    const view = viewFactory.renderView(page);
+    
     return (
         <div>
             {view
