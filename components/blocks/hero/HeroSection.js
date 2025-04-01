@@ -2,11 +2,10 @@ import { StyleBuilder } from '@/library/StyleBuilder';
 import React from 'react';
 
 function HeroSection(props) {
+    console.log('HeroSection', props);
     return (
         <div className=""
-            style={StyleBuilder.getInstance().addBackgroundImage(props?.properties?.background_image)}
-            data-aos="fade"
-            data-stellar-background-ratio="0.5">
+            style={StyleBuilder.getInstance().addBackGround(props?.properties)}>
 
             {/*<div className="site-blocks-cover inner-page-cover overlay"*/}
             {/*     style={{backgroundImage: 'url(/images/hero_2.jpg)'}}*/}

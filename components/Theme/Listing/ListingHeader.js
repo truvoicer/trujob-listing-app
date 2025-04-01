@@ -51,7 +51,7 @@ const ListingHeader = ({ app, page }) => {
                             <Branding />
                         </div>
                     </div>
-                    <div className="col-12 col-md-10 d-none d-xl-block">
+                    <div className="col-12 col-md-10 d-none d-lg-block">
 
                         <nav className="site-navigation position-relative text-right" role="navigation">
                             <MenuList name="header-menu" className="site-menu js-clone-nav mr-auto" />
@@ -60,7 +60,7 @@ const ListingHeader = ({ app, page }) => {
 
 
                     <div
-                        className="d-inline-block d-xl-none ml-auto py-3 col-6 text-right"
+                        className="d-inline-block d-lg-none ml-auto py-3 col-6 text-right"
                         style={{ position: 'relative', top: '3px' }}
                     >
                         <a
