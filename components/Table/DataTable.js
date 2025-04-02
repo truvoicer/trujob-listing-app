@@ -13,6 +13,7 @@ function DataTable({ columns = [], data = [] }) {
         }
         return '';
     }
+    console.log('DataTable', columns, data);
     return (
         <div className="table-responsive data-table">
             <table className="data-tables table w-100">

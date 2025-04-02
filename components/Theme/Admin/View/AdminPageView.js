@@ -5,9 +5,11 @@ import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import AdminLayout from '../Layouts/AdminLayout';
-import SessionLayout from '../../Listing/SessionLayout';
+import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
+import Loader from '@/components/Loader';
+import ErrorView from '../Error/ErrorView';
 
-function AdminPageView({ data }) {
+function AdminPageView({ data, page }) {
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
@@ -46,14 +48,17 @@ function AdminPageView({ data }) {
     }
     function renderView(blocks) {
         return (
-            <SessionLayout>
+            <AccessControlComponent
+                roles={page?.roles}
+                fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+            >
                 <AdminLayout>
                     {blocks}
                 </AdminLayout>
-            </SessionLayout>
+            </AccessControlComponent>
         );
     }
-    console.log('AdminPageView', buildBlocks(Array.isArray(data?.blocks) ? data.blocks : []));
+    console.log('AdminPageView', data);
     return renderView(
         renderBlocks(
             buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])

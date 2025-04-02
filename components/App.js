@@ -4,20 +4,23 @@ import { ViewFactory } from "@/library/view/ViewFactory";
 import { setPageAction } from '@/library/redux/actions/page-actions';
 import { setSettingsAction } from '@/library/redux/actions/settings-actions';
 import { connect } from 'react-redux';
-import { PAGE_STATE } from '@/library/redux/constants/page-constants';
+import { PAGE_LOADED, PAGE_STATE } from '@/library/redux/constants/page-constants';
 import { setSiteAction } from '@/library/redux/actions/site-actions';
 import Loader from './Loader';
 import { setAppModeAction } from '@/library/redux/actions/app-actions';
+import ViewLayout from './Layout/ViewLayout';
+import { isObject, isObjectEmpty } from '@/helpers/utils';
 
 function App({ data, settings, site, page }) {
-    const viewFactory = new ViewFactory();
     function getAppMode() {
         const dark = localStorage.getItem('dark');
         return dark === 'true' ? 'dark' : 'light';
     }
 
     useEffect(() => {
-        setPageAction(data);
+        let pageData = {...data};
+        pageData[PAGE_LOADED] = true;
+        setPageAction(pageData);
     }, [data]);
 
     useEffect(() => {
@@ -32,12 +35,12 @@ function App({ data, settings, site, page }) {
         setAppModeAction(getAppMode());
     }, []);
 
-    const view = viewFactory.renderView(page);
-    
+
     return (
         <div>
-            {view
-                ? view
+            {(page[PAGE_LOADED])
+                ? <ViewLayout />
+                
                 : <Loader fullScreen />
             }
         </div>

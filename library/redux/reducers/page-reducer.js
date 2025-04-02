@@ -32,11 +32,14 @@ import {
     ERROR,
     DATA,
     PAGE_STATE,
+    PAGE_ROLES,
+    PAGE_LOADED,
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
 
 export const pageStateData = {
     [ERROR]: null,
+    [PAGE_LOADED]: false,
     [PAGE_VIEW]: null,
     [PAGE_NAME]: null,
     [PAGE_TITLE]: null,
@@ -48,6 +51,7 @@ export const pageStateData = {
     [PAGE_HAS_SIDEBAR]: false,
     [PAGE_SIDEBAR_WIDGETS]: [],
     [PAGE_BLOCKS]: [],
+    [PAGE_ROLES]: [],
     [PAGE_SETTINGS]: {
         [PAGE_SETTINGS_META_TITLE]: null,
         [PAGE_SETTINGS_META_DESCRIPTION]: null,

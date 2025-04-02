@@ -1,44 +1,17 @@
-function MenuListItem({ item, onClick }) {
-    
-    function renderMenus(item, root = true) {
-        return (
-            <AccessControlComponent
-                roles={item?.roles}
-            >
-                <li>
-                    <Link href={item?.url || '#'} className="collapsed">
-                        <span>{item?.label || ''}</span>
-                    </Link>
-                    <ul className="iq-submenu sub-scrll collapse">
-                        {Array.isArray(item?.menus) && item.menus.map((item, index) => {
-                            return (
-                                <React.Fragment key={index}>
-                                    {renderMenuItems(item?.menuItems, root)}
-                                </React.Fragment>
-                            );
-                        })}
-                    </ul>
-                </li>
-            </AccessControlComponent>
-        );
-    }
-    function renderMenuItems(items, root = true) {
-        return (
-            <>
-                {Array.isArray(items) && items.map((item, index) => {
-                    return (
-                        <React.Fragment key={index}>
-                            {renderMenuItem(item, root)}
-                        </React.Fragment>
-                    );
-                })}
-            </>
-        );
-    }
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+import siteConfig from "@/config/site-config";
+import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { SETTINGS_STATE } from "@/library/redux/constants/settings-constants";
+import Link from "next/link";
+import React from "react";
+import { connect } from "react-redux";
+import MenuListItemSub from "./MenuListItemSub";
 
+function MenuListItem({ data, session, settings }) {
+    
     function renderMenuItem(item) {
         if (Array.isArray(item?.menus) && item.menus.length > 0) {
-            return renderMenus(item, false);
+            return <MenuListItemSub data={item} />;
         }
         let liClass = item?.li_class || '';
         const aClass = item?.a_class || '';
@@ -82,14 +55,12 @@ function MenuListItem({ item, onClick }) {
             </AccessControlComponent>
         );
     }
-  return (
-    <li className="menu-list-item">
-      <button type="button" onClick={onClick} className="menu-list-item-button">
-        {item.icon && <item.icon />}
-        {item.label}
-      </button>
-    </li>
-  );
+  return renderMenuItem(data);
 }
 
-export default MenuListItem;
+export default connect(
+    state => ({
+        session: state[SESSION_STATE],
+        settings: state[SETTINGS_STATE]
+    })
+)(MenuListItem);

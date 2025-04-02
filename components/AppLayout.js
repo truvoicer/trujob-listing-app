@@ -7,20 +7,8 @@ import { TruJobApiMiddleware } from '@/library/middleware/api/TruJobApiMiddlewar
 
 const inter = Inter({subsets: ['latin']})
 
-function TruLayout(props) {
+function AppLayout(props) {
     const {children, params} = props;
-
-//   const routeParams = await params;
-//   let uri;
-//   if (Array.isArray(routeParams.page)) {
-//     uri = routeParams.page.join("/");
-//   }
-
-//   const truJobApiMiddleware = new TruJobApiMiddleware();
-//   const page = await truJobApiMiddleware.pageRequest(
-//       `/${uri}`,
-//   );
-//   console.log(routeParams)
     return (
         <Provider store={store}>
             <body className={inter.className}>{children}</body>
@@ -28,4 +16,4 @@ function TruLayout(props) {
     );
 }
 
-export default TruLayout;
+export default AppLayout;

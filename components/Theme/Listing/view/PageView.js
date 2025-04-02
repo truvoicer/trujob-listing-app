@@ -6,9 +6,11 @@ import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import ListingLayoutFull from '@/components/Theme/Listing/ListingLayoutFull';
 import ListingLayoutSidebar from '../ListingLayoutSidebar';
-import SessionLayout from '../SessionLayout';
+import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
+import ErrorView from '../Error/ErrorView';
+import Loader from '@/components/Loader';
 
-function PageView({ data }) {
+function PageView({ data, page }) {
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
@@ -49,22 +51,30 @@ function PageView({ data }) {
     function renderView(blocks) {
         if (data?.has_sidebar) {
             return (
-                <SessionLayout>
-                    <ListingLayoutSidebar>
+                <ListingLayoutSidebar>
+                    <AccessControlComponent
+                        roles={page?.roles}
+                        loader={() => <Loader fullScreen />}
+                        fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+                    >
                         {blocks}
-                    </ListingLayoutSidebar>
-                </SessionLayout>
+                    </AccessControlComponent>
+                </ListingLayoutSidebar>
             )
         }
         return (
-            <SessionLayout>
-                <ListingLayoutFull>
+            <ListingLayoutFull>
+                <AccessControlComponent
+                    roles={page?.roles}
+                    loader={() => <Loader fullScreen />}
+                    fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+                >
                     {blocks}
-                </ListingLayoutFull>
-            </SessionLayout>
+                </AccessControlComponent>
+            </ListingLayoutFull>
         );
     }
-
+    
     return renderView(
         renderBlocks(
             buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])

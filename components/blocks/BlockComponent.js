@@ -1,15 +1,16 @@
 import { BlockContext, blockContextData } from "@/contexts/BlockContext";
 import { useEffect, useRef, useState } from "react";
+import AccessControlComponent from "../AccessControl/AccessControlComponent";
 
 function BlockComponent(props) {
-    const { component, className = '', ...otherProps } = props;
+    const { component, className = '', roles, ...otherProps } = props;
     if (!component) {
         return null;
     }
     const Component = component;
     const blockProps = props || {};
 
-    const [blockConTextState, setBlockContextState] = useState({
+    const [blockContextState, setBlockContextState] = useState({
         ...blockContextData,
         first_block: props?.firstBlock || false,
         last_block: props?.lastBlock || false,
@@ -39,21 +40,25 @@ function BlockComponent(props) {
         });
         setBlockLoaded(true);
     }, [blockRef]);
-
+    
     return (
-        <BlockContext.Provider value={blockConTextState}>
-            {blockLoaded
-                ? (
-                    <div {...getBlockProps()}>
-                        {(typeof component !== 'undefined' && component !== null)
-                            ? <Component {...blockProps} />
-                            : null
-                        }
-                    </div>
-                )
-                : null
-            }
-        </BlockContext.Provider>
+        <AccessControlComponent
+            roles={roles}
+        >
+            <BlockContext.Provider value={blockContextState}>
+                {blockLoaded
+                    ? (
+                        <div {...getBlockProps()}>
+                            {(typeof component !== 'undefined' && component !== null)
+                                ? <Component {...blockProps} />
+                                : null
+                            }
+                        </div>
+                    )
+                    : null
+                }
+            </BlockContext.Provider>
+        </AccessControlComponent>
     );
 }
 

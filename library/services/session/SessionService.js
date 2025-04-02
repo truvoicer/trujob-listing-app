@@ -1,6 +1,7 @@
 import { isSet } from "@/helpers/utils";
 import { setIsAuthenticatingAction, setSessionUserAction } from "@/library/redux/actions/session-actions";
-import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
+import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_STATE, SESSION_USER, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
+import store from "@/library/redux/store";
 
 export class SessionService {
 
@@ -96,6 +97,11 @@ export class SessionService {
             SessionService.logout();
             return false;
         }
+    }
+
+    static getUserName() {
+        const sessionState = store.getState()[SESSION_STATE];
+        return sessionState?.[SESSION_USER]?.[SESSION_USER_USERNAME] || 'No username';
     }
 
     static getInstance() {

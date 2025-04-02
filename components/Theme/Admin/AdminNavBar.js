@@ -6,8 +6,11 @@ import { setAppModeAction, setAppSidebarOpenAction } from "@/library/redux/actio
 import { Dropdown } from "react-bootstrap";
 import Link from "next/link";
 import DropDownMenuList from "./Menu/DropDownMenuList";
+import { SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { SessionService } from "@/library/services/session/SessionService";
 
-function AdminNavBar({ app }) {
+function AdminNavBar({ app, session }) {
+    
     function addClass(classes, className) {
         if (classes.indexOf(className) === -1) {
             classes.push(className);
@@ -247,7 +250,7 @@ function AdminNavBar({ app }) {
                                                 alt="user" />
                                             <div className="caption ml-3">
                                                 <h6 className="mb-0 line-height">
-                                                    Rick O'shea
+                                                    {SessionService.getUserName()}
                                                     <i className="las la-angle-down ml-3"></i>
                                                 </h6>
                                             </div>
@@ -265,7 +268,8 @@ function AdminNavBar({ app }) {
 }
 export default connect(
     state => ({
-        app: state[APP_STATE]
+        app: state[APP_STATE],
+        session: state[SESSION_STATE]
     }),
     null
 )(AdminNavBar);

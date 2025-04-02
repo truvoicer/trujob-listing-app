@@ -1,9 +1,12 @@
 import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE, SESSION_USER, SESSION_USER_ROLES } from "@/library/redux/constants/session-constants";
 import { connect } from "react-redux";
+import Loader from "../Loader";
 
 function AccessControlComponent({
     children,
     session,
+    loader,
+    fallback,
     roles = [],
 }) {
     function hasRole(roleData, name) {
@@ -14,11 +17,8 @@ function AccessControlComponent({
             return true;
         }
         const hasSite = hasRole(roles, 'site');
-        
-        if (session?.[SESSION_IS_AUTHENTICATING]) {
-            return false;
-        }
-        if (!session[SESSION_AUTHENTICATED] && hasSite) {
+
+        if (hasSite) {
             return true;
         }
         const userRoles = session?.[SESSION_USER]?.[SESSION_USER_ROLES];
@@ -39,8 +39,41 @@ function AccessControlComponent({
         }
         return false;
     }
+
+    function renderFallback() {
+        if (typeof fallback === 'function') {
+            return fallback();
+        }
+        if (typeof fallback === 'object') {
+            return fallback;
+        }
+        return null;
+    }
+
+    function renderLoader() {
+        if (typeof loader === 'function') {
+            return loader();
+        }
+        if (typeof loader === 'object') {
+            return loader;
+        }
+        return <Loader fullScreen />;
+    }
     
-    return showComponent() ? children : null;
+    return (
+        <>
+            {session?.[SESSION_IS_AUTHENTICATING]
+                ? (
+                    renderLoader()
+                )
+                : showComponent()
+                    ? (
+                        children
+                    ) : (
+                        renderFallback()
+                    )}
+        </>
+    )
 }
 
 export default connect(

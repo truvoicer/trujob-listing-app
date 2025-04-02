@@ -1,6 +1,21 @@
 import DataTable from "@/components/Table/DataTable";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { useEffect, useState } from "react";
 
 function ManagePage() {
+    const [data, setData] = useState(null);
+
+    async function pageRequest() {
+        const response = await TruJobApiMiddleware.getInstance().pageIndexRequest();
+        if (!response) {
+            return;
+        }
+        setData(response);
+    }
+    useEffect(() => {
+        pageRequest();
+    }, []);
+    console.log(data);
     return (
         <>
             <div className="content-top">
@@ -52,16 +67,16 @@ function ManagePage() {
                                                 <a href="#" className="btn btn-primary" data-toggle="modal" data-target="#addContact">Add New</a>
                                             </div>
                                             <div className="card-body">
-                                                <DataTable
-                                                    columns={[{label: 'ID', key: 'id'}, {label: 'Title', key: 'title'}, {label: 'Status', key: 'status'}]}
-                                                    data={[
-                                                        { id: 1, title: 'Home', status: 'Active' },
-                                                        { id: 2, title: 'About Us', status: 'Inactive' },
-                                                        { id: 3, title: 'Contact Us', status: 'Active' },
-                                                        { id: 4, title: 'Services', status: 'Inactive' },
-                                                        { id: 5, title: 'Blog', status: 'Active' },
-                                                    ]}
-                                                />
+                                                {Array.isArray(data?.data) && data.data.length && (
+                                                    <DataTable
+                                                        columns={[
+                                                            { label: 'ID', key: 'id' }, 
+                                                            { label: 'Title', key: 'title' }, 
+                                                            { label: 'Permalink', key: 'permalink' }
+                                                        ]}
+                                                        data={data.data}
+                                                    />
+                                                )}
                                             </div>
                                         </div>
                                     </div>

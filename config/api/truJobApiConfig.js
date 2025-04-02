@@ -8,7 +8,7 @@ export default {
         settings: '/settings',
         menu: '/menu',
         site: '/site',
-        page: '/site/page',
+        page: '/page',
         login: '/auth/login',
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',

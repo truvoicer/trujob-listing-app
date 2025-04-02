@@ -7,6 +7,7 @@ import { SETTINGS_STATE } from "@/library/redux/constants/settings-constants";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
+import MenuListItem from "./MenuListItem";
 
 function MenuList({ name, className = '', session }) {
     const [data, setData] = useState([]);
@@ -20,102 +21,28 @@ function MenuList({ name, className = '', session }) {
         setData(menuFetch.data);
     }
 
-    function renderMenus(item, root = true) {
-        return (
-            <AccessControlComponent
-                roles={item?.roles}
-            >
-                <li>
-                    <Link href={item?.url || '#'} className="collapsed">
-                        <span>{item?.label || ''}</span>
-                    </Link>
-                    <ul className="iq-submenu sub-scrll collapse">
-                        {Array.isArray(item?.menus) && item.menus.map((item, index) => {
-                            return (
-                                <React.Fragment key={index}>
-                                    {renderMenuItems(item?.menuItems, root)}
-                                </React.Fragment>
-                            );
-                        })}
-                    </ul>
-                </li>
-            </AccessControlComponent>
-        );
-    }
-    function renderMenuItems(items, root = true) {
-        return (
-            <>
-                {Array.isArray(items) && items.map((item, index) => {
-                    return (
-                        <React.Fragment key={index}>
-                            {renderMenuItem(item, root)}
-                        </React.Fragment>
-                    );
-                })}
-            </>
-        );
-    }
-
-    function renderMenuItem(item) {
-        if (Array.isArray(item?.menus) && item.menus.length > 0) {
-            return renderMenus(item, false);
-        }
-        let liClass = item?.li_class || '';
-        const aClass = item?.a_class || '';
-        
-        if (
-            !session[SESSION_IS_AUTHENTICATING] &&
-            session[SESSION_AUTHENTICATED] &&
-            siteConfig.site.menu.types.auth.unauthenticated.includes(item?.type)
-        ) {
-            return null;
-        }
-        switch (item?.type) {
-            case 'register':
-                return (
-                    <AccessControlComponent
-                        roles={item?.roles}
-                    >
-                        <li className={liClass}>
-                            <Link
-                                href={item?.url || '#'}
-                                className={aClass}
-                            >
-                                <span className="bg-primary text-white rounded">{item.label}</span>
-                            </Link>
-                        </li>
-                    </AccessControlComponent>
-                );
-        }
-        return (
-            <AccessControlComponent
-                roles={item?.roles}
-            >
-                <li className={liClass}>
-                    <Link
-                        href={item?.url || '#'}
-                        className={aClass}
-                    >
-                        <span>{item.label}</span>
-                    </Link>
-                </li>
-            </AccessControlComponent>
-        );
-    }
-
     useEffect(() => {
         if (!name || name === '') {
             return;
         }
         menuItemsInit(name);
     }, [name]);
-    
+
     return (
         <ul className={className}>
             <AccessControlComponent
                 roles={data?.roles}
             >
-                {renderMenuItems(data?.menuItems, true)}
+                {Array.isArray(data?.menuItems) && data?.menuItems.map((item, index) => {
+                    return (
+                        <React.Fragment key={index}>
+                            <MenuListItem 
+                                data={item}
+                            />
+                            {/* {renderMenuItem(item, root)} */}
+                        </React.Fragment>
+                    );
+                })}
             </AccessControlComponent>
         </ul>
     );

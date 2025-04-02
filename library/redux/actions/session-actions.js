@@ -16,8 +16,9 @@ import { SessionService } from "@/library/services/session/SessionService";
 export function setSessionUserAction(data, token, tokenExpiry, authenticated = false) {
     let sessionUserState = { ...store.getState().session.user };
     const nextState = produce(sessionUserState, (draftState) => {
-        Object.keys(SessionService.extractUserData(data)).forEach((key) => {
-            draftState[key] = data[key];
+        const extractedUserData = SessionService.extractUserData(data);
+        Object.keys(extractedUserData).forEach((key) => {
+            draftState[key] = extractedUserData[key];
         });
         draftState[SESSION_USER_TOKEN] = token;
         draftState[SESSION_USER_TOKEN_EXPIRY] = tokenExpiry;

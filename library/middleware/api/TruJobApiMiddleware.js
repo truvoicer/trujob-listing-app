@@ -79,12 +79,22 @@ export class TruJobApiMiddleware {
         })
     }
 
+    async pageIndexRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}`,
+            method: 'GET',
+            query: query,
+            protectedReq: true,
+            data
+        })
+    }
+
     async pageRequest(permalink, query = {}, data = {}) {
         if (!permalink || permalink === '') {
             throw new Error('Page permalink is required');
         }
         return await ApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${this.config.endpoints.page}`,
+            endpoint: `${this.config.endpoints.site}/page`,
             method: 'GET',
             query: {
                 permalink: permalink,
