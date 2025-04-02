@@ -198,6 +198,10 @@ function FormProvider({
     }
     function handleChange(e) {
         const { name, value } = e.target;
+        if (e.target.hasOwnProperty('checked')) {
+            setFieldValue(name, e.target.checked);
+            return;
+        }
         setFieldValue(name, value);
     }
 

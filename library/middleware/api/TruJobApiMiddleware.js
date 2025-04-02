@@ -17,7 +17,20 @@ export class TruJobApiMiddleware {
         this.config = truJobApiConfig;
         this.apiMiddleware = ApiMiddleware.getInstance();
     }
+    
 
+    async pageBlocksRequest(pageId, query = {}, data = {}) {
+        if (!pageId || pageId === '') {
+            throw new Error('Page ID is required');
+        }
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/${pageId}/block`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
     async authViewRequest(query = {}, data = {}) {
         return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.auth.view}`,

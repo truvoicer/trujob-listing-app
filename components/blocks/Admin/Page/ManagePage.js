@@ -1,10 +1,73 @@
 import DataTable from "@/components/Table/DataTable";
+import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useContext, useEffect, useState } from "react";
+import EditPage from "./EditPage";
 
 function ManagePage() {
     const [data, setData] = useState(null);
+    const appModalContext = useContext(AppModalContext);
 
+    function renderActions(item, index) {
+        return (
+            <div className="d-flex align-items-center list-action">
+                <Link className="badge bg-success-light mr-2"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title=""
+                    data-original-title="View"
+                    href=""
+                    onClick={e => {
+                        e.preventDefault();
+                        appModalContext.showModal({
+                            component: (
+                                <EditPage data={item} />
+                            ),
+                            show: true,
+                            showFooter: false
+                        });
+                    }}>
+                    <i className="lar la-eye"></i>
+                </Link>
+                <span className="badge bg-primary-light"
+                    data-toggle="tooltip"
+                    data-placement="top"
+                    title=""
+                    data-original-title="Action"
+                    href="#">
+                    <div className="dropdown">
+                        <span className="text-primary dropdown-toggle action-item"
+                            id="moreOptions1"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false"
+                            href="#">
+                        </span>
+                        <div className="dropdown-menu" aria-labelledby="moreOptions1">
+                            <a className="dropdown-item"
+                                onClick={e => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    appModalContext.showModal({
+                                        component: (
+                                            <h1>asddas</h1>
+                                        ),
+                                        show: true,
+                                        showFooter: false
+                                    });
+                                }}
+                                href="#">
+                                Edit
+                            </a>
+                            <a className="dropdown-item" href="#">Delete</a>
+                            <a className="dropdown-item" href="#">Hide from Contacts</a>
+                        </div>
+                    </div>
+                </span>
+            </div>
+        )
+    }
     async function pageRequest() {
         const response = await TruJobApiMiddleware.getInstance().pageIndexRequest();
         if (!response) {
@@ -70,11 +133,14 @@ function ManagePage() {
                                                 {Array.isArray(data?.data) && data.data.length && (
                                                     <DataTable
                                                         columns={[
-                                                            { label: 'ID', key: 'id' }, 
-                                                            { label: 'Title', key: 'title' }, 
+                                                            { label: 'ID', key: 'id' },
+                                                            { label: 'Title', key: 'title' },
                                                             { label: 'Permalink', key: 'permalink' }
                                                         ]}
                                                         data={data.data}
+                                                        actions={(item, index) => {
+                                                            return renderActions(item, index);
+                                                        }}
                                                     />
                                                 )}
                                             </div>
