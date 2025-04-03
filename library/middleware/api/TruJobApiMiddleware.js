@@ -31,6 +31,16 @@ export class TruJobApiMiddleware {
             protectedReq: true
         })
     }
+
+    async blockRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.block}`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
     async authViewRequest(query = {}, data = {}) {
         return await ApiMiddleware.getInstance().resourceRequest({
             endpoint: `${this.config.endpoints.auth.view}`,

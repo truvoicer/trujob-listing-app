@@ -9,6 +9,7 @@ export default {
         menu: '/menu',
         site: '/site',
         page: '/page',
+        block: '/block',
         login: '/auth/login',
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',

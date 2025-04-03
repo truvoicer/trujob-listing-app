@@ -20,7 +20,9 @@ function ManagePage() {
                     href=""
                     onClick={e => {
                         e.preventDefault();
-                        appModalContext.showModal({
+                        e.stopPropagation();
+                        console.log('item', item);
+                        appModalContext.show({
                             component: (
                                 <EditPage data={item} />
                             ),
@@ -49,7 +51,8 @@ function ManagePage() {
                                 onClick={e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    appModalContext.showModal({
+                                    console.log('item', item);
+                                    appModalContext.show({
                                         component: (
                                             <h1>asddas</h1>
                                         ),

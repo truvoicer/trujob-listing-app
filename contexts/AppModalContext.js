@@ -1,11 +1,17 @@
 import React from 'react'
 
 export const appModalContextData = {
+    modals: [],
+    onCancel: () => {},
+    show: () => {},
+    hide: () => {},
+};
+
+export const appModalItemContextData = {
+    id: null,
     component: null,
     title: null,
-    show: false,
+    show: true,
     showFooter: true,
-    onCancel: () => {},
-    showModal: () => {},
 };
 export const AppModalContext = React.createContext(appModalContextData);

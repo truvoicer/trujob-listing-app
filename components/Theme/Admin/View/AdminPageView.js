@@ -8,8 +8,10 @@ import AdminLayout from '../Layouts/AdminLayout';
 import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
 import Loader from '@/components/Loader';
 import ErrorView from '../Error/ErrorView';
+import { useRouter } from 'next/navigation';
 
 function AdminPageView({ data, page }) {
+    const router = useRouter();
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData) {
         return blockData.map((item, index) => {
@@ -50,7 +52,10 @@ function AdminPageView({ data, page }) {
         return (
             <AccessControlComponent
                 roles={page?.roles}
-                fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+                fallback={() => {
+                    router.push('/login');
+                    return null;
+                }}
             >
                 <AdminLayout>
                     {blocks}
