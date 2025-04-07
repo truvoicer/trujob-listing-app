@@ -49,7 +49,7 @@ function Form({
         onBlur: handleBlur,
         validate: validationHandler,
     });
-    
+
     function setValues(values) {
         if (typeof values !== 'object') {
             return;
@@ -66,9 +66,9 @@ function Form({
     function setFieldValue(key, value) {
         setFormContextState(prevState => {
             let newState = { ...prevState };
-            if (typeof newState.values[key] === 'undefined') {
+            if (typeof newState.values?.[key] === 'undefined') {
                 console.warn(`Form value ${key} does not exist in values`);
-                return;
+                return newState;
             }
             newState.values[key] = value;
             return newState;
@@ -93,10 +93,10 @@ function Form({
     function validationHandler() {
         const values = formContextState.values;
         if (!isObject(validation) || isObjectEmpty(validation)) {
-            return;
+            return {};
         }
         if (!isObject(values) || isObjectEmpty(values)) {
-            return;
+            return {};
         }
         let validationErrors = {};
         Object.keys(validation).forEach(key => {
@@ -224,15 +224,11 @@ function Form({
     useEffect(() => {
         formContextState.setValues(initialValues);
     }, [initialValues]);
-    
-    const Children = children || (() => null);
+
     return (
         <FormContext.Provider value={formContextState}>
-
-        <form onSubmit={formContextState.onSubmit} className={className}>
-            {/* <form onSubmit={formContextState.onSubmit} className={className}> */}
+            <form onSubmit={formContextState.onSubmit} className={className}>
                 {children(formContextState)}
-            {/* </form> */}
             </form>
         </FormContext.Provider>
     )

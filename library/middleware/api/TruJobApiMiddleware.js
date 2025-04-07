@@ -19,6 +19,111 @@ export class TruJobApiMiddleware {
     }
     
 
+    async widgetRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.widget}`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async sidebarRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.sidebar}`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async sidebarRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.sidebar}`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async createPageRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/create`,
+            method: 'POST',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async pageViewRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/view`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async paginationScrollTypeRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.pagination}/scroll/type`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async paginationTypeRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.pagination}/type`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async pageViewRequest(query = {}, data = {}) {
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/view`,
+            method: 'GET',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async updatePageRequest(pageId, query = {}, data = {}) {
+        if (!pageId || pageId === '') {
+            throw new Error('Page ID is required');
+        }
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/${pageId}/update`,
+            method: 'PATCH',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
+
+    async pageDeleteRequest(pageId, query = {}, data = {}) {
+        if (!pageId || pageId === '') {
+            throw new Error('Page ID is required');
+        }
+        return await ApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${this.config.endpoints.page}/${pageId}`,
+            method: 'DELETE',
+            query,
+            data,
+            protectedReq: true
+        })
+    }
     async pageBlocksRequest(pageId, query = {}, data = {}) {
         if (!pageId || pageId === '') {
             throw new Error('Page ID is required');

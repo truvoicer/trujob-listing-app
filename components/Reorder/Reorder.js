@@ -127,17 +127,6 @@ function Reorder({
                             }
                             )}
                         </Accordion>
-                        <div className="d-flex justify-content-between mt-3">
-                            <a
-                                className="btn btn-sm btn-primary"
-                                onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleAddNew()
-                                }}>
-                                Add New
-                            </a>
-                        </div>
                     </>
                 )
                 : (
@@ -145,6 +134,18 @@ function Reorder({
                         No data available
                     </div>
                 )}
+
+            <div className="d-flex justify-content-between mt-3">
+                <a
+                    className="btn btn-sm btn-primary text-white"
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleAddNew()
+                    }}>
+                    Add New
+                </a>
+            </div>
         </div>
     );
 }

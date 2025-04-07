@@ -10,6 +10,8 @@ export class ApiMiddleware {
 
     static REQUEST_GET = 'GET';
     static REQUEST_POST = 'POST';
+    static REQUEST_PATCH = 'PATCH';
+    static REQUEST_DELETE = 'DELETE';
 
     errors = [];
 
@@ -224,6 +226,22 @@ export class ApiMiddleware {
                 request = {
                     ...request,
                     method: 'POST',
+                    body,
+                };
+                break;
+            case ApiMiddleware.REQUEST_PATCH.toUpperCase():
+            case ApiMiddleware.REQUEST_PATCH.toLowerCase():
+                request = {
+                    ...request,
+                    method: 'PATCH',
+                    body,
+                };
+                break;
+            case ApiMiddleware.REQUEST_DELETE.toUpperCase():
+            case ApiMiddleware.REQUEST_DELETE.toLowerCase():
+                request = {
+                    ...request,
+                    method: 'DELETE',
                     body,
                 };
                 break;

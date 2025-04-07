@@ -3,6 +3,7 @@ import React from 'react'
 export const appModalContextData = {
     modals: [],
     onCancel: () => {},
+    onOk: () => {},
     show: () => {},
     hide: () => {},
 };

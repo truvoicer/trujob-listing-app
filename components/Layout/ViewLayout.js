@@ -80,6 +80,12 @@ function ViewLayout({ page }) {
         }
         handleModalClose(index);
     }
+    function handleModalOk(index) {
+        if (typeof modalState?.onOk === "function") {
+            modalState.onOk();
+        }
+        handleModalClose(index);
+    }
     function handleModalClose(index) {
         setModalState(modalState => {
             let cloneState = { ...modalState };
@@ -138,7 +144,7 @@ function ViewLayout({ page }) {
                                     <Button variant="secondary" onClick={() => handleModalCancel(index)}>
                                         Close
                                     </Button>
-                                    <Button variant="primary" onClick={() => handleModalCancel(index)}>
+                                    <Button variant="primary" onClick={() => handleModalOk(index)}>
                                         Save Changes
                                     </Button>
                                 </Modal.Footer>

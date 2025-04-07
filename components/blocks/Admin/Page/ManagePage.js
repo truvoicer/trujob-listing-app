@@ -4,6 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import EditPage from "./EditPage";
+import BadgeDropDown from "@/components/BadgeDropDown";
 
 function ManagePage() {
     const [data, setData] = useState(null);
@@ -13,61 +14,56 @@ function ManagePage() {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title=""
-                    data-original-title="View"
-                    href=""
-                    onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        console.log('item', item);
-                        appModalContext.show({
-                            component: (
-                                <EditPage data={item} />
-                            ),
-                            show: true,
-                            showFooter: false
-                        });
-                    }}>
+                    target="_blank"
+                    href="http://google.com"
+                >
                     <i className="lar la-eye"></i>
                 </Link>
-                <span className="badge bg-primary-light"
-                    data-toggle="tooltip"
-                    data-placement="top"
-                    title=""
-                    data-original-title="Action"
-                    href="#">
-                    <div className="dropdown">
-                        <span className="text-primary dropdown-toggle action-item"
-                            id="moreOptions1"
-                            data-toggle="dropdown"
-                            aria-haspopup="true"
-                            aria-expanded="false"
-                            href="#">
-                        </span>
-                        <div className="dropdown-menu" aria-labelledby="moreOptions1">
-                            <a className="dropdown-item"
-                                onClick={e => {
+                <BadgeDropDown
+                    data={[
+                        {
+                            text: 'Edit',
+                            linkProps: {
+                                href: '#',
+                                onClick: e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('item', item);
                                     appModalContext.show({
                                         component: (
-                                            <h1>asddas</h1>
+                                            <EditPage data={item} operation={'edit'} />
                                         ),
                                         show: true,
                                         showFooter: false
                                     });
-                                }}
-                                href="#">
-                                Edit
-                            </a>
-                            <a className="dropdown-item" href="#">Delete</a>
-                            <a className="dropdown-item" href="#">Hide from Contacts</a>
-                        </div>
-                    </div>
-                </span>
+                                }
+                            }
+                        },
+                        {
+                            text: 'Delete',
+                            linkProps: {
+                                href: '#',
+                                onClick: e => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    appModalContext.show({
+                                        title: 'Delete Page',
+                                        component: (
+                                            <p>Are you sure you want to delete this page ({item?.title})?</p>
+                                        ),
+                                        onOk: async () => {
+                                            const response = await TruJobApiMiddleware.getInstance().pageDeleteRequest(item?.id);
+                                            if (!response) {
+                                                return;
+                                            }
+                                        },
+                                        show: true,
+                                        showFooter: true
+                                    });
+                                }
+                            }
+                        }
+                    ]}
+                />
             </div>
         )
     }
@@ -112,8 +108,6 @@ function ManagePage() {
                                     <input type="text" className="text search-input" placeholder="Search..." />
                                 </form>
                             </div>
-                            <div className="float-sm-right"><a href="page-new-event.html" className="btn btn-primary pr-5 position-relative" style={{ height: 40 }}>
-                                Add Page<span className="event-add-btn" style={{ height: 40 }}><i className="ri-add-line"></i></span></a></div>
                         </div>
                     </div>
                 </div>
@@ -130,7 +124,23 @@ function ManagePage() {
                                                 <div className="iq-header-title">
                                                     <h4 className="card-title mb-0">Pages</h4>
                                                 </div>
-                                                <a href="#" className="btn btn-primary" data-toggle="modal" data-target="#addContact">Add New</a>
+                                                <a href="#"
+                                                    className="btn btn-primary"
+                                                    onClick={e => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        appModalContext.show({
+                                                            title: 'Add New Page',
+                                                            component: (
+                                                                <EditPage operation={'add'} />
+                                                            ),
+                                                            show: true,
+                                                            showFooter: false
+                                                        });
+                                                    }}
+                                                >
+                                                    Add New
+                                                </a>
                                             </div>
                                             <div className="card-body">
                                                 {Array.isArray(data?.data) && data.data.length && (

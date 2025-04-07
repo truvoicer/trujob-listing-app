@@ -8,23 +8,30 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import SelectBlock from "./SelectBlock";
+import SidebarForm from "./SidebarForm";
+import SelectPaginationTypes from "./SelectPaginationType";
+import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
 
-function PageBlockForm({ data }) {
+function PageBlockForm({ data = null, onChange = null }) {
+    const [blocks, setBlocks] = useState(data || []);
+
     const appModalContext = useContext(AppModalContext);
     const formContext = useContext(FormContext);
-    async function pageBlockRequest() {
-        const response = await TruJobApiMiddleware.getInstance().pageBlocksRequest(data?.id);
-        if (!response) {
-            return;
-        }
-        formContext.setFieldValue('blocks', response?.data || []);
-    }
+
+    // async function pageBlockRequest() {
+    //     const response = await TruJobApiMiddleware.getInstance().pageBlocksRequest(data?.id);
+    //     if (!response) {
+    //         return;
+    //     }
+    //     formContext.setFieldValue('blocks', response?.data || []);
+    // }
+
     function renderSideBarWidgets(block) {
         return (
             <Reorder
                 itemSchema={pageBlockSchema}
-                itemHeader={(item, index) => item?.type || 'Item type error'}
-                data={block?.sidebar_widgets || []}
+                itemHeader={(item, index) => item?.title || 'Item title error'}
+                data={block?.sidebars || []}
                 onChange={async (values) => {
                     // updateFieldValue(index, 'sidebar_widgets', values);
                 }}
@@ -40,13 +47,6 @@ function PageBlockForm({ data }) {
             </Reorder>
         );
     }
-    useEffect(() => {
-        if (!data?.id) {
-            return;
-        }
-        pageBlockRequest()
-
-    }, [data?.id]);
 
     const pageBlockSchema = {
         'title': '',
@@ -63,20 +63,34 @@ function PageBlockForm({ data }) {
         'order': 0,
     };
     function updateFieldValue(index, field, value) {
-        const newData = [...formContext?.values?.blocks];
+        const newData = [...blocks];
+        // if (!newData?.[index]) {
+        //     newData[index] = { ...pageBlockSchema };
+        // }
+        console.log('newData', index, field, value);
         newData[index][field] = value;
-        formContext.setFieldValue('blocks', newData);
+        setBlocks(newData);
     }
+    function handleChange(values) {
+        setBlocks(values);
+    }
+
+    useEffect(() => {
+        if (typeof onChange === 'function') {
+            onChange(blocks);
+        }
+    }, [blocks]);
     return (
         <div className="row">
             <div className="col-12">
                 <Reorder
                     itemSchema={pageBlockSchema}
-                    itemHeader={(item, index) => item?.type || 'Item type error'}
-                    data={formContext?.values?.blocks || []}
-                    onChange={async (values) => {
-                        formContext.setFieldValue('blocks', values);
-                    }}
+                    itemHeader={(item, index) => {
+                        console.log('item', item);
+                        return item?.type || 'Item type error'}
+                    }
+                    data={blocks || []}
+                    onChange={handleChange}
                     onAdd={({
                         reorderData,
                         setReorderData,
@@ -176,22 +190,6 @@ function PageBlockForm({ data }) {
                                 <input
                                     className="form-control"
                                     type="text"
-                                    name="pagination_type"
-                                    id={"pagination_type" + index}
-                                    required=""
-                                    onChange={e => {
-                                        updateFieldValue(index, 'pagination_type', e.target.value);
-                                    }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'pagination_type', e.target.value);
-                                    }}
-                                    value={block?.pagination_type || ""} />
-                                <label className="form-label" htmlFor={'pagination_type' + index}>Pagination Type</label>
-                            </div>
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
                                     name="pagination"
                                     id={"pagination" + index}
                                     required=""
@@ -204,22 +202,18 @@ function PageBlockForm({ data }) {
                                     value={block?.pagination || ""} />
                                 <label className="form-label" htmlFor={'pagination' + index}>Pagination</label>
                             </div>
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="pagination_scroll_type"
-                                    id={"pagination_scroll_type" + index}
-                                    required=""
-                                    onChange={e => {
-                                        updateFieldValue(index, 'pagination_scroll_type', e.target.value);
-                                    }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'pagination_scroll_type', e.target.value);
-                                    }}
-                                    value={block?.pagination_scroll_type || ""} />
-                                <label className="form-label" htmlFor={'pagination_scroll_type' + index}>Pagination Scroll Type</label>
-                            </div>
+                            <SelectPaginationTypes 
+                                onChange={(paginationType) => {
+                                    updateFieldValue(index, 'pagination_type', paginationType);
+                                }}
+                                showSubmitButton={false}
+                            />
+                            <SelectPaginationScrollTypes
+                                onChange={(paginationScrollType) => {
+                                    updateFieldValue(index, 'pagination_scroll_type', paginationScrollType);
+                                }}
+                                showSubmitButton={false}
+                            />
                             <div className="floating-input form-group">
                                 <textarea
                                     className="form-control"
@@ -261,23 +255,27 @@ function PageBlockForm({ data }) {
                             </div>
                             <div className="floating-input form-group">
                                 <button
-                                    className="btn btn-primary"
-                                    onClick={e => {
+                                    type="button"
+                                    className="btn btn-primary mr-2"
+                                    onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
                                         appModalContext.show({
+                                            title: "Manage Sidebars",
                                             component: (
-                                                <div className="row">
-                                                    <div className="col-12 col-lg-12">
-                                                        {renderSideBarWidgets(block)}
-                                                    </div>
-                                                </div>
+                                                <SidebarForm
+                                                    data={block?.sidebars || []}
+                                                    onChange={(sidebars) => {
+                                                        console.log('sidebars', sidebars);
+                                                        updateFieldValue(index, 'sidebars', sidebars);
+                                                    }}
+                                                />
                                             ),
                                             showFooter: false
                                         }, 'page-edit-block-sidebar-widgets');
                                     }}
                                 >
-                                    Manage Sidebar Widgets
+                                    Manage Sidebars
                                 </button>
                             </div>
                             <div className="floating-input form-group">
