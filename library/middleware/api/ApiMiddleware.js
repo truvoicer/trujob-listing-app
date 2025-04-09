@@ -7,11 +7,12 @@ import { AppManager } from "@/library/AppManager";
 import { SessionService } from "@/library/services/session/SessionService";
 
 export class ApiMiddleware {
-
-    static REQUEST_GET = 'GET';
-    static REQUEST_POST = 'POST';
-    static REQUEST_PATCH = 'PATCH';
-    static REQUEST_DELETE = 'DELETE';
+    static METHOD = {
+        GET: 'GET',
+        POST: 'POST',
+        PATCH: 'PATCH',
+        DELETE: 'DELETE',
+    }
 
     errors = [];
 
@@ -214,31 +215,31 @@ export class ApiMiddleware {
             body = JSON.stringify(data);
         }
         switch (method) {
-            case ApiMiddleware.REQUEST_GET.toUpperCase():
-            case ApiMiddleware.REQUEST_GET.toLowerCase():
+            case ApiMiddleware.METHOD.GET.toUpperCase():
+            case ApiMiddleware.METHOD.GET.toLowerCase():
                 request = {
                     ...request,
                     method: 'GET',
                 };
                 break;
-            case ApiMiddleware.REQUEST_POST.toUpperCase():
-            case ApiMiddleware.REQUEST_POST.toLowerCase():
+            case ApiMiddleware.METHOD.POST.toUpperCase():
+            case ApiMiddleware.METHOD.POST.toLowerCase():
                 request = {
                     ...request,
                     method: 'POST',
                     body,
                 };
                 break;
-            case ApiMiddleware.REQUEST_PATCH.toUpperCase():
-            case ApiMiddleware.REQUEST_PATCH.toLowerCase():
+            case ApiMiddleware.METHOD.PATCH.toUpperCase():
+            case ApiMiddleware.METHOD.PATCH.toLowerCase():
                 request = {
                     ...request,
                     method: 'PATCH',
                     body,
                 };
                 break;
-            case ApiMiddleware.REQUEST_DELETE.toUpperCase():
-            case ApiMiddleware.REQUEST_DELETE.toLowerCase():
+            case ApiMiddleware.METHOD.DELETE.toUpperCase():
+            case ApiMiddleware.METHOD.DELETE.toLowerCase():
                 request = {
                     ...request,
                     method: 'DELETE',

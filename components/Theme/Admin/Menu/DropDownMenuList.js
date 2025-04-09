@@ -1,4 +1,5 @@
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
 import siteConfig from "@/config/site-config";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
@@ -73,7 +74,10 @@ function DropDownMenuList({ name, className = '', session, children }) {
     const [data, setData] = useState([]);
 
     async function menuItemsInit(name) {
-        const menuFetch = await TruJobApiMiddleware.getInstance().menuRequest(name);
+        const menuFetch = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
+            method: ApiMiddleware.METHOD.GET,
+        })
         if (!Array.isArray(menuFetch?.data?.menuItems)) {
             console.warn(`Menu data is not an array | name: ${name}`);
             return;

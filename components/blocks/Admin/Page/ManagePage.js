@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import EditPage from "./EditPage";
 import BadgeDropDown from "@/components/BadgeDropDown";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 function ManagePage() {
     const [data, setData] = useState(null);
@@ -51,7 +53,14 @@ function ManagePage() {
                                             <p>Are you sure you want to delete this page ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
-                                            const response = await TruJobApiMiddleware.getInstance().pageDeleteRequest(item?.id);
+                                            if (!item?.id || item?.id === '') {
+                                                throw new Error('Page ID is required');
+                                            }
+                                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.page}/${item.id}`,
+                                                method: ApiMiddleware.METHOD.DELETE,
+                                                protectedReq: true
+                                            })
                                             if (!response) {
                                                 return;
                                             }
@@ -68,7 +77,11 @@ function ManagePage() {
         )
     }
     async function pageRequest() {
-        const response = await TruJobApiMiddleware.getInstance().pageIndexRequest();
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.page}`,
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true,
+        })
         if (!response) {
             return;
         }

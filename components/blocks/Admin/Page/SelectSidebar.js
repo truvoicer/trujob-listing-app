@@ -1,3 +1,5 @@
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
@@ -10,7 +12,11 @@ function SelectSidebar({
 
     async function fetchSidebars() {
         // Fetch sidebars from the API or any other source
-        const response = await TruJobApiMiddleware.getInstance().sidebarRequest();
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: truJobApiConfig.endpoints.sidebar,
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true,
+        });
         if (!response) {
             console.warn('No response from API when fetching sidebars');
             return;

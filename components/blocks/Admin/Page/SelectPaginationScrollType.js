@@ -1,7 +1,10 @@
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
 function SelectPaginationScrollTypes({
+    value,
     onChange,
     onSubmit,
     showSubmitButton = true,
@@ -11,7 +14,11 @@ function SelectPaginationScrollTypes({
 
     async function fetchPaginationScrollTypes() {
         // Fetch paginationScrollTypes from the API or any other source
-        const response = await TruJobApiMiddleware.getInstance().paginationScrollTypeRequest();
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.pagination}/scroll/type`,
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true
+        });
         if (!response) {
             console.warn('No response from API when fetching paginationScrollTypes');
             return;
@@ -22,6 +29,12 @@ function SelectPaginationScrollTypes({
     useEffect(() => {
         fetchPaginationScrollTypes();
     }, []);
+
+    useEffect(() => {
+        if (value) {
+            setSelectedPaginationScrollType(value);
+        }
+    }, [value]);
 
     useEffect(() => {
         if (typeof onChange === 'function') {

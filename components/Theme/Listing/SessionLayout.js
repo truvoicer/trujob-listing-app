@@ -1,3 +1,5 @@
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { setIsAuthenticatingAction } from "@/library/redux/actions/session-actions";
 import { SESSION_IS_AUTHENTICATING, SESSION_STATE } from "@/library/redux/constants/session-constants";
@@ -9,7 +11,11 @@ function SessionLayout({ children, session }) {
 
     async function authViewRequest() {
         
-        const response = await TruJobApiMiddleware.getInstance().authViewRequest();
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.auth.view}`,
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true
+        });
 
         if (!response) {
             setIsAuthenticatingAction(false)

@@ -1,3 +1,5 @@
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
@@ -11,7 +13,11 @@ function SelectPageViews({
 
     async function fetchPageViews() {
         // Fetch pageViews from the API or any other source
-        const response = await TruJobApiMiddleware.getInstance().pageViewRequest();
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.page}/view`,
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true
+        });
         if (!response) {
             console.warn('No response from API when fetching pageViews');
             return;

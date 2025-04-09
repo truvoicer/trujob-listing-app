@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
+import { AppModalContext } from "@/contexts/AppModalContext";
+import React, { useContext, useEffect, useState } from "react";
+import { Accordion, Button, Card, Modal } from "react-bootstrap";
 
 function Reorder({
     children,
@@ -13,7 +14,11 @@ function Reorder({
     onChange = null,
 }) {
     const [reorderData, setReorderData] = useState(data);
-
+    const [modalComponent, setModalComponent] = useState(null);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalShow, setModalShow] = useState(false);
+    const [modalShowFooter, setModalShowFooter] = useState(true);
+    const appModalContext = useContext(AppModalContext);
     useEffect(() => {
         setReorderData(data);
     }, [data]);
@@ -75,58 +80,66 @@ function Reorder({
             onChange(reorderData);
         }
     }, [reorderData]);
+
+
     return (
         <div>
             {Array.isArray(reorderData) && reorderData.length
                 ? (
                     <>
-                        <Accordion>
-                            {reorderData.map((block, index) => {
-                                return (
-                                    <Accordion.Item eventKey={index.toString()} key={index}>
-                                        <Accordion.Header>
-                                            {renderItemHeader(block, index)}
-                                            <div className="d-flex gap-3 justify-content-between">
-                                                <a
-                                                    className="btn btn-sm btn-outline-primary"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleMoveUp(index)
-                                                    }}>
-                                                    Move Up
-                                                </a>
-                                                <a
-                                                    className="btn btn-sm btn-outline-primary"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleMoveDown(index)
-                                                    }}>
-                                                    Move Down
-                                                </a>
-                                                <a
-                                                    className="btn btn-sm btn-danger"
-                                                    onClick={(e) => {
-                                                        e.preventDefault();
-                                                        e.stopPropagation();
-                                                        handleDelete(index)
-                                                    }}>
-                                                    Delete
-                                                </a>
-                                            </div>
-                                        </Accordion.Header>
-                                        <Accordion.Body>
-                                            {children({
-                                                block,
-                                                index,
-                                            })}
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-                                );
-                            }
-                            )}
-                        </Accordion>
+                        {reorderData.map((block, index) => {
+                            return (
+                                <Card key={index}>
+                                    <Card.Header>
+                                        {renderItemHeader(block, index)}
+                                        <div className="d-flex gap-3 justify-content-between">
+                                            <a
+                                                className="btn btn-sm btn-outline-primary"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    setModalComponent(children({
+                                                        block,
+                                                        index,
+                                                    }));
+                                                    setModalTitle('Edit');
+                                                    setModalShow(true);
+                                                }}>
+                                                Edit
+                                            </a>
+                                            <a
+                                                className="btn btn-sm btn-outline-primary"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleMoveUp(index)
+                                                }}>
+                                                Move Up
+                                            </a>
+                                            <a
+                                                className="btn btn-sm btn-outline-primary"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleMoveDown(index)
+                                                }}>
+                                                Move Down
+                                            </a>
+                                            <a
+                                                className="btn btn-sm btn-danger"
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    e.stopPropagation();
+                                                    handleDelete(index)
+                                                }}>
+                                                Delete
+                                            </a>
+                                        </div>
+                                    </Card.Header>
+                                </Card>
+                            );
+                        }
+                        )}
                     </>
                 )
                 : (
@@ -146,6 +159,24 @@ function Reorder({
                     Add New
                 </a>
             </div>
+            <Modal show={modalShow} onHide={() => setModalShow(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{modalTitle || ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {modalComponent || null}
+                </Modal.Body>
+                {modalShowFooter &&
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => setModalShow(false)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={() => setModalShow(false)}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                }
+            </Modal>
         </div>
     );
 }

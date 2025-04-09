@@ -64,10 +64,10 @@ function PageBlockForm({ data = null, onChange = null }) {
     };
     function updateFieldValue(index, field, value) {
         const newData = [...blocks];
-        // if (!newData?.[index]) {
-        //     newData[index] = { ...pageBlockSchema };
-        // }
-        console.log('newData', index, field, value);
+        if (!newData?.[index]) {
+            return;
+        }
+        console.log(index, field, value, newData)
         newData[index][field] = value;
         setBlocks(newData);
     }
@@ -80,6 +80,7 @@ function PageBlockForm({ data = null, onChange = null }) {
             onChange(blocks);
         }
     }, [blocks]);
+    console.log('PageBlockForm', data)
     return (
         <div className="row">
             <div className="col-12">
@@ -87,7 +88,8 @@ function PageBlockForm({ data = null, onChange = null }) {
                     itemSchema={pageBlockSchema}
                     itemHeader={(item, index) => {
                         console.log('item', item);
-                        return item?.type || 'Item type error'}
+                        return item?.type || 'Item type error'
+                    }
                     }
                     data={blocks || []}
                     onChange={handleChange}
@@ -132,9 +134,6 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     onChange={e => {
                                         updateFieldValue(index, 'title', e.target.value);
                                     }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'title', e.target.value);
-                                    }}
                                     value={block?.title || ""} />
                                 <label className="form-label" htmlFor={'title' + index}>Title</label>
                             </div>
@@ -146,9 +145,6 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     id={"subtitle" + index}
                                     required=""
                                     onChange={e => {
-                                        updateFieldValue(index, 'subtitle', e.target.value);
-                                    }}
-                                    onBlur={e => {
                                         updateFieldValue(index, 'subtitle', e.target.value);
                                     }}
                                     value={block?.subtitle || ""} />
@@ -164,9 +160,6 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     onChange={e => {
                                         updateFieldValue(index, 'background_image', e.target.value);
                                     }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'background_image', e.target.value);
-                                    }}
                                     value={block?.background_image || ""} />
                                 <label className="form-label" htmlFor={'background_image' + index}>Background Image</label>
                             </div>
@@ -180,35 +173,33 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     onChange={e => {
                                         updateFieldValue(index, 'background_color', e.target.value);
                                     }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'background_color', e.target.value);
-                                    }}
                                     value={block?.background_color || ""} />
                                 <label className="form-label" htmlFor={'background_color' + index}>Background Color</label>
                             </div>
-                            <div className="floating-input form-group">
+                            <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
-                                    className="form-control"
-                                    type="text"
+                                    type="checkbox"
+                                    className="custom-control-input"
                                     name="pagination"
                                     id={"pagination" + index}
-                                    required=""
+                                    checked={block?.pagination || false}
                                     onChange={e => {
-                                        updateFieldValue(index, 'pagination', e.target.value);
+                                        updateFieldValue(index, 'pagination', e.target.checked);
                                     }}
-                                    onBlur={e => {
-                                        updateFieldValue(index, 'pagination', e.target.value);
-                                    }}
-                                    value={block?.pagination || ""} />
-                                <label className="form-label" htmlFor={'pagination' + index}>Pagination</label>
+                                />
+                                <label className="custom-control-label" htmlFor={'pagination' + index}>
+                                    Pagination
+                                </label>
                             </div>
-                            <SelectPaginationTypes 
+                            <SelectPaginationTypes
+                                value={block?.pagination_type}
                                 onChange={(paginationType) => {
                                     updateFieldValue(index, 'pagination_type', paginationType);
                                 }}
                                 showSubmitButton={false}
                             />
                             <SelectPaginationScrollTypes
+                                value={block?.pagination_scroll_type}
                                 onChange={(paginationScrollType) => {
                                     updateFieldValue(index, 'pagination_scroll_type', paginationScrollType);
                                 }}
@@ -221,9 +212,6 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     id={"content" + index}
                                     required=""
                                     onChange={e => {
-                                        updateFieldValue(index, 'content', e.target.value);
-                                    }}
-                                    onBlur={e => {
                                         updateFieldValue(index, 'content', e.target.value);
                                     }}
                                     value={block?.content || ""}></textarea>
@@ -240,18 +228,20 @@ function PageBlockForm({ data = null, onChange = null }) {
                                             value={block?.properties || ""} />
                                         <label className="form-label" htmlFor={'properties' + index}>Properties</label>
                                     </div> */}
-                            <div className="floating-input form-group">
+                            <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
-                                    className="form-control"
-                                    type="text"
+                                    type="checkbox"
+                                    className="custom-control-input"
                                     name="has_sidebar"
                                     id={"has_sidebar" + index}
-                                    required=""
+                                    checked={block?.has_sidebar || false}
                                     onChange={e => {
                                         updateFieldValue(index, 'has_sidebar', e.target.checked);
                                     }}
-                                    value={block?.has_sidebar || ""} />
-                                <label className="form-label" htmlFor={'has_sidebar' + index}>Has Sidebar</label>
+                                />
+                                <label className="custom-control-label" htmlFor={'has_sidebar' + index}>
+                                    Has Sidebar
+                                </label>
                             </div>
                             <div className="floating-input form-group">
                                 <button
@@ -286,9 +276,6 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     id={"order" + index}
                                     required=""
                                     onChange={e => {
-                                        updateFieldValue(index, 'order', e.target.value);
-                                    }}
-                                    onBlur={e => {
                                         updateFieldValue(index, 'order', e.target.value);
                                     }}
                                     value={block?.order || ""} />

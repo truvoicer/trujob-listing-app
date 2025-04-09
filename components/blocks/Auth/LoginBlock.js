@@ -1,4 +1,6 @@
 import Form, { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/Form";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { useRouter } from "next/navigation";
@@ -9,7 +11,11 @@ function LoginBlock({ session }) {
     async function formSubmitHandler(values, errors) {
         let requestData = { ...values };
         requestData.auth_provider = "local";
-        const response = await TruJobApiMiddleware.getInstance().loginRequest({}, requestData);
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.auth.login}`,
+            method: ApiMiddleware.METHOD.POST,
+            data: requestData
+        })
         if (!TruJobApiMiddleware.handleTokenResponse(
             response
         )) {

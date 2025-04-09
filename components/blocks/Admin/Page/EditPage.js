@@ -9,6 +9,8 @@ import { formContextData } from "@/components/form/contexts/FormContext";
 import { Button, Modal } from "react-bootstrap";
 import SidebarForm from "./SidebarForm";
 import SelectPageViews from "./SelectPageViews";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 function EditPage({ data, operation }) {
     const [pageViews, setPageViews] = useState([]);
@@ -63,16 +65,28 @@ function EditPage({ data, operation }) {
                                     return parseInt(sidebar.id);
                                 });
                         }
-                        console.log('requestData', requestData);
+                        console.log('requestData', operation, requestData);
+
                         let response = null;
                         switch (operation) {
                             case 'edit':
                             case 'update':
-                                response = await TruJobApiMiddleware.getInstance().updatePageRequest(data?.id, {}, requestData);
+                                if (!data?.id || data?.id === '') {
+                                    throw new Error('Page ID is required');
+                                }
+                                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
+                                    method: ApiMiddleware.METHOD.PATCH,
+                                    protectedReq: true,
+                                })
                                 break;
                             case 'add':
                             case 'create':
-                                response = await TruJobApiMiddleware.getInstance().createPageRequest({}, requestData);
+                                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.page}/create`,
+                                    method: ApiMiddleware.METHOD.POST,
+                                    protectedReq: true,
+                                })
                                 break;
                             default:
                                 console.warn('Invalid operation');

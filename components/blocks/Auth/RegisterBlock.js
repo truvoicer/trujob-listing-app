@@ -1,4 +1,6 @@
 import Form, { VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/Form";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 
 function RegisterBlock() {
@@ -6,7 +8,12 @@ function RegisterBlock() {
     const formSubmitHandler = (values, errors) => {
         let requestData = { ...values };
         requestData.auth_provider = "local";
-        const response = TruJobApiMiddleware.getInstance().registerUserRequest({}, requestData);
+        const response = TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.auth.register}`,
+            method: ApiMiddleware.METHOD.POST,
+            query,
+            data: requestData
+        });
         if (!TruJobApiMiddleware.handleTokenResponse(response)) {
             return;
         }

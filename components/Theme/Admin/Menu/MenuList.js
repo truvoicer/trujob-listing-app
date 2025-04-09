@@ -8,12 +8,16 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MenuListItem from "./MenuListItem";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
 
 function MenuList({ name, className = '', session }) {
     const [data, setData] = useState([]);
 
     async function menuItemsInit(name) {
-        const menuFetch = await TruJobApiMiddleware.getInstance().menuRequest(name);
+        const menuFetch = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
+            method: ApiMiddleware.METHOD.GET,
+        })
         if (!Array.isArray(menuFetch?.data?.menuItems)) {
             console.warn(`Menu data is not an array | name: ${name}`);
             return;
