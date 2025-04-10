@@ -5,6 +5,7 @@ export const appModalContextData = {
     onCancel: () => {},
     onOk: () => {},
     show: () => {},
+    close: () => {},
     hide: () => {},
 };
 

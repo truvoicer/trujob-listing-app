@@ -11,13 +11,20 @@ import SidebarForm from "./SidebarForm";
 import SelectPageViews from "./SelectPageViews";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
+import { DataTableContext } from "@/contexts/DataTableContext";
 
 function EditPage({ data, operation }) {
-    const [pageViews, setPageViews] = useState([]);
-    const [modalComponent, setModalComponent] = useState(null);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalShow, setModalShow] = useState(false);
-    const [modalShowFooter, setModalShowFooter] = useState(true);
+    const [blocksModal, setBlocksModal] = useState({
+        show: false,
+        title: '',
+        footer: true,
+    });
+    const [sidebarsModal, setSidebarsModal] = useState({
+        show: false,
+        title: '',
+        footer: true,
+    });
 
     const [initialValues, setInitialValues] = useState({
         view: data?.view || '',
@@ -47,7 +54,37 @@ function EditPage({ data, operation }) {
             meta_og_site_name: data?.settings?.meta_og_site_name || ''
         }
     });
+    function hideModal(setter) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = false;
+            return newState;
+        });
+    }
+    function showModal(setter) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = true;
+            return newState;
+        });
+    }
+    function setModalTitle(title, setter) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.title = title;
+            return newState;
+        });
+    }
+    function setModalFooter(hasFooter = false, setter) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.footer = hasFooter;
+            return newState;
+        });
+    }
+
     const appModalContext = useContext(AppModalContext);
+    const dataTableContext = useContext(DataTableContext);
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -78,6 +115,7 @@ function EditPage({ data, operation }) {
                                     endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
                                     method: ApiMiddleware.METHOD.PATCH,
                                     protectedReq: true,
+                                    data: requestData,
                                 })
                                 break;
                             case 'add':
@@ -86,6 +124,7 @@ function EditPage({ data, operation }) {
                                     endpoint: `${truJobApiConfig.endpoints.page}/create`,
                                     method: ApiMiddleware.METHOD.POST,
                                     protectedReq: true,
+                                    data: requestData,
                                 })
                                 break;
                             default:
@@ -95,7 +134,8 @@ function EditPage({ data, operation }) {
                         if (!response) {
                             return;
                         }
-                        appModalContext.hideModal();
+                        dataTableContext.refresh();
+                        appModalContext.close(EDIT_PAGE_MODAL_ID);
 
                     }}
                 >
@@ -105,11 +145,13 @@ function EditPage({ data, operation }) {
                         setFieldValue,
                         onChange,
                     }) => {
+                        console.log('values', values);
                         return (
                             <>
                                 <div className="row">
                                     <div className="col-12 col-lg-6">
                                         <SelectPageViews
+                                            value={values?.view || ''}
                                             onChange={(pageViews) => {
                                                 console.log('view', pageViews);
                                                 setFieldValue('view', pageViews);
@@ -224,18 +266,10 @@ function EditPage({ data, operation }) {
                                             type="button"
                                             className="btn btn-primary mr-2"
                                             onClick={(e) => {
-                                                setModalTitle('Manage Blocks');
-                                                setModalComponent(
-                                                    <PageBlockForm
-                                                        data={values?.blocks || []}
-                                                        onChange={(blocks) => {
-                                                            console.log('blocks', blocks);
-                                                            setFieldValue('blocks', blocks);
-                                                        }}
-                                                    />
-                                                );
-                                                setModalShowFooter(false);
-                                                setModalShow(true);
+                                                console.log('onclick blocks', values?.blocks);
+                                                setModalTitle('Manage Blocks', setBlocksModal);
+                                                setModalFooter(false, setBlocksModal);
+                                                showModal(setBlocksModal);
                                             }}
                                         >
                                             Manage Blocks
@@ -244,18 +278,9 @@ function EditPage({ data, operation }) {
                                             type="button"
                                             className="btn btn-primary mr-2"
                                             onClick={(e) => {
-                                                setModalTitle('Manage Sidebars');
-                                                setModalComponent(
-                                                    <SidebarForm
-                                                        data={values?.sidebars || []}
-                                                        onChange={(sidebars) => {
-                                                            console.log('sidebars', sidebars);
-                                                            setFieldValue('sidebars', sidebars);
-                                                        }}
-                                                    />
-                                                );
-                                                setModalShowFooter(false);
-                                                setModalShow(true);
+                                                setModalTitle('Manage Sidebars', setSidebarsModal);
+                                                setModalFooter(false, setSidebarsModal);
+                                                showModal(setSidebarsModal);
                                             }}
                                         >
                                             Manage Sidebars
@@ -273,19 +298,49 @@ function EditPage({ data, operation }) {
                                     </div>
                                 </div>
 
-                                <Modal show={modalShow} onHide={() => setModalShow(false)}>
+                                <Modal show={blocksModal.show} onHide={() => hideModal(setBlocksModal)}>
                                     <Modal.Header closeButton>
-                                        <Modal.Title>{modalTitle || ''}</Modal.Title>
+                                        <Modal.Title>{blocksModal?.title || ''}</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
-                                        {modalComponent || null}
+                                        <PageBlockForm
+                                            data={values?.blocks || []}
+                                            onChange={(blocks) => {
+                                                console.log('blocks', blocks);
+                                                setFieldValue('blocks', blocks);
+                                            }}
+                                        />
                                     </Modal.Body>
-                                    {modalShowFooter &&
+                                    {blocksModal.footer &&
                                         <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => setModalShow(false)}>
+                                            <Button variant="secondary" onClick={() => hideModal(setBlocksModal)}>
                                                 Close
                                             </Button>
-                                            <Button variant="primary" onClick={() => setModalShow(false)}>
+                                            <Button variant="primary" onClick={() => hideModal(setBlocksModal)}>
+                                                Save Changes
+                                            </Button>
+                                        </Modal.Footer>
+                                    }
+                                </Modal>
+                                <Modal show={sidebarsModal.show} onHide={() => hideModal(setSidebarsModal)}>
+                                    <Modal.Header closeButton>
+                                        <Modal.Title>{sidebarsModal?.title || ''}</Modal.Title>
+                                    </Modal.Header>
+                                    <Modal.Body>
+                                        <SidebarForm
+                                            data={values?.sidebars || []}
+                                            onChange={(sidebars) => {
+                                                console.log('sidebars', sidebars);
+                                                setFieldValue('sidebars', sidebars);
+                                            }}
+                                        />
+                                    </Modal.Body>
+                                    {sidebarsModal.footer &&
+                                        <Modal.Footer>
+                                            <Button variant="secondary" onClick={() => hideModal(setSidebarsModal)}>
+                                                Close
+                                            </Button>
+                                            <Button variant="primary" onClick={() => hideModal(setSidebarsModal)}>
                                                 Save Changes
                                             </Button>
                                         </Modal.Footer>

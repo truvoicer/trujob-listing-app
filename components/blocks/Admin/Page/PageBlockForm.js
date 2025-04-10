@@ -13,7 +13,6 @@ import SelectPaginationTypes from "./SelectPaginationType";
 import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
 
 function PageBlockForm({ data = null, onChange = null }) {
-    const [blocks, setBlocks] = useState(data || []);
 
     const appModalContext = useContext(AppModalContext);
     const formContext = useContext(FormContext);
@@ -63,23 +62,20 @@ function PageBlockForm({ data = null, onChange = null }) {
         'order': 0,
     };
     function updateFieldValue(index, field, value) {
-        const newData = [...blocks];
+        const newData = [...data];
         if (!newData?.[index]) {
             return;
         }
-        console.log(index, field, value, newData)
         newData[index][field] = value;
-        setBlocks(newData);
+        // setBlocks(newData);
+        onChange(newData);
     }
     function handleChange(values) {
-        setBlocks(values);
+        // setBlocks(values);
+        console.log('handleChange', values);
+        onChange(values);
     }
 
-    useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(blocks);
-        }
-    }, [blocks]);
     console.log('PageBlockForm', data)
     return (
         <div className="row">
@@ -91,11 +87,11 @@ function PageBlockForm({ data = null, onChange = null }) {
                         return item?.type || 'Item type error'
                     }
                     }
-                    data={blocks || []}
+                    data={data || []}
                     onChange={handleChange}
                     onAdd={({
                         reorderData,
-                        setReorderData,
+                        onChange,
                         itemSchema
                     }) => {
                         appModalContext.show({
@@ -108,7 +104,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                                 console.log('selectedBlock', selectedBlock);
                                                 const newData = [...reorderData];
                                                 newData.push({ ...pageBlockSchema, ...selectedBlock });
-                                                setReorderData(newData);
+                                                onChange(newData);
                                                 appModalContext.close('page-edit-block-select');
                                             }}
                                         />

@@ -97,16 +97,18 @@ function ViewLayout({ page }) {
             return cloneState;
         })
     }
+    function closeBatchModal(id) {
+        const findModalItemIdex = modalState.modals.findIndex(item => item?.id === id);
+        console.log('findModalItemIdex', findModalItemIdex, id, modalState.modals);
+        if (findModalItemIdex > -1) {
+            handleModalClose(findModalItemIdex);
+        }
+    }
     const [modalState, setModalState] = useState({
         modals: [],
         show: updateModalState,
-        close: (id) => {
-            const findModalItemIdex = modalState.modals.findIndex(item => item?.id === id);
-            console.log('findModalItemIdex', findModalItemIdex, id, modalState.modals);
-            if (findModalItemIdex > -1) {
-                handleModalClose(findModalItemIdex);
-            }
-        },
+        close: closeBatchModal,
+        hide: closeBatchModal
     });
 
     const [notificationState, setNotificationState] = useState({

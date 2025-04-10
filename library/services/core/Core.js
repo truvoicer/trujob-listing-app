@@ -1,5 +1,6 @@
 import { ContextService } from "../context/ContextService";
 import { ListingsService } from "../listings/ListingsService";
+import { ModalService } from "../modal/ModalService";
 import { SessionService } from "../session/SessionService";
 import { StateService } from "../state/StateService";
 
@@ -21,6 +22,9 @@ export class Core {
     }
     getSessionService() {
         return new SessionService();
+    }
+    getModalService() {
+        return new ModalService();
     }
 
     static getInstance() {

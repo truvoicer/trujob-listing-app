@@ -7,9 +7,22 @@ import EditPage from "./EditPage";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
+import { Button, Modal } from "react-bootstrap";
+import { ModalService } from "@/library/services/modal/ModalService";
+
+export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function ManagePage() {
-    const [data, setData] = useState(null);
+    const [modal, setModal] = useState({
+        data: null,
+        component: null,
+        operation: null,
+        show: false,
+        title: '',
+        footer: true,
+    });
+
     const appModalContext = useContext(AppModalContext);
 
     function renderActions(item, index) {
@@ -30,10 +43,11 @@ function ManagePage() {
                                 onClick: e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    appModalContext.show({
-                                        component: (
-                                            <EditPage data={item} operation={'edit'} />
-                                        ),
+                                    setModal({
+                                        title: 'Edit Page',
+                                        component: 'edit-page',
+                                        data: item,
+                                        operation: 'edit',
                                         show: true,
                                         showFooter: false
                                     });
@@ -67,7 +81,7 @@ function ManagePage() {
                                         },
                                         show: true,
                                         showFooter: true
-                                    });
+                                    }, EDIT_PAGE_MODAL_ID);
                                 }
                             }
                         }
@@ -85,14 +99,28 @@ function ManagePage() {
         if (!response) {
             return;
         }
-        setData(response);
+        setDataTableContextState(prevState => {
+            let newState = { ...prevState };
+            newState.data = response.data;
+            newState.links = response.links;
+            newState.meta = response.meta;
+            return newState;
+        });
     }
+
+    const [dataTableContextState, setDataTableContextState] = useState({
+        ...dataTableContextData,
+        refresh: () => {
+            console.log('refresh');
+            pageRequest();
+        }
+    });
+
     useEffect(() => {
         pageRequest();
     }, []);
-    console.log(data);
     return (
-        <>
+        <DataTableContext.Provider value={dataTableContextState}>
             <div className="content-top">
                 <div className="container">
                     <div className="row">
@@ -142,11 +170,10 @@ function ManagePage() {
                                                     onClick={e => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        appModalContext.show({
+                                                        setModal({
                                                             title: 'Add New Page',
-                                                            component: (
-                                                                <EditPage operation={'add'} />
-                                                            ),
+                                                            component: 'add-page',
+                                                            operation: 'add',
                                                             show: true,
                                                             showFooter: false
                                                         });
@@ -156,14 +183,14 @@ function ManagePage() {
                                                 </a>
                                             </div>
                                             <div className="card-body">
-                                                {Array.isArray(data?.data) && data.data.length && (
+                                                {Array.isArray(dataTableContextState?.data) && dataTableContextState.data.length && (
                                                     <DataTable
                                                         columns={[
                                                             { label: 'ID', key: 'id' },
                                                             { label: 'Title', key: 'title' },
                                                             { label: 'Permalink', key: 'permalink' }
                                                         ]}
-                                                        data={data.data}
+                                                        data={dataTableContextState.data}
                                                         actions={(item, index) => {
                                                             return renderActions(item, index);
                                                         }}
@@ -178,7 +205,35 @@ function ManagePage() {
                     </div>
                 </div>
             </div>
-        </>
+            <Modal show={modal.show} onHide={() => ModalService.hideModal(setModal)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{modal?.title || ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {modal?.component === 'edit-page' && (
+                        <EditPage
+                            data={modal?.data}
+                            operation={modal?.operation}
+                        />
+                    )}
+                    {modal?.component === 'add-page' && (
+                        <EditPage
+                            operation={'add'}
+                        />
+                    )}
+                </Modal.Body>
+                {modal.footer &&
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => ModalService.hideModal(setModal)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={() => ModalService.hideModal(setModal)}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                }
+            </Modal>
+        </DataTableContext.Provider>
     );
 }
 export default ManagePage;

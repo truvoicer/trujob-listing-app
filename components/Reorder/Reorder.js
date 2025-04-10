@@ -13,15 +13,12 @@ function Reorder({
     onDelete = null,
     onChange = null,
 }) {
-    const [reorderData, setReorderData] = useState(data);
-    const [modalComponent, setModalComponent] = useState(null);
+    const [childIndex, setChildIndex] = useState(null);
     const [modalTitle, setModalTitle] = useState('');
     const [modalShow, setModalShow] = useState(false);
     const [modalShowFooter, setModalShowFooter] = useState(true);
     const appModalContext = useContext(AppModalContext);
-    useEffect(() => {
-        setReorderData(data);
-    }, [data]);
+    const reorderData = data;
 
     function handleMoveUp(index) {
         if (index > 0) {
@@ -29,7 +26,7 @@ function Reorder({
             const temp = newData[index - 1];
             newData[index - 1] = newData[index];
             newData[index] = temp;
-            setReorderData(newData);
+            onChange(newData);
         }
     }
     function handleMoveDown(index) {
@@ -38,13 +35,13 @@ function Reorder({
             const temp = newData[index + 1];
             newData[index + 1] = newData[index];
             newData[index] = temp;
-            setReorderData(newData);
+            onChange(newData);
         }
     }
     function handleDelete(index) {
         const newData = [...reorderData];
         newData.splice(index, 1);
-        setReorderData(newData);
+        onChange(newData);
     }
     function handleAddNew() {
         const newData = [...reorderData];
@@ -52,7 +49,7 @@ function Reorder({
         if (typeof onAdd === 'function') {
             newItem = onAdd({
                 reorderData,
-                setReorderData,
+                onChange,
                 itemSchema,
             });
         } else if (typeof itemSchema === 'object') {
@@ -62,7 +59,7 @@ function Reorder({
             return;
         }
         newData.push(newItem);
-        setReorderData(newData);
+        onChange(newData);
     }
 
     function renderItemHeader(item, index) {
@@ -98,11 +95,8 @@ function Reorder({
                                                 onClick={(e) => {
                                                     e.preventDefault();
                                                     e.stopPropagation();
-                                                    setModalComponent(children({
-                                                        block,
-                                                        index,
-                                                    }));
                                                     setModalTitle('Edit');
+                                                    setChildIndex(index);
                                                     setModalShow(true);
                                                 }}>
                                                 Edit
@@ -164,7 +158,26 @@ function Reorder({
                     <Modal.Title>{modalTitle || ''}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {modalComponent || null}
+                    {Array.isArray(reorderData) && reorderData.length && (
+                        <>
+                            {reorderData.map((block, index) => {
+                                if (childIndex !== index) {
+                                    return null;
+                                }
+                                return (
+                                    <React.Fragment key={index}>
+                                        {
+                                            children({
+                                                block,
+                                                index,
+                                            })
+                                        }
+                                    </React.Fragment>
+                                );
+                            }
+                            )}
+                        </>
+                    )}
                 </Modal.Body>
                 {modalShowFooter &&
                     <Modal.Footer>

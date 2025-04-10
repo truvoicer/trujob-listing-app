@@ -4,6 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useEffect, useState } from "react";
 
 function SelectPageViews({
+    value,
     onChange,
     onSubmit,
     showSubmitButton = true,
@@ -28,6 +29,12 @@ function SelectPageViews({
     useEffect(() => {
         fetchPageViews();
     }, []);
+
+    useEffect(() => {
+        if (value) {
+            setSelectedPageView(value);
+        }
+    }, [value]);
 
     useEffect(() => {
         if (typeof onChange === 'function') {
