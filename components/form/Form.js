@@ -1,4 +1,4 @@
-import { isObject, isObjectEmpty } from "@/helpers/utils";
+import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
 
 const { useEffect, useState } = require("react");
 const { formContextData, FormContext } = require("./contexts/FormContext");
@@ -32,8 +32,10 @@ export const VALIDATION_RULES = [
     VALIDATION_ALPHA_NUMERIC_SYMBOLS,
 ]
 function Form({
+    operation = 'create',
     className = '',
     initialValues = {},
+    requiredFields = [],
     validation = {},
     onSubmit,
     preventSubmitOnErrors = true,
@@ -206,13 +208,33 @@ function Form({
         setFieldValue(name, value);
     }
 
+    function buildFinalValues(values) {
+        let finalValues = {};
+        console.log({initialValues, values});
+        Object.keys(values).forEach((key) => {
+            if (
+                initialValues.hasOwnProperty(key) &&
+                compareValues(initialValues[key], values[key]) &&
+                !requiredFields.includes(key)
+            ) {
+                return
+            }
+            finalValues[key] = values[key];
+        });
+        return finalValues;
+    }
     function handleSubmit(e) {
         e.preventDefault();
         const errors = validationHandler();
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
             return;
         }
-        onSubmit(formContextState.values, errors);
+        let requestData = { ...formContextState.values };
+
+        if (['update', 'edit'].includes(operation)) {
+            requestData = buildFinalValues(requestData);
+        }
+        onSubmit(requestData, errors);
     }
 
     function handleBlur(e) {
@@ -222,7 +244,7 @@ function Form({
 
 
     useEffect(() => {
-        formContextState.setValues(initialValues);
+        formContextState.setValues({...initialValues});
     }, [initialValues]);
 
     return (

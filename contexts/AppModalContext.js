@@ -1,19 +1,4 @@
+import { ModalService } from '@/library/services/modal/ModalService';
 import React from 'react'
 
-export const appModalContextData = {
-    modals: [],
-    onCancel: () => {},
-    onOk: () => {},
-    show: () => {},
-    close: () => {},
-    hide: () => {},
-};
-
-export const appModalItemContextData = {
-    id: null,
-    component: null,
-    title: null,
-    show: true,
-    showFooter: true,
-};
-export const AppModalContext = React.createContext(appModalContextData);
+export const AppModalContext = React.createContext(ModalService.INIT_CONTEXT_DATA);

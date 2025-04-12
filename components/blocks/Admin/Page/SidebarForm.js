@@ -9,11 +9,12 @@ import { useContext, useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import SelectSidebar from "./SelectSidebar";
 import WidgetForm from "./WidgetForm";
+import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 
 function SidebarForm({ data = null, onChange = null }) {
     const [sidebars, setSidebars] = useState(data || []);
 
-    const appModalContext = useContext(AppModalContext);
+    const dataTableContext = useContext(DataTableContext);
     const formContext = useContext(FormContext);
 
     // async function pageSidebarRequest() {
@@ -53,21 +54,21 @@ function SidebarForm({ data = null, onChange = null }) {
                     onChange={handleChange}
                     onAdd={({
                         reorderData,
-                        setReorderData,
+                        onChange,
                         itemSchema
                     }) => {
-                        appModalContext.show({
+                        dataTableContext.modal.show({
                             component: (
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectSidebar
-                                            pageId={data?.id}
+                                            sidebarId={data?.id}
                                             onSubmit={selectedSidebar => {
                                                 console.log('selectedSidebar', selectedSidebar);
                                                 const newData = [...reorderData];
                                                 newData.push({ ...pageSidebarSchema, ...selectedSidebar });
-                                                setReorderData(newData);
-                                                appModalContext.close('page-edit-sidebar-select');
+                                                onChange(newData);
+                                                dataTableContext.modal.close('page-edit-sidebar-select');
                                             }}
                                         />
                                     </div>
@@ -89,7 +90,7 @@ function SidebarForm({ data = null, onChange = null }) {
                                     onClick={e => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        appModalContext.show({
+                                        dataTableContext.modal.show({
                                             component: (
                                                 <WidgetForm
                                                     data={sidebar?.widgets || []}

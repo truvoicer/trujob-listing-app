@@ -9,6 +9,7 @@ import AccessControlComponent from '@/components/AccessControl/AccessControlComp
 import Loader from '@/components/Loader';
 import ErrorView from '../Error/ErrorView';
 import { useRouter } from 'next/navigation';
+import TabLayout from '@/components/Layout/TabLayout';
 
 function AdminPageView({ data, page }) {
     const router = useRouter();
@@ -48,6 +49,27 @@ function AdminPageView({ data, page }) {
             </>
         )
     }
+
+    function buildTabbedBlocks(blockData) {
+        const tabbedBlocks = [];
+        blockData.forEach((item, index) => {
+            const tabItem = {
+                ...item.props,
+                key: index.toString(),
+                component: <BlockComponent
+                    key={index}
+                    firstBlock={index === 0}
+                    lastBlock={index === blockData.length - 1}
+                    component={item.component}
+                    {...item.props}
+                />,
+            };
+            tabbedBlocks.push(tabItem);
+        });
+        return tabbedBlocks;
+
+    }
+
     function renderView(blocks) {
         return (
             <AccessControlComponent
@@ -57,17 +79,24 @@ function AdminPageView({ data, page }) {
                     return null;
                 }}
             >
-                <AdminLayout>
-                    {blocks}
-                </AdminLayout>
+                {data?.view === 'admin_page' && (
+                    <AdminLayout>
+                        {renderBlocks(blocks)}
+                    </AdminLayout>
+                )}
+                {data?.view === 'admin_tab_page' && (
+                    <AdminLayout>
+                        <TabLayout
+                            config={buildTabbedBlocks(blocks)}
+                        />
+                    </AdminLayout>
+                )}
             </AccessControlComponent>
         );
     }
     console.log('AdminPageView', data);
     return renderView(
-        renderBlocks(
-            buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
-        )
+        buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
     );
 }
 

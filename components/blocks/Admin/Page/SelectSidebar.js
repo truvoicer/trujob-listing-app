@@ -4,6 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useEffect, useState } from "react";
 
 function SelectSidebar({
+    sidebarId,
     onChange,
     onSubmit
 }) {
@@ -29,6 +30,22 @@ function SelectSidebar({
     }, []);
 
     useEffect(() => {
+        if (!sidebarId) {
+            return;
+        }
+        if (!Array.isArray(sidebars) || sidebars.length === 0) {
+            return;
+        }
+        const findSelected = sidebars.find(sidebar => sidebar?.id === sidebarId);
+        if (findSelected) {
+            setSelectedSidebar(findSelected);
+            return;
+        }
+        
+    }, [sidebarId, sidebars]);
+
+
+    useEffect(() => {
         if (typeof onChange === 'function') {
             onChange(selectedSidebar);
         }
@@ -38,6 +55,13 @@ function SelectSidebar({
         <div>
             <h2>Select Sidebar</h2>
             <p>Select a sidebar to add to the page.</p>
+            <form onSubmit={e => {
+                e.preventDefault();
+                console.log('Selected Sidebar:', selectedSidebar);
+                if (typeof onSubmit === 'function') {
+                    onSubmit(selectedSidebar);
+                }
+            }}>
             <select
                 className="form-control"
                 onChange={e => {
@@ -57,6 +81,7 @@ function SelectSidebar({
                 ))}
             </select>
             <button type="submit" className="btn btn-primary">Select</button>
+            </form>
         </div>
     );
 }

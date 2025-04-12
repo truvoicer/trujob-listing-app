@@ -11,11 +11,11 @@ import SelectBlock from "./SelectBlock";
 import SidebarForm from "./SidebarForm";
 import SelectPaginationTypes from "./SelectPaginationType";
 import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
+import { DataTableContext } from "@/contexts/DataTableContext";
 
 function PageBlockForm({ data = null, onChange = null }) {
 
-    const appModalContext = useContext(AppModalContext);
-    const formContext = useContext(FormContext);
+    const dataTableContext = useContext(DataTableContext);
 
     // async function pageBlockRequest() {
     //     const response = await TruJobApiMiddleware.getInstance().pageBlocksRequest(data?.id);
@@ -48,6 +48,8 @@ function PageBlockForm({ data = null, onChange = null }) {
     }
 
     const pageBlockSchema = {
+        'default': false,
+        'nav_title': '',
         'title': '',
         'subtitle': '',
         'background_image': '',
@@ -67,23 +69,18 @@ function PageBlockForm({ data = null, onChange = null }) {
             return;
         }
         newData[index][field] = value;
-        // setBlocks(newData);
         onChange(newData);
     }
     function handleChange(values) {
-        // setBlocks(values);
-        console.log('handleChange', values);
         onChange(values);
     }
 
-    console.log('PageBlockForm', data)
     return (
         <div className="row">
             <div className="col-12">
                 <Reorder
                     itemSchema={pageBlockSchema}
                     itemHeader={(item, index) => {
-                        console.log('item', item);
                         return item?.type || 'Item type error'
                     }
                     }
@@ -94,18 +91,17 @@ function PageBlockForm({ data = null, onChange = null }) {
                         onChange,
                         itemSchema
                     }) => {
-                        appModalContext.show({
+                        dataTableContext.modal.show({
                             component: (
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectBlock
                                             pageId={data?.id}
                                             onSubmit={selectedBlock => {
-                                                console.log('selectedBlock', selectedBlock);
                                                 const newData = [...reorderData];
                                                 newData.push({ ...pageBlockSchema, ...selectedBlock });
                                                 onChange(newData);
-                                                appModalContext.close('page-edit-block-select');
+                                                dataTableContext.modal.close('page-edit-block-select');
                                             }}
                                         />
                                     </div>
@@ -120,6 +116,34 @@ function PageBlockForm({ data = null, onChange = null }) {
                         index,
                     }) => (
                         <>
+                            <div className="custom-control custom-checkbox mb-3 text-left">
+                                <input
+                                    type="checkbox"
+                                    className="custom-control-input"
+                                    name="default"
+                                    id={"default" + index}
+                                    checked={block?.default || false}
+                                    onChange={e => {
+                                        updateFieldValue(index, 'default', e.target.checked);
+                                    }}
+                                />
+                                <label className="custom-control-label" htmlFor={'default' + index}>
+                                    Default?
+                                </label>
+                            </div>
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="nav_title"
+                                    id={"nav_title" + index}
+                                    required=""
+                                    onChange={e => {
+                                        updateFieldValue(index, 'nav_title', e.target.value);
+                                    }}
+                                    value={block?.nav_title || ""} />
+                                <label className="form-label" htmlFor={'nav_title' + index}>Nav Title</label>
+                            </div>
                             <div className="floating-input form-group">
                                 <input
                                     className="form-control"
@@ -246,13 +270,12 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     onClick={(e) => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        appModalContext.show({
+                                        dataTableContext.modal.show({
                                             title: "Manage Sidebars",
                                             component: (
                                                 <SidebarForm
                                                     data={block?.sidebars || []}
                                                     onChange={(sidebars) => {
-                                                        console.log('sidebars', sidebars);
                                                         updateFieldValue(index, 'sidebars', sidebars);
                                                     }}
                                                 />

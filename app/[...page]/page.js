@@ -32,6 +32,7 @@ export async function generateMetadata({ params, searchParams }, parent) {
   });
 
   if (truJobApiMiddleware.hasErrors()) {
+    console.log(truJobApiMiddleware.hasErrors());
     throw new Error(
       `Failed to load data | ${JSON.stringify(truJobApiMiddleware.getErrors())}`,
     );

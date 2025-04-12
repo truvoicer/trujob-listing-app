@@ -10,6 +10,7 @@ export class ViewFactory {
             case 'page':
                 return <PageView data={data} />;
             case 'admin_page':
+            case 'admin_tab_page':
                 return <AdminPageView data={data} />;
             default:
                 return null;

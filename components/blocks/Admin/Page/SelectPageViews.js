@@ -36,11 +36,6 @@ function SelectPageViews({
         }
     }, [value]);
 
-    useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(selectedPageView);
-        }
-    }, [selectedPageView]);
 
     return (
         <div>
@@ -50,6 +45,9 @@ function SelectPageViews({
                     className="form-control"
                     onChange={e => {
                         setSelectedPageView(e.target.value);
+                        if (typeof onChange === 'function') {
+                            onChange(e.target.value);
+                        }
                     }}
                     required=""
                     value={selectedPageView || ''}

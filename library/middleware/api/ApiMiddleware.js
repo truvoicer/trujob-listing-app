@@ -274,13 +274,19 @@ export class ApiMiddleware {
         if (!response) {
             return false;
         }
-        const responseData = await response;
-        switch (responseData?.status) {
+        const responsePromise = await response;
+        const responseData = await responsePromise.json();
+        switch (responsePromise?.status) {
             case 200:
             case 202:
-                return await response.json();
+                return responseData;
             default:
-                this.addError(responseData?.status, responseData?.statusText, { requestUrl });
+                this.addError({
+                    statusCode: responsePromise?.status, 
+                    statusText: responsePromise?.statusText, 
+                    requestUrl,
+                    response: responseData
+                });
                 return false;
         }
     }

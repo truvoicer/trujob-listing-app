@@ -6,6 +6,7 @@ export function findInObjectByIndex(obj,i) {
     }
     return obj[i];
 }
+
 export function findInObject(str, obj) {
     return str.split('.').reduce(findInObjectByIndex, obj)
 }
@@ -147,4 +148,8 @@ export function getNextArrayIndex(array) {
         index++;
     }
     return index;
+}
+
+export function compareValues(value1, value2) {
+    return (JSON.stringify(value1) === JSON.stringify(value2));
 }

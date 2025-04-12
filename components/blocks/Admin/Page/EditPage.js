@@ -13,6 +13,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { isObjectEmpty } from "@/helpers/utils";
 
 function EditPage({ data, operation }) {
     const [blocksModal, setBlocksModal] = useState({
@@ -85,15 +86,20 @@ function EditPage({ data, operation }) {
 
     const appModalContext = useContext(AppModalContext);
     const dataTableContext = useContext(DataTableContext);
-
+    console.log('EditPage', data);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
 
                 <Form
+                    operation={operation}
                     initialValues={initialValues}
                     onSubmit={async (values) => {
                         let requestData = { ...values };
+                        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
+                            console.warn('No data to update');
+                            return;
+                        }
                         if (Array.isArray(requestData?.sidebars)) {
                             requestData.sidebars = requestData?.sidebars.filter((sidebar) => {
                                 return sidebar?.id;
@@ -102,8 +108,21 @@ function EditPage({ data, operation }) {
                                     return parseInt(sidebar.id);
                                 });
                         }
-                        console.log('requestData', operation, requestData);
-
+                        if (Array.isArray(requestData?.blocks)) {
+                            requestData.blocks = requestData?.blocks.map((block) => {
+                                if (Array.isArray(block?.sidebars)) {
+                                    block.sidebars = block.sidebars
+                                        .filter((sidebar) => {
+                                            return sidebar?.id;
+                                        })
+                                        .map((sidebar) => {
+                                            return parseInt(sidebar.id);
+                                        });
+                                }
+                                return block;
+                            });
+                        }
+                        
                         let response = null;
                         switch (operation) {
                             case 'edit':
@@ -135,7 +154,7 @@ function EditPage({ data, operation }) {
                             return;
                         }
                         dataTableContext.refresh();
-                        appModalContext.close(EDIT_PAGE_MODAL_ID);
+                        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
 
                     }}
                 >
@@ -145,7 +164,6 @@ function EditPage({ data, operation }) {
                         setFieldValue,
                         onChange,
                     }) => {
-                        console.log('values', values);
                         return (
                             <>
                                 <div className="row">
@@ -153,7 +171,6 @@ function EditPage({ data, operation }) {
                                         <SelectPageViews
                                             value={values?.view || ''}
                                             onChange={(pageViews) => {
-                                                console.log('view', pageViews);
                                                 setFieldValue('view', pageViews);
                                             }}
                                             showSubmitButton={false}
@@ -266,7 +283,6 @@ function EditPage({ data, operation }) {
                                             type="button"
                                             className="btn btn-primary mr-2"
                                             onClick={(e) => {
-                                                console.log('onclick blocks', values?.blocks);
                                                 setModalTitle('Manage Blocks', setBlocksModal);
                                                 setModalFooter(false, setBlocksModal);
                                                 showModal(setBlocksModal);
@@ -306,8 +322,7 @@ function EditPage({ data, operation }) {
                                         <PageBlockForm
                                             data={values?.blocks || []}
                                             onChange={(blocks) => {
-                                                console.log('blocks', blocks);
-                                                setFieldValue('blocks', blocks);
+                                                // setFieldValue('blocks', blocks);
                                             }}
                                         />
                                     </Modal.Body>
@@ -330,7 +345,6 @@ function EditPage({ data, operation }) {
                                         <SidebarForm
                                             data={values?.sidebars || []}
                                             onChange={(sidebars) => {
-                                                console.log('sidebars', sidebars);
                                                 setFieldValue('sidebars', sidebars);
                                             }}
                                         />
