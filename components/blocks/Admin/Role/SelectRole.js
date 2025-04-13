@@ -75,7 +75,7 @@ function SelectRole({
                     <option
                         key={index}
                         value={role.id}>
-                        {`${role.title} (${role.name})`}
+                        {`${role.label} (${role.name})`}
                     </option>
                 ))}
             </select>

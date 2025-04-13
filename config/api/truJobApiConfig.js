@@ -14,6 +14,7 @@ export default {
         widget: '/widget',
         pagination: '/pagination',
         login: '/auth/login',
+        role: '/role',
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',
         auth: {

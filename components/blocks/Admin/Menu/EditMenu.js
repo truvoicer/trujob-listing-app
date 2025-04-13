@@ -8,6 +8,7 @@ import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import MenuItemForm from "./MenuItemForm";
+import RoleForm from "../Role/RoleForm";
 
 function EditMenu({ data, operation }) {
     const [rolesModal, setRolesModal] = useState({
@@ -59,7 +60,6 @@ function EditMenu({ data, operation }) {
     }
 
     const dataTableContext = useContext(DataTableContext);
-
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -68,7 +68,8 @@ function EditMenu({ data, operation }) {
                     initialValues={initialValues}
                     onSubmit={async (values) => {
                         let requestData = { ...values };
-
+                        console.log('requestData', requestData);
+                        return;
                         if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
                             console.warn('No data to update');
                             return;
@@ -230,6 +231,12 @@ function EditMenu({ data, operation }) {
                                         <Modal.Title>{rolesModal?.title || ''}</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
+                                        <RoleForm
+                                            data={values?.roles || []}
+                                            onChange={(roles) => {
+                                                setFieldValue('roles', roles);
+                                            }}
+                                        />
                                     </Modal.Body>
                                     {rolesModal.footer &&
                                         <Modal.Footer>
@@ -250,6 +257,7 @@ function EditMenu({ data, operation }) {
                                         <MenuItemForm
                                             data={values?.menu_items || []}
                                             onChange={(menuItems) => {
+                                                console.log('menuItems', menuItems);
                                                 setFieldValue('menu_items', menuItems);
                                             }}
                                         />
