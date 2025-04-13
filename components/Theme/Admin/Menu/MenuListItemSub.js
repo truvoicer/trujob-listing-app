@@ -26,7 +26,7 @@ function MenuListItemSub({ data, session, settings }) {
                     {Array.isArray(data?.menus) && data.menus.map((menu, index) => {
                         return (
                             <React.Fragment key={index}>
-                                {Array.isArray(menu?.menuItems) && menu?.menuItems.map((item, index) => {
+                                {Array.isArray(menu?.menu_items) && menu?.menu_items.map((item, index) => {
                                     return (
                                         <React.Fragment key={index}>
                                             <MenuListItem data={item} />

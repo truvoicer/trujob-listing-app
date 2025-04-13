@@ -3,7 +3,6 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditPage from "./EditPage";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -14,10 +13,11 @@ import Pagination from "@/components/listings/Pagination";
 import DataManager from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import EditMenu from "./EditMenu";
 
-export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
+export const EDIT_MENU_MODAL_ID = 'edit-menu-modal';
 
-function ManagePage() {
+function ManageMenu() {
     function renderActions(item, index, dataTableContextState) {
         return (
             <div className="d-flex align-items-center list-action">
@@ -30,7 +30,7 @@ function ManagePage() {
                         dataTableContextState.modal.show({
                             title: 'Edit Page',
                             component: (
-                                <EditPage
+                                <EditMenu
                                     data={item}
                                     operation={'edit'}
                                 />
@@ -38,7 +38,7 @@ function ManagePage() {
                             show: true,
                             showFooter: false,
                             fullscreen: true
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_MENU_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -55,14 +55,14 @@ function ManagePage() {
                                     dataTableContextState.modal.show({
                                         title: 'Edit Page',
                                         component: (
-                                            <EditPage
+                                            <EditMenu
                                                 data={item}
                                                 operation={'edit'}
                                             />
                                         ),
                                         show: true,
                                         showFooter: false
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_MENU_MODAL_ID);
                                 }
                             }
                         },
@@ -93,7 +93,7 @@ function ManagePage() {
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_MENU_MODAL_ID);
                                 }
                             }
                         }
@@ -131,7 +131,7 @@ function ManagePage() {
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.page}`,
+            endpoint: `${truJobApiConfig.endpoints.menu}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -163,13 +163,13 @@ function ManagePage() {
         dataTableContextState.modal.show({
             title: 'Add New Page',
             component: (
-                <EditPage
+                <EditMenu
                     operation={'add'}
                 />
             ),
             show: true,
             showFooter: false
-        }, EDIT_PAGE_MODAL_ID);
+        }, EDIT_MENU_MODAL_ID);
     }
     return (
         <Suspense fallback={<div>Loading...</div>}>
@@ -179,11 +179,10 @@ function ManagePage() {
                 request={pageRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Title', key: 'title' },
-                    { label: 'Permalink', key: 'permalink' }
+                    { label: 'Name', key: 'name' },
                 ]}
             />
         </Suspense>
     );
 }
-export default ManagePage;
+export default ManageMenu;

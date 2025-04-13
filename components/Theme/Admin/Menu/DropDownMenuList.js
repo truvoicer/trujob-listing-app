@@ -78,7 +78,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
             endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
             method: ApiMiddleware.METHOD.GET,
         })
-        if (!Array.isArray(menuFetch?.data?.menuItems)) {
+        if (!Array.isArray(menuFetch?.data?.menu_items)) {
             console.warn(`Menu data is not an array | name: ${name}`);
             return;
         }
@@ -98,7 +98,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
                         {Array.isArray(item?.menus) && item.menus.map((item, index) => {
                             return (
                                 <React.Fragment key={index}>
-                                    {renderMenuItems(item?.menuItems, root)}
+                                    {renderMenuItems(item?.menu_items, root)}
                                 </React.Fragment>
                             );
                         })}
@@ -174,7 +174,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
                 <AccessControlComponent
                     roles={data?.roles}
                 >
-                    {renderMenuItems(data?.menuItems, true)}
+                    {renderMenuItems(data?.menu_items, true)}
                 </AccessControlComponent>
             </Dropdown.Menu>
         </Dropdown>

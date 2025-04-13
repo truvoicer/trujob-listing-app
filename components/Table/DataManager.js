@@ -17,14 +17,21 @@ function DataManager({
     columns = [],
 }) {
 
-    const searchParams = useSearchParams();
+    const searchParamsUse = useSearchParams();
 
-    const searchParamPage = searchParams.get('page');
-    const searchParamSortOrder = searchParams.get('sort_order');
-    const searchParamSortBy = searchParams.get('sort_by');
-    const searchParamQuery = searchParams.get('query');
-    const searchParamPageSize = searchParams.get('page_size');
+    const searchParamPage = searchParamsUse.get('page');
+    const searchParamSortOrder = searchParamsUse.get('sort_order');
+    const searchParamSortBy = searchParamsUse.get('sort_by');
+    const searchParamQuery = searchParamsUse.get('query');
+    const searchParamPageSize = searchParamsUse.get('page_size');
 
+    const searchParams = {
+        page: searchParamPage,
+        sort_order: searchParamSortOrder,
+        sort_by: searchParamSortBy,
+        query: searchParamQuery,
+        page_size: searchParamPageSize,
+    };
 
     const appModalContext = useContext(AppModalContext);
     const modalService = new ModalService();
@@ -43,15 +50,31 @@ function DataManager({
 
     async function makeRequest() {
         if (typeof request === 'function') {
+            if (dataTableContextState?.requestStatus !== 'loading') {
+                setDataTableContextState(prevState => {
+                    let newState = {
+                        ...prevState,
+                        requestStatus: 'loading'
+                    };
+                    return newState;
+                });
+            }
             request({
                 dataTableContextState,
-                setDataTableContextState
+                setDataTableContextState,
+                searchParams
             });
             return;
         }
     }
 
     useEffect(() => {
+        const someSet = Object.keys(searchParams).some(key => {
+            return searchParams[key] !== null && searchParams[key] !== undefined;
+        });
+        if (someSet) {
+            return;
+        }
         makeRequest();
     }, []);
 
@@ -66,18 +89,10 @@ function DataManager({
     }, []);
 
     useEffect(() => {
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            if (!newState.searchParams) {
-                newState.searchParams = {};
-            }
-            newState.searchParams['page'] = searchParamPage;
-            newState.searchParams['sort_order'] = searchParamSortOrder;
-            newState.searchParams['sort_by'] = searchParamSortBy;
-            newState.searchParams['query'] = searchParamQuery;
-            newState.searchParams['page_size'] = searchParamPageSize;
-            return newState;
-        });
+        if (dataTableContextState?.requestStatus !== 'idle') {
+            return;
+        }
+        makeRequest();
     }, [
         searchParamPage,
         searchParamSortOrder,
@@ -85,7 +100,6 @@ function DataManager({
         searchParamQuery,
         searchParamPageSize
     ]);
-
     useEffect(() => {
         if (!dataTableContextState?.query) {
             return;
@@ -98,6 +112,7 @@ function DataManager({
         }
         makeRequest();
     }, [dataTableContextState.query]);
+    
     return (
         <DataTableContext.Provider value={dataTableContextState}>
             <div className="row">

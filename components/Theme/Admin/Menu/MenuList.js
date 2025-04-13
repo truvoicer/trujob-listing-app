@@ -18,7 +18,7 @@ function MenuList({ name, className = '', session }) {
             endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
             method: ApiMiddleware.METHOD.GET,
         })
-        if (!Array.isArray(menuFetch?.data?.menuItems)) {
+        if (!Array.isArray(menuFetch?.data?.menu_items)) {
             console.warn(`Menu data is not an array | name: ${name}`);
             return;
         }
@@ -37,7 +37,7 @@ function MenuList({ name, className = '', session }) {
             <AccessControlComponent
                 roles={data?.roles}
             >
-                {Array.isArray(data?.menuItems) && data?.menuItems.map((item, index) => {
+                {Array.isArray(data?.menu_items) && data?.menu_items.map((item, index) => {
                     return (
                         <React.Fragment key={index}>
                             <MenuListItem 

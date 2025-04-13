@@ -6,6 +6,9 @@ import LoginBlock from "@/components/blocks/Auth/LoginBlock";
 import RegisterBlock from "@/components/blocks/Auth/RegisterBlock";
 import ManagePage from "@/components/blocks/Admin/Page/ManagePage";
 import ManageListing from "@/components/blocks/Admin/Listing/ManageListing";
+import ManageSidebar from "@/components/blocks/Admin/Sidebar/ManageSidebar";
+import ManageWidget from "@/components/blocks/Admin/Widget/ManageWidget";
+import ManageMenu from "@/components/blocks/Admin/Menu/ManageMenu";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -16,6 +19,9 @@ export class Blocks {
     static REGISTER_BLOCK = 'register-block';
     static MANAGE_PAGES_BLOCK = 'manage-pages-block';
     static MANAGE_LISTINGS_BLOCK = 'manage-listings-block';
+    static MANAGE_SIDEBARS_BLOCK = 'manage-sidebars-block';
+    static MANAGE_WIDGETS_BLOCK = 'manage-widgets-block';
+    static MANAGE_MENUS_BLOCK = 'manage-menus-block';
 
     static getBlocks() {
         return {
@@ -66,6 +72,24 @@ export class Blocks {
                 description: 'This is the manage listings block',
                 icon: 'manage-listings-block-icon',
                 component: ManageListing,
+            },
+            [Blocks.MANAGE_SIDEBARS_BLOCK]: {
+                title: 'Manage Sidebars',
+                description: 'This is the manage sidebars',
+                icon: 'manage-listings-block-icon',
+                component: ManageSidebar,
+            },
+            [Blocks.MANAGE_WIDGETS_BLOCK]: {
+                title: 'Manage Widgets',
+                description: 'This is the manage widgets',
+                icon: 'manage-listings-block-icon',
+                component: ManageWidget,
+            },
+            [Blocks.MANAGE_MENUS_BLOCK]: {
+                title: 'Manage Menus',
+                description: 'This is the manage manus',
+                icon: 'manage-listings-block-icon',
+                component: ManageMenu,
             },
         };
     }

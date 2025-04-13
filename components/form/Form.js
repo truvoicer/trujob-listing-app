@@ -44,6 +44,7 @@ function Form({
 
     const [formContextState, setFormContextState] = useState({
         ...formContextData,
+        values: JSON.parse(JSON.stringify(initialValues)),
         setValues: setValues,
         setFieldValue: setFieldValue,
         onChange: handleChange,
@@ -241,11 +242,6 @@ function Form({
         const { name, value } = e.target;
         setFieldValue(name, value);
     }
-
-
-    useEffect(() => {
-        formContextState.setValues({...initialValues});
-    }, [initialValues]);
 
     return (
         <FormContext.Provider value={formContextState}>
