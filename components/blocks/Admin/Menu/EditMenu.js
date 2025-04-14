@@ -7,7 +7,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import MenuItemForm from "./MenuItemForm";
+import MenuItemForm from "./ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
 
 function EditMenu({ data, operation }) {

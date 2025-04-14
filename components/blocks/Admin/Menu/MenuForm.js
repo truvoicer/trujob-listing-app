@@ -2,7 +2,8 @@ import Reorder from "@/components/Reorder/Reorder";
 import { useContext, useEffect, useState } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import RoleForm from "../Role/RoleForm";
-import MenuItemForm from "./MenuItemForm";
+import MenuItemForm from "./ManageMenuItems";
+import SelectMenu from "./SelectMenu";
 
 function MenuForm({ data = null, onChange = null }) {
 
@@ -28,6 +29,7 @@ function MenuForm({ data = null, onChange = null }) {
         <div className="row">
             <div className="col-12">
                 <Reorder
+                    enableEdit={false}
                     itemSchema={menuItemSchema}
                     itemHeader={(item, index) => `${item?.name}` || 'Item type error'}
                     data={data || []}
@@ -41,12 +43,20 @@ function MenuForm({ data = null, onChange = null }) {
                             component: (
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
-
+                                        <SelectMenu
+                                            menuId={data?.id}
+                                            onSubmit={selectedMenu => {
+                                                const newData = [...reorderData];
+                                                newData.push({ ...menuItemSchema, ...selectedMenu });
+                                                onChange(newData);
+                                                dataTableContext.modal.close('menu-edit-form');
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             ),
                             showFooter: false
-                        }, 'page-edit-menuItem-select');
+                        }, 'menu-edit-form');
                     }}
                 >
                     {({

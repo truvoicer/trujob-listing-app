@@ -8,10 +8,9 @@ function Reorder({
     itemHeader = null,
     itemSchema = {},
     onAdd = null,
-    onMoveUp = null,
-    onMoveDown = null,
-    onDelete = null,
     onChange = null,
+    enableControls = true,
+    enableEdit = true,
 }) {
     const [childIndex, setChildIndex] = useState(null);
     const [modalTitle, setModalTitle] = useState('');
@@ -89,46 +88,50 @@ function Reorder({
                                 <Card key={index}>
                                     <Card.Header>
                                         {renderItemHeader(block, index)}
-                                        <div className="d-flex gap-3 justify-content-between">
-                                            <a
-                                                className="btn btn-sm btn-outline-primary"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    setModalTitle('Edit');
-                                                    setChildIndex(index);
-                                                    setModalShow(true);
-                                                }}>
-                                                Edit
-                                            </a>
-                                            <a
-                                                className="btn btn-sm btn-outline-primary"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleMoveUp(index)
-                                                }}>
-                                                Move Up
-                                            </a>
-                                            <a
-                                                className="btn btn-sm btn-outline-primary"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleMoveDown(index)
-                                                }}>
-                                                Move Down
-                                            </a>
-                                            <a
-                                                className="btn btn-sm btn-danger"
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    e.stopPropagation();
-                                                    handleDelete(index)
-                                                }}>
-                                                Delete
-                                            </a>
-                                        </div>
+                                        {enableControls && (
+                                            <div className="d-flex gap-3 justify-content-between">
+                                                {enableEdit && (
+                                                    <a
+                                                        className="btn btn-sm btn-outline-primary"
+                                                        onClick={(e) => {
+                                                            e.preventDefault();
+                                                            e.stopPropagation();
+                                                            setModalTitle('Edit');
+                                                            setChildIndex(index);
+                                                            setModalShow(true);
+                                                        }}>
+                                                        Edit
+                                                    </a>
+                                                )}
+                                                <a
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleMoveUp(index)
+                                                    }}>
+                                                    Move Up
+                                                </a>
+                                                <a
+                                                    className="btn btn-sm btn-outline-primary"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleMoveDown(index)
+                                                    }}>
+                                                    Move Down
+                                                </a>
+                                                <a
+                                                    className="btn btn-sm btn-danger"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        handleDelete(index)
+                                                    }}>
+                                                    Delete
+                                                </a>
+                                            </div>
+                                        )}
                                     </Card.Header>
                                 </Card>
                             );
