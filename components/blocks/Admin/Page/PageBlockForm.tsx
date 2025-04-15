@@ -1,21 +1,15 @@
-import { FormContext } from "@/components/form/contexts/FormContext";
-import Form from "@/components/form/Form";
 import Reorder from "@/components/Reorder/Reorder";
-import DataTable from "@/components/Table/DataTable";
-import { AppModalContext } from "@/contexts/AppModalContext";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
+import { useContext } from "react";
 import SelectBlock from "./SelectBlock";
 import SidebarForm from "./SidebarForm";
 import SelectPaginationTypes from "./SelectPaginationType";
 import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import { Block } from "@/types/Block";
+import { PageBlock } from "@/types/PageBlock";
+import { Sidebar } from "@/types/Sidebar";
 
 type Props = {
-    data?: Array<Block>;
+    data?: Array<PageBlock>;
     onChange: (data: any) => void;
 }
 function PageBlockForm({ data, onChange }: Props) {
@@ -38,18 +32,18 @@ function PageBlockForm({ data, onChange }: Props) {
         'sidebar_widgets': [],
         'order': 0,
     };
-    function updateFieldValue(index: number, field: string, value: number | string | boolean) {
+    function updateFieldValue(index: number, field: string, value: number | string | boolean | Array<Sidebar>) {
         if (!data) {
             return;
         }
-        const newData: Array<Block> = [...data];
+        const newData: Array<PageBlock> = [...data];
         if (!newData?.[index]) {
             return;
         }
         newData[index][field] = value;
         onChange(newData);
     }
-    function handleChange(values: Array<Block>) {
+    function handleChange(values: Array<PageBlock>) {
         onChange(values);
     }
 
@@ -74,7 +68,6 @@ function PageBlockForm({ data, onChange }: Props) {
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectBlock
-                                            pageId={data?.id}
                                             onSubmit={selectedBlock => {
                                                 const newData = [...reorderData];
                                                 newData.push({ ...pageBlockSchema, ...selectedBlock });
@@ -253,7 +246,7 @@ function PageBlockForm({ data, onChange }: Props) {
                                             component: (
                                                 <SidebarForm
                                                     data={block?.sidebars || []}
-                                                    onChange={(sidebars) => {
+                                                    onChange={(sidebars: Array<Sidebar>) => {
                                                         updateFieldValue(index, 'sidebars', sidebars);
                                                     }}
                                                 />

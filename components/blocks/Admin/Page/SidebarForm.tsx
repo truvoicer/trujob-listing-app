@@ -10,8 +10,14 @@ import { Accordion } from "react-bootstrap";
 import SelectSidebar from "./SelectSidebar";
 import WidgetForm from "./WidgetForm";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
+import { Sidebar } from "@/types/Sidebar";
 
-function SidebarForm({ data = null, onChange = null }) {
+type SidebarFormProps = {
+    data?: Array<Sidebar>;
+    onChange?: (data: Array<any>) => void;
+}
+
+function SidebarForm({ data, onChange }: SidebarFormProps) {
     const [sidebars, setSidebars] = useState(data || []);
 
     const dataTableContext = useContext(DataTableContext);
@@ -30,12 +36,12 @@ function SidebarForm({ data = null, onChange = null }) {
         'name': '',
         'icon': '',
     };
-    function updateFieldValue(index, field, value) {
-        const newData = [...sidebars];
+    function updateFieldValue(index: number, field: string, value: string | number) {
+        const newData: Array<Sidebar> = [...sidebars];
         newData[index][field] = value;
         setSidebars(newData);
     }
-    function handleChange(values) {
+    function handleChange(values: Array<Sidebar>) {
         setSidebars(values);
     }
 

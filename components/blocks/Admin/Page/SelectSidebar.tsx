@@ -1,15 +1,21 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { Sidebar } from "@/types/Sidebar";
 import { useEffect, useState } from "react";
 
+type Props = {
+    sidebarId?: number;
+    onChange?: (sidebar: any) => void;
+    onSubmit?: (sidebar: any) => void;
+}
 function SelectSidebar({
     sidebarId,
     onChange,
     onSubmit
-}) {
-    const [sidebars, setSidebars] = useState([]);
-    const [selectedSidebar, setSelectedSidebar] = useState(null);
+}: Props) {
+    const [sidebars, setSidebars] = useState<Array<Sidebar>>([]);
+    const [selectedSidebar, setSelectedSidebar] = useState<Sidebar>();
 
     async function fetchSidebars() {
         // Fetch sidebars from the API or any other source
@@ -64,13 +70,14 @@ function SelectSidebar({
             }}>
             <select
                 className="form-control"
-                onChange={e => {
-                    const findSelectedSidebar = sidebars.find(sidebar => parseInt(sidebar?.id) === parseInt(e.target.value));
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                    let selectedValue = parseInt(e.target.value);
+                   
+                    const findSelectedSidebar = sidebars.find(sidebar => sidebar.id === selectedValue);
                     setSelectedSidebar(findSelectedSidebar);
                 }}
-                required=""
-                value={parseInt(selectedSidebar?.id) || ''}
-            >
+                value={selectedSidebar?.id || ''}
+                >
                 <option value="">Select Sidebar</option>
                 {sidebars.map((sidebar, index) => (
                     <option

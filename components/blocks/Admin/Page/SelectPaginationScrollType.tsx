@@ -3,14 +3,18 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
+type Props = {
+    value?: string;
+    onChange?: (value: string) => void;
+    showSubmitButton?: boolean;
+}
 function SelectPaginationScrollTypes({
     value,
     onChange,
-    onSubmit,
     showSubmitButton = true,
-}) {
-    const [paginationScrollTypes, setPaginationScrollTypes] = useState([]);
-    const [selectedPaginationScrollType, setSelectedPaginationScrollType] = useState(null);
+}: Props) {
+    const [paginationScrollTypes, setPaginationScrollTypes] = useState<Array<string>>([]);
+    const [selectedPaginationScrollType, setSelectedPaginationScrollType] = useState<string>('');
 
     async function fetchPaginationScrollTypes() {
         // Fetch paginationScrollTypes from the API or any other source
@@ -51,7 +55,6 @@ function SelectPaginationScrollTypes({
                 onChange={e => {
                     setSelectedPaginationScrollType(e.target.value);
                 }}
-                required=""
                 value={selectedPaginationScrollType || ''}
             >
                 <option value="">Select Pagination Type</option>

@@ -1,7 +1,7 @@
-import { Block } from "@/types/Block";
+import { PageBlock } from "@/types/PageBlock";
 import { Nav, Tab } from "react-bootstrap";
 
-export type TabItem = Block & {
+export type TabItem = PageBlock & {
     key: string;
     component: any;
 }

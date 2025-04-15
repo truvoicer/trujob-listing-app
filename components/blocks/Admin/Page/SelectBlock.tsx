@@ -1,25 +1,20 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { Block } from "@/types/Block";
 import { useEffect, useState } from "react";
 
 type Props = {
-    pageId: string;
-    pageBlockId: string | null;
-    pageBlockName: string | null;
-    onChange: (block: any) => void;
+    onChange?: (block: any) => void;
     onSubmit?: (block: any) => void;
 }
 
 function SelectBlock({
-    pageId,
-    pageBlockId,
-    pageBlockName,
     onChange,
     onSubmit
-}) {
-    const [blocks, setBlocks] = useState([]);
-    const [selectedBlock, setSelectedBlock] = useState(null);
+}: Props) {
+    const [blocks, setBlocks] = useState<Array<Block>>([]);
+    const [selectedBlock, setSelectedBlock] = useState<Block | null>(null);
 
     async function fetchBlocks() {
         // Fetch blocks from the API or any other source
@@ -38,27 +33,6 @@ function SelectBlock({
     useEffect(() => {
         fetchBlocks();
     }, []);
-
-
-    useEffect(() => {
-        if (!pageBlockId) {
-            return;
-        }
-        if (!Array.isArray(blocks) || blocks.length === 0) {
-            return;
-        }
-        const findSelectedBlock = blocks.find(block => block?.id === pageBlockId);
-        if (findSelectedBlock) {
-            // setSelectedBlock(findSelectedBlock);
-            return;
-        }
-        const findBlock = blocks.find(block => block?.name === pageBlockName);
-        if (findBlock) {
-            // setSelectedBlock(findBlock);
-            return;
-        }
-        console.warn('No block found with the given ID or name');
-    }, [pageBlockId, blocks]);
 
     useEffect(() => {
         if (typeof onChange === 'function') {
@@ -82,9 +56,11 @@ function SelectBlock({
                     onChange={e => {
                         const findSelectedBlock = blocks.find(block => block?.type === e.target.value);
                         console.log('Selected Block:', findSelectedBlock, e.target.value, blocks);
+                        if (!findSelectedBlock) {
+                            return;
+                        }
                         setSelectedBlock(findSelectedBlock);
                     }}
-                    required=""
                     value={selectedBlock?.type || ''}
                 >
                     <option value="">Select Block</option>

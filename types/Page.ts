@@ -1,16 +1,16 @@
-import { Block } from "./Block";
+import { PageBlock } from "./PageBlock";
 import { Role } from "./Role";
 import { Sidebar } from "./Sidebar";
 
 export type Page = {
-    [key: string]: string | boolean | number | null | PageSettings | Array<Block> | Array<Role> | Array<Sidebar>;
+    [key: string]: string | boolean | number | null | PageSettings | Array<PageBlock> | Array<Role> | Array<Sidebar>;
     id: number;
     view: string;
     permalink: string;
     name: string;
     title: null | string;
     content: null | string;
-    blocks: Array<Block>;
+    blocks: Array<PageBlock>;
     has_sidebar: boolean;
     sidebars: Array<Sidebar>;
     is_active: boolean;

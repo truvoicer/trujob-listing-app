@@ -11,7 +11,7 @@ import ErrorView from '../Error/ErrorView';
 import { useRouter } from 'next/navigation';
 import TabLayout, { TabItem } from '@/components/Layout/TabLayout';
 import { Page } from '@/types/Page';
-import { Block } from '@/types/Block';
+import { PageBlock } from '@/types/PageBlock';
 
 type Props = {
     data: Page;
@@ -24,7 +24,7 @@ type BlockData = {
 function AdminPageView({ data, page }: Props) {
     const router = useRouter();
     const blockFactory = new BlockFactory();
-    function buildBlocks(blockData: Array<Block>) {
+    function buildBlocks(blockData: Array<PageBlock>) {
         return blockData.map((item, index) => {
             let itemProps = item?.props || {};
             const getBlock = blockFactory.renderBlock(item?.type);
@@ -77,7 +77,7 @@ function AdminPageView({ data, page }: Props) {
             tabbedBlocks.push(tabItem);
         });
         return tabbedBlocks;
-        
+
     }
 
     function renderView(blocks: Array<BlockData>) {

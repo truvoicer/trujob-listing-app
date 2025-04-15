@@ -10,7 +10,7 @@ import AccessControlComponent from '@/components/AccessControl/AccessControlComp
 import ErrorView from '../Error/ErrorView';
 import Loader from '@/components/Loader';
 import { Page } from '@/types/Page';
-import { Block } from '@/types/Block';
+import { PageBlock } from '@/types/PageBlock';
 
 type Props = {
     data: Page;
@@ -26,7 +26,7 @@ function PageView({
 }: Props) {
     const blockFactory = new BlockFactory();
 
-    function buildBlocks(blockData: Array<Block>) {
+    function buildBlocks(blockData: Array<PageBlock>) {
         return blockData.map((item, index) => {
             let itemProps = item?.props || {};
             const getBlock = blockFactory.renderBlock(item?.type);

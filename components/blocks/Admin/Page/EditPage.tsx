@@ -16,7 +16,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Page } from "@/types/Page";
 import { Sidebar } from "@/types/Sidebar";
-import { Block } from "@/types/Block";
+import { PageBlock } from "@/types/PageBlock";
 
 type Props = {
     data: Page;
@@ -126,7 +126,7 @@ function EditPage({ data, operation }: Props) {
                                 });
                         }
                         if (Array.isArray(requestData?.blocks)) {
-                            requestData.blocks = requestData?.blocks.map((block: Block) => {
+                            requestData.blocks = requestData?.blocks.map((block: PageBlock) => {
                                 if (Array.isArray(block?.sidebars)) {
                                     block.sidebars = block.sidebars
                                         .filter((sidebar: Sidebar) => {
@@ -335,7 +335,7 @@ function EditPage({ data, operation }: Props) {
                                     <Modal.Body>
                                         <PageBlockForm
                                             data={values?.blocks || []}
-                                            onChange={(blocks: Array<Block>) => {
+                                            onChange={(blocks: Array<PageBlock>) => {
                                                 console.log('blocks', blocks);
                                                 setFieldValue('blocks', blocks);
                                             }}
