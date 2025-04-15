@@ -1,34 +1,59 @@
-import Form from "@/components/form/Form";
+import Form from "@/components/form/form";
+import DataTable from "@/components/Table/DataTable";
+import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
+import PageBlockForm from "./PageBlockForm";
+import { formContextData } from "@/components/form/contexts/FormContext";
 import { Button, Modal } from "react-bootstrap";
+import SidebarForm from "./SidebarForm";
+import SelectPageViews from "./SelectPageViews";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
+import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import MenuItemForm from "./ManageMenuItems";
-import RoleForm from "../Role/RoleForm";
 
-function EditMenu({ data, operation }) {
-    const [rolesModal, setRolesModal] = useState({
+function EditPage({ data, operation }) {
+    const [blocksModal, setBlocksModal] = useState({
         show: false,
         title: '',
         footer: true,
     });
-    const [menuItemsModal, setMenuItemsModal] = useState({
+    const [sidebarsModal, setSidebarsModal] = useState({
         show: false,
         title: '',
         footer: true,
     });
 
     const initialValues = {
-        'name': data?.name || '',
-        'has_parent': data?.has_parent || false,
-        'ul_class': data?.ul_class || '',
-        'active': data?.active || false,
-        'roles': data?.roles || [],
-        'menu_items': data?.menu_items || [],
+        view: data?.view || '',
+        name: data?.name || '',
+        title: data?.title || '',
+        permalink: data?.permalink || '',
+        content: data?.content || '',
+        is_active: data?.is_active || false,
+        is_featured: data?.is_featured || false,
+        is_home: data?.is_home || false,
+        blocks: data?.blocks || [],
+        has_sidebar: data?.has_sidebar || false,
+        sidebars: data?.sidebars || [],
+        settings: {
+            meta_title: data?.settings?.meta_title || '',
+            meta_description: data?.settings?.meta_description || '',
+            meta_keywords: data?.settings?.meta_keywords || '',
+            meta_robots: data?.settings?.meta_robots || '',
+            meta_canonical: data?.settings?.meta_canonical || '',
+            meta_author: data?.settings?.meta_author || '',
+            meta_publisher: data?.settings?.meta_publisher || '',
+            meta_og_title: data?.settings?.meta_og_title || '',
+            meta_og_description: data?.settings?.meta_og_description || '',
+            meta_og_type: data?.settings?.meta_og_type || '',
+            meta_og_url: data?.settings?.meta_og_url || '',
+            meta_og_image: data?.settings?.meta_og_image || '',
+            meta_og_site_name: data?.settings?.meta_og_site_name || ''
+        }
     };
     function hideModal(setter) {
         setter(prevState => {
@@ -59,17 +84,18 @@ function EditMenu({ data, operation }) {
         });
     }
 
+    const appModalContext = useContext(AppModalContext);
     const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
+
                 <Form
                     operation={operation}
                     initialValues={initialValues}
                     onSubmit={async (values) => {
                         let requestData = { ...values };
-                        console.log('requestData', requestData);
-                        return;
+                        
                         if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
                             console.warn('No data to update');
                             return;
@@ -96,8 +122,8 @@ function EditMenu({ data, operation }) {
                                 return block;
                             });
                         }
-
-
+                        
+                        
                         let response = null;
                         switch (operation) {
                             case 'edit':
@@ -129,7 +155,7 @@ function EditMenu({ data, operation }) {
                             return;
                         }
                         dataTableContext.refresh();
-                        dataTableContext.modal.close(EDIT_MENU_MODAL_ID);
+                        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
 
                     }}
                 >
@@ -143,6 +169,15 @@ function EditMenu({ data, operation }) {
                             <>
                                 <div className="row">
                                     <div className="col-12 col-lg-6">
+                                        <SelectPageViews
+                                            value={values?.view || ''}
+                                            onChange={(pageViews) => {
+                                                setFieldValue('view', pageViews);
+                                            }}
+                                            showSubmitButton={false}
+                                        />
+                                    </div>
+                                    <div className="col-12 col-lg-6">
                                         <div className="custom-control custom-checkbox mb-3 text-left">
                                             <input
                                                 onChange={e => {
@@ -150,15 +185,57 @@ function EditMenu({ data, operation }) {
                                                 }}
                                                 type="checkbox"
                                                 className="custom-control-input"
-                                                id="active"
-                                                name="active"
-                                                checked={values?.active || false} />
-                                            <label className="custom-control-label" htmlFor="active">
-                                                Active
+                                                id="is_active"
+                                                name="is_active"
+                                                checked={values?.is_active || false} />
+                                            <label className="custom-control-label" htmlFor="is_active">
+                                                Is active
                                             </label>
                                         </div>
                                     </div>
 
+                                    <div className="col-12 col-lg-6">
+                                        <div className="custom-control custom-checkbox mb-3 text-left">
+                                            <input
+                                                type="checkbox"
+                                                className="custom-control-input"
+                                                id="is_featured"
+                                                name="is_featured"
+                                                onChange={onChange}
+                                                checked={values?.is_featured || false} />
+                                            <label className="custom-control-label" htmlFor="is_featured">
+                                                Is Featured
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12 col-lg-6">
+                                        <div className="custom-control custom-checkbox mb-3 text-left">
+                                            <input
+                                                type="checkbox"
+                                                className="custom-control-input"
+                                                id="is_home"
+                                                name="is_home"
+                                                onChange={onChange}
+                                                checked={values?.is_home || false} />
+                                            <label className="custom-control-label" htmlFor="is_home">
+                                                Is Home
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div className="col-12 col-lg-6">
+                                        <div className="floating-input form-group">
+                                            <input
+                                                className="form-control"
+                                                type="text"
+                                                name="title"
+                                                id="title"
+                                                required=""
+                                                onChange={onChange}
+                                                value={values?.title || ""} />
+                                            <label className="form-label" htmlFor="title">Title</label>
+                                        </div>
+                                    </div>
                                     <div className="col-12 col-lg-6">
                                         <div className="floating-input form-group">
                                             <input
@@ -172,20 +249,31 @@ function EditMenu({ data, operation }) {
                                             <label className="form-label" htmlFor="name">Name</label>
                                         </div>
                                     </div>
-
                                     <div className="col-12 col-lg-6">
                                         <div className="floating-input form-group">
                                             <input
                                                 className="form-control"
                                                 type="text"
-                                                name="ul_class"
-                                                id="ul_class"
+                                                name="permalink"
+                                                id="permalink"
                                                 required=""
                                                 onChange={onChange}
-                                                value={values?.ul_class || ""} />
-                                            <label className="form-label" htmlFor="ul_class">
-                                                UL Class
-                                            </label>
+                                                value={values?.permalink || ""} />
+                                            <label className="form-label" htmlFor="permalink">Permalink</label>
+                                        </div>
+                                    </div>
+
+
+                                    <div className="col-12 col-lg-6">
+                                        <div className="floating-input form-group">
+                                            <textarea
+                                                className="form-control"
+                                                name="content"
+                                                id="content"
+                                                required=""
+                                                onChange={onChange}
+                                                value={values?.content || ""}></textarea>
+                                            <label className="form-label" htmlFor="content">Content</label>
                                         </div>
                                     </div>
 
@@ -196,25 +284,26 @@ function EditMenu({ data, operation }) {
                                             type="button"
                                             className="btn btn-primary mr-2"
                                             onClick={(e) => {
-                                                setModalTitle('Manage Roles', setRolesModal);
-                                                setModalFooter(false, setRolesModal);
-                                                showModal(setRolesModal);
+                                                setModalTitle('Manage Blocks', setBlocksModal);
+                                                setModalFooter(false, setBlocksModal);
+                                                showModal(setBlocksModal);
                                             }}
                                         >
-                                            Manage Roles
+                                            Manage Blocks
                                         </button>
                                         <button
                                             type="button"
                                             className="btn btn-primary mr-2"
                                             onClick={(e) => {
-                                                setModalTitle('Manage Menu Items', setMenuItemsModal);
-                                                setModalFooter(false, setMenuItemsModal);
-                                                showModal(setMenuItemsModal);
+                                                setModalTitle('Manage Sidebars', setSidebarsModal);
+                                                setModalFooter(false, setSidebarsModal);
+                                                showModal(setSidebarsModal);
                                             }}
                                         >
-                                            Manage Menu Items
+                                            Manage Sidebars
                                         </button>
                                     </div>
+
 
                                     <div className="col-12">
                                         <button
@@ -226,48 +315,48 @@ function EditMenu({ data, operation }) {
                                     </div>
                                 </div>
 
-                                <Modal show={rolesModal.show} onHide={() => hideModal(setRolesModal)}>
+                                <Modal show={blocksModal.show} onHide={() => hideModal(setBlocksModal)}>
                                     <Modal.Header closeButton>
-                                        <Modal.Title>{rolesModal?.title || ''}</Modal.Title>
+                                        <Modal.Title>{blocksModal?.title || ''}</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
-                                        <RoleForm
-                                            data={values?.roles || []}
-                                            onChange={(roles) => {
-                                                setFieldValue('roles', roles);
+                                        <PageBlockForm
+                                            data={values?.blocks || []}
+                                            onChange={(blocks) => {
+                                                console.log('blocks', blocks);
+                                                setFieldValue('blocks', blocks);
                                             }}
                                         />
                                     </Modal.Body>
-                                    {rolesModal.footer &&
+                                    {blocksModal.footer &&
                                         <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
+                                            <Button variant="secondary" onClick={() => hideModal(setBlocksModal)}>
                                                 Close
                                             </Button>
-                                            <Button variant="primary" onClick={() => hideModal(setRolesModal)}>
+                                            <Button variant="primary" onClick={() => hideModal(setBlocksModal)}>
                                                 Save Changes
                                             </Button>
                                         </Modal.Footer>
                                     }
                                 </Modal>
-                                <Modal show={menuItemsModal.show} onHide={() => hideModal(setMenuItemsModal)}>
+                                <Modal show={sidebarsModal.show} onHide={() => hideModal(setSidebarsModal)}>
                                     <Modal.Header closeButton>
-                                        <Modal.Title>{menuItemsModal?.title || ''}</Modal.Title>
+                                        <Modal.Title>{sidebarsModal?.title || ''}</Modal.Title>
                                     </Modal.Header>
                                     <Modal.Body>
-                                        <MenuItemForm
-                                            data={values?.menu_items || []}
-                                            onChange={(menuItems) => {
-                                                console.log('menuItems', menuItems);
-                                                setFieldValue('menu_items', menuItems);
+                                        <SidebarForm
+                                            data={values?.sidebars || []}
+                                            onChange={(sidebars) => {
+                                                setFieldValue('sidebars', sidebars);
                                             }}
                                         />
                                     </Modal.Body>
-                                    {menuItemsModal.footer &&
+                                    {sidebarsModal.footer &&
                                         <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => hideModal(setMenuItemsModal)}>
+                                            <Button variant="secondary" onClick={() => hideModal(setSidebarsModal)}>
                                                 Close
                                             </Button>
-                                            <Button variant="primary" onClick={() => hideModal(setMenuItemsModal)}>
+                                            <Button variant="primary" onClick={() => hideModal(setSidebarsModal)}>
                                                 Save Changes
                                             </Button>
                                         </Modal.Footer>
@@ -281,4 +370,4 @@ function EditMenu({ data, operation }) {
         </div>
     );
 }
-export default EditMenu;
+export default EditPage;

@@ -5,8 +5,24 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { Metadata, ResolvingMetadata } from "next";
 
-export async function generateMetadata({ params, searchParams }, parent) {
+type Props = {
+  params: Promise<{ page: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+
+  const routeParams = await params;
+  let uri;
+  if (Array.isArray(routeParams.page)) {
+    uri = routeParams.page.join("/");
+  }
+
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.resourceRequest({
     endpoint: `${truJobApiConfig.endpoints.site}/${siteConfig.site.name}`,
@@ -20,17 +36,19 @@ export async function generateMetadata({ params, searchParams }, parent) {
     endpoint: `${truJobApiConfig.endpoints.site}/page`,
     method: ApiMiddleware.METHOD.GET,
     query: {
-      permalink: `/`,
+      permalink: `/${uri}`,
     },
   });
 
   if (truJobApiMiddleware.hasErrors()) {
+    console.log(truJobApiMiddleware.hasErrors());
     throw new Error(
       `Failed to load data | ${JSON.stringify(truJobApiMiddleware.getErrors())}`,
     );
+    return Promise.resolve({});
   }
   if (!page) {
-    return;
+    return Promise.resolve({});
   }
   let title = [];
   if (page?.data?.seo_title) {
@@ -44,7 +62,12 @@ export async function generateMetadata({ params, searchParams }, parent) {
   };
 }
 
-async function Home({ params }) {
+async function Home({ params }: Props) {
+  const routeParams = await params;
+  let uri;
+  if (Array.isArray(routeParams.page)) {
+    uri = routeParams.page.join("/");
+  }
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.resourceRequest({
     endpoint: `${truJobApiConfig.endpoints.site}/${siteConfig.site.name}`,
@@ -58,10 +81,10 @@ async function Home({ params }) {
     endpoint: `${truJobApiConfig.endpoints.site}/page`,
     method: ApiMiddleware.METHOD.GET,
     query: {
-      permalink: `/`,
+      permalink: `/${uri}`,
     },
   });
-  console.log(site, settings, page);
+  console.log(site, settings, page, `/${uri}`);
   if (!settings?.data) {
     return;
   }

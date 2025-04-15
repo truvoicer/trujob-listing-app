@@ -11,7 +11,13 @@ import { setAppModeAction } from '@/library/redux/actions/app-actions';
 import ViewLayout from './Layout/ViewLayout';
 import { isObject, isObjectEmpty } from '@/helpers/utils';
 
-function App({ data, settings, site, page }) {
+type Props = {
+    data: any;
+    settings: any;
+    site: any;
+    page: any;
+}
+function App({ data, settings, site, page }: Props) {
     function getAppMode() {
         const dark = localStorage.getItem('dark');
         return dark === 'true' ? 'dark' : 'light';
@@ -48,7 +54,7 @@ function App({ data, settings, site, page }) {
 }
 
 export default connect(
-    state => ({
+    (state: any) => ({
         page: state[PAGE_STATE],
     })
 )(App);

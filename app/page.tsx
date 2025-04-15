@@ -5,11 +5,18 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import type { Metadata, ResolvingMetadata } from 'next'
 
-export async function generateMetadata({ params, searchParams }, parent) {
+type Props = {
+  params: Promise<{ page: string }>
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-  const routeParams = await params;
-  let uri;
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.resourceRequest({
     endpoint: `${truJobApiConfig.endpoints.site}/${siteConfig.site.name}`,
@@ -19,20 +26,21 @@ export async function generateMetadata({ params, searchParams }, parent) {
     endpoint: `${truJobApiConfig.endpoints.settings}`,
     method: ApiMiddleware.METHOD.GET,
   });
-
   const page = await truJobApiMiddleware.resourceRequest({
-    endpoint: `${truJobApiConfig.endpoints.page}/${routeParams.item}`,
+    endpoint: `${truJobApiConfig.endpoints.site}/page`,
     method: ApiMiddleware.METHOD.GET,
+    query: {
+      permalink: `/`,
+    },
   });
 
   if (truJobApiMiddleware.hasErrors()) {
     throw new Error(
       `Failed to load data | ${JSON.stringify(truJobApiMiddleware.getErrors())}`,
     );
-    return;
   }
   if (!page) {
-    return;
+    return Promise.resolve({});
   }
   let title = [];
   if (page?.data?.seo_title) {
@@ -46,9 +54,7 @@ export async function generateMetadata({ params, searchParams }, parent) {
   };
 }
 
-async function Item({ params }) {
-  const routeParams = await params;
-  let uri;
+async function Home({ params }: Props ) {
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.resourceRequest({
     endpoint: `${truJobApiConfig.endpoints.site}/${siteConfig.site.name}`,
@@ -58,11 +64,14 @@ async function Item({ params }) {
     endpoint: `${truJobApiConfig.endpoints.settings}`,
     method: ApiMiddleware.METHOD.GET,
   });
-
   const page = await truJobApiMiddleware.resourceRequest({
-    endpoint: `${truJobApiConfig.endpoints.page}/${routeParams.item}`,
+    endpoint: `${truJobApiConfig.endpoints.site}/page`,
     method: ApiMiddleware.METHOD.GET,
+    query: {
+      permalink: `/`,
+    },
   });
+  console.log(site, settings, page);
   if (!settings?.data) {
     return;
   }
@@ -79,5 +88,5 @@ async function Item({ params }) {
   )
 }
 
-export default Item;
+export default Home;
 

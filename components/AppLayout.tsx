@@ -3,11 +3,16 @@ import React from 'react';
 import {Provider} from "react-redux";
 import store from "@/library/redux/store";
 import {Inter} from "next/font/google";
-import { TruJobApiMiddleware } from '@/library/middleware/api/TruJobApiMiddleware';
 
 const inter = Inter({subsets: ['latin']})
 
-function AppLayout(props) {
+type LayoutProps = {
+    children: React.ReactNode;
+    params: { [key: string]: string | string[] | undefined };
+    searchParams: { [key: string]: string | string[] | undefined };
+  };
+
+function AppLayout(props: LayoutProps) {
     const {children, params} = props;
     return (
         <Provider store={store}>

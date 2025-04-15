@@ -9,7 +9,10 @@ import { Button, Modal } from "react-bootstrap";
 import { useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
 
-function ViewLayout({ page }) {
+type Props = {
+    page: any;
+}
+function ViewLayout({ page }: Props) {
     const viewFactory = new ViewFactory();
     const view = viewFactory.renderView(page);
 
@@ -160,7 +163,7 @@ function ViewLayout({ page }) {
     );
 }
 export default connect(
-    state => ({
+    (state: any) => ({
         page: state[PAGE_STATE],
     })
 )(ViewLayout);
