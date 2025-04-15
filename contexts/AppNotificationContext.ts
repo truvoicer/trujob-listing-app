@@ -1,3 +1,4 @@
+import { NotificationService } from '@/library/services/notification/NotificationService'
 import React from 'react'
 
 export const NOTIFICATION_TYPE_TOAST = 'toast'
@@ -74,9 +75,6 @@ export const notificationVariants = [
     'light',
     'dark',
 ];
-export const appNotificationContextData = {
-    notifications: [],
-    add: () => {},
-    remove: () => {}
-};
-export const AppNotificationContext = React.createContext(appNotificationContextData);
+export const AppNotificationContext = React.createContext(
+    NotificationService.INIT_DATA
+);

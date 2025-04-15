@@ -9,10 +9,24 @@ import ListingLayoutSidebar from '../ListingLayoutSidebar';
 import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
 import ErrorView from '../Error/ErrorView';
 import Loader from '@/components/Loader';
+import { Page } from '@/types/Page';
+import { Block } from '@/types/Block';
 
-function PageView({ data, page }) {
+type Props = {
+    data: Page;
+    page: Page;
+}
+type BlockData = {
+    component: any;
+    props: any;
+}
+function PageView({ 
+    data, 
+    page 
+}: Props) {
     const blockFactory = new BlockFactory();
-    function buildBlocks(blockData) {
+
+    function buildBlocks(blockData: Array<Block>) {
         return blockData.map((item, index) => {
             let itemProps = item?.props || {};
             const getBlock = blockFactory.renderBlock(item?.type);
@@ -31,7 +45,7 @@ function PageView({ data, page }) {
             }
         });
     }
-    function renderBlocks(blockData) {
+    function renderBlocks(blockData: Array<BlockData>) {
         return (
             <>
                 {blockData.map((item, index) => {
@@ -48,7 +62,7 @@ function PageView({ data, page }) {
             </>
         )
     }
-    function renderView(blocks) {
+    function renderView(blocks: React.ReactNode) {
         if (data?.has_sidebar) {
             return (
                 <ListingLayoutSidebar>
@@ -77,13 +91,13 @@ function PageView({ data, page }) {
     
     return renderView(
         renderBlocks(
-            buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
+            buildBlocks(data?.blocks || [])
         )
     );
 }
 
 export default connect(
-    (state) => {
+    (state: any) => {
         return {
             page: state[PAGE_STATE],
         }

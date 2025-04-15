@@ -1,18 +1,30 @@
 import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE, SESSION_USER, SESSION_USER_ROLES } from "@/library/redux/constants/session-constants";
 import { connect } from "react-redux";
 import Loader from "../Loader";
+import { Role } from "@/types/Role";
 
+type Props = {
+    session: any;
+    children: React.Component | React.ReactNode;
+    roles?: Array<Role> | null | undefined;
+    loader?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
+    fallback?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
+}
 function AccessControlComponent({
     children,
     session,
     loader,
     fallback,
     roles = [],
-}) {
-    function hasRole(roleData, name) {
+}: Props) {
+    function hasRole(roleData: Array<Role>, name: string) {
         return roleData.find(r => r?.name === name);
     }
     function showComponent() {
+        if (!Array.isArray(roles)) {
+            return true;
+        }
+
         if (roles.length === 0) {
             return true;
         }
@@ -77,7 +89,7 @@ function AccessControlComponent({
 }
 
 export default connect(
-    state => ({
+    (state: any) => ({
         session: state[SESSION_STATE]
     })
 )(AccessControlComponent);
