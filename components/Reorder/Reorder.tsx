@@ -2,45 +2,61 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import React, { useContext, useEffect, useState } from "react";
 import { Accordion, Button, Card, Modal } from "react-bootstrap";
 
+type Props = {
+    children: (props: any) => React.ReactNode;
+    data?: Array<any>;
+    itemHeader?: string | ((item: any, index: number) => React.ReactNode);
+    itemSchema?: any;
+    onAdd?: (props: any) => any;
+    onChange?: (data: Array<any>) => void;
+    enableControls?: boolean;
+    enableEdit?: boolean;
+}
 function Reorder({
     children,
     data = [],
-    itemHeader = null,
+    itemHeader,
     itemSchema = {},
-    onAdd = null,
-    onChange = null,
+    onAdd,
+    onChange,
     enableControls = true,
     enableEdit = true,
-}) {
-    const [childIndex, setChildIndex] = useState(null);
-    const [modalTitle, setModalTitle] = useState('');
-    const [modalShow, setModalShow] = useState(false);
-    const [modalShowFooter, setModalShowFooter] = useState(true);
-    const appModalContext = useContext(AppModalContext);
-    const reorderData = data;
+}: Props) {
+    const [childIndex, setChildIndex] = useState<number|null>(null);
+    const [modalTitle, setModalTitle] = useState<string>('');
+    const [modalShow, setModalShow] = useState<boolean>(false);
+    const [modalShowFooter, setModalShowFooter] = useState<boolean>(true);
+    
+    const reorderData: Array<any> = data;
 
-    function handleMoveUp(index) {
+    function handleChange(data: Array<any>) {
+        if (typeof onChange === 'function') {
+            onChange(data);
+        }
+    }
+
+    function handleMoveUp(index: number) {
         if (index > 0) {
             const newData = [...reorderData];
             const temp = newData[index - 1];
             newData[index - 1] = newData[index];
             newData[index] = temp;
-            onChange(newData);
+            handleChange(newData);
         }
     }
-    function handleMoveDown(index) {
+    function handleMoveDown(index: number) {
         if (index < reorderData.length - 1) {
             const newData = [...reorderData];
             const temp = newData[index + 1];
             newData[index + 1] = newData[index];
             newData[index] = temp;
-            onChange(newData);
+            handleChange(newData);
         }
     }
-    function handleDelete(index) {
+    function handleDelete(index: number) {
         const newData = [...reorderData];
         newData.splice(index, 1);
-        onChange(newData);
+        handleChange(newData);
     }
     function handleAddNew() {
         const newData = [...reorderData];
@@ -58,10 +74,10 @@ function Reorder({
             return;
         }
         newData.push(newItem);
-        onChange(newData);
+        handleChange(newData);
     }
 
-    function renderItemHeader(item, index) {
+    function renderItemHeader(item: any, index: number) {
         if (typeof itemHeader === 'function') {
             return itemHeader(item, index);
         }

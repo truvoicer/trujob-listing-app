@@ -3,6 +3,14 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
+type Props = {
+    pageId: string;
+    pageBlockId: string | null;
+    pageBlockName: string | null;
+    onChange: (block: any) => void;
+    onSubmit?: (block: any) => void;
+}
+
 function SelectBlock({
     pageId,
     pageBlockId,

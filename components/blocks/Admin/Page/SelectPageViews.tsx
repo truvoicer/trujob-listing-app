@@ -3,14 +3,20 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
+type Props = {
+    value: string | null;
+    onChange: (pageView: string) => void;
+    onSubmit?: (pageView: string) => void;
+    showSubmitButton?: boolean;
+}
 function SelectPageViews({
     value,
     onChange,
     onSubmit,
     showSubmitButton = true,
-}) {
-    const [pageViews, setPageViews] = useState([]);
-    const [selectedPageView, setSelectedPageView] = useState(null);
+}: Props) {
+    const [pageViews, setPageViews] = useState<Array<string>>([]);
+    const [selectedPageView, setSelectedPageView] = useState<string>(value || '');
 
     async function fetchPageViews() {
         // Fetch pageViews from the API or any other source
@@ -49,7 +55,6 @@ function SelectPageViews({
                             onChange(e.target.value);
                         }
                     }}
-                    required=""
                     value={selectedPageView || ''}
                 >
                     <option value="">Select PageView</option>

@@ -8,7 +8,7 @@ export const dataTableContextData = {
     meta: {},
     query: {},
     modal: {
-        ...ModalService.INIT_CONTEXT_DATA,
+        ...ModalService.INIT_DATA,
     },
     refresh: () => {},
     update: () => {},

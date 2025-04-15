@@ -3,7 +3,7 @@ import { Role } from "./Role";
 import { Sidebar } from "./Sidebar";
 
 export type Page = {
-    [key: string]: string | boolean | number | null | Array<Block> | Array<Role> | Array<Sidebar>;
+    [key: string]: string | boolean | number | null | PageSettings | Array<Block> | Array<Role> | Array<Sidebar>;
     id: number;
     view: string;
     permalink: string;
@@ -17,8 +17,26 @@ export type Page = {
     is_home: boolean;
     is_featured: boolean;
     is_protected: boolean;
+    settings: PageSettings;
     deleted_at: null | string;
     created_at: string;
     updated_at: string;
     roles: Array<Role>;
+}
+
+export type PageSettings = {
+    [key: string]: string;
+    meta_title: string;
+    meta_description: string;
+    meta_keywords: string;
+    meta_robots: string;
+    meta_canonical: string;
+    meta_author: string;
+    meta_publisher: string;
+    meta_og_title: string;
+    meta_og_description: string;
+    meta_og_type: string;
+    meta_og_url: string;
+    meta_og_image: string;
+    meta_og_site_name: string;
 }

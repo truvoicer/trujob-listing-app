@@ -1,8 +1,19 @@
+import { Block } from "@/types/Block";
 import { Nav, Tab } from "react-bootstrap";
 
+export type TabItem = Block & {
+    key: string;
+    component: any;
+}
+type Props = {
+    config: Array<TabItem>;
+}
+type ContainerProps = {
+    defaultActiveKey: string;
+}
 function TabLayout({
     config = []
-}) {
+}: Props) {
     console.log('TabLayout', config);
     function getDefaultKey() {
         const filterDefaults = config.filter(item => item?.default);
@@ -13,7 +24,10 @@ function TabLayout({
     }
 
     function getTabContainerProps() {
-        let containerProps = {};
+        let containerProps: ContainerProps = {
+            defaultActiveKey: '',
+        };
+        
         const defaultKey = getDefaultKey();
         if (defaultKey) {
             containerProps.defaultActiveKey = defaultKey;
@@ -75,7 +89,7 @@ function TabLayout({
 
 
                         <Tab.Content>
-                            {config.map((item, index) => {
+                            {config.map((item: TabItem, index: number) => {
                                 if (!item?.key) {
                                     console.warn('Tab key is required', { index, item });
                                     return null;

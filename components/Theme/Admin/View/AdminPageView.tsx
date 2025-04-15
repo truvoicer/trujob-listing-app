@@ -9,7 +9,7 @@ import AccessControlComponent from '@/components/AccessControl/AccessControlComp
 import Loader from '@/components/Loader';
 import ErrorView from '../Error/ErrorView';
 import { useRouter } from 'next/navigation';
-import TabLayout from '@/components/Layout/TabLayout';
+import TabLayout, { TabItem } from '@/components/Layout/TabLayout';
 import { Page } from '@/types/Page';
 import { Block } from '@/types/Block';
 
@@ -61,7 +61,7 @@ function AdminPageView({ data, page }: Props) {
     }
 
     function buildTabbedBlocks(blockData: Array<BlockData>) {
-        const tabbedBlocks = [];
+        const tabbedBlocks: Array<TabItem> = [];
         blockData.forEach((item, index) => {
             const tabItem = {
                 ...item.props,
@@ -77,7 +77,7 @@ function AdminPageView({ data, page }: Props) {
             tabbedBlocks.push(tabItem);
         });
         return tabbedBlocks;
-
+        
     }
 
     function renderView(blocks: Array<BlockData>) {

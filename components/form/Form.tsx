@@ -1,7 +1,33 @@
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
+import React, { useState, useEffect } from 'react';
 
-const { useEffect, useState } = require("react");
-const { formContextData, FormContext } = require("./contexts/FormContext");
+export type FormProps = {
+    operation: string;
+    className?: string  | null;
+    initialValues?: any;
+    requiredFields?: any;
+    validation?: any;
+    onSubmit: (data: any, errors: any) => void;
+    preventSubmitOnErrors?: boolean;
+    children: any;
+}
+export type ValidationRule = {
+    [key: string]: string | number | boolean | null;
+    type: string;
+    message: string | null;
+    value: any;
+    field: string | null;
+}
+export type FormContextType = {
+    values: any;
+    setValues: (values: any) => void;
+    setFieldValue: (key: string, value: any) => void;
+    onChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
+    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
+    validate: () => any;
+    errors: any;
+}
 
 export const VALIDATION_REQUIRED = 'required';
 export const VALIDATION_EMAIL = 'email';
@@ -30,7 +56,20 @@ export const VALIDATION_RULES = [
     VALIDATION_REGEX,
     VALIDATION_MATCH,
     VALIDATION_ALPHA_NUMERIC_SYMBOLS,
-]
+];
+
+export const formContextData: FormContextType = {
+    values: {},
+    setValues: () => {},
+    setFieldValue: () => {},
+    onChange: () => {},
+    onSubmit: () => {},
+    onBlur: () => {},
+    validate: () => {},
+    errors: {},
+};
+export const FormContext = React.createContext(formContextData);
+
 function Form({
     operation = 'create',
     className = '',
@@ -40,7 +79,7 @@ function Form({
     onSubmit,
     preventSubmitOnErrors = true,
     children
-}) {
+}: FormProps) {
 
     const [formContextState, setFormContextState] = useState({
         ...formContextData,
@@ -53,7 +92,7 @@ function Form({
         validate: validationHandler,
     });
 
-    function setValues(values) {
+    function setValues(values: any) {
         if (typeof values !== 'object') {
             return;
         }
@@ -66,7 +105,7 @@ function Form({
         });
     }
 
-    function setFieldValue(key, value) {
+    function setFieldValue(key: string, value: any) {
         setFormContextState(prevState => {
             let newState = { ...prevState };
             if (typeof newState.values?.[key] === 'undefined') {
@@ -78,7 +117,7 @@ function Form({
         });
     }
 
-    function checkValidationRule(rule, requiredFields = []) {
+    function checkValidationRule(rule: ValidationRule, requiredFields: Array<string> = []) {
         for (let i = 0; i < requiredFields.length; i++) {
             const field = requiredFields[i];
             if (typeof rule[field] === 'undefined') {
@@ -101,7 +140,7 @@ function Form({
         if (!isObject(values) || isObjectEmpty(values)) {
             return {};
         }
-        let validationErrors = {};
+        let validationErrors: any = {};
         Object.keys(validation).forEach(key => {
             if (!Array.isArray(validation[key]) || validation[key].length === 0) {
                 return;
@@ -200,7 +239,7 @@ function Form({
         });
         return validationErrors;
     }
-    function handleChange(e) {
+    function handleChange(e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) {
         const { name, value } = e.target;
         if (e.target.hasOwnProperty('checked')) {
             setFieldValue(name, e.target.checked);
@@ -209,8 +248,8 @@ function Form({
         setFieldValue(name, value);
     }
 
-    function buildFinalValues(values) {
-        let finalValues = {};
+    function buildFinalValues(values: any) {
+        let finalValues: any = {};
         console.log({initialValues, values});
         Object.keys(values).forEach((key) => {
             if (
@@ -224,8 +263,12 @@ function Form({
         });
         return finalValues;
     }
-    function handleSubmit(e) {
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
+        if (typeof operation !== 'string') {
+            console.warn(`Form operation is not a string`);
+            return;
+        }
         const errors = validationHandler();
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
             return;
@@ -238,14 +281,14 @@ function Form({
         onSubmit(requestData, errors);
     }
 
-    function handleBlur(e) {
+    function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
         const { name, value } = e.target;
         setFieldValue(name, value);
     }
 
     return (
         <FormContext.Provider value={formContextState}>
-            <form onSubmit={formContextState.onSubmit} className={className}>
+            <form onSubmit={formContextState.onSubmit} className={className || ''}>
                 {children(formContextState)}
             </form>
         </FormContext.Provider>

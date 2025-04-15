@@ -12,40 +12,15 @@ import SidebarForm from "./SidebarForm";
 import SelectPaginationTypes from "./SelectPaginationType";
 import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { Block } from "@/types/Block";
 
-function PageBlockForm({ data = null, onChange = null }) {
+type Props = {
+    data?: Array<Block>;
+    onChange: (data: any) => void;
+}
+function PageBlockForm({ data, onChange }: Props) {
 
     const dataTableContext = useContext(DataTableContext);
-
-    // async function pageBlockRequest() {
-    //     const response = await TruJobApiMiddleware.getInstance().pageBlocksRequest(data?.id);
-    //     if (!response) {
-    //         return;
-    //     }
-    //     formContext.setFieldValue('blocks', response?.data || []);
-    // }
-
-    function renderSideBarWidgets(block) {
-        return (
-            <Reorder
-                itemSchema={pageBlockSchema}
-                itemHeader={(item, index) => item?.title || 'Item title error'}
-                data={block?.sidebars || []}
-                onChange={async (values) => {
-                    // updateFieldValue(index, 'sidebar_widgets', values);
-                }}
-            >
-                {({
-                    block,
-                    index,
-                }) => (
-                    <>
-
-                    </>
-                )}
-            </Reorder>
-        );
-    }
 
     const pageBlockSchema = {
         'default': false,
@@ -63,15 +38,18 @@ function PageBlockForm({ data = null, onChange = null }) {
         'sidebar_widgets': [],
         'order': 0,
     };
-    function updateFieldValue(index, field, value) {
-        const newData = [...data];
+    function updateFieldValue(index: number, field: string, value: number | string | boolean) {
+        if (!data) {
+            return;
+        }
+        const newData: Array<Block> = [...data];
         if (!newData?.[index]) {
             return;
         }
         newData[index][field] = value;
         onChange(newData);
     }
-    function handleChange(values) {
+    function handleChange(values: Array<Block>) {
         onChange(values);
     }
 
@@ -137,7 +115,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="nav_title"
                                     id={"nav_title" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'nav_title', e.target.value);
                                     }}
@@ -150,7 +128,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="title"
                                     id={"title" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'title', e.target.value);
                                     }}
@@ -163,7 +141,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="subtitle"
                                     id={"subtitle" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'subtitle', e.target.value);
                                     }}
@@ -176,7 +154,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="background_image"
                                     id={"background_image" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'background_image', e.target.value);
                                     }}
@@ -189,7 +167,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="background_color"
                                     id={"background_color" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'background_color', e.target.value);
                                     }}
@@ -230,7 +208,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     className="form-control"
                                     name="content"
                                     id={"content" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'content', e.target.value);
                                     }}
@@ -243,7 +221,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                             type="text"
                                             name="properties"
                                             id={"properties" + index}
-                                            required=""
+                                            
                                             onChange={handleChange}
                                             value={block?.properties || ""} />
                                         <label className="form-label" htmlFor={'properties' + index}>Properties</label>
@@ -293,7 +271,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="order"
                                     id={"order" + index}
-                                    required=""
+                                    
                                     onChange={e => {
                                         updateFieldValue(index, 'order', e.target.value);
                                     }}
@@ -306,7 +284,7 @@ function PageBlockForm({ data = null, onChange = null }) {
                                             type="text"
                                             name="roles"
                                             id={"roles" + index}
-                                            required=""
+                                            
                                             onChange={handleChange}
                                             value={block?.roles || ""} />
                                         <label className="form-label" htmlFor={'roles' + index}>Roles</label>

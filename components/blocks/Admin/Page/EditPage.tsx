@@ -1,9 +1,9 @@
-import Form from "@/components/form/form";
+import Form, { FormContextType } from "@/components/form/Form";
 import DataTable from "@/components/Table/DataTable";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { useContext, useEffect, useState } from "react";
+import { Dispatch, useContext, useEffect, useState } from "react";
 import PageBlockForm from "./PageBlockForm";
 import { formContextData } from "@/components/form/contexts/FormContext";
 import { Button, Modal } from "react-bootstrap";
@@ -14,14 +14,31 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
+import { Page } from "@/types/Page";
+import { Sidebar } from "@/types/Sidebar";
+import { Block } from "@/types/Block";
 
-function EditPage({ data, operation }) {
-    const [blocksModal, setBlocksModal] = useState({
+type Props = {
+    data: Page;
+    operation: string;
+}
+type SidebarModalState = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+}
+type BlocksModalState = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+}
+function EditPage({ data, operation }: Props) {
+    const [blocksModal, setBlocksModal] = useState<BlocksModalState>({
         show: false,
         title: '',
         footer: true,
     });
-    const [sidebarsModal, setSidebarsModal] = useState({
+    const [sidebarsModal, setSidebarsModal] = useState<SidebarModalState>({
         show: false,
         title: '',
         footer: true,
@@ -55,28 +72,28 @@ function EditPage({ data, operation }) {
             meta_og_site_name: data?.settings?.meta_og_site_name || ''
         }
     };
-    function hideModal(setter) {
+    function hideModal(setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.show = false;
             return newState;
         });
     }
-    function showModal(setter) {
+    function showModal(setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.show = true;
             return newState;
         });
     }
-    function setModalTitle(title, setter) {
+    function setModalTitle(title: string, setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.title = title;
             return newState;
         });
     }
-    function setModalFooter(hasFooter = false, setter) {
+    function setModalFooter(hasFooter: boolean = false, setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.footer = hasFooter;
@@ -101,22 +118,22 @@ function EditPage({ data, operation }) {
                             return;
                         }
                         if (Array.isArray(requestData?.sidebars)) {
-                            requestData.sidebars = requestData?.sidebars.filter((sidebar) => {
+                            requestData.sidebars = requestData?.sidebars.filter((sidebar: Sidebar) => {
                                 return sidebar?.id;
                             })
-                                .map((sidebar) => {
-                                    return parseInt(sidebar.id);
+                                .map((sidebar: Sidebar) => {
+                                    return sidebar.id;
                                 });
                         }
                         if (Array.isArray(requestData?.blocks)) {
-                            requestData.blocks = requestData?.blocks.map((block) => {
+                            requestData.blocks = requestData?.blocks.map((block: Block) => {
                                 if (Array.isArray(block?.sidebars)) {
                                     block.sidebars = block.sidebars
-                                        .filter((sidebar) => {
+                                        .filter((sidebar: Sidebar) => {
                                             return sidebar?.id;
                                         })
-                                        .map((sidebar) => {
-                                            return parseInt(sidebar.id);
+                                        .map((sidebar: Sidebar) => {
+                                            return sidebar.id;
                                         });
                                 }
                                 return block;
@@ -128,9 +145,9 @@ function EditPage({ data, operation }) {
                         switch (operation) {
                             case 'edit':
                             case 'update':
-                                if (!data?.id || data?.id === '') {
-                                    throw new Error('Page ID is required');
-                                }
+                                // if (!data?.id || data?.id === '') {
+                                //     throw new Error('Page ID is required');
+                                // }
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
                                     method: ApiMiddleware.METHOD.PATCH,
@@ -164,14 +181,14 @@ function EditPage({ data, operation }) {
                         errors,
                         setFieldValue,
                         onChange,
-                    }) => {
+                    }: FormContextType) => {
                         return (
                             <>
                                 <div className="row">
                                     <div className="col-12 col-lg-6">
                                         <SelectPageViews
                                             value={values?.view || ''}
-                                            onChange={(pageViews) => {
+                                            onChange={(pageViews: string) => {
                                                 setFieldValue('view', pageViews);
                                             }}
                                             showSubmitButton={false}
@@ -230,7 +247,6 @@ function EditPage({ data, operation }) {
                                                 type="text"
                                                 name="title"
                                                 id="title"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.title || ""} />
                                             <label className="form-label" htmlFor="title">Title</label>
@@ -243,7 +259,6 @@ function EditPage({ data, operation }) {
                                                 type="text"
                                                 name="name"
                                                 id="name"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.name || ""} />
                                             <label className="form-label" htmlFor="name">Name</label>
@@ -256,7 +271,6 @@ function EditPage({ data, operation }) {
                                                 type="text"
                                                 name="permalink"
                                                 id="permalink"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.permalink || ""} />
                                             <label className="form-label" htmlFor="permalink">Permalink</label>
@@ -270,7 +284,6 @@ function EditPage({ data, operation }) {
                                                 className="form-control"
                                                 name="content"
                                                 id="content"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.content || ""}></textarea>
                                             <label className="form-label" htmlFor="content">Content</label>
@@ -322,7 +335,7 @@ function EditPage({ data, operation }) {
                                     <Modal.Body>
                                         <PageBlockForm
                                             data={values?.blocks || []}
-                                            onChange={(blocks) => {
+                                            onChange={(blocks: Array<Block>) => {
                                                 console.log('blocks', blocks);
                                                 setFieldValue('blocks', blocks);
                                             }}
@@ -346,7 +359,7 @@ function EditPage({ data, operation }) {
                                     <Modal.Body>
                                         <SidebarForm
                                             data={values?.sidebars || []}
-                                            onChange={(sidebars) => {
+                                            onChange={(sidebars: Array<Sidebar>) => {
                                                 setFieldValue('sidebars', sidebars);
                                             }}
                                         />
