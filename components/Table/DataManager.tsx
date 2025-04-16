@@ -10,12 +10,19 @@ import { isObject, isObjectEmpty } from "@/helpers/utils";
 
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
+type DataManagerProps = {
+    renderActions?: (item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null;
+    renderAddNew?: (e: React.MouseEvent, context: any) => void;
+    request?: (context: any) => void;
+    columns?: Array<any>;
+}
+
 function DataManager({
-    renderActions = null,
-    renderAddNew = null,
-    request = null,
+    renderActions,
+    renderAddNew,
+    request,
     columns = [],
-}) {
+}: DataManagerProps) {
 
     const searchParamsUse = useSearchParams();
 
@@ -33,9 +40,6 @@ function DataManager({
         page_size: searchParamPageSize,
     };
 
-    const appModalContext = useContext(AppModalContext);
-    const modalService = new ModalService();
-
     const [dataTableContextState, setDataTableContextState] = useState({
         ...dataTableContextData,
         refresh: () => {
@@ -44,9 +48,8 @@ function DataManager({
         },
     });
 
-    modalService.setModalKey('modal');
-    modalService.setSetter(setDataTableContextState);
-    modalService.setState(dataTableContextState);
+    const modalService = new ModalService(dataTableContextState, setDataTableContextState);
+    modalService.setKey('modal');
 
     async function makeRequest() {
         if (typeof request === 'function') {
