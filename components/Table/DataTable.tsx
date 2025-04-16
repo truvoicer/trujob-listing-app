@@ -1,13 +1,28 @@
 import { isNotEmpty } from "@/helpers/utils";
-
+export type DataTableColumn = {
+    label?: string;
+    key?: string;
+    render?: null | ((column: any, item: any) => React.ReactNode | React.Component | string | number | boolean |null);
+}
+export type DataTableItem = {
+    [key: string]: any;
+}
+export type DataTableProps = {
+    columns?: Array<DataTableColumn>;
+    data?: Array<any>;
+    actions?: null | ((item: any, index: number) => React.ReactNode | React.Component | string | number | boolean |null);
+}
 function DataTable({
     columns = [],
     data = [],
-    actions = null
-}) {
-    function getValue(column, item) {
+    actions
+} : DataTableProps) {
+    function getValue(column: DataTableColumn, item: DataTableItem) {
         if (typeof column?.render === 'function') {
             return column.render(column, item);
+        }
+        if (typeof column?.key !== 'string') {
+            return '';
         }
         if (!isNotEmpty(column?.key)) {
             return '';
@@ -17,7 +32,7 @@ function DataTable({
         }
         return '';
     }
-    function renderActions(item, index) {
+    function renderActions(item: DataTableItem, index: number) {
         if (actions && typeof actions === 'function') {
             return actions(item, index);
         }

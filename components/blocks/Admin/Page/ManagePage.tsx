@@ -11,14 +11,17 @@ import { DataTableContext, dataTableContextData } from "@/contexts/DataTableCont
 import { Button, Modal } from "react-bootstrap";
 import { ModalService } from "@/library/services/modal/ModalService";
 import Pagination from "@/components/listings/Pagination";
-import DataManager from "@/components/Table/DataManager";
+import DataManager, { DataTableContextType } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { Page } from "@/types/Page";
 
+export type ManagePageProps = {
+}
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
-function ManagePage() {
-    function renderActions(item, index, dataTableContextState) {
+function ManagePage({}: ManagePageProps) {
+    function renderActions(item: Page, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"

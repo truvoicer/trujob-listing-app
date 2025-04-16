@@ -3,23 +3,29 @@ import { connect } from "react-redux";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ListingsFetch } from "@/library/services/listings/ListingsFetch";
-import { Core } from "@/library/services/core/Core";
 import { SESSION_USER } from "@/library/redux/constants/session-constants";
+
+export type PaginationProps = {
+    data: any;
+    onPageClick: null | ((e: React.MouseEvent, pageNumber: number) => void);
+    showIndicator?: boolean;
+    children?: React.ReactNode | React.Component | null;
+}
 
 const Pagination = ({
     data = null,
     onPageClick = null,
     showIndicator = true,
     children
-}) => {
-    const [padding, setPadding] = useState(2);
-    const [pageNumber, setPageNumber] = useState(1);
+}: PaginationProps) => {
+    const [padding, setPadding] = useState<number>(2);
+    const [pageNumber, setPageNumber] = useState<number>(1);
     const searchParams = useSearchParams();
     const pageQueryVal = searchParams.get('page');
 
     const lastPageNumber = getLastPageNumber();
 
-    const paginationClickHandler = (e, pageNumber) => {
+    const paginationClickHandler = (e: React.MouseEvent, pageNumber: number) => {
         if (typeof onPageClick === 'function') {
             onPageClick(e, pageNumber);
         }
@@ -46,7 +52,7 @@ const Pagination = ({
         return data?.[ListingsFetch.PAGINATION.CURRENT_PAGE] || 1;
     }
 
-    const getpadding = (currentPage) => {
+    const getpadding = (currentPage: number) => {
         let right = [];
         let left = [];
         if (currentPage >= lastPageNumber) {
@@ -81,7 +87,7 @@ const Pagination = ({
         };
     }
 
-    function getPageLinkProps(page) {
+    function getPageLinkProps(page: number) {
         return {
             scroll: false,
             href: {
@@ -89,7 +95,7 @@ const Pagination = ({
                     page: page
                 }
             },
-            onClick: (e) => {
+            onClick: (e: React.MouseEvent) => {
                 paginationClickHandler(e, page)
             }
         }
@@ -173,7 +179,7 @@ const Pagination = ({
     );
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state: any) {
     return {
         user: state.session[SESSION_USER],
     };

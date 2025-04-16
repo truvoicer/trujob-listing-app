@@ -9,11 +9,11 @@ export type ModalState = {
     hide: (id: string) => void;
 }
 export type ModalItem = {
-    [key: string]: string | number | boolean | null | Function;
+    [key: string]: string | number | boolean | null | Function | undefined;
     id: string|null;
     title: string|null;
-    size: string;
-    fullscreen: string|boolean;
+    size: "sm" | "lg" | "xl" ;
+    fullscreen: string | true | undefined;
     component: any;
     show: boolean;
     showFooter: boolean;

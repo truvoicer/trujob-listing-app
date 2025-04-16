@@ -1,21 +1,56 @@
 import DataTable from "@/components/Table/DataTable";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { useContext, useEffect, useState } from "react";
-import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { Button, Modal, Nav, Tab } from "react-bootstrap";
-import { ModalService } from "@/library/services/modal/ModalService";
+import { ModalItem, ModalService } from "@/library/services/modal/ModalService";
 import Pagination from "@/components/listings/Pagination";
 import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
+import { createContext } from "vm";
 
-export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
-
-type DataManagerProps = {
-    renderActions?: (item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null;
+export type DataManagerProps = {
+    renderActions?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
     renderAddNew?: (e: React.MouseEvent, context: any) => void;
     request?: (context: any) => void;
     columns?: Array<any>;
 }
+
+export type DataTableContextType = {
+    requestStatus: string;
+    data: Array<any>;
+    links: object;
+    meta: object;
+    query: object;
+    modal: any;
+    refresh: () => void;
+    update: (data: any) => void;
+}
+
+export type SearchParams = {
+    [key: string]: string | null | undefined;
+    page?: string | null;
+    sort_order?: string | null;
+    sort_by?: string | null;
+    query?: string | null;
+    page_size?: string | null;
+}
+
+export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
+
+export const dataTableContextData = {
+    requestStatus: 'idle',
+    data: [],
+    links: {},
+    meta: {},
+    query: {},
+    modal: {
+        ...ModalService.INIT_DATA,
+    },
+    refresh: () => {},
+    update: () => {},
+};
+
+export const DataTableContext = createContext(dataTableContextData);
+
 
 function DataManager({
     renderActions,
@@ -32,7 +67,7 @@ function DataManager({
     const searchParamQuery = searchParamsUse.get('query');
     const searchParamPageSize = searchParamsUse.get('page_size');
 
-    const searchParams = {
+    const searchParams: SearchParams = {
         page: searchParamPage,
         sort_order: searchParamSortOrder,
         sort_by: searchParamSortBy,
@@ -40,7 +75,7 @@ function DataManager({
         page_size: searchParamPageSize,
     };
 
-    const [dataTableContextState, setDataTableContextState] = useState({
+    const [dataTableContextState, setDataTableContextState] = useState<DataTableContextType>({
         ...dataTableContextData,
         refresh: () => {
             console.log('refresh');
@@ -85,7 +120,7 @@ function DataManager({
         setDataTableContextState(prevState => {
             let newState = {
                 ...prevState,
-                ...modalService.getModalState()
+                ...modalService.getState()
             };
             return newState;
         });
@@ -205,7 +240,7 @@ function DataManager({
                     </div>
                 </div>
             </div>
-            {Array.isArray(dataTableContextState?.modal?.modals) && dataTableContextState.modal.modals.map((modal, index) => {
+            {Array.isArray(dataTableContextState?.modal?.modals) && dataTableContextState.modal.modals.map((modal: ModalItem, index: number) => {
                 if (!modal?.show) {
                     return null;
                 }
@@ -214,8 +249,8 @@ function DataManager({
                         key={index}
                         show={modal.show}
                         size={modal?.size || 'md'}
-                        fullscreen={modal?.fullscreen || false}
-                        onHide={() => modalService.handleModalCancel(index)}>
+                        fullscreen={modal?.fullscreen}
+                        onHide={() => modalService.handleCancel(index)}>
                         <Modal.Header closeButton>
                             <Modal.Title>{modal?.title || ''}</Modal.Title>
                         </Modal.Header>
@@ -224,10 +259,10 @@ function DataManager({
                         </Modal.Body>
                         {modal?.showFooter &&
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={() => modalService.handleModalCancel(index)}>
+                                <Button variant="secondary" onClick={() => modalService.handleCancel(index)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => modalService.handleModalOk(index)}>
+                                <Button variant="primary" onClick={() => modalService.handleOk(index)}>
                                     Save Changes
                                 </Button>
                             </Modal.Footer>

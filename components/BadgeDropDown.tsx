@@ -3,6 +3,9 @@ import Link from "next/link";
 import React from "react";
 import { Dropdown } from "react-bootstrap";
 
+export type BadgeDropDownItem = {
+    text: string;
+}
 const CustomDropdownItem = React.forwardRef(
     (atts, ref) => {
         const { children, style, className, 'aria-labelledby': labeledBy, href, linkProps } = atts;
