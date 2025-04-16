@@ -7,7 +7,7 @@ import { SessionService } from "@/library/services/session/SessionService";
 
 export class TruJobApiMiddleware extends ApiMiddleware {
     
-    static async handleTokenResponse(response) {
+    static async handleTokenResponse(response: any) {
         if (!response) {
             setIsAuthenticatingAction(false)
             return false;

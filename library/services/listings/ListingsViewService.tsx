@@ -6,7 +6,11 @@ export class ListingsViewService {
         return new ListingsViewService();
     }
 
-    renderGridItem(type, props = {}) {
+    renderGridItem(
+        type: 'event' | 'vehicle' | 'service' | 'real-estate' | 'job' | 'pet' |
+            'item' | 'property' | 'business' | 'ticket' | 'course' | 'food',
+        props = {}
+    ) {
         const config = gridConfig;
         const findConfig = config.find((item) => item?.type === type);
         if (!findConfig) {
@@ -18,8 +22,8 @@ export class ListingsViewService {
             return null;
         }
         const Component = findConfig.component;
-        return <Component data={props} />;
-        
+        return <Component data={ props } />;
+
     }
 
 }

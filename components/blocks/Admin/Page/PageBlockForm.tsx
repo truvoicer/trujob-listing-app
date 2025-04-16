@@ -8,11 +8,11 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { PageBlock } from "@/types/PageBlock";
 import { Sidebar } from "@/types/Sidebar";
 
-type Props = {
-    data?: Array<PageBlock>;
+type PageBlockFormProps = {
+    data?: Array<PageBlock> | undefined;
     onChange: (data: any) => void;
 }
-function PageBlockForm({ data, onChange }: Props) {
+function PageBlockForm({ data, onChange }: PageBlockFormProps) {
 
     const dataTableContext = useContext(DataTableContext);
 

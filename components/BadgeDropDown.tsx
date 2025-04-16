@@ -1,17 +1,32 @@
 import { isNotEmpty } from "@/helpers/utils";
-import Link from "next/link";
+import Link, { LinkProps } from "next/link";
 import React from "react";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, DropdownItemProps, DropdownProps } from "react-bootstrap";
 
+export type BadgeDropDownProps = {
+    data?: Array<BadgeDropDownItem>;
+}
 export type BadgeDropDownItem = {
     text: string;
+    linkProps: LinkProps
 }
+export interface BadgeDropDownItemProps extends DropdownItemProps {
+    linkProps: LinkProps;
+}
+
 const CustomDropdownItem = React.forwardRef(
-    (atts, ref) => {
-        const { children, style, className, 'aria-labelledby': labeledBy, href, linkProps } = atts;
+    (atts: BadgeDropDownItemProps, ref: React.Ref<HTMLAnchorElement>) => {
+        const { 
+            children, 
+            style, 
+            className, 
+            'aria-labelledby': 
+            labeledBy,
+             href, 
+            linkProps 
+        }: BadgeDropDownItemProps = atts;
         return (
             <Link
-                href={href}
                 ref={ref}
                 style={style}
                 className={className}
@@ -25,8 +40,10 @@ const CustomDropdownItem = React.forwardRef(
     },
 );
 const CustomDropdown = React.forwardRef(
-    ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
-        className = className.replace('dropdown', '')
+    ({ children, style, className, 'aria-labelledby': labeledBy }: DropdownProps, ref: React.Ref<HTMLDivElement>) => {
+        if (typeof className === 'string') {
+            className = className.replace('dropdown', '')
+        }
         return (
             <div
                 ref={ref}
@@ -40,36 +57,10 @@ const CustomDropdown = React.forwardRef(
     },
 );
 
-const CustomMenu = React.forwardRef(
-    ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
-        return (
-            <div
-                ref={ref}
-                style={style}
-                className={className + " iq-sub-dropdown user-dropdown"}
-                aria-labelledby={labeledBy}
-            >
-                <div className="card m-0">
-                    <div className="card-body p-0">
-                        <div className="py-3">
-                            {children}
-                        </div>
 
-                        <a
-                            className="right-ic p-3 border-top btn-block position-relative text-center"
-                            href="/logout"
-                            role="button">
-                            Logout
-                        </a>
-                    </div>
-                </div>
-            </div>
-        );
-    },
-);
 function BadgeDropDown({
     data = []
-}) {
+}: BadgeDropDownProps) {
     return (
         <span className="badge bg-primary-light pointer"
             style={{

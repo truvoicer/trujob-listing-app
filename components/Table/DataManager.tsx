@@ -6,10 +6,11 @@ import Pagination from "@/components/listings/Pagination";
 import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import { createContext } from "vm";
+import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 
 export type DataManagerProps = {
     renderActions?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
-    renderAddNew?: (e: React.MouseEvent, context: any) => void;
+    renderAddNew?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLAnchorElement, MouseEvent>, context: any) => void;
     request?: (context: any) => void;
     columns?: Array<any>;
 }
@@ -17,15 +18,16 @@ export type DataManagerProps = {
 export type DataTableContextType = {
     requestStatus: string;
     data: Array<any>;
-    links: object;
-    meta: object;
-    query: object;
+    links: any;
+    meta: any;
+    query: any;
+    post: any;
     modal: any;
     refresh: () => void;
     update: (data: any) => void;
 }
 
-export type SearchParams = {
+export type DatatableSearchParams = {
     [key: string]: string | null | undefined;
     page?: string | null;
     sort_order?: string | null;
@@ -35,22 +37,6 @@ export type SearchParams = {
 }
 
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
-
-export const dataTableContextData = {
-    requestStatus: 'idle',
-    data: [],
-    links: {},
-    meta: {},
-    query: {},
-    modal: {
-        ...ModalService.INIT_DATA,
-    },
-    refresh: () => {},
-    update: () => {},
-};
-
-export const DataTableContext = createContext(dataTableContextData);
-
 
 function DataManager({
     renderActions,
@@ -67,7 +53,7 @@ function DataManager({
     const searchParamQuery = searchParamsUse.get('query');
     const searchParamPageSize = searchParamsUse.get('page_size');
 
-    const searchParams: SearchParams = {
+    const searchParams: DatatableSearchParams = {
         page: searchParamPage,
         sort_order: searchParamSortOrder,
         sort_by: searchParamSortBy,
@@ -163,7 +149,7 @@ function DataManager({
                                 </div>
                                 <a href="#"
                                     className="btn btn-primary"
-                                    onClick={e => {
+                                    onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
                                         if (typeof renderAddNew === 'function') {
                                             renderAddNew(e, {
                                                 dataTableContextState,

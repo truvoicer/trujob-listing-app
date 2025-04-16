@@ -28,8 +28,8 @@ export class NotificationService extends MessageService {
     };
     static INIT_ITEM_DATA: NotificationItem = {
         variant: 'info',
-        type: NOTIFICATION_DEFAULT_TYPE,
-        position: NOTIFICATION_DEFAULT_POSITION,
+        type: 'toast',
+        position: 'top_center',
         title: null,
         body: null,
         show: false,

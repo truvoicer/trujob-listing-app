@@ -152,7 +152,7 @@ function AdminNavBar({ app, session }) {
                                                         <a href="#" className="iq-sub-card">
                                                             <div className="media align-items-center cust-card p-2">
                                                                 <div className="">
-                                                                    <img className="avatar-40 rounded-small" src="../assets/images/user/u-2.jpg" alt="02" />
+                                                                    <img className="avatar-40 rounded-small" src="/images/user/u-2.jpg" alt="02" />
                                                                 </div>
                                                                 <div className="media-body ml-3">
                                                                     <h6 className="mb-0">Lorem Ipsum Watson</h6>
@@ -163,7 +163,7 @@ function AdminNavBar({ app, session }) {
                                                         <a href="#" className="iq-sub-card">
                                                             <div className="media align-items-center cust-card p-2">
                                                                 <div className="">
-                                                                    <img className="avatar-40 rounded-small" src="../assets/images/user/u-3.jpg" alt="03" />
+                                                                    <img className="avatar-40 rounded-small" src="/images/user/u-3.jpg" alt="03" />
                                                                 </div>
                                                                 <div className="media-body ml-3">
                                                                     <h6 className="mb-0">Why do we use it?</h6>
@@ -210,7 +210,7 @@ function AdminNavBar({ app, session }) {
                                                         <a href="#" className="iq-sub-card">
                                                             <div className="media align-items-center cust-card p-2">
                                                                 <div className="">
-                                                                    <img className="avatar-40 rounded-small" src="../assets/images/user/u-2.jpg" alt="02" />
+                                                                    <img className="avatar-40 rounded-small" src="/images/user/u-2.jpg" alt="02" />
                                                                 </div>
                                                                 <div className="media-body ml-3">
                                                                     <div className="d-flex align-items-center justify-content-between">

@@ -18,8 +18,8 @@ import { Page } from "@/types/Page";
 import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
 
-type Props = {
-    data: Page;
+type EditPageProps = {
+    data?: Page;
     operation: string;
 }
 type SidebarModalState = {
@@ -32,7 +32,7 @@ type BlocksModalState = {
     title: string;
     footer: boolean;
 }
-function EditPage({ data, operation }: Props) {
+function EditPage({ data, operation }: EditPageProps) {
     const [blocksModal, setBlocksModal] = useState<BlocksModalState>({
         show: false,
         title: '',
@@ -145,9 +145,9 @@ function EditPage({ data, operation }: Props) {
                         switch (operation) {
                             case 'edit':
                             case 'update':
-                                // if (!data?.id || data?.id === '') {
-                                //     throw new Error('Page ID is required');
-                                // }
+                                if (!data?.id) {
+                                    throw new Error('Page ID is required');
+                                }
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
                                     method: ApiMiddleware.METHOD.PATCH,

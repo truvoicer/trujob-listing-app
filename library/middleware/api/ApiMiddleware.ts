@@ -6,6 +6,15 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppManager } from "@/library/AppManager";
 import { SessionService } from "@/library/services/session/SessionService";
 
+export type ResourceRequest = {
+    endpoint: string;
+    query?: any;
+    data?: any;
+    method: "GET" | "POST" | "PATCH" | "DELETE" | 'get' | 'post' | 'patch' | 'delete';
+    upload?: boolean;
+    protectedReq?: boolean;
+    headers?: any;
+}
 export class ApiMiddleware {
     static METHOD = {
         GET: 'GET',
@@ -14,9 +23,9 @@ export class ApiMiddleware {
         DELETE: 'DELETE',
     }
 
-    errors = [];
+    errors: Array<any> = [];
 
-    buildQueryString(queryObject = false) {
+    buildQueryString(queryObject: any = false) {
         if (queryObject.length === 0) {
             return "";
         }
@@ -61,7 +70,7 @@ export class ApiMiddleware {
         return {};
     }
 
-    getHeaders(config, upload = false) {
+    getHeaders(config: any, upload: boolean = false) {
         if (upload) {
             return config.headers.upload;
         }
@@ -72,7 +81,7 @@ export class ApiMiddleware {
         return truJobApiConfig?.token;
     }
 
-    getAuthHeader(protectedReq = false) {
+    getAuthHeader(protectedReq: boolean = false) {
         let token;
         if (protectedReq) {
             token = this.getProtectedSessionToken();
@@ -94,30 +103,15 @@ export class ApiMiddleware {
         };
     }
 
-    handleTokenResponse({ result, config, appKey }) {
+    handleTokenResponse({ result, config, appKey }: {
+        result: Promise<any>,
+        config?: any | null,
+        appKey?: string
+    }) {
         if (typeof config?.tokenResponseHandler !== 'function') {
             return false;
         }
         return config.tokenResponseHandler(result, appKey);
-    }
-
-    async validateToken() {
-        if (!SessionService.getSessionObject()) {
-            setIsAuthenticatingAction(false)
-            return false;
-        }
-        try {
-            return !!this.handleTokenResponse({
-                response: await this.resourceRequest({
-                    endpoint: truJobApiConfig.endpoints.checkToken,
-                    method: 'GET',
-                    protectedReq: true
-                })
-            });
-        } catch (error) {
-            setSessionErrorAction(error)
-            setIsAuthenticatingAction(false)
-        }
     }
 
     async resourceRequest({
@@ -128,7 +122,7 @@ export class ApiMiddleware {
         upload = false,
         protectedReq = false,
         headers = null
-    }) {
+    }: ResourceRequest) {
         if (!method) {
             throw new Error('Method not set');
         }
@@ -167,6 +161,11 @@ export class ApiMiddleware {
         upload = false,
         config,
         headers = null,
+    }: {
+        protectedReq?: boolean,
+        upload?: boolean,
+        config: any,
+        headers?: any | null,
     }) {
         let buildHeadersData = (headers && isObject(headers)) ? headers : this.getHeaders(config, upload);
         const authHeader = this.getAuthHeader(protectedReq);
@@ -193,6 +192,15 @@ export class ApiMiddleware {
         headers = null,
         upload = false,
         protectedReq = false,
+    }: {
+        config: any,
+        method: "GET" | "POST" | "PATCH" | "DELETE" | 'get' | 'post' | 'patch' | 'delete',
+        endpoint: string,
+        query?: any,
+        data?: any,
+        headers?: any | null,
+        upload?: boolean,
+        protectedReq?: boolean,
     }) {
         const requestUrl = this.buildRequestUrl(`${config.apiBaseUrl}${endpoint}`, query);
         const buildHeadersData = this.buildHeaders({
@@ -204,11 +212,15 @@ export class ApiMiddleware {
         if (!buildHeadersData) {
             return false;
         }
-        let request = {
+        let request: {
+            method: string,
+            headers: any,
+            body?: any
+        } = {
             method,
             headers: buildHeadersData,
         };
-        let body;
+        let body: any = null;
         if (upload) {
             body = data;
         } else {
@@ -262,7 +274,7 @@ export class ApiMiddleware {
         );
     }
 
-    buildRequestUrl(url, queryObject = {}) {
+    buildRequestUrl(url: string, queryObject: any = {}) {
         let queryString = '';
         if (!isObjectEmpty(queryObject)) {
             queryString = `/?${this.buildQueryString(queryObject)}`;
@@ -270,7 +282,7 @@ export class ApiMiddleware {
         return `${url}${queryString}`;
     }
 
-    async handleResponse(requestUrl, response) {
+    async handleResponse(requestUrl: string, response: Response | Promise<Response>) {
         if (!response) {
             return false;
         }
@@ -281,17 +293,21 @@ export class ApiMiddleware {
             case 202:
                 return responseData;
             default:
-                this.addError({
-                    statusCode: responsePromise?.status, 
-                    statusText: responsePromise?.statusText, 
-                    requestUrl,
-                    response: responseData
-                });
+                this.addError(
+                    'api_error',
+                    responseData?.message || 'API Error',
+                    {
+                        statusCode: responsePromise?.status,
+                        statusText: responsePromise?.statusText,
+                        requestUrl,
+                        response: responseData
+                    }
+                );
                 return false;
         }
     }
 
-    addError(code, message = null, data = {}) {
+    addError(code: string, message: string|null = null, data: any = {}) {
         this.errors.push({
             code,
             message,

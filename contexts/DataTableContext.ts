@@ -7,6 +7,7 @@ export const dataTableContextData = {
     links: {},
     meta: {},
     query: {},
+    post: {},
     modal: {
         ...ModalService.INIT_DATA,
     },
