@@ -1,12 +1,12 @@
 export class StyleBuilder {
-    style = {};
-    addBackgroundImage(backgroundImage) {
+    style: any = {};
+    addBackgroundImage(backgroundImage: string) {
         if (!backgroundImage) {
             return {};
         }
         return {...this.style, backgroundImage: `url(${backgroundImage})`};
     }
-    addBackGround(props) {
+    addBackGround(props: any) {
         if (!props) {
             return {
                 backgroundColor: '#cccccc',
@@ -14,7 +14,7 @@ export class StyleBuilder {
         }
         const {background_image, background_color} = props;
         if (background_image) {
-            this.style.backgroundImage = `url(${backgroundImage})`;
+            this.style.backgroundImage = `url(${background_image})`;
         }
         if (background_color) {
             this.style.backgroundColor = background_color;
