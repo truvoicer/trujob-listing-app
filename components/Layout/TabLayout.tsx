@@ -1,6 +1,7 @@
 import { PageBlock } from "@/types/PageBlock";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Nav, Tab } from "react-bootstrap";
+import { use, useEffect, useState } from "react";
+import { Nav, Tab, TabContainerProps } from "react-bootstrap";
 
 export type TabItem = PageBlock & {
     key: string;
@@ -16,9 +17,11 @@ type ContainerProps = {
 function TabLayout({
     config = []
 }: Props) {
+
     const searchParams = useSearchParams();
     const router = useRouter();
-    console.log('TabLayout', config);
+    const activeTabKey = getActiveTabKey();
+
     function getDefaultKey() {
         const filterDefaults = config.filter(item => item?.default);
         if (filterDefaults.length > 0) {
@@ -26,6 +29,7 @@ function TabLayout({
         }
         return null;
     }
+
     function createQueryString(query: Array<{
         name: string;
         value: string | number | boolean | null | undefined;
@@ -57,9 +61,35 @@ function TabLayout({
     
         return params.toString()
     }
+    function buildTabId(tabItem: TabItem) {
+        const filterTabsByType = config.filter(item => item?.type === tabItem?.type);
+        if (filterTabsByType.length === 1) {
+            return tabItem?.type;
+        }
+        return tabItem?.type + '-' + tabItem?.key;
+    }
+    function findTabById(tabId: string) {
+        const filterTabsByType = config.filter(item => item?.type === tabId);
+        if (filterTabsByType.length === 0) {
+            return null;
+        }
+        if (filterTabsByType.length === 1) {
+            return filterTabsByType[0];
+        }
+        const findTab = config.find(item => {
+            const findKey = buildTabId(item);
+            return findKey === tabId;
+        });
+        if (!findTab) {
+            return null;
+        }
+        return findTab;
+    }
     function getTabContainerProps() {
-        let containerProps: ContainerProps = {
+        let containerProps: TabContainerProps = {
             defaultActiveKey: '',
+            mountOnEnter: true,
+            unmountOnExit: true,
             onSelect: (eventKey: string | null) => {
                 console.log('Selected Tab:', eventKey);
                 const findKey = config.find(item => item.key === eventKey);
@@ -71,19 +101,33 @@ function TabLayout({
                 const query = createQueryString([
                     {
                         name: 'tab',
-                        value: findKey,
+                        value: buildTabId(findKey),
                     }
                 ]);
                 router.push(`?${query}`);
             }
         };
         
-        const defaultKey = getDefaultKey();
-        if (defaultKey) {
-            containerProps.defaultActiveKey = defaultKey;
+        if (activeTabKey && activeTabKey !== null) {
+            containerProps.defaultActiveKey = activeTabKey;
         }
         return containerProps;
     }
+    function getActiveTabKey() {
+
+        const tabId = searchParams.get('tab');
+        if (!tabId) {
+            return getDefaultKey();
+        }
+
+        const findTab = findTabById(tabId);
+        if (!findTab) {
+            console.error('Tab not found', tabId);
+            return;
+        }
+        return findTab.key;
+    }
+
     return (
         <Tab.Container {...getTabContainerProps()}>
             <div className="content-top">
