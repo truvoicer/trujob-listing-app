@@ -31,7 +31,7 @@ function ViewLayout({ page }: Props) {
         modalState,
         setModalState
     );
-    
+
 
     const notificationService = new NotificationService(
         notificationState,
@@ -69,31 +69,8 @@ function ViewLayout({ page }: Props) {
                     )
                     : <Loader fullScreen />
                 }
-                {Array.isArray(modalState?.modals) && modalState?.modals.map((modal, index) => {
-                    if (!modal?.show) {
-                        return null;
-                    }
-                    return (
-                        <Modal key={index} show={modal.show} onHide={() => modalService.handleCancel(index)}>
-                            <Modal.Header closeButton>
-                                <Modal.Title>{modal?.title || ''}</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                {modal?.component || ''}
-                            </Modal.Body>
-                            {modal?.showFooter &&
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={() => modalService.handleCancel(index)}>
-                                        Close
-                                    </Button>
-                                    <Button variant="primary" onClick={() => modalService.handleOk(index)}>
-                                        Save Changes
-                                    </Button>
-                                </Modal.Footer>
-                            }
-                        </Modal>
-                    );
-                })}
+
+                {modalService.render()}
             </AppModalContext.Provider>
         </AppNotificationContext.Provider>
     );

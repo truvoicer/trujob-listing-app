@@ -1,9 +1,16 @@
 import { findInObject } from "@/helpers/utils";
-
+import { ModalItem } from "../modal/ModalService";
+export type MessageState = {
+    items: Array<any>;
+    show: (data: any, id: string) => void;
+    close: (id: string) => void;
+    hide: (id: string) => void;
+}
 export class MessageService {
     key: null | string = null;
     state: any;
     setter: any;
+    
     constructor(state: any, setter: any) {
         this.state = state;
         this.setter = setter;
@@ -24,7 +31,7 @@ export class MessageService {
     }
 
     static hideModal(setter: any) {
-        setter(prevState => {
+        setter((prevState: any) => {
             let newState = { ...prevState };
             newState.show = false;
             return newState;
@@ -32,7 +39,7 @@ export class MessageService {
     }
 
     static showModal(setter: any) {
-        setter(prevState => {
+        setter((prevState: any) => {
             let newState = { ...prevState };
             newState.show = true;
             return newState;
@@ -40,7 +47,7 @@ export class MessageService {
     }
 
     static setModalTitle(title: string, setter: any) {
-        setter(prevState => {
+        setter((prevState: any) => {
             let newState = { ...prevState };
             newState.title = title;
             return newState;
@@ -48,7 +55,7 @@ export class MessageService {
     }
 
     static setModalFooter(hasFooter: boolean = false, setter: any) {
-        setter(prevState => {
+        setter((prevState: any) => {
             let newState = { ...prevState };
             newState.footer = hasFooter;
             return newState;
@@ -56,108 +63,111 @@ export class MessageService {
     }
 
     handleCancel(index: number) {
-        let modalState;
+        let itemState;
         if (this.key) {
-            modalState = findInObject(this.key, this.state);
-            if (!modalState) {
+            itemState = findInObject(this.key, this.state);
+            if (!itemState) {
                 console.error("state not found");
                 return;
             }
         } else {
-            modalState = this.state;
+            itemState = this.state;
         }
-        if (typeof modalState?.onCancel === "function") {
-            modalState.onCancel();
+        if (typeof itemState?.onCancel === "function") {
+            itemState.onCancel();
         }
         this.handleClose(index);
     }
     handleOk(index: number) {
-        let modalState;
+        let itemState;
         if (this.key) {
-            modalState = findInObject(this.key, this.state);
-            if (!modalState) {
+            itemState = findInObject(this.key, this.state);
+            if (!itemState) {
                 console.error("state not found");
                 return;
             }
         } else {
-            modalState = this.state;
+            itemState = this.state;
         }
-        if (typeof modalState?.onOk === "function") {
-            modalState.onOk();
+        if (typeof itemState?.onOk === "function") {
+            itemState.onOk();
         }
         this.handleClose(index);
     }
     handleClose(index: number) {
-        this.setter(modalState => {
-            let cloneState = { ...modalState };
+        this.setter((itemState: any) => {
+            let cloneState = { ...itemState };
             if (this.key) {
-                if (Array.isArray(cloneState?.[this.key]?.modals)) {
-                    cloneState[this.key].modals.splice(index, 1);
+                if (Array.isArray(cloneState?.[this.key]?.items)) {
+                    cloneState[this.key].items.splice(index, 1);
                 }
                 return cloneState;
             } else {
 
-                if (Array.isArray(cloneState?.modals)) {
-                    cloneState.modals.splice(index, 1);
+                if (Array.isArray(cloneState?.items)) {
+                    cloneState.items.splice(index, 1);
                 } else {
-                    cloneState.modals = [];
+                    cloneState.items = [];
                 }
                 return cloneState;
             }
         })
     }
     closeBatch(id: string) {
-        const modalState = this.findStateData();
-        if (!modalState) {
+        const itemState = this.findStateData();
+        if (!itemState) {
             console.error("state not found");
             return;
         }
-        const findItemIdex = modalState.modals.findIndex(item => item?.id === id);
+        const findItemIdex = itemState.items.findIndex((item: ModalItem) => item?.id === id);
         if (findItemIdex > -1) {
             this.handleClose(findItemIdex);
         }
     }
-    updateState(data: any, id: null | string = null) {
-        const modalState = this.findStateData();
-        if (!modalState) {
+    findItemIndexById(id: string): number {
+        return -1;
+    }
+    buildItemData(data: any, id: null | string = null) {
+        return {};
+    }
+    updateState(data: any, id: null | string = null): void {
+        const itemState = this.findStateData();
+        if (!itemState) {
             console.error("state not found");
             return;
         }
-        let cloneState = { ...modalState };
-        if (!Array.isArray(cloneState?.modals)) {
-            cloneState.modals = [];
+        let cloneState = { ...itemState };
+        if (!Array.isArray(cloneState?.items)) {
+            cloneState.items = [];
         }
-        let modalItem = {};
         let findItemIdex = -1;
-
+        let item = {};
         if (id) {
-            findItemIdex = cloneState.modals.findIndex(item => item?.id === id);
+            findItemIdex = this.findItemIndexById(id);
             if (findItemIdex > -1) {
-                modalItem = cloneState.modals[findItemIdex];
+                item = cloneState.items[findItemIdex];
             }
         }
-        Object.keys(MessageService.INIT_ITEM_DATA).forEach((key) => {
-            if (Object.keys(data).includes(key)) {
-                modalItem[key] = data[key];
-            } else {
-                modalItem[key] = MessageService.INIT_ITEM_DATA[key];
-            }
-        });
-        modalItem.id = id;
+        item = {
+            ...item,
+            ...this.buildItemData(data, id),
+        };
+
         if (findItemIdex > -1) {
-            cloneState.modals[findItemIdex] = modalItem;
+            cloneState.items[findItemIdex] = item;
         } else {
-            cloneState.modals.push(modalItem);
+            cloneState.items.push(item);
         }
-        if (this.key) {
-            this.setter(prevState => {
-                let newState = { ...prevState };
-                newState[this.key].modals = cloneState.modals;
-                return newState;
-            });
-            return;
-        }
-        this.setter(cloneState);
+        this.setter((prevState: any) => {
+            let newState = { ...prevState };
+            if (typeof this.key === "string") {
+                newState[this.key].items = cloneState.items;
+            } else {
+                newState.items = cloneState.items;
+            }
+            return newState;
+        });
+
     }
     findStateData() {
         let findKeyData;
@@ -186,7 +196,7 @@ export class MessageService {
         }
         const data = {
             ...findKeyData,
-            modals: [],
+            items: [],
             show: this.updateState.bind(this),
             close: this.closeBatch.bind(this),
             hide: this.closeBatch.bind(this),

@@ -32297,6 +32297,11 @@ button.close-popup
   margin-bottom: 30px;
   background: #fff;
 }
+.fixed-top-navbar .content-top .content-top--wrapper
+{
+    z-index: 10;
+    position: relative;
+}
 
 .fixed-top-navbar .content-top .event-tab .nav-item:last-child .nav-link
 {

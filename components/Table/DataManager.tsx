@@ -226,36 +226,7 @@ function DataManager({
                     </div>
                 </div>
             </div>
-            {Array.isArray(dataTableContextState?.modal?.modals) && dataTableContextState.modal.modals.map((modal: ModalItem, index: number) => {
-                if (!modal?.show) {
-                    return null;
-                }
-                return (
-                    <Modal
-                        key={index}
-                        show={modal.show}
-                        size={modal?.size || 'md'}
-                        fullscreen={modal?.fullscreen}
-                        onHide={() => modalService.handleCancel(index)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{modal?.title || ''}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            {modal?.component || ''}
-                        </Modal.Body>
-                        {modal?.showFooter &&
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={() => modalService.handleCancel(index)}>
-                                    Close
-                                </Button>
-                                <Button variant="primary" onClick={() => modalService.handleOk(index)}>
-                                    Save Changes
-                                </Button>
-                            </Modal.Footer>
-                        }
-                    </Modal>
-                );
-            })}
+            {modalService.render()}
         </DataTableContext.Provider>
     );
 }

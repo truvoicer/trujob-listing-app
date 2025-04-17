@@ -89,7 +89,10 @@
     &.fixed-top-navbar {
         .content-top {
             background: $dark-card-bg;
-
+            &--wrapper {
+                z-index: 10;
+                position: relative;
+            }
             .event-tab {
                 .nav-item {
                     .nav-link {

@@ -1,4 +1,5 @@
 import { PageBlock } from "@/types/PageBlock";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Nav, Tab } from "react-bootstrap";
 
 export type TabItem = PageBlock & {
@@ -10,10 +11,13 @@ type Props = {
 }
 type ContainerProps = {
     defaultActiveKey: string;
+    onSelect?: (eventKey: string | null) => void;
 }
 function TabLayout({
     config = []
 }: Props) {
+    const searchParams = useSearchParams();
+    const router = useRouter();
     console.log('TabLayout', config);
     function getDefaultKey() {
         const filterDefaults = config.filter(item => item?.default);
@@ -22,10 +26,56 @@ function TabLayout({
         }
         return null;
     }
-
+    function createQueryString(query: Array<{
+        name: string;
+        value: string | number | boolean | null | undefined;
+    }> = []) {
+        const params = new URLSearchParams(searchParams.toString())
+        if (query.length === 0) {
+            return params.toString()
+        }
+        query.forEach(({ name, value }) => {
+            if (typeof value === 'object') {
+                console.warn('Query value should not be an object', { name, value });
+                return;
+            }
+            if (value === null || value === undefined) {
+                console.warn('Query value should not be null or undefined', { name, value });
+                return;
+            }
+            if (typeof value === 'string') {
+                params.set(name, value);
+            } else if (typeof value === 'number') {
+                params.set(name, value.toString());
+            } else if (typeof value === 'boolean') {
+                params.set(name, value ? 'true' : 'false');
+            } else {
+                console.warn('Query value should be a string, number or boolean', { name, value });
+                return;
+            }
+        });
+    
+        return params.toString()
+    }
     function getTabContainerProps() {
         let containerProps: ContainerProps = {
             defaultActiveKey: '',
+            onSelect: (eventKey: string | null) => {
+                console.log('Selected Tab:', eventKey);
+                const findKey = config.find(item => item.key === eventKey);
+                console.log('findKey', findKey);
+                if (!findKey) {
+                    console.error('Tab key not found', eventKey);
+                    return;
+                }
+                const query = createQueryString([
+                    {
+                        name: 'tab',
+                        value: findKey,
+                    }
+                ]);
+                router.push(`?${query}`);
+            }
         };
         
         const defaultKey = getDefaultKey();
@@ -37,6 +87,7 @@ function TabLayout({
     return (
         <Tab.Container {...getTabContainerProps()}>
             <div className="content-top">
+                <div className="content-top--wrapper">
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12 mb-3">
@@ -81,6 +132,7 @@ function TabLayout({
                             </div>
                         </div>
                     </div> */}
+                </div>
                 </div>
             </div>
             <div className="container">

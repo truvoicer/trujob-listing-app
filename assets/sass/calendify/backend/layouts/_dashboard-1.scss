@@ -46,6 +46,10 @@
 		margin-bottom: 30px;
 		background: $white;
 
+		&--wrapper {
+			z-index: 10;
+			position: relative;
+		}
 		.event-tab {
 			.nav-item {
 				&:last-child {
