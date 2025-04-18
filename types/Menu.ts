@@ -30,7 +30,6 @@ export type MenuItem = {
 
 export type MenuPostRequest = {
     [key: string]: string | number | boolean | null | Array<number> | Array<CreateMenuItem> | undefined;
-    name: string;
     ul_class?: string;
     active?: boolean;
     roles?: Array<number>;

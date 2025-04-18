@@ -4,24 +4,47 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import RoleForm from "../Role/RoleForm";
 import MenuItemForm from "./ManageMenuItems";
 import SelectMenu from "./SelectMenu";
+import { CreateMenu, CreateMenuItem, Menu, MenuItem } from "@/types/Menu";
+import { Role } from "@/types/Role";
 
-function MenuForm({ data = null, onChange = null }) {
+export type MenuFormProps = {
+    data?: Array<Menu>;
+    onChange?: (data: Array<Menu>) => void;
+}
+function MenuForm({ 
+    data = [],
+    onChange 
+}: MenuFormProps) {
 
     const dataTableContext = useContext(DataTableContext);
 
-    const menuItemSchema = {
-            name: data?.name || '',
-            ul_class: data?.ul_class || '',
-            active: data?.active || false,
-            roles: data?.roles || [],
-            menu_items: data?.menu_items || [],
+    const menuSchema: Menu = {
+        id: 0,
+        active: false,
+        name: '',
+        ul_class: '',
+        roles: [],
+        menu_items: [],
+        has_parent: false,
     };
-    function updateFieldValue(index, field, value) {
+    function updateFieldValue(
+        index: number, 
+        field: string, 
+        value: string | number | boolean | Array<MenuItem> | Array<Role>
+    ) {
         const newData = [...data];
         newData[index][field] = value;
+        if (typeof onChange !== 'function') {
+            return;
+        }
         onChange(newData);
     }
-    function handleChange(values) {
+    function handleChange(
+        values: Array<Menu>
+    ) {
+        if (typeof onChange !== 'function') {
+            return;
+        }
         onChange(values);
     }
     console.log('MenuForm', data);
@@ -30,7 +53,7 @@ function MenuForm({ data = null, onChange = null }) {
             <div className="col-12">
                 <Reorder
                     enableEdit={false}
-                    itemSchema={menuItemSchema}
+                    itemSchema={menuSchema}
                     itemHeader={(item, index) => `${item?.name}` || 'Item type error'}
                     data={data || []}
                     onChange={handleChange}
@@ -44,10 +67,9 @@ function MenuForm({ data = null, onChange = null }) {
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectMenu
-                                            menuId={data?.id}
                                             onSubmit={selectedMenu => {
                                                 const newData = [...reorderData];
-                                                newData.push({ ...menuItemSchema, ...selectedMenu });
+                                                newData.push({ ...menuSchema, ...selectedMenu });
                                                 onChange(newData);
                                                 dataTableContext.modal.close('menu-edit-form');
                                             }}
@@ -87,7 +109,6 @@ function MenuForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="name"
                                     id={"name" + index}
-                                    required=""
                                     onChange={e => {
                                         updateFieldValue(index, 'name', e.target.value);
                                     }}
@@ -103,7 +124,6 @@ function MenuForm({ data = null, onChange = null }) {
                                     type="text"
                                     name="ul_class"
                                     id={"ul_class" + index}
-                                    required=""
                                     onChange={e => {
                                         updateFieldValue(index, 'ul_class', e.target.value);
                                     }}

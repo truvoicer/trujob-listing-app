@@ -1,16 +1,24 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { Page } from "@/types/Page";
 import { useEffect, useState } from "react";
 
+export type SelectPageProps = {
+    id?: string | null;
+    value?: number | null;
+    onChange?: (pageId: number | null) => void;
+    onSubmit?: (pageId: number | null) => void;
+    showSubmitButton?: boolean;
+}
 function SelectPage({
     id = null,
     value,
     onChange,
     showSubmitButton = true,
-}) {
-    const [pages, setPages] = useState([]);
-    const [selectedPage, setSelectedPage] = useState(null);
+}: SelectPageProps) {
+    const [pages, setPages] = useState<Array<Page>>([]);
+    const [selectedPage, setSelectedPage] = useState<number | null>(null);
 
     async function fetchPages() {
         // Fetch pages from the API or any other source
@@ -44,12 +52,11 @@ function SelectPage({
                 id={id || 'page'}
                 className="form-control"
                 onChange={e => {
-                    setSelectedPage(e.target.value);
+                    setSelectedPage(parseInt(e.target.value));
                     if (typeof onChange === 'function') {
-                        onChange(e.target.value);
+                        onChange(parseInt(e.target.value));
                     }
                 }}
-                required=""
                 value={selectedPage || ''}
             >
                 <option value="">Select Page</option>
@@ -57,7 +64,7 @@ function SelectPage({
                     <option
                         key={index}
                         value={page.id}>
-                        {`${page?.title} | name: ${page?.name} | id: (${page?.id})`}
+                        {`${page.title} | name: ${page.name} | id: (${page.id})`}
                     </option>
                 ))}
             </select>

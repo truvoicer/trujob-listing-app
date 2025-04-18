@@ -3,15 +3,22 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useEffect, useState } from "react";
 
+export type SelectMenuItemTypeProps = {
+    id?: string | null;
+    value?: string | null;
+    onChange?: (value: string | null) => void;
+    onSubmit?: (value: string | null) => void;
+    showSubmitButton?: boolean;
+}
 function SelectMenuItemType({
     id = null,
     value,
     onChange,
     onSubmit,
     showSubmitButton = true,
-}) {
-    const [menuItemTypes, setMenuItemTypes] = useState([]);
-    const [selectedMenuItemType, setSelectedMenuItemType] = useState(null);
+}: SelectMenuItemTypeProps) {
+    const [menuItemTypes, setMenuItemTypes] = useState<Array<string>>([]);
+    const [selectedMenuItemType, setSelectedMenuItemType] = useState<string | null>(null);
 
     async function fetchMenuItemTypes() {
         // Fetch menuItemTypes from the API or any other source
@@ -49,7 +56,6 @@ function SelectMenuItemType({
                         onChange(e.target.value);
                     }
                 }}
-                required=""
                 value={selectedMenuItemType || ''}
             >
                 <option value="">Select Menu Item Type</option>

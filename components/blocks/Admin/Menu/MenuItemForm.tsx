@@ -9,10 +9,10 @@ import { Role } from "@/types/Role";
 import { Page } from "@/types/Page";
 
 export type MenuItemFormProps = {
-    data?: UpdateMenuItem;
+    data?: MenuItem;
     index?: number;
     onChange?: (key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) => void;
-    onSubmit?: (data: CreateMenuItem | UpdateMenuItem) => void;
+    onSubmit?: (data: MenuItem) => void;
 }
 function MenuItemForm({ 
     data,
@@ -20,7 +20,7 @@ function MenuItemForm({
     onChange,
     onSubmit,
  }: MenuItemFormProps) {
-    const [menuItem, setMenuItem] = useState<CreateMenuItem | UpdateMenuItem>(data || {
+    const [menuItem, setMenuItem] = useState<MenuItem>(data || {
         id: 0,
         active: false,
         label: '',
@@ -43,7 +43,7 @@ function MenuItemForm({
         }
     }
     function handleChange(key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) {
-        setMenuItem((prevState: CreateMenuItem | UpdateMenuItem) => {
+        setMenuItem((prevState: MenuItem) => {
             let newState = { ...prevState };
             newState[key] = value;
             return newState;
@@ -226,7 +226,6 @@ function MenuItemForm({
                 <button
                     type="submit"
                     className="btn btn-primary mr-2"
-                    onClick={handleSubmit}
                 >
                     Submit
                 </button>

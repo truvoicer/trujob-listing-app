@@ -1,17 +1,24 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { Menu } from "@/types/Menu";
 import { useEffect, useState } from "react";
 
+export type SelectMenuProps = {
+    pageId?: string | null;
+    menuId?: number | null;
+    menuName?: string | null;
+    onChange?: (menu: any) => void;
+    onSubmit?: (menu: any) => void;
+}
 function SelectMenu({
-    pageId,
     menuId,
     menuName,
     onChange,
     onSubmit
-}) {
-    const [menus, setMenus] = useState([]);
-    const [selectedMenu, setSelectedMenu] = useState(null);
+}: SelectMenuProps) {
+    const [menus, setMenus] = useState<Array<Menu>>([]);
+    const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
 
     async function fetchMenus() {
         // Fetch menus from the API or any other source
@@ -70,10 +77,13 @@ function SelectMenu({
                 <select
                     className="form-control"
                     onChange={e => {
-                        const findSelectedMenu = menus.find(menu => parseInt(menu?.id) === parseInt(e.target.value));
+                        const findSelectedMenu = menus.find(menu => menu?.id === parseInt(e.target.value));
+                        if (!findSelectedMenu) {
+                            console.warn('No menu found with the given ID');
+                            return;
+                        }
                         setSelectedMenu(findSelectedMenu);
                     }}
-                    required=""
                     value={selectedMenu?.id || ''}
                 >
                     <option value="">Select Menu</option>

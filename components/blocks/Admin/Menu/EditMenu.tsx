@@ -9,7 +9,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import MenuItemForm from "./ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
-import { CreateMenu, Menu, MenuItem, UpdateMenu } from "@/types/Menu";
+import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 
 export type RolesModal = {
@@ -81,57 +81,53 @@ function EditMenu({
             return newState;
         });
     }
-    function buildRequestData(values: Menu, requestData: CreateMenu | UpdateMenu) {
-        if (Array.isArray(values?.menu_items)) {
-            values?.menu_items.forEach((menuItem: MenuItem, index: number) => {
-                if (Array.isArray(menuItem?.roles)) {
-                    const filterRoleData: Array<Role> = menuItem.roles
-                        .filter((role: Role | number) => {
-                            if (typeof role === 'object') {
-                                return role.id;
-                            }
-                            return false;
-                        });
-                    const filterRoleDataId: Array<number> = filterRoleData.map((role: Role) => {
-                        return role.id;
+    function buildMenuItemRequestData(menuItems: Array<MenuItem>) {
+        let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
+        menuItems.forEach((menuItem: MenuItem, index: number) => {
+            if (Array.isArray(menuItem?.roles)) {
+                const filterRoleData: Array<Role> = menuItem.roles
+                    .filter((role: Role | number) => {
+                        if (typeof role === 'object') {
+                            return role.id;
+                        }
+                        return false;
                     });
-                    if (!Array.isArray(requestData?.menu_items)) {
-                        requestData.menu_items = [];
-                    }
-                    if (!Array.isArray(requestData?.menu_items?.[index]?.roles)) {
-                        requestData.menu_items[index].roles = [];
-                    }
-                    requestData.menu_items[index].roles = filterRoleDataId;
+                const filterRoleDataId: Array<number> = filterRoleData.map((role: Role) => {
+                    return role.id;
+                });
+                if (!Array.isArray(newMenuItems?.[index]?.roles)) {
+                    newMenuItems[index].roles = [];
                 }
-                if (Array.isArray(menuItem?.menus)) {
-                    const filterMenuData: Array<Menu> = menuItem.menus
-                        .filter((menu: Menu) => {
-                            if (typeof menu === 'object') {
-                                return menu.id;
-                            }
-                            return false;
-                        });
-                    const filterMenuDataId: Array<number> = filterMenuData.map((menu: Menu) => {
-                        return menu.id;
+                newMenuItems[index].roles = filterRoleDataId;
+            }
+            if (Array.isArray(menuItem?.menus)) {
+                const filterMenuData: Array<Menu> = menuItem.menus
+                    .filter((menu: Menu) => {
+                        if (typeof menu === 'object') {
+                            return menu.id;
+                        }
+                        return false;
                     });
-                    if (!Array.isArray(requestData?.menu_items)) {
-                        requestData.menu_items = [];
-                    }
-                    if (!Array.isArray(requestData?.menu_items?.[index]?.menus)) {
-                        requestData.menu_items[index].menus = [];
-                    }
-                    requestData.menu_items[index].menus = filterMenuDataId;
+                const filterMenuDataId: Array<number> = filterMenuData.map((menu: Menu) => {
+                    return menu.id;
+                });
+
+                if (!Array.isArray(newMenuItems?.[index]?.menus)) {
+                    newMenuItems[index].menus = [];
                 }
-            });
-        }
-        return requestData;
+                newMenuItems[index].menus = filterMenuDataId;
+            }
+        });
+        return newMenuItems
     }
 
     function buildCreateData(values: Menu) {
         let requestData: CreateMenu = {
             name: values?.name,
         };
-        requestData = buildRequestData(values, requestData);
+        if (Array.isArray(values?.menu_items)) {
+            requestData.menu_items = buildMenuItemRequestData(values.menu_items);
+        }
         return requestData;
     }
 
@@ -139,7 +135,9 @@ function EditMenu({
         let requestData: UpdateMenu = {
             id: values?.id,
         };
-        requestData = buildRequestData(values, requestData);
+        if (Array.isArray(values?.menu_items)) {
+            requestData.menu_items = buildMenuItemRequestData(values.menu_items);
+        }
         return requestData;
     }
     const dataTableContext = useContext(DataTableContext);
@@ -160,6 +158,8 @@ function EditMenu({
                             case 'edit':
                             case 'update':
                                 requestData = buildUpdateData(values);
+                                console.log('edit requestData', requestData);
+                                return;
                                 if (!requestData?.id) {
                                     throw new Error('Menu ID is required');
                                 }
@@ -173,6 +173,8 @@ function EditMenu({
                             case 'add':
                             case 'create':
                                 requestData = buildCreateData(values);
+                                console.log('create requestData', requestData);
+                                return;
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: `${truJobApiConfig.endpoints.menu}/create`,
                                     method: ApiMiddleware.METHOD.POST,
