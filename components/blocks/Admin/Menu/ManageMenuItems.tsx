@@ -2,32 +2,46 @@ import Reorder from "@/components/Reorder/Reorder";
 import { useContext } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import MenuItemForm from "./MenuItemForm";
+import { CreateMenuItem, MenuItem, UpdateMenuItem } from "@/types/Menu";
 
-function ManageMenuItems({ data = null, onChange = null }) {
+export type ManageMenuItemsProps = {
+    data?: Array<MenuItem>;
+    onChange?: (data: Array<MenuItem>) => void;
+}
+function ManageMenuItems({ 
+    data = [], 
+    onChange 
+}: ManageMenuItemsProps) {
     const menuItems = data || [];
 
     const dataTableContext = useContext(DataTableContext);
 
-    const menuItemSchema = {
-        active: data?.active || false,
-        label: data?.label || '',
-        type: data?.type || '',
-        url: data?.url || '',
-        target: data?.target || '',
-        order: data?.order || '',
-        icon: data?.icon || '',
-        li_class: data?.li_class || '',
-        a_class: data?.a_class || '',
-        page: data?.page || null,
-        roles: data?.roles || [],
-        menus: data?.menus || [],
+    const menuItemSchema: CreateMenuItem = {
+        active: false,
+        label: '',
+        type: '',
+        url: '',
+        target: '',
+        order: 0,
+        icon: '',
+        li_class: '',
+        a_class: '',
+        page: null,
+        roles: [],
+        menus: [],
     };
-    function updateFieldValue(index, field, value) {
-        const newData = [...menuItems];
+    function updateFieldValue(index: number, field: string, value: string | number | boolean) {
+        const newData: Array<MenuItem> = [...menuItems];
         newData[index][field] = value;
+        if (typeof onChange !== 'function') {
+            return;
+        }
         onChange(newData);
     }
-    function handleChange(values) {
+    function handleChange(values: Array<MenuItem>) {
+        if (typeof onChange !== 'function') {
+            return;
+        }
         onChange(values);
     }
     

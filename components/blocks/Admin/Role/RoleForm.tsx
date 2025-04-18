@@ -2,23 +2,31 @@ import Reorder from "@/components/Reorder/Reorder";
 import { useContext } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectRole from "./SelectRole";
+import { Role } from "@/types/Role";
 
-function RoleForm({ data = null, onChange = null }) {
+export type RoleFormProps = {
+    data?: Array<Role>;
+    onChange: (data: Array<Role>) => void;
+}
+function RoleForm({ 
+    data = [], 
+    onChange
+ }: RoleFormProps) {
 
     const dataTableContext = useContext(DataTableContext);
 
     const roleSchema = {
     };
 
-    function updateFieldValue(index, field, value) {
-        const newData = [...data];
+    function updateFieldValue(index: number, field: string, value: string) {
+        const newData: Array<Role> = [...data];
         if (!newData?.[index]) {
             return;
         }
         newData[index][field] = value;
         onChange(newData);
     }
-    function handleChange(values) {
+    function handleChange(values: Array<Role>) {
         onChange(values);
     }
     console.log('RoleForm', data);
@@ -43,7 +51,6 @@ function RoleForm({ data = null, onChange = null }) {
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectRole
-                                            roleId={data?.id}
                                             onSubmit={selectedRole => {
                                                 const newData = [...reorderData];
                                                 newData.push({ ...roleSchema, ...selectedRole });
@@ -65,7 +72,7 @@ function RoleForm({ data = null, onChange = null }) {
                         <>
                             <SelectRole
                                 roleId={block?.id}
-                                onChange={(role) => {
+                                onChange={(role: Role) => {
                                     console.log('role', role);
                                     // updateFieldValue(index, 'pagination_type', paginationType);
                                 }}

@@ -1,6 +1,6 @@
-import Form from "@/components/form/Form";
+import Form, { FormContextType } from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -9,14 +9,33 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import MenuItemForm from "./ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
+import { CreateMenu, Menu, MenuItem, UpdateMenu } from "@/types/Menu";
+import { Role } from "@/types/Role";
 
-function EditMenu({ data, operation }) {
-    const [rolesModal, setRolesModal] = useState({
+export type RolesModal = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+};
+export type MenuItemsModal = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+};
+export type EditMenuProps = {
+    data?: Menu | null;
+    operation: 'edit' | 'update' | 'add' | 'create';
+};
+function EditMenu({
+    data,
+    operation
+}: EditMenuProps) {
+    const [rolesModal, setRolesModal] = useState<RolesModal>({
         show: false,
         title: '',
         footer: true,
     });
-    const [menuItemsModal, setMenuItemsModal] = useState({
+    const [menuItemsModal, setMenuItemsModal] = useState<MenuItemsModal>({
         show: false,
         title: '',
         footer: true,
@@ -30,35 +49,99 @@ function EditMenu({ data, operation }) {
         'roles': data?.roles || [],
         'menu_items': data?.menu_items || [],
     };
-    function hideModal(setter) {
+    function hideModal(setter: Dispatch<SetStateAction<{
+        show: boolean;
+        title: string;
+        footer: boolean;
+    }>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.show = false;
             return newState;
         });
     }
-    function showModal(setter) {
+    function showModal(setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.show = true;
             return newState;
         });
     }
-    function setModalTitle(title, setter) {
+    function setModalTitle(title: string, setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.title = title;
             return newState;
         });
     }
-    function setModalFooter(hasFooter = false, setter) {
+    function setModalFooter(hasFooter: boolean = false, setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
         setter(prevState => {
             let newState = { ...prevState };
             newState.footer = hasFooter;
             return newState;
         });
     }
+    function buildRequestData(values: Menu, requestData: CreateMenu | UpdateMenu) {
+        if (Array.isArray(values?.menu_items)) {
+            values?.menu_items.forEach((menuItem: MenuItem, index: number) => {
+                if (Array.isArray(menuItem?.roles)) {
+                    const filterRoleData: Array<Role> = menuItem.roles
+                        .filter((role: Role | number) => {
+                            if (typeof role === 'object') {
+                                return role.id;
+                            }
+                            return false;
+                        });
+                    const filterRoleDataId: Array<number> = filterRoleData.map((role: Role) => {
+                        return role.id;
+                    });
+                    if (!Array.isArray(requestData?.menu_items)) {
+                        requestData.menu_items = [];
+                    }
+                    if (!Array.isArray(requestData?.menu_items?.[index]?.roles)) {
+                        requestData.menu_items[index].roles = [];
+                    }
+                    requestData.menu_items[index].roles = filterRoleDataId;
+                }
+                if (Array.isArray(menuItem?.menus)) {
+                    const filterMenuData: Array<Menu> = menuItem.menus
+                        .filter((menu: Menu) => {
+                            if (typeof menu === 'object') {
+                                return menu.id;
+                            }
+                            return false;
+                        });
+                    const filterMenuDataId: Array<number> = filterMenuData.map((menu: Menu) => {
+                        return menu.id;
+                    });
+                    if (!Array.isArray(requestData?.menu_items)) {
+                        requestData.menu_items = [];
+                    }
+                    if (!Array.isArray(requestData?.menu_items?.[index]?.menus)) {
+                        requestData.menu_items[index].menus = [];
+                    }
+                    requestData.menu_items[index].menus = filterMenuDataId;
+                }
+            });
+        }
+        return requestData;
+    }
 
+    function buildCreateData(values: Menu) {
+        let requestData: CreateMenu = {
+            name: values?.name,
+        };
+        requestData = buildRequestData(values, requestData);
+        return requestData;
+    }
+
+    function buildUpdateData(values: Menu) {
+        let requestData: UpdateMenu = {
+            id: values?.id,
+        };
+        requestData = buildRequestData(values, requestData);
+        return requestData;
+    }
     const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
@@ -66,47 +149,22 @@ function EditMenu({ data, operation }) {
                 <Form
                     operation={operation}
                     initialValues={initialValues}
-                    onSubmit={async (values) => {
-                        let requestData = { ...values };
-                        console.log('requestData', requestData);
-                        return;
-                        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
+                    onSubmit={async (values: Menu) => {
+                        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
                             console.warn('No data to update');
                             return;
                         }
-                        if (Array.isArray(requestData?.sidebars)) {
-                            requestData.sidebars = requestData?.sidebars.filter((sidebar) => {
-                                return sidebar?.id;
-                            })
-                                .map((sidebar) => {
-                                    return parseInt(sidebar.id);
-                                });
-                        }
-                        if (Array.isArray(requestData?.blocks)) {
-                            requestData.blocks = requestData?.blocks.map((block) => {
-                                if (Array.isArray(block?.sidebars)) {
-                                    block.sidebars = block.sidebars
-                                        .filter((sidebar) => {
-                                            return sidebar?.id;
-                                        })
-                                        .map((sidebar) => {
-                                            return parseInt(sidebar.id);
-                                        });
-                                }
-                                return block;
-                            });
-                        }
-
-
                         let response = null;
+                        let requestData: CreateMenu | UpdateMenu;
                         switch (operation) {
                             case 'edit':
                             case 'update':
-                                if (!data?.id || data?.id === '') {
-                                    throw new Error('Page ID is required');
+                                requestData = buildUpdateData(values);
+                                if (!requestData?.id) {
+                                    throw new Error('Menu ID is required');
                                 }
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
+                                    endpoint: `${truJobApiConfig.endpoints.menu}/${requestData.id}/update`,
                                     method: ApiMiddleware.METHOD.PATCH,
                                     protectedReq: true,
                                     data: requestData,
@@ -114,8 +172,9 @@ function EditMenu({ data, operation }) {
                                 break;
                             case 'add':
                             case 'create':
+                                requestData = buildCreateData(values);
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.page}/create`,
+                                    endpoint: `${truJobApiConfig.endpoints.menu}/create`,
                                     method: ApiMiddleware.METHOD.POST,
                                     protectedReq: true,
                                     data: requestData,
@@ -138,7 +197,7 @@ function EditMenu({ data, operation }) {
                         errors,
                         setFieldValue,
                         onChange,
-                    }) => {
+                    }: FormContextType) => {
                         return (
                             <>
                                 <div className="row">
@@ -166,7 +225,6 @@ function EditMenu({ data, operation }) {
                                                 type="text"
                                                 name="name"
                                                 id="name"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.name || ""} />
                                             <label className="form-label" htmlFor="name">Name</label>
@@ -180,7 +238,6 @@ function EditMenu({ data, operation }) {
                                                 type="text"
                                                 name="ul_class"
                                                 id="ul_class"
-                                                required=""
                                                 onChange={onChange}
                                                 value={values?.ul_class || ""} />
                                             <label className="form-label" htmlFor="ul_class">
@@ -233,7 +290,7 @@ function EditMenu({ data, operation }) {
                                     <Modal.Body>
                                         <RoleForm
                                             data={values?.roles || []}
-                                            onChange={(roles) => {
+                                            onChange={(roles: Array<Role>) => {
                                                 setFieldValue('roles', roles);
                                             }}
                                         />
@@ -256,7 +313,7 @@ function EditMenu({ data, operation }) {
                                     <Modal.Body>
                                         <MenuItemForm
                                             data={values?.menu_items || []}
-                                            onChange={(menuItems) => {
+                                            onChange={(menuItems: Array<MenuItem>) => {
                                                 setFieldValue('menu_items', menuItems);
                                             }}
                                         />

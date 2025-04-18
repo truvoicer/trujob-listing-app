@@ -5,18 +5,24 @@ import {
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppManager } from "@/library/AppManager";
 import { SessionService } from "@/library/services/session/SessionService";
-
+export type Method = "GET" | "POST" | "PATCH" | "DELETE" | 'get' | 'post' | 'patch' | 'delete';
+export type MethodObject = {
+    GET: 'GET' | 'get';
+    POST: 'POST' | 'post';
+    PATCH: 'PATCH' | 'patch';
+    DELETE: 'DELETE' | 'delete';
+}
 export type ResourceRequest = {
     endpoint: string;
     query?: any;
     data?: any;
-    method: "GET" | "POST" | "PATCH" | "DELETE" | 'get' | 'post' | 'patch' | 'delete';
+    method: Method;
     upload?: boolean;
     protectedReq?: boolean;
     headers?: any;
 }
 export class ApiMiddleware {
-    static METHOD = {
+    static METHOD: MethodObject = {
         GET: 'GET',
         POST: 'POST',
         PATCH: 'PATCH',

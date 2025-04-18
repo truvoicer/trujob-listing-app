@@ -4,23 +4,46 @@ import RoleForm from "../Role/RoleForm";
 import MenuForm from "./MenuForm";
 import SelectMenuItemType from "./SelectMenuItemType";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { CreateMenuItem, Menu, MenuItem, UpdateMenuItem } from "@/types/Menu";
+import { Role } from "@/types/Role";
+import { Page } from "@/types/Page";
 
+export type MenuItemFormProps = {
+    data?: UpdateMenuItem;
+    index?: number;
+    onChange?: (key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) => void;
+    onSubmit?: (data: CreateMenuItem | UpdateMenuItem) => void;
+}
 function MenuItemForm({ 
     data,
     index,
     onChange,
     onSubmit,
- }) {
-    const [menuItem, setMenuItem] = useState(data);
+ }: MenuItemFormProps) {
+    const [menuItem, setMenuItem] = useState<CreateMenuItem | UpdateMenuItem>(data || {
+        id: 0,
+        active: false,
+        label: '',
+        type: '',
+        url: '',
+        target: '',
+        order: 0,
+        icon: '',
+        li_class: '',
+        a_class: '',
+        page: null,
+        roles: [],
+        menus: [],
+    });
     const dataTableContext = useContext(DataTableContext);
-    function handleSubmit(e) {
+    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         if (typeof onSubmit === 'function') {
             onSubmit(menuItem);
         }
     }
-    function handleChange(key, value) {
-        setMenuItem(prevState => {
+    function handleChange(key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) {
+        setMenuItem((prevState: CreateMenuItem | UpdateMenuItem) => {
             let newState = { ...prevState };
             newState[key] = value;
             return newState;
@@ -68,7 +91,6 @@ function MenuItemForm({
                     type="text"
                     name="label"
                     id={"label" + index}
-                    required=""
                     onChange={e => {
                         handleChange('label', e.target.value);
                     }}
@@ -81,7 +103,6 @@ function MenuItemForm({
                     type="text"
                     name="url"
                     id={"url" + index}
-                    required=""
                     onChange={e => {
                         handleChange('url', e.target.value);
                     }}
@@ -94,7 +115,6 @@ function MenuItemForm({
                     type="text"
                     name="target"
                     id={"target" + index}
-                    required=""
                     onChange={e => {
                         handleChange('target', e.target.value);
                     }}
@@ -107,7 +127,6 @@ function MenuItemForm({
                     type="text"
                     name="order"
                     id={"order" + index}
-                    required=""
                     onChange={e => {
                         handleChange('order', e.target.value);
                     }}
@@ -120,7 +139,6 @@ function MenuItemForm({
                     type="text"
                     name="icon"
                     id={"icon" + index}
-                    required=""
                     onChange={e => {
                         handleChange('icon', e.target.value);
                     }}
@@ -133,7 +151,6 @@ function MenuItemForm({
                     type="text"
                     name="li_class"
                     id={"li_class" + index}
-                    required=""
                     onChange={e => {
                         handleChange('li_class', e.target.value);
                     }}
@@ -146,7 +163,6 @@ function MenuItemForm({
                     type="text"
                     name="a_class"
                     id={"a_class" + index}
-                    required=""
                     onChange={e => {
                         handleChange('a_class', e.target.value);
                     }}

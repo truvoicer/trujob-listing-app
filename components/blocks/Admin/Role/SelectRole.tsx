@@ -1,15 +1,23 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { Role } from "@/types/Role";
 import { useEffect, useState } from "react";
 
+export type SelectRoleProps = {
+    roleId?: number;
+    onChange?: (role: Role) => void;
+    onSubmit?: (role: Role) => void;
+    showSubmitButton?: boolean;
+}
 function SelectRole({
     roleId,
     onChange,
-    onSubmit
-}) {
-    const [roles, setRoles] = useState([]);
-    const [selectedRole, setSelectedRole] = useState(null);
+    onSubmit,
+    showSubmitButton = true,
+}: SelectRoleProps) {
+    const [roles, setRoles] = useState<Array<Role>>([]);
+    const [selectedRole, setSelectedRole] = useState<Role>();
 
     async function fetchRoles() {
         // Fetch roles from the API or any other source
@@ -46,6 +54,9 @@ function SelectRole({
 
 
     useEffect(() => {
+        if (!selectedRole) {
+            return;
+        }
         if (typeof onChange === 'function') {
             onChange(selectedRole);
         }
@@ -57,6 +68,9 @@ function SelectRole({
             <form onSubmit={e => {
                 e.preventDefault();
                 console.log('Selected Role:', selectedRole);
+                if (!selectedRole) {
+                    return;
+                }
                 if (typeof onSubmit === 'function') {
                     onSubmit(selectedRole);
                 }
@@ -64,11 +78,10 @@ function SelectRole({
             <select
                 className="form-control"
                 onChange={e => {
-                    const findSelectedRole = roles.find(role => parseInt(role?.id) === parseInt(e.target.value));
+                    const findSelectedRole: Role | undefined = roles.find(role => role.id === parseInt(e.target.value));
                     setSelectedRole(findSelectedRole);
                 }}
-                required=""
-                value={parseInt(selectedRole?.id) || ''}
+                value={selectedRole?.id || ''}
             >
                 <option value="">Select Role</option>
                 {roles.map((role, index) => (
@@ -79,7 +92,11 @@ function SelectRole({
                     </option>
                 ))}
             </select>
-            <button type="submit" className="btn btn-primary">Select</button>
+            {showSubmitButton && (
+                <div className="mt-3">
+                    <button type="submit" className="btn btn-primary">Select</button>
+                </div>
+            )}
             </form>
         </div>
     );
