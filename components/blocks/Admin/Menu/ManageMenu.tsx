@@ -28,7 +28,7 @@ function ManageMenu() {
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Page',
+                            title: 'Edit Menu',
                             component: (
                                 <EditMenu
                                     data={item}
@@ -53,7 +53,7 @@ function ManageMenu() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Page',
+                                        title: 'Edit Menu',
                                         component: (
                                             <EditMenu
                                                 data={item}

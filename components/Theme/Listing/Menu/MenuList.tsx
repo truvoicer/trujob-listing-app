@@ -16,6 +16,7 @@ function MenuList({ name, className = '', session }) {
         const menuFetch = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
             method: ApiMiddleware.METHOD.GET,
+            protectedReq: session[SESSION_AUTHENTICATED],
         })
         if (!Array.isArray(menuFetch?.data?.menu_items)) {
             console.warn(`Menu data is not an array | name: ${name}`);
@@ -27,7 +28,7 @@ function MenuList({ name, className = '', session }) {
     function renderMenus(item, root = true) {
         return (
             <AccessControlComponent
-                roles={item?.roles}
+            roles={item?.roles}
             >
                 <li className="has-children">
                     <Link href={item?.url || '#'}>
@@ -66,7 +67,7 @@ function MenuList({ name, className = '', session }) {
         }
         let liClass = item?.li_class || '';
         const aClass = item?.a_class || '';
-        
+
         if (
             !session[SESSION_IS_AUTHENTICATING] &&
             session[SESSION_AUTHENTICATED] &&
@@ -78,7 +79,7 @@ function MenuList({ name, className = '', session }) {
             case 'register':
                 return (
                     <AccessControlComponent
-                        roles={item?.roles}
+                    roles={item?.roles}
                     >
                         <li className={liClass}>
                             <Link
@@ -93,7 +94,7 @@ function MenuList({ name, className = '', session }) {
         }
         return (
             <AccessControlComponent
-                roles={item?.roles}
+            roles={item?.roles}
             >
                 <li className={liClass}>
                     <Link
@@ -112,16 +113,23 @@ function MenuList({ name, className = '', session }) {
             return;
         }
         menuItemsInit(name);
-    }, [name]);
-    
+    }, [name, session[SESSION_IS_AUTHENTICATING], session[SESSION_AUTHENTICATED]]);
+
     return (
-        <ul className={className}>
-            <AccessControlComponent
-                roles={data?.roles}
-            >
-                {renderMenuItems(data?.menu_items, true)}
-            </AccessControlComponent>
-        </ul>
+        <>
+            {session[SESSION_IS_AUTHENTICATING]
+                ? null
+                : (
+                    <ul className={className}>
+                        <AccessControlComponent
+                            roles={data?.roles}
+                        >
+                            {renderMenuItems(data?.menu_items, true)}
+                        </AccessControlComponent>
+                    </ul>
+                )
+            }
+        </>
     );
 }
 export default connect(

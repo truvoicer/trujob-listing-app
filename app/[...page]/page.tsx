@@ -6,6 +6,7 @@ import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { Metadata, ResolvingMetadata } from "next";
+import ErrorView from "@/components/Theme/Listing/Error/ErrorView";
 
 type Props = {
   params: Promise<{ page: string }>
@@ -41,10 +42,6 @@ export async function generateMetadata(
   });
 
   if (truJobApiMiddleware.hasErrors()) {
-    console.log(truJobApiMiddleware.hasErrors());
-    throw new Error(
-      `Failed to load data | ${JSON.stringify(truJobApiMiddleware.getErrors())}`,
-    );
     return Promise.resolve({});
   }
   if (!page) {
@@ -84,7 +81,14 @@ async function Home({ params }: Props) {
       permalink: `/${uri}`,
     },
   });
-  console.log(site, settings, page, `/${uri}`);
+  if (truJobApiMiddleware.hasErrors()) {
+    return (
+      <ErrorView
+        message={`Page not found`}
+      />
+    );
+  }
+
   if (!settings?.data) {
     return;
   }

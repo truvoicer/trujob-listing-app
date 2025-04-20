@@ -42,6 +42,7 @@ function EditMenu({
     });
 
     const initialValues = {
+        'id': data?.id,
         'name': data?.name || '',
         'has_parent': data?.has_parent || false,
         'ul_class': data?.ul_class || '',
@@ -81,41 +82,56 @@ function EditMenu({
             return newState;
         });
     }
+    function buildMenuIdData(menus: Array<Menu>): Array<number> {
+        const filterMenuData: Array<Menu> = menus
+            .filter((menu: Menu) => {
+                if (typeof menu === 'object') {
+                    return menu.id;
+                }
+                return false;
+            });
+        return filterMenuData.map((menu: Menu) => {
+            return menu.id;
+        });
+    }
+    function buildRoleIdData(roles: Array<Role>): Array<number> {
+        const filterRoleData: Array<Role> = roles
+            .filter((role: Role | number) => {
+                if (typeof role === 'object') {
+                    return role.id;
+                }
+                return false;
+            });
+        return filterRoleData.map((role: Role) => {
+            return role.id;
+        });
+    }
     function buildMenuItemRequestData(menuItems: Array<MenuItem>) {
         let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
         menuItems.forEach((menuItem: MenuItem, index: number) => {
+            newMenuItems[index] = {
+                id: menuItem?.id,
+                active: menuItem?.active,
+                label: menuItem?.label,
+                type: menuItem?.type,
+                url: menuItem?.url,
+                target: menuItem?.target,
+                order: menuItem?.order,
+                icon: menuItem?.icon,
+                li_class: menuItem?.li_class,
+                a_class: menuItem?.a_class
+            };
             if (Array.isArray(menuItem?.roles)) {
-                const filterRoleData: Array<Role> = menuItem.roles
-                    .filter((role: Role | number) => {
-                        if (typeof role === 'object') {
-                            return role.id;
-                        }
-                        return false;
-                    });
-                const filterRoleDataId: Array<number> = filterRoleData.map((role: Role) => {
-                    return role.id;
-                });
                 if (!Array.isArray(newMenuItems?.[index]?.roles)) {
                     newMenuItems[index].roles = [];
                 }
-                newMenuItems[index].roles = filterRoleDataId;
+                newMenuItems[index].roles = buildRoleIdData(menuItem.roles);
             }
             if (Array.isArray(menuItem?.menus)) {
-                const filterMenuData: Array<Menu> = menuItem.menus
-                    .filter((menu: Menu) => {
-                        if (typeof menu === 'object') {
-                            return menu.id;
-                        }
-                        return false;
-                    });
-                const filterMenuDataId: Array<number> = filterMenuData.map((menu: Menu) => {
-                    return menu.id;
-                });
-
                 if (!Array.isArray(newMenuItems?.[index]?.menus)) {
                     newMenuItems[index].menus = [];
                 }
-                newMenuItems[index].menus = filterMenuDataId;
+                newMenuItems[index].menus = buildMenuIdData(menuItem.menus);
             }
         });
         return newMenuItems
@@ -125,6 +141,15 @@ function EditMenu({
         let requestData: CreateMenu = {
             name: values?.name,
         };
+        if (values.hasOwnProperty('ul_class')) {
+            requestData.ul_class = values.ul_class;
+        }
+        if (values.hasOwnProperty('active')) {
+            requestData.active = values.active;
+        }
+        if (Array.isArray(values?.roles)) {
+            requestData.roles = buildRoleIdData(values.roles);
+        }
         if (Array.isArray(values?.menu_items)) {
             requestData.menu_items = buildMenuItemRequestData(values.menu_items);
         }
@@ -135,10 +160,26 @@ function EditMenu({
         let requestData: UpdateMenu = {
             id: values?.id,
         };
+        if (values.hasOwnProperty('ul_class')) {
+            requestData.ul_class = values.ul_class;
+        }
+        if (values.hasOwnProperty('active')) {
+            requestData.active = values.active;
+        }
+        if (Array.isArray(values?.roles)) {
+            requestData.roles = buildRoleIdData(values.roles);
+        }
         if (Array.isArray(values?.menu_items)) {
             requestData.menu_items = buildMenuItemRequestData(values.menu_items);
         }
         return requestData;
+    }
+    function getRequiredFields() {
+        let requiredFields: Array<string> = [];
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields.push('id');
+        }
+        return requiredFields;
     }
     const dataTableContext = useContext(DataTableContext);
     return (
@@ -146,8 +187,10 @@ function EditMenu({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <Form
                     operation={operation}
+                    requiredFields={getRequiredFields()}
                     initialValues={initialValues}
                     onSubmit={async (values: Menu) => {
+                        console.log('edit menu values', values);
                         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
                             console.warn('No data to update');
                             return;
@@ -159,7 +202,7 @@ function EditMenu({
                             case 'update':
                                 requestData = buildUpdateData(values);
                                 console.log('edit requestData', requestData);
-                                return;
+                                // return;
                                 if (!requestData?.id) {
                                     throw new Error('Menu ID is required');
                                 }
@@ -174,7 +217,7 @@ function EditMenu({
                             case 'create':
                                 requestData = buildCreateData(values);
                                 console.log('create requestData', requestData);
-                                return;
+                                // return;
                                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: `${truJobApiConfig.endpoints.menu}/create`,
                                     method: ApiMiddleware.METHOD.POST,

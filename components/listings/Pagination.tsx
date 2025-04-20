@@ -35,7 +35,7 @@ const Pagination = ({
         if (data?.[ListingsFetch.PAGINATION.LAST_PAGE]) {
             return data[ListingsFetch.PAGINATION.LAST_PAGE];
         }
-        if (data[ListingsFetch.PAGINATION.TOTAL_PAGES] && data[ListingsFetch.PAGINATION.TOTAL_ITEMS]) {
+        if (data?.[ListingsFetch.PAGINATION.TOTAL_PAGES] && data?.[ListingsFetch.PAGINATION.TOTAL_ITEMS]) {
             const calculate = Math.ceil(
                 data[ListingsFetch.PAGINATION.TOTAL_ITEMS] / data[ListingsFetch.PAGINATION.PAGE_SIZE]
             );

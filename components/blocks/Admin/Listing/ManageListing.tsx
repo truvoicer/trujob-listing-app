@@ -18,7 +18,7 @@ function ManageListing() {
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Page',
+                            title: 'Edit Listing',
                             // component: (
                             //     <EditPage
                             //         data={item}
@@ -43,7 +43,7 @@ function ManageListing() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Page',
+                                        title: 'Edit Listing',
                                         // component: (
                                         //     <EditPage
                                         //         data={item}

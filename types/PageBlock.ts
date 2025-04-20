@@ -18,4 +18,5 @@ export type PageBlock = {
     has_sidebar: boolean;
     sidebars: Array<any>;
     roles: Array<Role>;
+    has_permission: boolean;
 }

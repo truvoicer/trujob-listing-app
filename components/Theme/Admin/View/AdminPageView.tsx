@@ -12,16 +12,18 @@ import { useRouter } from 'next/navigation';
 import TabLayout, { TabItem } from '@/components/Layout/TabLayout';
 import { Page } from '@/types/Page';
 import { PageBlock } from '@/types/PageBlock';
+import { SESSION_STATE } from '@/library/redux/constants/session-constants';
 
 type Props = {
     data: Page;
     page: Page;
+    session: any;
 }
 type BlockData = {
     component: any;
     props: any;
 }
-function AdminPageView({ data, page }: Props) {
+function AdminPageView({ data, page, session }: Props) {
     const router = useRouter();
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData: Array<PageBlock>) {
@@ -83,7 +85,7 @@ function AdminPageView({ data, page }: Props) {
     function renderView(blocks: Array<BlockData>) {
         return (
             <AccessControlComponent
-                roles={page?.roles}
+            roles={page?.roles}
                 fallback={() => {
                     router.push('/login');
                     return null;
@@ -104,7 +106,7 @@ function AdminPageView({ data, page }: Props) {
             </AccessControlComponent>
         );
     }
-    console.log('AdminPageView', data);
+    console.log('AdminPageView', {data, session});
 
     return renderView(
         buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
@@ -115,6 +117,7 @@ export default connect(
     (state: any) => {
         return {
             page: state[PAGE_STATE],
+            session: state[SESSION_STATE],
         }
     }
 )(AdminPageView);

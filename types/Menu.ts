@@ -9,6 +9,7 @@ export type Menu = {
     ul_class: string;
     active: boolean;
     roles: Array<Role>;
+    has_permission: boolean;
     menu_items: Array<MenuItem>;
 }
 export type MenuItem = {
@@ -25,6 +26,7 @@ export type MenuItem = {
     a_class: string|null;
     page: Page|null;
     roles: Array<Role>;
+    has_permission: boolean;
     menus: Array<Menu>;
 }
 

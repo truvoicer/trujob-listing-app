@@ -22,6 +22,7 @@ export type Page = {
     created_at: string;
     updated_at: string;
     roles: Array<Role>;
+    has_permission: boolean;
 }
 
 export type PageSettings = {

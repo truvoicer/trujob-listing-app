@@ -26,6 +26,7 @@ export const PAGE_IS_HOME = "is_home";
 export const PAGE_IS_FEATURED = "is_featured";
 export const PAGE_IS_PROTECTED = "is_protected";
 export const PAGE_ROLES = "roles";
+export const PAGE_HAS_PERMISSION = "has_permission";
 export const PAGE_DELETED_AT = "deleted_at";
 export const PAGE_CREATED_AT = "created_at";
 export const PAGE_UPDATED_AT = "updated_at";

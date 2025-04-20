@@ -17,6 +17,7 @@ function MenuList({ name, className = '', session }) {
         const menuFetch = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menu}/${name}`,
             method: ApiMiddleware.METHOD.GET,
+            protectedReq: session[SESSION_AUTHENTICATED],
         })
         if (!Array.isArray(menuFetch?.data?.menu_items)) {
             console.warn(`Menu data is not an array | name: ${name}`);
@@ -33,22 +34,28 @@ function MenuList({ name, className = '', session }) {
     }, [name]);
 
     return (
-        <ul className={className}>
-            <AccessControlComponent
-                roles={data?.roles}
-            >
-                {Array.isArray(data?.menu_items) && data?.menu_items.map((item, index) => {
-                    return (
-                        <React.Fragment key={index}>
-                            <MenuListItem 
-                                data={item}
-                            />
-                            {/* {renderMenuItem(item, root)} */}
-                        </React.Fragment>
-                    );
-                })}
-            </AccessControlComponent>
-        </ul>
+        <>
+            {session[SESSION_IS_AUTHENTICATING]
+                ? null
+                : (
+                    <ul className={className}>
+                        <AccessControlComponent
+                    roles={data?.roles}
+                        >
+                            {Array.isArray(data?.menu_items) && data?.menu_items.map((item, index) => {
+                                return (
+                                    <React.Fragment key={index}>
+                                        <MenuListItem
+                                            data={item}
+                                        />
+                                        {/* {renderMenuItem(item, root)} */}
+                                    </React.Fragment>
+                                );
+                            })}
+                        </AccessControlComponent>
+                    </ul>
+                )}
+        </>
     );
 }
 export default connect(

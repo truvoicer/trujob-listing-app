@@ -11,7 +11,7 @@ function MenuListItemSub({ data, session, settings }) {
     const [isOpen, setIsOpen] = useState(false);
     return (
         <AccessControlComponent
-            roles={data?.roles}
+        roles={data?.roles}
         >
             <li>
                 <Link href={data?.url || '#'}

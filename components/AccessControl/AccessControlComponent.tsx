@@ -6,19 +6,22 @@ import { Role } from "@/types/Role";
 type Props = {
     session: any;
     children: React.Component | React.ReactNode;
-    roles?: Array<Role> | null | undefined;
+    hasPermission?: boolean | null;
     loader?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     fallback?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
+    roles?: Array<Role>;
 }
 function AccessControlComponent({
     children,
     session,
     loader,
     fallback,
-    roles = [],
+    hasPermission = false,
+    roles = [], 
 }: Props) {
+    
     function hasRole(roleData: Array<Role>, name: string) {
-        return roleData.find(r => r?.name === name);
+        return roleData.find(r => r?.name === name) || false;
     }
     function showComponent() {
         if (!Array.isArray(roles)) {
@@ -40,6 +43,12 @@ function AccessControlComponent({
         ) {
             return false;
         }
+        const userRolesHasAdmin = ['admin', 'superuser'].some(role => {
+            return hasRole(userRoles, role);
+        });
+        if (userRolesHasAdmin) {
+            return true;
+        }
         for (let i = 0; i < roles.length; i++) {
             const role = roles[i];
             if (!role?.name) {
@@ -51,7 +60,6 @@ function AccessControlComponent({
         }
         return false;
     }
-
     function renderFallback() {
         if (typeof fallback === 'function') {
             return fallback();

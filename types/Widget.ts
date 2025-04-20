@@ -10,4 +10,5 @@ export type Widget = {
     order: number;
     properties: any;
     roles: Array<Role>;
+    has_permission: boolean;
 }

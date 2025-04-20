@@ -27,7 +27,7 @@ function MenuListItem({ data, session, settings }) {
             case 'register':
                 return (
                     <AccessControlComponent
-                        roles={item?.roles}
+                    roles={item?.roles}
                     >
                         <li className={liClass}>
                             <Link
@@ -42,7 +42,7 @@ function MenuListItem({ data, session, settings }) {
         }
         return (
             <AccessControlComponent
-                roles={item?.roles}
+            roles={item?.roles}
             >
                 <li className={liClass}>
                     <Link

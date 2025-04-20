@@ -62,14 +62,15 @@ function PageView({
             </>
         )
     }
+    
     function renderView(blocks: React.ReactNode) {
         if (data?.has_sidebar) {
             return (
                 <ListingLayoutSidebar>
                     <AccessControlComponent
-                        roles={page?.roles}
+                    roles={page?.roles}
                         loader={() => <Loader fullScreen />}
-                        fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+                        fallback={() => <ErrorView message={"1You do not have permission to view this page."} />}
                     >
                         {blocks}
                     </AccessControlComponent>
@@ -81,7 +82,7 @@ function PageView({
                 <AccessControlComponent
                     roles={page?.roles}
                     loader={() => <Loader fullScreen />}
-                    fallback={() => <ErrorView message={"You do not have permission to view this page."} />}
+                    fallback={() => <ErrorView message={"2You do not have permission to view this page."} />}
                 >
                     {blocks}
                 </AccessControlComponent>

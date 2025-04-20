@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import AccessControlComponent from "../AccessControl/AccessControlComponent";
 
 function BlockComponent(props) {
-    const { component, className = '', roles, ...otherProps } = props;
+    const { component, className = '', roles, has_permission, ...otherProps } = props;
     if (!component) {
         return null;
     }
@@ -43,7 +43,7 @@ function BlockComponent(props) {
     
     return (
         <AccessControlComponent
-            roles={roles}
+        roles={roles}
         >
             <BlockContext.Provider value={blockContextState}>
                 {blockLoaded

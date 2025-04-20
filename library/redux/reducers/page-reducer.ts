@@ -34,6 +34,7 @@ import {
     PAGE_STATE,
     PAGE_ROLES,
     PAGE_LOADED,
+    PAGE_HAS_PERMISSION,
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
 
@@ -52,6 +53,7 @@ export const pageStateData = {
     [PAGE_SIDEBAR_WIDGETS]: [],
     [PAGE_BLOCKS]: [],
     [PAGE_ROLES]: [],
+    [PAGE_HAS_PERMISSION]: false,
     [PAGE_SETTINGS]: {
         [PAGE_SETTINGS_META_TITLE]: null,
         [PAGE_SETTINGS_META_DESCRIPTION]: null,
