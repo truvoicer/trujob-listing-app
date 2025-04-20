@@ -1,3 +1,4 @@
+import { ObjectDifference } from "@/helpers/ObjectDfference";
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
 import React, { useState, useEffect } from 'react';
 
@@ -250,7 +251,12 @@ function Form({
 
     function buildFinalValues(values: any) {
         let finalValues: any = {};
-        console.log({initialValues, values});
+        console.log({initialValues, values}, ObjectDifference.getDifference(
+            values, 
+            initialValues, 
+            requiredFields
+        ));
+        return;
         Object.keys(values).forEach((key) => {
             if (
                 initialValues.hasOwnProperty(key) &&
@@ -278,6 +284,7 @@ function Form({
         if (['update', 'edit'].includes(operation)) {
             requestData = buildFinalValues(requestData);
         }
+        return;
         onSubmit(requestData, errors);
     }
 

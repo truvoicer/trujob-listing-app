@@ -175,9 +175,17 @@ function EditMenu({
         return requestData;
     }
     function getRequiredFields() {
-        let requiredFields: Array<string> = [];
+        let requiredFields: any = {};
         if (operation === 'edit' || operation === 'update') {
-            requiredFields.push('id');
+            requiredFields = {
+                id: true,
+                menu_items: {
+                    id: true,
+                },
+                roles: {
+                    id: true,
+                },
+            };
         }
         return requiredFields;
     }
