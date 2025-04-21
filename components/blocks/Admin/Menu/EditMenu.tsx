@@ -110,7 +110,6 @@ function EditMenu({
         let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
         menuItems.forEach((menuItem: MenuItem, index: number) => {
             newMenuItems[index] = {
-                id: menuItem?.id,
                 active: menuItem?.active,
                 label: menuItem?.label,
                 type: menuItem?.type,
@@ -121,6 +120,9 @@ function EditMenu({
                 li_class: menuItem?.li_class,
                 a_class: menuItem?.a_class
             };
+            if (menuItem.hasOwnProperty('id') && menuItem.id) {
+                newMenuItems[index].id = menuItem.id;
+            }
             if (Array.isArray(menuItem?.roles)) {
                 if (!Array.isArray(newMenuItems?.[index]?.roles)) {
                     newMenuItems[index].roles = [];

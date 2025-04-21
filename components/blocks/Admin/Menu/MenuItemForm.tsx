@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { SetStateAction, useContext, useState } from "react";
 import SelectPage from "../Page/SelectPage";
 import RoleForm from "../Role/RoleForm";
 import MenuForm from "./MenuForm";
@@ -7,34 +7,45 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { CreateMenuItem, Menu, MenuItem, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 import { Page } from "@/types/Page";
+import { MenuModal, RolesModal } from "./EditMenu";
+import { Button, Modal } from "react-bootstrap";
+import { Dispatch } from "redux";
+import SelectLinkTarget from "./SelectLinkTarget";
 
+export type RolesModal = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+};
+export type MenuModal = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+};
 export type MenuItemFormProps = {
     data?: MenuItem;
     index?: number;
     onChange?: (key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) => void;
     onSubmit?: (data: MenuItem) => void;
 }
-function MenuItemForm({ 
+function MenuItemForm({
     data,
     index,
     onChange,
     onSubmit,
- }: MenuItemFormProps) {
-    const [menuItem, setMenuItem] = useState<MenuItem>(data || {
-        id: 0,
-        active: false,
-        label: '',
-        type: '',
-        url: '',
-        target: '',
-        order: 0,
-        icon: '',
-        li_class: '',
-        a_class: '',
-        page: null,
-        roles: [],
-        menus: [],
+}: MenuItemFormProps) {
+
+    const [rolesModal, setRolesModal] = useState<RolesModal>({
+        show: false,
+        title: '',
+        footer: true,
     });
+    const [menuModal, setMenuModal] = useState<MenuModal>({
+        show: false,
+        title: '',
+        footer: true,
+    });
+    const [menuItem, setMenuItem] = useState<MenuItem>(data || {});
     const dataTableContext = useContext(DataTableContext);
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -52,14 +63,45 @@ function MenuItemForm({
             onChange(key, value);
         }
     }
-    
+    function hideModal(setter: Dispatch<SetStateAction<{
+        show: boolean;
+        title: string;
+        footer: boolean;
+    }>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = false;
+            return newState;
+        });
+    }
+    function showModal(setter: Dispatch<SetStateAction<RolesModal | MenuModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = true;
+            return newState;
+        });
+    }
+    function setModalTitle(title: string, setter: Dispatch<SetStateAction<RolesModal | MenuModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.title = title;
+            return newState;
+        });
+    }
+    function setModalFooter(hasFooter: boolean = false, setter: Dispatch<SetStateAction<RolesModal | MenuModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.footer = hasFooter;
+            return newState;
+        });
+    }
     return (
-        <form 
-        onSubmit={e => {
-            e.preventDefault();
-            console.log('Selected Menu:', menuItem);
-            handleSubmit(e);
-        }}>
+        <form
+            onSubmit={e => {
+                e.preventDefault();
+                console.log('Selected Menu:', menuItem);
+                handleSubmit(e);
+            }}>
             <div className="custom-control custom-checkbox mb-3 text-left">
                 <input
                     type="checkbox"
@@ -109,18 +151,16 @@ function MenuItemForm({
                     value={menuItem?.url || ""} />
                 <label className="form-label" htmlFor={'url' + index}>URL</label>
             </div>
-            <div className="floating-input form-group">
-                <input
-                    className="form-control"
-                    type="text"
-                    name="target"
-                    id={"target" + index}
-                    onChange={e => {
-                        handleChange('target', e.target.value);
-                    }}
-                    value={menuItem?.target || ""} />
-                <label className="form-label" htmlFor={'target' + index}>Target</label>
-            </div>
+            
+            <SelectLinkTarget
+                id={'linktarget' + index}
+                value={menuItem?.target}
+                onChange={selectedLinkTarget => {
+                    handleChange('target', selectedLinkTarget);
+                }}
+                showSubmitButton={false}
+            />
+
             <div className="floating-input form-group">
                 <input
                     className="form-control"
@@ -183,18 +223,9 @@ function MenuItemForm({
                     type="button"
                     className="btn btn-primary mr-2"
                     onClick={(e) => {
-                        dataTableContext.modal.show({
-                            component: (
-                                <RoleForm
-                                    data={menuItem?.roles || []}
-                                    onChange={(roles) => {
-                                        console.log('roles', roles);
-                                        handleChange('roles', roles);
-                                    }}
-                                />
-                            ),
-                            showFooter: false
-                        }, 'menu-edit-menuItem-form');
+                        setModalTitle('Manage Roles', setRolesModal);
+                        setModalFooter(false, setRolesModal);
+                        showModal(setRolesModal);
                     }}
                 >
                     Roles
@@ -205,18 +236,9 @@ function MenuItemForm({
                     type="button"
                     className="btn btn-primary mr-2"
                     onClick={(e) => {
-                        dataTableContext.modal.show({
-                            component: (
-                                <MenuForm
-                                    data={menuItem?.menus || []}
-                                    onChange={(menus) => {
-                                        console.log('menus', menus);
-                                        handleChange('menus', menus);
-                                    }}
-                                />
-                            ),
-                            showFooter: false
-                        }, 'menu-edit-menu-form');
+                        setModalTitle('Manage Menus', setMenuModal);
+                        setModalFooter(false, setMenuModal);
+                        showModal(setMenuModal);
                     }}
                 >
                     Menus
@@ -230,6 +252,54 @@ function MenuItemForm({
                     Submit
                 </button>
             </div>
+            <Modal show={rolesModal.show} onHide={() => hideModal(setRolesModal)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{rolesModal?.title || ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <RoleForm
+                        data={menuItem?.roles || []}
+                        onChange={(roles) => {
+                            console.log('roles', roles);
+                            handleChange('roles', roles);
+                        }}
+                    />
+                </Modal.Body>
+                {rolesModal.footer &&
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={() => hideModal(setRolesModal)}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                }
+            </Modal>
+            <Modal show={menuModal.show} onHide={() => hideModal(setMenuModal)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{menuModal?.title || ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <MenuForm
+                        data={menuItem?.menus || []}
+                        onChange={(menus) => {
+                            console.log('menus', menus);
+                            handleChange('menus', menus);
+                        }}
+                    />
+                </Modal.Body>
+                {menuModal.footer &&
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => hideModal(setMenuModal)}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={() => hideModal(setMenuModal)}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                }
+            </Modal>
         </form>
     );
 }

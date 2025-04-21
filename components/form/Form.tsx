@@ -250,24 +250,11 @@ function Form({
     }
 
     function buildFinalValues(values: any) {
-        let finalValues: any = {};
-        console.log({initialValues, values}, ObjectDifference.getDifference(
+        return ObjectDifference.getDifference(
             values, 
             initialValues, 
             requiredFields
-        ));
-        return;
-        Object.keys(values).forEach((key) => {
-            if (
-                initialValues.hasOwnProperty(key) &&
-                compareValues(initialValues[key], values[key]) &&
-                !requiredFields.includes(key)
-            ) {
-                return
-            }
-            finalValues[key] = values[key];
-        });
-        return finalValues;
+        );
     }
     function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -284,7 +271,7 @@ function Form({
         if (['update', 'edit'].includes(operation)) {
             requestData = buildFinalValues(requestData);
         }
-        return;
+        
         onSubmit(requestData, errors);
     }
 

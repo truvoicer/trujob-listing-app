@@ -17,6 +17,7 @@ export default {
         role: '/role',
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',
+        enum: '/enum',
         auth: {
             view: '/auth/view',
             login: '/auth/login',
