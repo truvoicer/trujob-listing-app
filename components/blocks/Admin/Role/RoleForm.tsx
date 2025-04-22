@@ -66,12 +66,12 @@ function RoleForm({
                     }}
                 >
                     {({
-                        block,
+                        item,
                         index,
                     }) => (
                         <>
                             <SelectRole
-                                roleId={block?.id}
+                                roleId={item?.id}
                                 onChange={(role: Role) => {
                                     console.log('role', role);
                                     // updateFieldValue(index, 'pagination_type', paginationType);

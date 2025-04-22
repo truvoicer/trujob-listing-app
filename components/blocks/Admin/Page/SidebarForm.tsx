@@ -85,7 +85,7 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
                     }}
                 >
                     {({
-                        sidebar,
+                        item,
                         index,
                     }) => (
                         <>
@@ -99,7 +99,7 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
                                         dataTableContext.modal.show({
                                             component: (
                                                 <WidgetForm
-                                                    data={sidebar?.widgets || []}
+                                                    data={item?.widgets || []}
                                                 />
                                             ),
                                             showFooter: false

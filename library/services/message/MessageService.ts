@@ -151,6 +151,7 @@ export class MessageService {
         item = {
             ...item,
             ...this.buildItemData(data, id),
+            show: true,
         };
 
         if (findItemIdex > -1) {

@@ -82,7 +82,7 @@ function MenuForm({
                     }}
                 >
                     {({
-                        block,
+                        item,
                         index,
                     }) => (
                         <>
@@ -93,7 +93,7 @@ function MenuForm({
                                     className="custom-control-input"
                                     name="active"
                                     id={"active" + index}
-                                    checked={block?.active || false}
+                                    checked={item?.active || false}
                                     onChange={e => {
                                         updateFieldValue(index, 'active', e.target.checked);
                                     }}
@@ -112,7 +112,7 @@ function MenuForm({
                                     onChange={e => {
                                         updateFieldValue(index, 'name', e.target.value);
                                     }}
-                                    value={block?.name || ""} />
+                                    value={item?.name || ""} />
                                 <label className="form-label" htmlFor={'name' + index}>
                                     Name
                                 </label>
@@ -127,7 +127,7 @@ function MenuForm({
                                     onChange={e => {
                                         updateFieldValue(index, 'ul_class', e.target.value);
                                     }}
-                                    value={block?.ul_class || ""} />
+                                    value={item?.ul_class || ""} />
                                 <label className="form-label" htmlFor={'ul_class' + index}>UL Class</label>
                             </div>
 
@@ -139,7 +139,7 @@ function MenuForm({
                                         dataTableContext.modal.show({
                                             component: (
                                                 <RoleForm
-                                                    data={block?.roles || []}
+                                                    data={item?.roles || []}
                                                     onChange={(roles) => {
                                                         console.log('roles', roles);
                                                         updateFieldValue(index, 'roles', roles);
@@ -161,7 +161,7 @@ function MenuForm({
                                         dataTableContext.modal.show({
                                             component: (
                                                 <MenuItemForm
-                                                    data={block?.menu_items || []}
+                                                    data={item?.menu_items || []}
                                                     onChange={(menuItems) => {
                                                         console.log('menuItems', menuItems);
                                                         updateFieldValue(index, 'menuItems', menuItems);

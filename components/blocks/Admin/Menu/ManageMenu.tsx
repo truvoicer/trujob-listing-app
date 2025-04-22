@@ -36,7 +36,7 @@ function ManageMenu() {
                                 />
                             ),
                             show: true,
-                            showFooter: false,
+                            showFooter: true,
                             fullscreen: true
                         }, EDIT_MENU_MODAL_ID);
                     }}

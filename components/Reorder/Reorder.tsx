@@ -1,16 +1,48 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
+import { dir } from "console";
 import React, { useContext, useEffect, useState } from "react";
 import { Accordion, Button, Card, Modal } from "react-bootstrap";
 
-type Props = {
+export type ReorderProps = {
     children: (props: any) => React.ReactNode;
     data?: Array<any>;
     itemHeader?: string | ((item: any, index: number) => React.ReactNode);
     itemSchema?: any;
     onAdd?: (props: any) => any;
+    onEdit?: (props: any) => any;
+    onDelete?: (props: any) => any;
+    onMove?: (props: any) => any;
     onChange?: (data: Array<any>) => void;
     enableControls?: boolean;
     enableEdit?: boolean;
+}
+export type ReorderOnAdd = {
+    reorderData: Array<any>;
+    onChange: (data: Array<any>) => void;
+    itemSchema: any;
+}
+export type ReorderOnEdit = {
+    reorderData: Array<any>;
+    onChange: (data: Array<any>) => void;
+    itemSchema: any;
+    index: number;
+    item: any;
+}
+export type ReorderOnDelete = {
+    reorderData: Array<any>;
+    onChange: (data: Array<any>) => void;
+    itemSchema: any;
+    index: number;
+    item: any;
+}
+export type ReorderOnMove = {
+    direction: 'up' | 'down';
+    reorderData: Array<any>;
+    onChange: (data: Array<any>) => void;
+    itemSchema: any;
+    index: number;
+    newIndex: number;
+    item: any;
 }
 function Reorder({
     children,
@@ -18,15 +50,18 @@ function Reorder({
     itemHeader,
     itemSchema = {},
     onAdd,
+    onEdit,
+    onDelete,
+    onMove,
     onChange,
     enableControls = true,
     enableEdit = true,
-}: Props) {
-    const [childIndex, setChildIndex] = useState<number|null>(null);
+}: ReorderProps) {
+    const [childIndex, setChildIndex] = useState<number | null>(null);
     const [modalTitle, setModalTitle] = useState<string>('');
     const [modalShow, setModalShow] = useState<boolean>(false);
     const [modalShowFooter, setModalShowFooter] = useState<boolean>(true);
-    
+
     const reorderData: Array<any> = data;
 
     function handleChange(data: Array<any>) {
@@ -35,26 +70,62 @@ function Reorder({
         }
     }
 
-    function handleMoveUp(index: number) {
+    function handleMoveUp(index: number, item: any) {
         if (index > 0) {
+            const newIndex = index - 1;
+            if (typeof onMove === 'function') {
+                if (
+                    !onMove({
+                        direction: 'up',
+                        reorderData,
+                        onChange,
+                        itemSchema,
+                        index,
+                        newIndex,
+                        item
+                    })) {
+                    return;
+                }
+            }
             const newData = [...reorderData];
-            const temp = newData[index - 1];
-            newData[index - 1] = newData[index];
+            const temp = newData[newIndex];
+            newData[newIndex] = newData[index];
             newData[index] = temp;
             handleChange(newData);
         }
     }
-    function handleMoveDown(index: number) {
+    function handleMoveDown(index: number, item: any) {
         if (index < reorderData.length - 1) {
+            const newIndex = index + 1;
+            if (typeof onMove === 'function') {
+                if (
+                    !onMove({
+                        direction: 'down',
+                        reorderData,
+                        onChange,
+                        itemSchema,
+                        index,
+                        newIndex,
+                        item
+                    })) {
+                    return;
+                }
+            }
             const newData = [...reorderData];
-            const temp = newData[index + 1];
-            newData[index + 1] = newData[index];
+            const temp = newData[newIndex];
+            newData[newIndex] = newData[index];
             newData[index] = temp;
             handleChange(newData);
         }
     }
-    function handleDelete(index: number) {
+    function handleDelete(index: number, item: any) {
         const newData = [...reorderData];
+
+        if (typeof onDelete === 'function') {
+            if (!onDelete({ reorderData, onChange, itemSchema, index, item })) {
+                return;
+            }
+        }
         newData.splice(index, 1);
         handleChange(newData);
     }
@@ -99,11 +170,11 @@ function Reorder({
             {Array.isArray(reorderData) && reorderData.length
                 ? (
                     <>
-                        {reorderData.map((block, index) => {
+                        {reorderData.map((item, index) => {
                             return (
                                 <Card key={index}>
                                     <Card.Header>
-                                        {renderItemHeader(block, index)}
+                                        {renderItemHeader(item, index)}
                                         {enableControls && (
                                             <div className="d-flex gap-3 justify-content-between">
                                                 {enableEdit && (
@@ -124,7 +195,7 @@ function Reorder({
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        handleMoveUp(index)
+                                                        handleMoveUp(index, item)
                                                     }}>
                                                     Move Up
                                                 </a>
@@ -133,7 +204,7 @@ function Reorder({
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        handleMoveDown(index)
+                                                        handleMoveDown(index, item)
                                                     }}>
                                                     Move Down
                                                 </a>
@@ -142,7 +213,7 @@ function Reorder({
                                                     onClick={(e) => {
                                                         e.preventDefault();
                                                         e.stopPropagation();
-                                                        handleDelete(index)
+                                                        handleDelete(index, item)
                                                     }}>
                                                     Delete
                                                 </a>
@@ -179,7 +250,7 @@ function Reorder({
                 <Modal.Body>
                     {Array.isArray(reorderData) && reorderData.length && (
                         <>
-                            {reorderData.map((block, index) => {
+                            {reorderData.map((item, index) => {
                                 if (childIndex !== index) {
                                     return null;
                                 }
@@ -187,7 +258,7 @@ function Reorder({
                                     <React.Fragment key={index}>
                                         {
                                             children({
-                                                block,
+                                                item,
                                                 index,
                                             })
                                         }

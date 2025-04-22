@@ -44,7 +44,7 @@ function SelectPage({
         }
     }, [value]);
 
-
+    console.log('Selected page:', selectedPage);
     return (
         <div>
 

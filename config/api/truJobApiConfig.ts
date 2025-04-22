@@ -7,6 +7,7 @@ export default {
     endpoints: {
         settings: '/settings',
         menu: '/menu',
+        menuItem: '/menu/%s/item',
         site: '/site',
         page: '/page',
         block: '/block',

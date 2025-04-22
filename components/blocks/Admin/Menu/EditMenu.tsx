@@ -123,6 +123,9 @@ function EditMenu({
             if (menuItem.hasOwnProperty('id') && menuItem.id) {
                 newMenuItems[index].id = menuItem.id;
             }
+            if (menuItem.hasOwnProperty('page_id')) {
+                newMenuItems[index].page_id = menuItem.page_id;
+            }
             if (Array.isArray(menuItem?.roles)) {
                 if (!Array.isArray(newMenuItems?.[index]?.roles)) {
                     newMenuItems[index].roles = [];
@@ -367,6 +370,7 @@ function EditMenu({
                                     </Modal.Header>
                                     <Modal.Body>
                                         <MenuItemForm
+                                            menuId={values?.id}
                                             data={values?.menu_items || []}
                                             onChange={(menuItems: Array<MenuItem>) => {
                                                 setFieldValue('menu_items', menuItems);

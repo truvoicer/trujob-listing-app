@@ -83,7 +83,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                     }}
                 >
                     {({
-                        block,
+                        item,
                         index,
                     }) => (
                         <>
@@ -93,7 +93,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     className="custom-control-input"
                                     name="default"
                                     id={"default" + index}
-                                    checked={block?.default || false}
+                                    checked={item?.default || false}
                                     onChange={e => {
                                         updateFieldValue(index, 'default', e.target.checked);
                                     }}
@@ -112,7 +112,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'nav_title', e.target.value);
                                     }}
-                                    value={block?.nav_title || ""} />
+                                    value={item?.nav_title || ""} />
                                 <label className="form-label" htmlFor={'nav_title' + index}>Nav Title</label>
                             </div>
                             <div className="floating-input form-group">
@@ -125,7 +125,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'title', e.target.value);
                                     }}
-                                    value={block?.title || ""} />
+                                    value={item?.title || ""} />
                                 <label className="form-label" htmlFor={'title' + index}>Title</label>
                             </div>
                             <div className="floating-input form-group">
@@ -138,7 +138,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'subtitle', e.target.value);
                                     }}
-                                    value={block?.subtitle || ""} />
+                                    value={item?.subtitle || ""} />
                                 <label className="form-label" htmlFor={'subtitle' + index}>Subtitle</label>
                             </div>
                             <div className="floating-input form-group">
@@ -151,7 +151,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'background_image', e.target.value);
                                     }}
-                                    value={block?.background_image || ""} />
+                                    value={item?.background_image || ""} />
                                 <label className="form-label" htmlFor={'background_image' + index}>Background Image</label>
                             </div>
                             <div className="floating-input form-group">
@@ -164,7 +164,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'background_color', e.target.value);
                                     }}
-                                    value={block?.background_color || ""} />
+                                    value={item?.background_color || ""} />
                                 <label className="form-label" htmlFor={'background_color' + index}>Background Color</label>
                             </div>
                             <div className="custom-control custom-checkbox mb-3 text-left">
@@ -173,7 +173,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     className="custom-control-input"
                                     name="pagination"
                                     id={"pagination" + index}
-                                    checked={block?.pagination || false}
+                                    checked={item?.pagination || false}
                                     onChange={e => {
                                         updateFieldValue(index, 'pagination', e.target.checked);
                                     }}
@@ -183,14 +183,14 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                 </label>
                             </div>
                             <SelectPaginationTypes
-                                value={block?.pagination_type}
+                                value={item?.pagination_type}
                                 onChange={(paginationType) => {
                                     updateFieldValue(index, 'pagination_type', paginationType);
                                 }}
                                 showSubmitButton={false}
                             />
                             <SelectPaginationScrollTypes
-                                value={block?.pagination_scroll_type}
+                                value={item?.pagination_scroll_type}
                                 onChange={(paginationScrollType) => {
                                     updateFieldValue(index, 'pagination_scroll_type', paginationScrollType);
                                 }}
@@ -205,7 +205,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'content', e.target.value);
                                     }}
-                                    value={block?.content || ""}></textarea>
+                                    value={item?.content || ""}></textarea>
                                 <label className="form-label" htmlFor={'content' + index}>Content</label>
                             </div>
                             {/* <div className="floating-input form-group">
@@ -216,7 +216,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                             id={"properties" + index}
                                             
                                             onChange={handleChange}
-                                            value={block?.properties || ""} />
+                                            value={item?.properties || ""} />
                                         <label className="form-label" htmlFor={'properties' + index}>Properties</label>
                                     </div> */}
                             <div className="custom-control custom-checkbox mb-3 text-left">
@@ -225,7 +225,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     className="custom-control-input"
                                     name="has_sidebar"
                                     id={"has_sidebar" + index}
-                                    checked={block?.has_sidebar || false}
+                                    checked={item?.has_sidebar || false}
                                     onChange={e => {
                                         updateFieldValue(index, 'has_sidebar', e.target.checked);
                                     }}
@@ -245,7 +245,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                             title: "Manage Sidebars",
                                             component: (
                                                 <SidebarForm
-                                                    data={block?.sidebars || []}
+                                                    data={item?.sidebars || []}
                                                     onChange={(sidebars: Array<Sidebar>) => {
                                                         updateFieldValue(index, 'sidebars', sidebars);
                                                     }}
@@ -268,7 +268,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                     onChange={e => {
                                         updateFieldValue(index, 'order', e.target.value);
                                     }}
-                                    value={block?.order || ""} />
+                                    value={item?.order || ""} />
                                 <label className="form-label" htmlFor={'order' + index}>Order</label>
                             </div>
                             {/* <div className="floating-input form-group">
@@ -279,7 +279,7 @@ function PageBlockForm({ data, onChange }: PageBlockFormProps) {
                                             id={"roles" + index}
                                             
                                             onChange={handleChange}
-                                            value={block?.roles || ""} />
+                                            value={item?.roles || ""} />
                                         <label className="form-label" htmlFor={'roles' + index}>Roles</label>
                                     </div> */}
                         </>

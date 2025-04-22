@@ -77,7 +77,7 @@ function WidgetForm({ data = null, onChange = null }) {
                     }}
                 >
                     {({
-                        widget,
+                        item,
                         index,
                     }) => (
                         <>

@@ -10,11 +10,11 @@ import { useEffect, useState } from "react";
 import { ModalService, ModalState } from "@/library/services/modal/ModalService";
 import { NotificationService, NotificationState } from "@/library/services/notification/NotificationService";
 
-type Props = {
+export type ViewLayoutProps = {
     page: any;
 }
 
-function ViewLayout({ page }: Props) {
+function ViewLayout({ page }: ViewLayoutProps) {
     const viewFactory = new ViewFactory();
     const view = viewFactory.renderView(page);
 
@@ -71,6 +71,7 @@ function ViewLayout({ page }: Props) {
                 }
 
                 {modalService.render()}
+                {notificationService.render()}
             </AppModalContext.Provider>
         </AppNotificationContext.Provider>
     );

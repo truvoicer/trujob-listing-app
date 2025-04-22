@@ -95,6 +95,7 @@ function MenuItemForm({
             return newState;
         });
     }
+    
     return (
         <form
             onSubmit={e => {
@@ -126,6 +127,16 @@ function MenuItemForm({
                 }}
                 showSubmitButton={false}
             />
+            {menuItem?.type === 'page' && (
+                <SelectPage
+                    id={'page_id' + index}
+                    value={menuItem?.page?.id || null}
+                    onChange={selectedPage => {
+                        handleChange('page_id', selectedPage);
+                    }}
+                    showSubmitButton={false}
+                />
+            )}
 
             <div className="floating-input form-group">
                 <input
@@ -151,7 +162,7 @@ function MenuItemForm({
                     value={menuItem?.url || ""} />
                 <label className="form-label" htmlFor={'url' + index}>URL</label>
             </div>
-            
+
             <SelectLinkTarget
                 id={'linktarget' + index}
                 value={menuItem?.target}
@@ -210,14 +221,6 @@ function MenuItemForm({
                 <label className="form-label" htmlFor={'a_class' + index}>A Class</label>
             </div>
 
-            <SelectPage
-                id={'page' + index}
-                value={menuItem?.page?.id || null}
-                onChange={selectedPage => {
-                    handleChange('page', selectedPage);
-                }}
-                showSubmitButton={false}
-            />
             <div className="floating-input form-group">
                 <button
                     type="button"
