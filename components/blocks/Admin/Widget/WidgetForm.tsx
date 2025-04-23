@@ -7,81 +7,73 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
-import SelectSidebar from "./SelectSidebar";
-import WidgetForm from "./WidgetForm";
-import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
-import { Sidebar } from "@/types/Sidebar";
+import SelectWidget from "./SelectWidget";
 
-type SidebarFormProps = {
-    data?: Array<Sidebar>;
-    onChange?: (data: Array<any>) => void;
-}
+function WidgetForm({ data = null, onChange = null }) {
+    const [widgets, setWidgets] = useState(data || []);
 
-function SidebarForm({ data, onChange }: SidebarFormProps) {
-    const [sidebars, setSidebars] = useState(data || []);
-
-    const dataTableContext = useContext(DataTableContext);
+    const appModalContext = useContext(AppModalContext);
     const formContext = useContext(FormContext);
 
-    // async function pageSidebarRequest() {
-    //     const response = await TruJobApiMiddleware.getInstance().pageSidebarsRequest(data?.id);
+    // async function pageWidgetRequest() {
+    //     const response = await TruJobApiMiddleware.getInstance().pageWidgetsRequest(data?.id);
     //     if (!response) {
     //         return;
     //     }
-    //     formContext.setFieldValue('sidebars', response?.data || []);
+    //     formContext.setFieldValue('widgets', response?.data || []);
     // }
 
-    const pageSidebarSchema = {
+    const pageWidgetSchema = {
         'title': '',
         'name': '',
         'icon': '',
     };
-    function updateFieldValue(index: number, field: string, value: string | number) {
-        const newData: Array<Sidebar> = [...sidebars];
+    function updateFieldValue(index, field, value) {
+        const newData = [...widgets];
         newData[index][field] = value;
-        setSidebars(newData);
+        setWidgets(newData);
     }
-    function handleChange(values: Array<Sidebar>) {
-        setSidebars(values);
+    function handleChange(values) {
+        setWidgets(values);
     }
 
     useEffect(() => {
         if (typeof onChange === 'function') {
-            onChange(sidebars);
+            onChange(widgets);
         }
-    }, [sidebars]);
+    }, [widgets]);
+    console.log('widgets', widgets, data);
     return (
         <div className="row">
             <div className="col-12">
                 <Reorder
-                    itemSchema={pageSidebarSchema}
+                    itemSchema={pageWidgetSchema}
                     itemHeader={(item, index) => `${item?.title} (${item?.name})` || 'Item type error'}
-                    data={sidebars || []}
+                    data={widgets || []}
                     onChange={handleChange}
                     onAdd={({
                         reorderData,
-                        onChange,
+                        setReorderData,
                         itemSchema
                     }) => {
-                        dataTableContext.modal.show({
+                        appModalContext.show({
                             component: (
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
-                                        <SelectSidebar
-                                            sidebarId={data?.id}
-                                            onSubmit={selectedSidebar => {
-                                                console.log('selectedSidebar', selectedSidebar);
+                                        <SelectWidget
+                                            onSubmit={selectedWidget => {
+                                                console.log('selectedWidget', selectedWidget);
                                                 const newData = [...reorderData];
-                                                newData.push({ ...pageSidebarSchema, ...selectedSidebar });
-                                                onChange(newData);
-                                                dataTableContext.modal.close('page-edit-sidebar-select');
+                                                newData.push({ ...pageWidgetSchema, ...selectedWidget });
+                                                setReorderData(newData);
+                                                appModalContext.close('page-edit-widget-select');
                                             }}
                                         />
                                     </div>
                                 </div>
                             ),
                             showFooter: false
-                        }, 'page-edit-sidebar-select');
+                        }, 'page-edit-widget-select');
                     }}
                 >
                     {({
@@ -96,14 +88,16 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
                                     onClick={e => {
                                         e.preventDefault();
                                         e.stopPropagation();
-                                        dataTableContext.modal.show({
+                                        appModalContext.show({
                                             component: (
-                                                <WidgetForm
-                                                    data={item?.widgets || []}
-                                                />
+                                                <div className="row">
+                                                    <div className="col-12 col-lg-12">
+                                                        {/* {renderSideBarWidgets(block)} */}
+                                                    </div>
+                                                </div>
                                             ),
                                             showFooter: false
-                                        }, 'page-edit-block-sidebar-widgets');
+                                        }, 'page-edit-block-widget-widgets');
                                     }}
                                 >
                                     Manage Widgets
@@ -116,4 +110,4 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
         </div>
     );
 }
-export default SidebarForm;
+export default WidgetForm;

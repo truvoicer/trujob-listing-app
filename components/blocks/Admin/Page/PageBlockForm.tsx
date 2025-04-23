@@ -1,7 +1,7 @@
 import Reorder from "@/components/Reorder/Reorder";
 import { useContext } from "react";
 import SelectBlock from "./SelectBlock";
-import SidebarForm from "./SidebarForm";
+import SidebarForm from "../Sidebar/SidebarForm";
 import SelectPaginationTypes from "./SelectPaginationType";
 import SelectPaginationScrollTypes from "./SelectPaginationScrollType";
 import { DataTableContext } from "@/contexts/DataTableContext";

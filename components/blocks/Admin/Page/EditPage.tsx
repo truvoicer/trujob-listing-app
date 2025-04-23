@@ -7,7 +7,7 @@ import { Dispatch, useContext, useEffect, useState } from "react";
 import PageBlockForm from "./PageBlockForm";
 import { formContextData } from "@/components/form/contexts/FormContext";
 import { Button, Modal } from "react-bootstrap";
-import SidebarForm from "./SidebarForm";
+import SidebarForm from "../Sidebar/SidebarForm";
 import SelectPageViews from "./SelectPageViews";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -17,10 +17,13 @@ import { isObjectEmpty } from "@/helpers/utils";
 import { Page } from "@/types/Page";
 import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
+import EditPageFields from "./EditPageFields";
 
 type EditPageProps = {
     data?: Page;
     operation: string;
+    inModal?: boolean;
+    modalId?: string;
 }
 type SidebarModalState = {
     show: boolean;
@@ -32,7 +35,12 @@ type BlocksModalState = {
     title: string;
     footer: boolean;
 }
-function EditPage({ data, operation }: EditPageProps) {
+function EditPage({
+    data,
+    operation,
+    inModal = false,
+    modalId,
+}: EditPageProps) {
     const [blocksModal, setBlocksModal] = useState<BlocksModalState>({
         show: false,
         title: '',
@@ -101,284 +109,115 @@ function EditPage({ data, operation }: EditPageProps) {
         });
     }
 
+    async function handleSubmit(values: Page) {
+        let requestData = { ...values };
+
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
+            console.warn('No data to update');
+            return;
+        }
+        if (Array.isArray(requestData?.sidebars)) {
+            requestData.sidebars = requestData?.sidebars.filter((sidebar: Sidebar) => {
+                return sidebar?.id;
+            })
+                .map((sidebar: Sidebar) => {
+                    return sidebar.id;
+                });
+        }
+        if (Array.isArray(requestData?.blocks)) {
+            requestData.blocks = requestData?.blocks.map((block: PageBlock) => {
+                if (Array.isArray(block?.sidebars)) {
+                    block.sidebars = block.sidebars
+                        .filter((sidebar: Sidebar) => {
+                            return sidebar?.id;
+                        })
+                        .map((sidebar: Sidebar) => {
+                            return sidebar.id;
+                        });
+                }
+                return block;
+            });
+        }
+
+
+        let response = null;
+        switch (operation) {
+            case 'edit':
+            case 'update':
+                if (!data?.id) {
+                    throw new Error('Page ID is required');
+                }
+                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                    endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
+                    method: ApiMiddleware.METHOD.PATCH,
+                    protectedReq: true,
+                    data: requestData,
+                })
+                break;
+            case 'add':
+            case 'create':
+                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                    endpoint: `${truJobApiConfig.endpoints.page}/create`,
+                    method: ApiMiddleware.METHOD.POST,
+                    protectedReq: true,
+                    data: requestData,
+                })
+                break;
+            default:
+                console.warn('Invalid operation');
+                break;
+        }
+        if (!response) {
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
+
+    }
+
+
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
+        }
+
+        dataTableContext.modal.update(
+            {
+                formProps: {
+                    operation: operation,
+                    initialValues: initialValues,
+                    onSubmit: handleSubmit,
+                }
+            },
+            modalId
+        );
+    }, [inModal, modalId]);
+
     const appModalContext = useContext(AppModalContext);
     const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
-
-                <Form
-                    operation={operation}
-                    initialValues={initialValues}
-                    onSubmit={async (values) => {
-                        let requestData = { ...values };
-                        
-                        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
-                            console.warn('No data to update');
-                            return;
-                        }
-                        if (Array.isArray(requestData?.sidebars)) {
-                            requestData.sidebars = requestData?.sidebars.filter((sidebar: Sidebar) => {
-                                return sidebar?.id;
-                            })
-                                .map((sidebar: Sidebar) => {
-                                    return sidebar.id;
-                                });
-                        }
-                        if (Array.isArray(requestData?.blocks)) {
-                            requestData.blocks = requestData?.blocks.map((block: PageBlock) => {
-                                if (Array.isArray(block?.sidebars)) {
-                                    block.sidebars = block.sidebars
-                                        .filter((sidebar: Sidebar) => {
-                                            return sidebar?.id;
-                                        })
-                                        .map((sidebar: Sidebar) => {
-                                            return sidebar.id;
-                                        });
-                                }
-                                return block;
-                            });
-                        }
-                        
-                        
-                        let response = null;
-                        switch (operation) {
-                            case 'edit':
-                            case 'update':
-                                if (!data?.id) {
-                                    throw new Error('Page ID is required');
-                                }
-                                response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
-                                    method: ApiMiddleware.METHOD.PATCH,
-                                    protectedReq: true,
-                                    data: requestData,
-                                })
-                                break;
-                            case 'add':
-                            case 'create':
-                                response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.page}/create`,
-                                    method: ApiMiddleware.METHOD.POST,
-                                    protectedReq: true,
-                                    data: requestData,
-                                })
-                                break;
-                            default:
-                                console.warn('Invalid operation');
-                                break;
-                        }
-                        if (!response) {
-                            return;
-                        }
-                        dataTableContext.refresh();
-                        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
-
-                    }}
-                >
-                    {({
-                        values,
-                        errors,
-                        setFieldValue,
-                        onChange,
-                    }: FormContextType) => {
-                        return (
-                            <>
-                                <div className="row">
-                                    <div className="col-12 col-lg-6">
-                                        <SelectPageViews
-                                            value={values?.view || ''}
-                                            onChange={(pageViews: string) => {
-                                                setFieldValue('view', pageViews);
-                                            }}
-                                            showSubmitButton={false}
-                                        />
-                                    </div>
-                                    <div className="col-12 col-lg-6">
-                                        <div className="custom-control custom-checkbox mb-3 text-left">
-                                            <input
-                                                onChange={e => {
-                                                    onChange(e);
-                                                }}
-                                                type="checkbox"
-                                                className="custom-control-input"
-                                                id="is_active"
-                                                name="is_active"
-                                                checked={values?.is_active || false} />
-                                            <label className="custom-control-label" htmlFor="is_active">
-                                                Is active
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12 col-lg-6">
-                                        <div className="custom-control custom-checkbox mb-3 text-left">
-                                            <input
-                                                type="checkbox"
-                                                className="custom-control-input"
-                                                id="is_featured"
-                                                name="is_featured"
-                                                onChange={onChange}
-                                                checked={values?.is_featured || false} />
-                                            <label className="custom-control-label" htmlFor="is_featured">
-                                                Is Featured
-                                            </label>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12 col-lg-6">
-                                        <div className="custom-control custom-checkbox mb-3 text-left">
-                                            <input
-                                                type="checkbox"
-                                                className="custom-control-input"
-                                                id="is_home"
-                                                name="is_home"
-                                                onChange={onChange}
-                                                checked={values?.is_home || false} />
-                                            <label className="custom-control-label" htmlFor="is_home">
-                                                Is Home
-                                            </label>
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-lg-6">
-                                        <div className="floating-input form-group">
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="title"
-                                                id="title"
-                                                onChange={onChange}
-                                                value={values?.title || ""} />
-                                            <label className="form-label" htmlFor="title">Title</label>
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-lg-6">
-                                        <div className="floating-input form-group">
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="name"
-                                                id="name"
-                                                onChange={onChange}
-                                                value={values?.name || ""} />
-                                            <label className="form-label" htmlFor="name">Name</label>
-                                        </div>
-                                    </div>
-                                    <div className="col-12 col-lg-6">
-                                        <div className="floating-input form-group">
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                name="permalink"
-                                                id="permalink"
-                                                onChange={onChange}
-                                                value={values?.permalink || ""} />
-                                            <label className="form-label" htmlFor="permalink">Permalink</label>
-                                        </div>
-                                    </div>
-
-
-                                    <div className="col-12 col-lg-6">
-                                        <div className="floating-input form-group">
-                                            <textarea
-                                                className="form-control"
-                                                name="content"
-                                                id="content"
-                                                onChange={onChange}
-                                                value={values?.content || ""}></textarea>
-                                            <label className="form-label" htmlFor="content">Content</label>
-                                        </div>
-                                    </div>
-
-
-                                    <div className="col-12 my-3">
-                                        <h4>Manage</h4>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary mr-2"
-                                            onClick={(e) => {
-                                                setModalTitle('Manage Blocks', setBlocksModal);
-                                                setModalFooter(false, setBlocksModal);
-                                                showModal(setBlocksModal);
-                                            }}
-                                        >
-                                            Manage Blocks
-                                        </button>
-                                        <button
-                                            type="button"
-                                            className="btn btn-primary mr-2"
-                                            onClick={(e) => {
-                                                setModalTitle('Manage Sidebars', setSidebarsModal);
-                                                setModalFooter(false, setSidebarsModal);
-                                                showModal(setSidebarsModal);
-                                            }}
-                                        >
-                                            Manage Sidebars
-                                        </button>
-                                    </div>
-
-
-                                    <div className="col-12">
-                                        <button
-                                            type="submit"
-                                            className="btn btn-primary mr-2"
-                                        >
-                                            Save
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <Modal show={blocksModal.show} onHide={() => hideModal(setBlocksModal)}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>{blocksModal?.title || ''}</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                        <PageBlockForm
-                                            data={values?.blocks || []}
-                                            onChange={(blocks: Array<PageBlock>) => {
-                                                console.log('blocks', blocks);
-                                                setFieldValue('blocks', blocks);
-                                            }}
-                                        />
-                                    </Modal.Body>
-                                    {blocksModal.footer &&
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => hideModal(setBlocksModal)}>
-                                                Close
-                                            </Button>
-                                            <Button variant="primary" onClick={() => hideModal(setBlocksModal)}>
-                                                Save Changes
-                                            </Button>
-                                        </Modal.Footer>
-                                    }
-                                </Modal>
-                                <Modal show={sidebarsModal.show} onHide={() => hideModal(setSidebarsModal)}>
-                                    <Modal.Header closeButton>
-                                        <Modal.Title>{sidebarsModal?.title || ''}</Modal.Title>
-                                    </Modal.Header>
-                                    <Modal.Body>
-                                        <SidebarForm
-                                            data={values?.sidebars || []}
-                                            onChange={(sidebars: Array<Sidebar>) => {
-                                                setFieldValue('sidebars', sidebars);
-                                            }}
-                                        />
-                                    </Modal.Body>
-                                    {sidebarsModal.footer &&
-                                        <Modal.Footer>
-                                            <Button variant="secondary" onClick={() => hideModal(setSidebarsModal)}>
-                                                Close
-                                            </Button>
-                                            <Button variant="primary" onClick={() => hideModal(setSidebarsModal)}>
-                                                Save Changes
-                                            </Button>
-                                        </Modal.Footer>
-                                    }
-                                </Modal>
-                            </>
-                        )
-                    }}
-                </Form>
+                {inModal
+                    ? (
+                        <EditPageFields />
+                    )
+                    : (
+                        <Form
+                            operation={operation}
+                            initialValues={initialValues}
+                            onSubmit={handleSubmit}
+                        >
+                            {() => {
+                                return (
+                                    <EditPageFields />
+                                )
+                            }}
+                        </Form>
+                    )}
             </div>
         </div>
     );

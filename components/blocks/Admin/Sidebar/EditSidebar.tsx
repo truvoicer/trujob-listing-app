@@ -1,50 +1,48 @@
 import Form, { FormContextType } from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { Dispatch, SetStateAction, use, useContext, useEffect, useState } from "react";
-import { Button, Modal } from "react-bootstrap";
+import { useContext, useEffect } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import MenuItemForm from "./ManageMenuItems";
-import RoleForm from "../Role/RoleForm";
-import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
-import EditMenuFields from "./EditMenuFields";
+import EditSidebarFields from "./EditSidebarFields";
+import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
+import { Sidebar } from "@/types/Sidebar";
 
-export type EditMenuProps = {
-    data?: Menu | null;
+export type EditSidebarProps = {
+    data?: Sidebar | null;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 };
-function EditMenu({
+function EditSidebar({
     data,
     operation,
     inModal = false,
     modalId,
-}: EditMenuProps) {
+}: EditSidebarProps) {
 
-    const initialValues = {
-        'id': data?.id,
-        'name': data?.name || '',
-        'has_parent': data?.has_parent || false,
-        'ul_class': data?.ul_class || '',
-        'active': data?.active || false,
-        'roles': data?.roles || [],
-        'menu_items': data?.menu_items || [],
+    const initialValues: Sidebar = {
+        name: data?.name || '',
+        title: data?.title || '',
+        icon: data?.icon || '',
+        has_container: data?.has_container || false,
+        order: data?.order || 0,
+        properties: data?.properties || {},
+        roles: data?.roles || [],
+        widgets: data?.widgets || [],
     };
-    function buildMenuIdData(menus: Array<Menu>): Array<number> {
-        const filterMenuData: Array<Menu> = menus
-            .filter((menu: Menu) => {
-                if (typeof menu === 'object') {
-                    return menu.id;
+    function buildSidebarIdData(sidebars: Array<Sidebar>): Array<number> {
+        const filterSidebarData: Array<Sidebar> = sidebars
+            .filter((sidebar: Sidebar) => {
+                if (typeof sidebar === 'object') {
+                    return sidebar.id;
                 }
                 return false;
             });
-        return filterMenuData.map((menu: Menu) => {
-            return menu.id;
+        return filterSidebarData.map((sidebar: Sidebar) => {
+            return sidebar.id;
         });
     }
     function buildRoleIdData(roles: Array<Role>): Array<number> {
@@ -59,44 +57,44 @@ function EditMenu({
             return role.id;
         });
     }
-    function buildMenuItemRequestData(menuItems: Array<MenuItem>) {
-        let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
-        menuItems.forEach((menuItem: MenuItem, index: number) => {
-            newMenuItems[index] = {
-                active: menuItem?.active,
-                label: menuItem?.label,
-                type: menuItem?.type,
-                url: menuItem?.url,
-                target: menuItem?.target,
-                order: menuItem?.order,
-                icon: menuItem?.icon,
-                li_class: menuItem?.li_class,
-                a_class: menuItem?.a_class
+    function buildSidebarItemRequestData(sidebarItems: Array<SidebarItem>) {
+        let newSidebarItems: Array<CreateSidebarItem | UpdateSidebarItem> = [];
+        sidebarItems.forEach((sidebarItem: SidebarItem, index: number) => {
+            newSidebarItems[index] = {
+                active: sidebarItem?.active,
+                label: sidebarItem?.label,
+                type: sidebarItem?.type,
+                url: sidebarItem?.url,
+                target: sidebarItem?.target,
+                order: sidebarItem?.order,
+                icon: sidebarItem?.icon,
+                li_class: sidebarItem?.li_class,
+                a_class: sidebarItem?.a_class
             };
-            if (menuItem.hasOwnProperty('id') && menuItem.id) {
-                newMenuItems[index].id = menuItem.id;
+            if (sidebarItem.hasOwnProperty('id') && sidebarItem.id) {
+                newSidebarItems[index].id = sidebarItem.id;
             }
-            if (menuItem.hasOwnProperty('page_id')) {
-                newMenuItems[index].page_id = menuItem.page_id;
+            if (sidebarItem.hasOwnProperty('page_id')) {
+                newSidebarItems[index].page_id = sidebarItem.page_id;
             }
-            if (Array.isArray(menuItem?.roles)) {
-                if (!Array.isArray(newMenuItems?.[index]?.roles)) {
-                    newMenuItems[index].roles = [];
+            if (Array.isArray(sidebarItem?.roles)) {
+                if (!Array.isArray(newSidebarItems?.[index]?.roles)) {
+                    newSidebarItems[index].roles = [];
                 }
-                newMenuItems[index].roles = buildRoleIdData(menuItem.roles);
+                newSidebarItems[index].roles = buildRoleIdData(sidebarItem.roles);
             }
-            if (Array.isArray(menuItem?.menus)) {
-                if (!Array.isArray(newMenuItems?.[index]?.menus)) {
-                    newMenuItems[index].menus = [];
+            if (Array.isArray(sidebarItem?.sidebars)) {
+                if (!Array.isArray(newSidebarItems?.[index]?.sidebars)) {
+                    newSidebarItems[index].sidebars = [];
                 }
-                newMenuItems[index].menus = buildMenuIdData(menuItem.menus);
+                newSidebarItems[index].sidebars = buildSidebarIdData(sidebarItem.sidebars);
             }
         });
-        return newMenuItems
+        return newSidebarItems
     }
 
-    function buildCreateData(values: Menu) {
-        let requestData: CreateMenu = {
+    function buildCreateData(values: Sidebar) {
+        let requestData: CreateSidebar = {
             name: values?.name,
         };
         if (values.hasOwnProperty('ul_class')) {
@@ -108,14 +106,14 @@ function EditMenu({
         if (Array.isArray(values?.roles)) {
             requestData.roles = buildRoleIdData(values.roles);
         }
-        if (Array.isArray(values?.menu_items)) {
-            requestData.menu_items = buildMenuItemRequestData(values.menu_items);
+        if (Array.isArray(values?.sidebar_items)) {
+            requestData.sidebar_items = buildSidebarItemRequestData(values.sidebar_items);
         }
         return requestData;
     }
 
-    function buildUpdateData(values: Menu) {
-        let requestData: UpdateMenu = {
+    function buildUpdateData(values: Sidebar) {
+        let requestData: UpdateSidebar = {
             id: values?.id,
         };
         if (values.hasOwnProperty('ul_class')) {
@@ -127,8 +125,8 @@ function EditMenu({
         if (Array.isArray(values?.roles)) {
             requestData.roles = buildRoleIdData(values.roles);
         }
-        if (Array.isArray(values?.menu_items)) {
-            requestData.menu_items = buildMenuItemRequestData(values.menu_items);
+        if (Array.isArray(values?.sidebar_items)) {
+            requestData.sidebar_items = buildSidebarItemRequestData(values.sidebar_items);
         }
         return requestData;
     }
@@ -137,7 +135,7 @@ function EditMenu({
         if (operation === 'edit' || operation === 'update') {
             requiredFields = {
                 id: true,
-                menu_items: {
+                sidebar_items: {
                     id: true,
                 },
                 roles: {
@@ -147,14 +145,14 @@ function EditMenu({
         }
         return requiredFields;
     }
-    async function handleSubmit(values: Menu) {
-        console.log('edit menu values', values);
+    async function handleSubmit(values: Sidebar) {
+        console.log('edit sidebar values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
         let response = null;
-        let requestData: CreateMenu | UpdateMenu;
+        let requestData: CreateSidebar | UpdateSidebar;
         switch (operation) {
             case 'edit':
             case 'update':
@@ -162,10 +160,10 @@ function EditMenu({
                 console.log('edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
-                    throw new Error('Menu ID is required');
+                    throw new Error('Sidebar ID is required');
                 }
                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.menu}/${requestData.id}/update`,
+                    endpoint: `${truJobApiConfig.endpoints.sidebar}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
                     data: requestData,
@@ -177,7 +175,7 @@ function EditMenu({
                 console.log('create requestData', requestData);
                 // return;
                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.menu}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.sidebar}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
                     data: requestData,
@@ -191,7 +189,7 @@ function EditMenu({
             return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_MENU_MODAL_ID);
+        dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
     }
     const dataTableContext = useContext(DataTableContext);
     useEffect(() => {
@@ -219,7 +217,7 @@ function EditMenu({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditMenuFields />
+                        <EditSidebarFields />
                     )
                     : (
                         <Form
@@ -235,7 +233,7 @@ function EditMenu({
                                 onChange,
                             }: FormContextType) => {
                                 return (
-                                    <EditMenuFields />
+                                    <EditSidebarFields />
                                 )
                             }}
                         </Form>
@@ -244,4 +242,4 @@ function EditMenu({
         </div>
     );
 }
-export default EditMenu;
+export default EditSidebar;

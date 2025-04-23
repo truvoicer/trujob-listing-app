@@ -10,13 +10,35 @@ import DataManager, { DataTableContextType, DatatableSearchParams } from "@/comp
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Page } from "@/types/Page";
+import { FormContextType } from "@/components/form/Form";
 
 export type ManagePageProps = {
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
-function ManagePage({}: ManagePageProps) {
+function ManagePage({ }: ManagePageProps) {
     const appModalContext = useContext(AppModalContext);
+
+    function getPageFormModalProps() {
+        return {
+            formProps: {},
+            show: true,
+            showFooter: true,
+            onOk: ({ formHelpers }: {
+                formHelpers?: FormContextType | null
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.onSubmit !== 'function') {
+                    return;
+                }
+                formHelpers.onSubmit();
+            },
+            fullscreen: true
+        }
+    }
+
     function renderActions(item: Page, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
@@ -32,11 +54,11 @@ function ManagePage({}: ManagePageProps) {
                                 <EditPage
                                     data={item}
                                     operation={'edit'}
+                                    inModal={true}
+                                    modalId={EDIT_PAGE_MODAL_ID}
                                 />
                             ),
-                            show: true,
-                            showFooter: false,
-                            fullscreen: true
+                            ...getPageFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
                     }}
                 >
@@ -57,10 +79,11 @@ function ManagePage({}: ManagePageProps) {
                                             <EditPage
                                                 data={item}
                                                 operation={'edit'}
+                                                inModal={true}
+                                                modalId={EDIT_PAGE_MODAL_ID}
                                             />
                                         ),
-                                        show: true,
-                                        showFooter: false
+                                        ...getPageFormModalProps(),
                                     }, EDIT_PAGE_MODAL_ID);
                                 }
                             }
@@ -171,10 +194,11 @@ function ManagePage({}: ManagePageProps) {
             component: (
                 <EditPage
                     operation={'add'}
+                    inModal={true}
+                    modalId={EDIT_PAGE_MODAL_ID}
                 />
             ),
-            show: true,
-            showFooter: false
+            ...getPageFormModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
     return (
