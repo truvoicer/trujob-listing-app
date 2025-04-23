@@ -24,7 +24,7 @@ export type FormContextType = {
     setValues: (values: any) => void;
     setFieldValue: (key: string, value: any) => void;
     onChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
-    onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
+    onSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
     onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
     validate: () => any;
     errors: any;
@@ -256,8 +256,10 @@ function Form({
             requiredFields
         );
     }
-    function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
+        if (e) {
+            e.preventDefault();
+        }
         if (typeof operation !== 'string') {
             console.warn(`Form operation is not a string`);
             return;

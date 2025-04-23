@@ -105,11 +105,14 @@ export const uCaseFirst = (string) => {
 }
 
 export const isObjectEmpty = (object) => {
+    if (typeof object === "undefined" || object === null) {
+        return true;
+    }
     if (!isSet(object)) {
-        return false;
+        return true;
     }
     if (!isObject(object)) {
-        return false;
+        return true;
     }
     return Object.keys(object).length === 0 && object.constructor === Object
 }

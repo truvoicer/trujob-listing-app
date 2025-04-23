@@ -1,12 +1,14 @@
-import { findInObject } from "@/helpers/utils";
+import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
+import Form, { FormProps } from "@/components/form/Form";
+import React from "react";
 
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
 }
 export type ModalItem = {
-    [key: string]: string | number | boolean | null | Function | undefined;
+    [key: string]: string | number | boolean | null | Function | undefined | FormProps;
     id?: string | null;
     title: string | null;
     size: "sm" | "md" | "lg" | "xl";
@@ -14,8 +16,9 @@ export type ModalItem = {
     component: any;
     show: boolean;
     showFooter: boolean;
-    onOk: () => void;
-    onCancel: () => void;
+    formProps?: null | FormProps;
+    onOk: () => boolean;
+    onCancel: () => boolean;
 }
 export class ModalService extends MessageService {
     static INIT_DATA: ModalState = {
@@ -23,6 +26,7 @@ export class ModalService extends MessageService {
         show: () => { },
         close: () => { },
         hide: () => { },
+        update: () => { },
     };
     static INIT_ITEM_DATA: ModalItem = {
         id: null,
@@ -32,8 +36,9 @@ export class ModalService extends MessageService {
         showFooter: true,
         size: 'md',
         fullscreen: undefined,
-        onCancel: () => { },
-        onOk: () => { },
+        formProps: null,
+        onCancel: () => { return true; },
+        onOk: () => { return true; },
     };
 
     buildItemData(data: any, id: null | string = null) {
@@ -59,6 +64,10 @@ export class ModalService extends MessageService {
         return modalState.items.findIndex((item: ModalItem) => item?.id === id);
     }
 
+    renderFormModal() {
+
+    }
+
     render() {
         const itemState = this.findStateData();
         if (!itemState) {
@@ -72,27 +81,46 @@ export class ModalService extends MessageService {
                         return null;
                     }
                     return (
-                        <Modal key={index} show={modal.show} onHide={() => this.handleCancel(index)}>
-                            <Modal.Header closeButton>
-                                <Modal.Title>{modal?.title || ''}</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                                {modal?.component || ''}
-                            </Modal.Body>
-                            {modal?.showFooter &&
-                                <Modal.Footer>
-                                    <Button variant="secondary" onClick={() => this.handleCancel(index)}>
-                                        Close
-                                    </Button>
-                                    <Button variant="primary" onClick={() => this.handleOk(index)}>
-                                        Save Changes
-                                    </Button>
-                                </Modal.Footer>
+                        <React.Fragment key={index}>
+                            {(isObject(modal?.formProps) && !isObjectEmpty(modal?.formProps))
+                                ? (
+                                    <Form
+                                        {...modal.formProps}
+                                    >
+                                        {(formHelpers: FormProps) => {
+                                            return this.renderModal(modal, index, formHelpers);
+                                        }}
+                                    </Form>
+                                )
+                                : this.renderModal(modal, index, null)
                             }
-                        </Modal>
+                        </React.Fragment>
                     );
                 })}
             </>
-        )
+        );
+    }
+
+    renderModal(modal: ModalItem, index: number, formHelpers?: any) {
+        return (
+            <Modal show={modal.show} onHide={() => this.handleCancel(index, {formHelpers})}>
+                <Modal.Header closeButton>
+                    <Modal.Title>{modal?.title || ''}</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    {modal?.component || ''}
+                </Modal.Body>
+                {modal?.showFooter &&
+                    <Modal.Footer>
+                        <Button variant="secondary" onClick={() => this.handleCancel(index, {formHelpers})}>
+                            Close
+                        </Button>
+                        <Button variant="primary" onClick={() => this.handleOk(index, {formHelpers})}>
+                            Save Changes
+                        </Button>
+                    </Modal.Footer>
+                }
+            </Modal>
+        );
     }
 }

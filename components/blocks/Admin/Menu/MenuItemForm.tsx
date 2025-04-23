@@ -227,7 +227,7 @@ function MenuItemForm({
                     className="btn btn-primary mr-2"
                     onClick={(e) => {
                         setModalTitle('Manage Roles', setRolesModal);
-                        setModalFooter(false, setRolesModal);
+                        setModalFooter(true, setRolesModal);
                         showModal(setRolesModal);
                     }}
                 >
@@ -240,19 +240,11 @@ function MenuItemForm({
                     className="btn btn-primary mr-2"
                     onClick={(e) => {
                         setModalTitle('Manage Menus', setMenuModal);
-                        setModalFooter(false, setMenuModal);
+                        setModalFooter(true, setMenuModal);
                         showModal(setMenuModal);
                     }}
                 >
                     Menus
-                </button>
-            </div>
-            <div className="floating-input form-group">
-                <button
-                    type="submit"
-                    className="btn btn-primary mr-2"
-                >
-                    Submit
                 </button>
             </div>
             <Modal show={rolesModal.show} onHide={() => hideModal(setRolesModal)}>
@@ -287,7 +279,6 @@ function MenuItemForm({
                     <MenuForm
                         data={menuItem?.menus || []}
                         onChange={(menus) => {
-                            console.log('menus', menus);
                             handleChange('menus', menus);
                         }}
                     />

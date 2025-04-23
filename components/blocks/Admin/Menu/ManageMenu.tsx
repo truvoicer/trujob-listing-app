@@ -14,10 +14,31 @@ import DataManager from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditMenu from "./EditMenu";
+import { FormContextType, FormProps } from "@/components/form/Form";
 
 export const EDIT_MENU_MODAL_ID = 'edit-menu-modal';
 
 function ManageMenu() {
+    const appModalContext = useContext(AppModalContext);
+    function getMenuFormModalProps() {
+        return {
+            formProps: {},
+            show: true,
+            showFooter: true,
+            onOk: ({ formHelpers }: {
+                formHelpers?: FormContextType | null
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.onSubmit !== 'function') {
+                    return;
+                }
+                formHelpers.onSubmit();
+            },
+            fullscreen: true
+        }
+    }
     function renderActions(item, index, dataTableContextState) {
         return (
             <div className="d-flex align-items-center list-action">
@@ -33,11 +54,11 @@ function ManageMenu() {
                                 <EditMenu
                                     data={item}
                                     operation={'edit'}
+                                    inModal={true}
+                                    modalId={EDIT_MENU_MODAL_ID}
                                 />
                             ),
-                            show: true,
-                            showFooter: true,
-                            fullscreen: true
+                            ...getMenuFormModalProps(),
                         }, EDIT_MENU_MODAL_ID);
                     }}
                 >
@@ -58,10 +79,11 @@ function ManageMenu() {
                                             <EditMenu
                                                 data={item}
                                                 operation={'edit'}
+                                                inModal={true}
+                                                modalId={EDIT_MENU_MODAL_ID}
                                             />
                                         ),
-                                        show: true,
-                                        showFooter: false
+                                        ...getMenuFormModalProps(),
                                     }, EDIT_MENU_MODAL_ID);
                                 }
                             }
@@ -74,22 +96,23 @@ function ManageMenu() {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Page',
+                                        title: 'Delete Menu',
                                         component: (
-                                            <p>Are you sure you want to delete this page ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this menu | name: {item?.name} | id: ({item?.id})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id || item?.id === '') {
-                                                throw new Error('Page ID is required');
+                                                throw new Error('Menu ID is required');
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.page}/${item.id}`,
+                                                endpoint: `${truJobApiConfig.endpoints.menu}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
                                             if (!response) {
                                                 return;
                                             }
+                                            dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true
@@ -122,7 +145,7 @@ function ManageMenu() {
         }
         return query;
     }
-    async function pageRequest({ dataTableContextState, setDataTableContextState, searchParams }) {
+    async function menuRequest({ dataTableContextState, setDataTableContextState, searchParams }) {
         let query = dataTableContextState?.query || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
@@ -158,17 +181,17 @@ function ManageMenu() {
     }
     function renderAddNew(e, { dataTableContextState, setDataTableContextState }) {
         e.preventDefault();
-        // e.stopPropagation();
-        console.log('Add New Page', dataTableContextState.modal);
         dataTableContextState.modal.show({
-            title: 'Add New Page',
+            title: 'New Menu',
             component: (
                 <EditMenu
                     operation={'add'}
+                    inModal={true}
+                    modalId={EDIT_MENU_MODAL_ID}
+
                 />
             ),
-            show: true,
-            showFooter: false
+            ...getMenuFormModalProps(),
         }, EDIT_MENU_MODAL_ID);
     }
     return (
@@ -176,7 +199,7 @@ function ManageMenu() {
             <DataManager
                 renderAddNew={renderAddNew}
                 renderActions={renderActions}
-                request={pageRequest}
+                request={menuRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Name', key: 'name' },

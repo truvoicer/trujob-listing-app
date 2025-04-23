@@ -1,10 +1,12 @@
 import { findInObject } from "@/helpers/utils";
 import { ModalItem } from "../modal/ModalService";
+import { FormProps } from "@/components/form/Form";
 export type MessageState = {
     items: Array<any>;
     show: (data: any, id: string) => void;
     close: (id: string) => void;
     hide: (id: string) => void;
+    update: (data: any, id: string) => void;
 }
 export class MessageService {
     key: null | string = null;
@@ -62,39 +64,47 @@ export class MessageService {
         });
     }
 
-    handleCancel(index: number) {
+    handleCancel(index: number, calllbackProps?: any) {
+        const handleCallback = this.handleCallback(index, "onCancel", calllbackProps);
+        if (!handleCallback) {
+            return;
+        }
+        this.handleClose(calllbackProps);
+    }
+    handleCallback(index: number, callbackName: string, callbackProps: any = null) {
         let itemState;
         if (this.key) {
             itemState = findInObject(this.key, this.state);
             if (!itemState) {
                 console.error("state not found");
-                return;
+                return false;
             }
         } else {
             itemState = this.state;
         }
-        if (typeof itemState?.onCancel === "function") {
-            itemState.onCancel();
+        if (!Array.isArray(itemState?.items)) {
+            return true;
         }
-        this.handleClose(index);
+        const findItemByIndex = itemState.items?.[index];
+        if (!findItemByIndex) {
+            return true;
+        }
+        const messageItem = itemState.items[index];
+        
+        if (typeof messageItem?.[callbackName] === "function") {
+            return messageItem[callbackName](callbackProps);
+        }
+
+        return true;
     }
-    handleOk(index: number) {
-        let itemState;
-        if (this.key) {
-            itemState = findInObject(this.key, this.state);
-            if (!itemState) {
-                console.error("state not found");
-                return;
-            }
-        } else {
-            itemState = this.state;
+    handleOk(index: number, calllbackProps?: any) {
+        const handleCallback = this.handleCallback(index, "onOk", calllbackProps);
+        if (!handleCallback) {
+            return;
         }
-        if (typeof itemState?.onOk === "function") {
-            itemState.onOk();
-        }
-        this.handleClose(index);
+        this.handleClose(calllbackProps);
     }
-    handleClose(index: number) {
+    handleClose(index: number, formHelpers?: any) {
         this.setter((itemState: any) => {
             let cloneState = { ...itemState };
             if (this.key) {
@@ -148,10 +158,10 @@ export class MessageService {
                 item = cloneState.items[findItemIdex];
             }
         }
+        
         item = {
             ...item,
             ...this.buildItemData(data, id),
-            show: true,
         };
 
         if (findItemIdex > -1) {
@@ -198,7 +208,16 @@ export class MessageService {
         const data = {
             ...findKeyData,
             items: [],
-            show: this.updateState.bind(this),
+            update: this.updateState.bind(this),
+            show: (data: any, id: null | string = null) => {
+                this.updateState(
+                    {
+                        ...data,
+                        show: true,
+                    }, 
+                    id
+                );
+            },
             close: this.closeBatch.bind(this),
             hide: this.closeBatch.bind(this),
         };
