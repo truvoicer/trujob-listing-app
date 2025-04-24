@@ -1,14 +1,20 @@
+import { FormContext } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { useEffect, useState } from "react";
+import { Widget } from "@/types/Widget";
+import { useContext, useEffect, useState } from "react";
 
+export type SelectWidgetProps = {
+    name?: string;
+}
 function SelectWidget({
-    onChange,
-    onSubmit
-}) {
-    const [widgets, setWidgets] = useState([]);
-    const [selectedWidget, setSelectedWidget] = useState(null);
+    name = 'widget',
+}: SelectWidgetProps) {
+    const [widgets, setWidgets] = useState<Array<Widget>>([]);
+    const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
+
+    const formContext = useContext(FormContext);
 
     async function fetchWidgets() {
         // Fetch widgets from the API or any other source
@@ -29,30 +35,36 @@ function SelectWidget({
     }, []);
 
     useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(selectedWidget);
+        if (!selectedWidget) {
+            return;
         }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedWidget);
+        
     }, [selectedWidget]);
 
     return (
         <div>
             <h2>Select Widget</h2>
             <p>Select a widget to add to the page.</p>
-            <form onSubmit={e => {
-                e.preventDefault();
-                console.log('Selected Widget:', selectedWidget);
-                if (typeof onSubmit === 'function') {
-                    onSubmit(selectedWidget);
-                }
-            }}>
                 <select
                     className="form-control"
                     onChange={e => {
                         const findSelectedWidget = widgets.find(widget => parseInt(widget?.id) === parseInt(e.target.value));
+                        if (!findSelectedWidget) {
+                            console.warn('No widget found with id', e.target.value);
+                            return;
+                        }
                         setSelectedWidget(findSelectedWidget);
                     }}
-                    required=""
-                    value={parseInt(selectedWidget?.id) || ''}
+                    value={selectedWidget?.id || ''}
                 >
                     <option value="">Select Widget</option>
                     {widgets.map((widget, index) => (
@@ -63,8 +75,6 @@ function SelectWidget({
                         </option>
                     ))}
                 </select>
-                <button type="submit" className="btn btn-primary">Select</button>
-            </form>
         </div>
     );
 }

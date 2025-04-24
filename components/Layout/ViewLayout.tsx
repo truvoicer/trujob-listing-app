@@ -19,12 +19,12 @@ function ViewLayout({ page }: ViewLayoutProps) {
     const view = viewFactory.renderView(page);
 
 
-    const [modalState, setModalState] = useState<ModalState>({
-        ...ModalService.INIT_DATA
-    });
-
     const [notificationState, setNotificationState] = useState<NotificationState>({
         ...NotificationService.INIT_DATA
+    });
+
+    const [modalState, setModalState] = useState<ModalState>({
+        ...ModalService.INIT_DATA
     });
 
     const modalService = new ModalService(

@@ -13,6 +13,8 @@ export default {
         block: '/block',
         sidebar: '/sidebar',
         widget: '/widget',
+        sidebarWidget: '/sidebar/%s/widget',
+        sidebarWidgetRel: '/sidebar/%s/widget/rel',
         pagination: '/pagination',
         login: '/auth/login',
         role: '/role',

@@ -8,7 +8,7 @@ export interface ModalState extends MessageState {
     items: Array<ModalItem>;
 }
 export type ModalItem = {
-    [key: string]: string | number | boolean | null | Function | undefined | FormProps;
+    [key: string]: string | number | boolean | null | Function | undefined | FormProps | any;
     id?: string | null;
     title: string | null;
     size: "sm" | "md" | "lg" | "xl";

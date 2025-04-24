@@ -59,7 +59,7 @@ function ManageMenuItems({
                     </div>
                 </div>
             ),
-            showFooter: false
+            showFooter: true
         }, 'menu-item-create-form');
     }
 

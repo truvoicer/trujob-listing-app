@@ -3,8 +3,6 @@ import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
-import { Widget } from "@/types/Widget";
-import WidgetForm from "../Widget/WidgetForm";
 
 export type RolesModal = {
     show: boolean;
@@ -18,13 +16,8 @@ export type WidgetModal = {
 };
 export type EditMenuFields = {
 };
-function EditSidebarFields() {
+function EditWidgetFields() {
     const [rolesModal, setRolesModal] = useState<RolesModal>({
-        show: false,
-        title: '',
-        footer: true,
-    });
-    const [widgetModal, setWidgetModal] = useState<WidgetModal>({
         show: false,
         title: '',
         footer: true,
@@ -101,6 +94,21 @@ function EditSidebarFields() {
                                 </label>
                             </div>
                         </div>
+
+                        <div className="col-12 col-lg-6">
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="description"
+                                    id="description"
+                                    onChange={onChange}
+                                    value={values?.description || ""} />
+                                <label className="form-label" htmlFor="description">
+                                    Description
+                                </label>
+                            </div>
+                        </div>
                         <div className="col-12 col-lg-6">
                             <div className="floating-input form-group">
                                 <input
@@ -115,7 +123,22 @@ function EditSidebarFields() {
                                 </label>
                             </div>
                         </div>
-
+                        <div className="col-12 col-lg-6">
+                            <div className="custom-control custom-checkbox mb-3 text-left">
+                                <input
+                                    onChange={e => {
+                                        onChange(e);
+                                    }}
+                                    type="checkbox"
+                                    className="custom-control-input"
+                                    id="has_container"
+                                    name="has_container"
+                                    checked={values?.has_container || false} />
+                                <label className="custom-control-label" htmlFor="has_container">
+                                    Has Container?
+                                </label>
+                            </div>
+                        </div>
 
                         <div className="col-12 my-3">
                             <h4>Manage</h4>
@@ -129,17 +152,6 @@ function EditSidebarFields() {
                                 }}
                             >
                                 Manage Roles
-                            </button>
-                            <button
-                                type="button"
-                                className="btn btn-primary mr-2"
-                                onClick={(e) => {
-                                    setModalTitle('Manage Widgets', setWidgetModal);
-                                    setModalFooter(true, setWidgetModal);
-                                    showModal(setWidgetModal);
-                                }}
-                            >
-                                Manage Widgets
                             </button>
                         </div>
                     </div>
@@ -167,34 +179,10 @@ function EditSidebarFields() {
                             </Modal.Footer>
                         }
                     </Modal>
-                    <Modal show={widgetModal.show} onHide={() => hideModal(setWidgetModal)}>
-                        <Modal.Header closeButton>
-                            <Modal.Title>{widgetModal?.title || ''}</Modal.Title>
-                        </Modal.Header>
-                        <Modal.Body>
-                            <WidgetForm
-                                sidebarId={values?.id}
-                                data={values?.widgets || []}
-                                onChange={(widget: Array<Widget>) => {
-                                    setFieldValue('widgets', widget);
-                                }}
-                            />
-                        </Modal.Body>
-                        {widgetModal.footer &&
-                            <Modal.Footer>
-                                <Button variant="secondary" onClick={() => hideModal(setWidgetModal)}>
-                                    Close
-                                </Button>
-                                <Button variant="primary" onClick={() => {hideModal(setWidgetModal)}}>
-                                    Save Changes
-                                </Button>
-                            </Modal.Footer>
-                        }
-                    </Modal>
                 </>
 
             </div>
         </div>
     );
 }
-export default EditSidebarFields;
+export default EditWidgetFields;

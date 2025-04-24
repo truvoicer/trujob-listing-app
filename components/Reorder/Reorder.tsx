@@ -1,4 +1,5 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
+import { ModalService, ModalState } from "@/library/services/modal/ModalService";
 import { dir } from "console";
 import React, { useContext, useEffect, useState } from "react";
 import { Accordion, Button, Card, Modal } from "react-bootstrap";
@@ -13,6 +14,8 @@ export type ReorderProps = {
     onDelete?: (props: any) => any;
     onMove?: (props: any) => any;
     onChange?: (data: Array<any>) => void;
+    onOk?: (props: any) => any;
+    onCancel?: (props: any) => any;
     enableControls?: boolean;
     enableEdit?: boolean;
 }
@@ -54,15 +57,24 @@ function Reorder({
     onDelete,
     onMove,
     onChange,
+    onOk,
+    onCancel,
     enableControls = true,
     enableEdit = true,
 }: ReorderProps) {
     const [childIndex, setChildIndex] = useState<number | null>(null);
-    const [modalTitle, setModalTitle] = useState<string>('');
-    const [modalShow, setModalShow] = useState<boolean>(false);
-    const [modalShowFooter, setModalShowFooter] = useState<boolean>(true);
 
     const reorderData: Array<any> = data;
+
+    const [modalState, setModalState] = useState<ModalState>({
+        ...ModalService.INIT_DATA,
+    });
+
+    const modalService = new ModalService(
+        modalState,
+        setModalState
+    );
+
 
     function handleChange(data: Array<any>) {
         if (typeof onChange === 'function') {
@@ -70,20 +82,20 @@ function Reorder({
         }
     }
 
-    function handleMoveUp(index: number, item: any) {
+    async function handleMoveUp(index: number, item: any) {
         if (index > 0) {
             const newIndex = index - 1;
             if (typeof onMove === 'function') {
-                if (
-                    !onMove({
-                        direction: 'up',
-                        reorderData,
-                        onChange,
-                        itemSchema,
-                        index,
-                        newIndex,
-                        item
-                    })) {
+                const response = await onMove({
+                    direction: 'up',
+                    reorderData,
+                    onChange,
+                    itemSchema,
+                    index,
+                    newIndex,
+                    item
+                });
+                if (!response) {
                     return;
                 }
             }
@@ -94,20 +106,21 @@ function Reorder({
             handleChange(newData);
         }
     }
-    function handleMoveDown(index: number, item: any) {
+    async function handleMoveDown(index: number, item: any) {
         if (index < reorderData.length - 1) {
             const newIndex = index + 1;
+
             if (typeof onMove === 'function') {
-                if (
-                    !onMove({
-                        direction: 'down',
-                        reorderData,
-                        onChange,
-                        itemSchema,
-                        index,
-                        newIndex,
-                        item
-                    })) {
+                const response = await onMove({
+                    direction: 'down',
+                    reorderData,
+                    onChange,
+                    itemSchema,
+                    index,
+                    newIndex,
+                    item
+                });
+                if (!response) {
                     return;
                 }
             }
@@ -118,11 +131,12 @@ function Reorder({
             handleChange(newData);
         }
     }
-    function handleDelete(index: number, item: any) {
+    async function handleDelete(index: number, item: any) {
         const newData = [...reorderData];
 
         if (typeof onDelete === 'function') {
-            if (!onDelete({ reorderData, onChange, itemSchema, index, item })) {
+            const response = await onDelete({ reorderData, onChange, itemSchema, index, item });
+            if (!response) {
                 return;
             }
         }
@@ -164,6 +178,22 @@ function Reorder({
         }
     }, [reorderData]);
 
+    useEffect(() => {
+        setModalState(prevState => {
+            let newState = {
+                ...prevState,
+                ...modalService.getState(),
+            };
+            return newState;
+        });
+    }, []);
+
+    function getReorderDataItem(index: number) {
+        if (Array.isArray(reorderData) && reorderData.length) {
+            return reorderData?.[index] || null;
+        }
+        return null;
+    }
 
     return (
         <div>
@@ -183,9 +213,28 @@ function Reorder({
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            setModalTitle('Edit');
-                                                            setChildIndex(index);
-                                                            setModalShow(true);
+                                                            modalState.show({
+                                                                title: 'Edit Item',
+                                                                showFooter: true,
+                                                                component: children({
+                                                                    item: getReorderDataItem(index),
+                                                                    index,
+                                                                    modalService
+                                                                }),
+                                                                onOk: async () => {
+                                                                    if (typeof onOk === 'function') {
+                                                                        const response = await onOk({
+                                                                            reorderData,
+                                                                            onChange,
+                                                                            itemSchema,
+                                                                        });
+                                                                        if (!response) {
+                                                                            return;
+                                                                        }
+                                                                    }
+                                                                    modalState.close('reorder-modal');
+                                                                }
+                                                            }, 'reorder-modal');
                                                         }}>
                                                         Edit
                                                     </a>
@@ -243,43 +292,7 @@ function Reorder({
                     Add New
                 </a>
             </div>
-            <Modal show={modalShow} onHide={() => setModalShow(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title>{modalTitle || ''}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {Array.isArray(reorderData) && reorderData.length && (
-                        <>
-                            {reorderData.map((item, index) => {
-                                if (childIndex !== index) {
-                                    return null;
-                                }
-                                return (
-                                    <React.Fragment key={index}>
-                                        {
-                                            children({
-                                                item,
-                                                index,
-                                            })
-                                        }
-                                    </React.Fragment>
-                                );
-                            }
-                            )}
-                        </>
-                    )}
-                </Modal.Body>
-                {modalShowFooter &&
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={() => setModalShow(false)}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={() => setModalShow(false)}>
-                            Save Changes
-                        </Button>
-                    </Modal.Footer>
-                }
-            </Modal>
+            {modalService.render()}
         </div>
     );
 }

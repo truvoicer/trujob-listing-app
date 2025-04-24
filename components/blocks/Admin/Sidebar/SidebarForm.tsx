@@ -99,6 +99,7 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
                                         dataTableContext.modal.show({
                                             component: (
                                                 <WidgetForm
+                                                    sidebarId={item?.id}
                                                     data={item?.widgets || []}
                                                 />
                                             ),

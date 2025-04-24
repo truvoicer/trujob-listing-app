@@ -66,10 +66,10 @@ export class MessageService {
 
     handleCancel(index: number, calllbackProps?: any) {
         const handleCallback = this.handleCallback(index, "onCancel", calllbackProps);
-        if (!handleCallback) {
+        if (typeof handleCallback !== 'undefined' && handleCallback === false) {
             return;
         }
-        this.handleClose(calllbackProps);
+        this.handleClose(index, calllbackProps);
     }
     handleCallback(index: number, callbackName: string, callbackProps: any = null) {
         let itemState;
@@ -99,10 +99,10 @@ export class MessageService {
     }
     handleOk(index: number, calllbackProps?: any) {
         const handleCallback = this.handleCallback(index, "onOk", calllbackProps);
-        if (!handleCallback) {
+        if (typeof handleCallback !== 'undefined' && handleCallback === false) {
             return;
         }
-        this.handleClose(calllbackProps);
+        this.handleClose(index, calllbackProps);
     }
     handleClose(index: number, formHelpers?: any) {
         this.setter((itemState: any) => {

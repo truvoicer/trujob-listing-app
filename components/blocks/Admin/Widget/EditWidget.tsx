@@ -6,46 +6,34 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
-import EditSidebarFields from "./EditSidebarFields";
-import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
-import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
-import { Widget } from "@/types/Widget";
+import EditWidgetFields from "./EditWidgetFields";
+import { EDIT_SIDEBAR_MODAL_ID } from "./ManageWidget";
+import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
 
-export type EditSidebarProps = {
-    data?: Sidebar | null;
+export type EditWidgetProps = {
+    data?: Widget | null;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 };
-function EditSidebar({
+function EditWidget({
     data,
     operation,
     inModal = false,
     modalId,
-}: EditSidebarProps) {
+}: EditWidgetProps) {
 
-    const initialValues: Sidebar = {
-        id: data?.id || 0,
+    const initialValues: Widget = {
         name: data?.name || '',
         title: data?.title || '',
+        description: data?.description || '',
         icon: data?.icon || '',
+        has_container: data?.has_container || false,
         order: data?.order || 0,
         properties: data?.properties || {},
         roles: data?.roles || [],
-        widgets: data?.widgets || [],
     };
-    function buildWidgetIdData(sidebars: Array<Widget>): Array<number> {
-        const filterWidgetData: Array<Widget> = sidebars
-            .filter((widget: Widget) => {
-                if (typeof widget === 'object') {
-                    return widget.id;
-                }
-                return false;
-            });
-        return filterWidgetData.map((widget: Widget) => {
-            return widget.id;
-        });
-    }
+    
     function buildRoleIdData(roles: Array<Role>): Array<number> {
         const filterRoleData: Array<Role> = roles
             .filter((role: Role | number) => {
@@ -59,8 +47,8 @@ function EditSidebar({
         });
     }
 
-    function buildCreateData(values: Sidebar) {
-        let requestData: CreateSidebar = {
+    function buildCreateData(values: Widget) {
+        let requestData: CreateWidget = {
             name: values?.name,
             title: values?.title,
         };
@@ -70,17 +58,20 @@ function EditSidebar({
         if (values.hasOwnProperty('icon')) {
             requestData.icon = values.icon;
         }
+        if (values.hasOwnProperty('has_container')) {
+            requestData.has_container = values.has_container;
+        }
+        if (values.hasOwnProperty('description')) {
+            requestData.description = values.description;
+        }
         if (Array.isArray(values?.roles)) {
             requestData.roles = buildRoleIdData(values.roles);
-        }
-        if (Array.isArray(values?.widgets)) {
-            requestData.widgets = buildWidgetIdData(values.widgets);
         }
         return requestData;
     }
 
-    function buildUpdateData(values: Sidebar) {
-        let requestData: UpdateSidebar = {
+    function buildUpdateData(values: Widget) {
+        let requestData: UpdateWidget = {
             id: values?.id,
         };
         if (values.hasOwnProperty('title')) {
@@ -89,11 +80,14 @@ function EditSidebar({
         if (values.hasOwnProperty('icon')) {
             requestData.icon = values.icon;
         }
+        if (values.hasOwnProperty('has_container')) {
+            requestData.has_container = values.has_container;
+        }
+        if (values.hasOwnProperty('description')) {
+            requestData.description = values.description;
+        }
         if (Array.isArray(values?.roles)) {
             requestData.roles = buildRoleIdData(values.roles);
-        }
-        if (Array.isArray(values?.widgets)) {
-            requestData.widgets = buildWidgetIdData(values.widgets);
         }
         return requestData;
     }
@@ -112,25 +106,25 @@ function EditSidebar({
         }
         return requiredFields;
     }
-    async function handleSubmit(values: Sidebar) {
-        console.log('edit sidebar values', values);
+    async function handleSubmit(values: Widget) {
+        console.log('edit widget values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
         let response = null;
-        let requestData: CreateSidebar | UpdateSidebar;
+        let requestData: CreateWidget | UpdateWidget;
         switch (operation) {
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData, values);
+                console.log('edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
-                    throw new Error('Sidebar ID is required');
+                    throw new Error('Widget ID is required');
                 }
                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.sidebar}/${requestData.id}/update`,
+                    endpoint: `${truJobApiConfig.endpoints.widget}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
                     data: requestData,
@@ -139,10 +133,10 @@ function EditSidebar({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', requestData, values);
+                console.log('create requestData', requestData);
                 // return;
                 response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.sidebar}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.widget}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
                     data: requestData,
@@ -184,7 +178,7 @@ function EditSidebar({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditSidebarFields />
+                        <EditWidgetFields />
                     )
                     : (
                         <Form
@@ -200,7 +194,7 @@ function EditSidebar({
                                 onChange,
                             }: FormContextType) => {
                                 return (
-                                    <EditSidebarFields />
+                                    <EditWidgetFields />
                                 )
                             }}
                         </Form>
@@ -209,4 +203,4 @@ function EditSidebar({
         </div>
     );
 }
-export default EditSidebar;
+export default EditWidget;
