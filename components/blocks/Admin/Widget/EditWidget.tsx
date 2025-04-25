@@ -160,7 +160,7 @@ function EditWidget({
         if (!modalId) {
             return;
         }
-        
+        console.log('modalId', {modalId, initialValues, dataTableContext});
         dataTableContext.modal.update(
             {
                 formProps: {

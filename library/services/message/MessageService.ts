@@ -64,14 +64,14 @@ export class MessageService {
         });
     }
 
-    handleCancel(index: number, calllbackProps?: any) {
-        const handleCallback = this.handleCallback(index, "onCancel", calllbackProps);
+    async handleCancel(index: number, calllbackProps?: any) {
+        const handleCallback = await this.handleCallback(index, "onCancel", calllbackProps);
         if (typeof handleCallback !== 'undefined' && handleCallback === false) {
             return;
         }
-        this.handleClose(index, calllbackProps);
+        this.handleClose(index);
     }
-    handleCallback(index: number, callbackName: string, callbackProps: any = null) {
+    async handleCallback(index: number, callbackName: string, callbackProps: any = null) {
         let itemState;
         if (this.key) {
             itemState = findInObject(this.key, this.state);
@@ -92,19 +92,19 @@ export class MessageService {
         const messageItem = itemState.items[index];
         
         if (typeof messageItem?.[callbackName] === "function") {
-            return messageItem[callbackName](callbackProps);
+            return await messageItem[callbackName](callbackProps);
         }
 
         return true;
     }
-    handleOk(index: number, calllbackProps?: any) {
-        const handleCallback = this.handleCallback(index, "onOk", calllbackProps);
+    async handleOk(index: number, calllbackProps?: any) {
+        const handleCallback = await this.handleCallback(index, "onOk", calllbackProps);
         if (typeof handleCallback !== 'undefined' && handleCallback === false) {
             return;
         }
-        this.handleClose(index, calllbackProps);
+        this.handleClose(index);
     }
-    handleClose(index: number, formHelpers?: any) {
+    handleClose(index: number) {
         this.setter((itemState: any) => {
             let cloneState = { ...itemState };
             if (this.key) {

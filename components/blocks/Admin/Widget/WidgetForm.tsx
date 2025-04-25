@@ -1,5 +1,5 @@
 import { FormContext } from "@/components/form/contexts/FormContext";
-import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnEdit, ReorderOnMove } from "@/components/Reorder/Reorder";
+import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnEdit, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
@@ -275,6 +275,7 @@ function WidgetForm({
         <div className="row">
             <div className="col-12">
                 <Reorder
+                    modalState={dataTableContext.modal}
                     itemSchema={pageWidgetSchema}
                     itemHeader={(item, index) => `${item?.title} (${item?.name})` || 'Item type error'}
                     data={widgets || []}
@@ -283,6 +284,15 @@ function WidgetForm({
                     onEdit={handleEditWidget}
                     onDelete={handleDeleteWidget}
                     onMove={handleMoveWidget}
+                    onOk={async ({
+                        formHelpers
+                     }: ReorderOnOk) => {
+                        console.log('onOk', formHelpers);
+                        if (!validateSidebarId()) {
+                            return;
+                        }
+
+                    }}
                 >
                     {({
                         item,
@@ -298,6 +308,8 @@ function WidgetForm({
                             <EditWidget
                                 data={item}
                                 operation={'edit'}
+                                inModal={true}
+                                modalId={'reorder-modal'}
                             />
                         </>
                     )}}

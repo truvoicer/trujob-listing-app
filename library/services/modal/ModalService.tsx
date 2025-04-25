@@ -64,8 +64,28 @@ export class ModalService extends MessageService {
         return modalState.items.findIndex((item: ModalItem) => item?.id === id);
     }
 
-    renderFormModal() {
+    renderModal(children: any, modal: any, index: number, formHelpers?: any) {
+        return (
+            <Modal show={modal.show} onHide={() => this.handleCancel(index, { formHelpers })}>
+                {children}
+            </Modal>
+        )
+    }
 
+    renderFormModal(children: any, modal: any, index: number, formHelpers?: any) {
+        return this.renderModal((
+            <Form
+                {...modal.formProps}
+            >
+                {(formHelpers: FormProps) => {
+                    return children;
+                }}
+            </Form>
+        ),
+            modal,
+            index,
+            formHelpers
+        );
     }
 
     render() {
@@ -83,16 +103,18 @@ export class ModalService extends MessageService {
                     return (
                         <React.Fragment key={index}>
                             {(isObject(modal?.formProps) && !isObjectEmpty(modal?.formProps))
-                                ? (
-                                    <Form
-                                        {...modal.formProps}
-                                    >
-                                        {(formHelpers: FormProps) => {
-                                            return this.renderModal(modal, index, formHelpers);
-                                        }}
-                                    </Form>
+                                ? this.renderFormModal(
+                                    this.renderModalContent(modal, index, modal?.formProps),
+                                    modal,
+                                    index,
+                                    modal?.formProps
                                 )
-                                : this.renderModal(modal, index, null)
+
+                                : this.renderModal(
+                                    this.renderModalContent(modal, index),
+                                    modal,
+                                    index
+                                )
                             }
                         </React.Fragment>
                     );
@@ -101,9 +123,9 @@ export class ModalService extends MessageService {
         );
     }
 
-    renderModal(modal: ModalItem, index: number, formHelpers?: any) {
+    renderModalContent(modal: ModalItem, index: number, formHelpers?: any) {
         return (
-            <Modal show={modal.show} onHide={() => this.handleCancel(index, {formHelpers})}>
+            <>
                 <Modal.Header closeButton>
                     <Modal.Title>{modal?.title || ''}</Modal.Title>
                 </Modal.Header>
@@ -112,15 +134,15 @@ export class ModalService extends MessageService {
                 </Modal.Body>
                 {modal?.showFooter &&
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => this.handleCancel(index, {formHelpers})}>
+                        <Button variant="secondary" onClick={() => this.handleCancel(index, { formHelpers })}>
                             Close
                         </Button>
-                        <Button variant="primary" onClick={() => this.handleOk(index, {formHelpers})}>
+                        <Button variant="primary" onClick={() => this.handleOk(index, { formHelpers })}>
                             Save Changes
                         </Button>
                     </Modal.Footer>
                 }
-            </Modal>
+            </>
         );
     }
 }

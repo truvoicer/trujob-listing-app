@@ -1,8 +1,8 @@
-import { AppModalContext } from "@/contexts/AppModalContext";
-import { ModalService, ModalState } from "@/library/services/modal/ModalService";
-import { dir } from "console";
-import React, { useContext, useEffect, useState } from "react";
-import { Accordion, Button, Card, Modal } from "react-bootstrap";
+import { ModalItem, ModalService, ModalState } from "@/library/services/modal/ModalService";
+import { init } from "next/dist/compiled/webpack/webpack";
+import React, { useEffect, useState } from "react";
+import { Card } from "react-bootstrap";
+import { FormContextType } from "../form/Form";
 
 export type ReorderProps = {
     children: (props: any) => React.ReactNode;
@@ -18,6 +18,7 @@ export type ReorderProps = {
     onCancel?: (props: any) => any;
     enableControls?: boolean;
     enableEdit?: boolean;
+    modalState?: ModalState;
 }
 export type ReorderOnAdd = {
     reorderData: Array<any>;
@@ -47,7 +48,16 @@ export type ReorderOnMove = {
     newIndex: number;
     item: any;
 }
+export type ReorderOnOk = {
+    reorderData: Array<any>;
+    onChange: (data: Array<any>) => void;
+    itemSchema: any;
+    index: number;
+    item: any;
+    formHelpers?: FormContextType | null;
+}
 function Reorder({
+    modalState,
     children,
     data = [],
     itemHeader,
@@ -62,19 +72,7 @@ function Reorder({
     enableControls = true,
     enableEdit = true,
 }: ReorderProps) {
-    const [childIndex, setChildIndex] = useState<number | null>(null);
-
     const reorderData: Array<any> = data;
-
-    const [modalState, setModalState] = useState<ModalState>({
-        ...ModalService.INIT_DATA,
-    });
-
-    const modalService = new ModalService(
-        modalState,
-        setModalState
-    );
-
 
     function handleChange(data: Array<any>) {
         if (typeof onChange === 'function') {
@@ -178,15 +176,6 @@ function Reorder({
         }
     }, [reorderData]);
 
-    useEffect(() => {
-        setModalState(prevState => {
-            let newState = {
-                ...prevState,
-                ...modalService.getState(),
-            };
-            return newState;
-        });
-    }, []);
 
     function getReorderDataItem(index: number) {
         if (Array.isArray(reorderData) && reorderData.length) {
@@ -194,7 +183,43 @@ function Reorder({
         }
         return null;
     }
-
+    function showModal(index: number, item: any) {
+        if (typeof modalState !== 'object') {
+            console.error("Modal state is not an object");
+            return;
+        }
+        if (typeof modalState?.show !== 'function') {
+            console.error("Modal show function not found");
+            return;
+        }
+        modalState.show({
+            title: 'Edit Item',
+            showFooter: true,
+            component: children({
+                item: getReorderDataItem(index),
+                index,
+            }),
+            formProps: {
+                initialValues: {},
+            },
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormContextType | null
+            }) => {
+                if (typeof onOk === 'function') {
+                    const response = await onOk({
+                        reorderData,
+                        onChange,
+                        itemSchema,
+                        index,
+                        item: getReorderDataItem(index),
+                        formHelpers
+                    });
+                    return response;
+                }
+                return true
+            }
+        }, 'reorder-modal');
+    }
     return (
         <div>
             {Array.isArray(reorderData) && reorderData.length
@@ -213,28 +238,7 @@ function Reorder({
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            modalState.show({
-                                                                title: 'Edit Item',
-                                                                showFooter: true,
-                                                                component: children({
-                                                                    item: getReorderDataItem(index),
-                                                                    index,
-                                                                    modalService
-                                                                }),
-                                                                onOk: async () => {
-                                                                    if (typeof onOk === 'function') {
-                                                                        const response = await onOk({
-                                                                            reorderData,
-                                                                            onChange,
-                                                                            itemSchema,
-                                                                        });
-                                                                        if (!response) {
-                                                                            return;
-                                                                        }
-                                                                    }
-                                                                    modalState.close('reorder-modal');
-                                                                }
-                                                            }, 'reorder-modal');
+                                                            showModal(index, item)
                                                         }}>
                                                         Edit
                                                     </a>
@@ -292,7 +296,6 @@ function Reorder({
                     Add New
                 </a>
             </div>
-            {modalService.render()}
         </div>
     );
 }
