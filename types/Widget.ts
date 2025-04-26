@@ -6,12 +6,16 @@ export type Widget = {
     name: string;
     title: string;
     icon: string;
-    has_container: boolean;
     description: string;
-    order: number;
     properties: any;
     roles: Array<Role>;
     has_permission: boolean;
+}
+
+export interface SidebarWidget extends Widget{
+    [key: string]: string | number | boolean | Array<Role>;
+    has_container: boolean;
+    order: number;
 }
 
 export type CreateWidget = {

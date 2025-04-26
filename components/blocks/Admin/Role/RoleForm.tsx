@@ -3,14 +3,17 @@ import { useContext } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectRole from "./SelectRole";
 import { Role } from "@/types/Role";
+import { FormContextType } from "@/components/form/Form";
 
 export type RoleFormProps = {
     data?: Array<Role>;
     onChange: (data: Array<Role>) => void;
+    onAdd?: (data: Role) => Promise<boolean>;
 }
 function RoleForm({ 
     data = [], 
-    onChange
+    onChange,
+    onAdd
  }: RoleFormProps) {
 
     const dataTableContext = useContext(DataTableContext);
@@ -18,14 +21,6 @@ function RoleForm({
     const roleSchema = {
     };
 
-    function updateFieldValue(index: number, field: string, value: string) {
-        const newData: Array<Role> = [...data];
-        if (!newData?.[index]) {
-            return;
-        }
-        newData[index][field] = value;
-        onChange(newData);
-    }
     function handleChange(values: Array<Role>) {
         onChange(values);
     }
@@ -51,17 +46,42 @@ function RoleForm({
                                 <div className="row">
                                     <div className="col-12 col-lg-12">
                                         <SelectRole
-                                            onSubmit={selectedRole => {
-                                                const newData = [...reorderData];
-                                                newData.push({ ...roleSchema, ...selectedRole });
-                                                onChange(newData);
-                                                dataTableContext.modal.close('role-select');
-                                            }}
+                                            modalId="role-select"
+                                            modalState={dataTableContext.modal}
+                                            inModal={true}
                                         />
                                     </div>
                                 </div>
                             ),
-                            showFooter: false
+                            formProps: {},
+                            showFooter: true,
+                            onOk: async ({formHelpers}: {
+                                formHelpers: FormContextType | null;
+                            })  => {
+                                if (!formHelpers) {
+                                    console.warn('No form helpers found');
+                                    return false;
+                                }
+                                
+                                if (!formHelpers?.values?.role) {
+                                    console.warn('No role found');
+                                    return false;
+                                }
+                                if (typeof onAdd !== 'function') {
+                                    console.warn('No onAdd function found');
+                                    return false;
+                                }
+                                const response = await onAdd(
+                                    formHelpers?.values?.role
+                                );
+                                if (!response) {
+                                    console.warn('No response from onAdd function');
+                                    return false;
+                                }
+                                console.log('Successfully added role');
+                                dataTableContext.modal.close('role-select');
+                                return false;
+                            }
                         }, 'role-select');
                     }}
                 >
@@ -76,7 +96,6 @@ function RoleForm({
                                     console.log('role', role);
                                     // updateFieldValue(index, 'pagination_type', paginationType);
                                 }}
-                                showSubmitButton={false}
                             />
                         </>
                     )}

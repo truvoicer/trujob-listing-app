@@ -4,7 +4,7 @@ import { Button, Modal } from "react-bootstrap";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { Widget } from "@/types/Widget";
-import WidgetForm from "../Widget/WidgetForm";
+import SidebarWidgetForm from "../Sidebar/Widget/SidebarWidgetForm";
 
 export type RolesModal = {
     show: boolean;
@@ -172,7 +172,7 @@ function EditSidebarFields() {
                             <Modal.Title>{widgetModal?.title || ''}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
-                            <WidgetForm
+                            <SidebarWidgetForm
                                 sidebarId={values?.id}
                                 data={values?.widgets || []}
                                 onChange={(widget: Array<Widget>) => {

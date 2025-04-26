@@ -1,24 +1,29 @@
+import { FormContext } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DataTableContext } from "@/contexts/DataTableContext";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { ModalState } from "@/library/services/modal/ModalService";
 import { Role } from "@/types/Role";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 export type SelectRoleProps = {
     roleId?: number;
     onChange?: (role: Role) => void;
-    onSubmit?: (role: Role) => void;
-    showSubmitButton?: boolean;
+    modalId?: string;
+    modalState?: ModalState;
+    inModal?: boolean;
 }
 function SelectRole({
     roleId,
     onChange,
-    onSubmit,
-    showSubmitButton = true,
+    modalId,
+    modalState,
+    inModal = false,
 }: SelectRoleProps) {
     const [roles, setRoles] = useState<Array<Role>>([]);
     const [selectedRole, setSelectedRole] = useState<Role>();
-
+    const formContext = useContext(FormContext);
     async function fetchRoles() {
         // Fetch roles from the API or any other source
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -49,7 +54,7 @@ function SelectRole({
             setSelectedRole(findSelected);
             return;
         }
-        
+
     }, [roleId, roles]);
 
 
@@ -57,24 +62,43 @@ function SelectRole({
         if (!selectedRole) {
             return;
         }
-        if (typeof onChange === 'function') {
-            onChange(selectedRole);
+        if (inModal) {
+            if (typeof formContext?.setFieldValue === 'function') {
+                formContext.setFieldValue('role', selectedRole);
+            }
+        } else {
+            if (typeof onChange === 'function') {
+                onChange(selectedRole);
+            }
         }
     }, [selectedRole]);
+
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
+        }
+        if (!modalState) {
+            return;
+        }
+        modalState.update(
+            {
+                formProps: {
+                    operation: 'create',
+                    initialValues: {
+                        role: null
+                    },
+                }
+            },
+            modalId
+        );
+    }, [modalId, modalId]);
 
     return (
         <div>
             <h2>Select Role</h2>
-            <form onSubmit={e => {
-                e.preventDefault();
-                console.log('Selected Role:', selectedRole);
-                if (!selectedRole) {
-                    return;
-                }
-                if (typeof onSubmit === 'function') {
-                    onSubmit(selectedRole);
-                }
-            }}>
             <select
                 className="form-control"
                 onChange={e => {
@@ -92,12 +116,6 @@ function SelectRole({
                     </option>
                 ))}
             </select>
-            {showSubmitButton && (
-                <div className="mt-3">
-                    <button type="submit" className="btn btn-primary">Select</button>
-                </div>
-            )}
-            </form>
         </div>
     );
 }

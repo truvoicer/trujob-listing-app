@@ -33,3 +33,4 @@ export type UpdateSidebar = {
     roles?: Array<number>;
     widgets?: Array<number>;
 }
+

@@ -3,7 +3,6 @@ import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
 import Form, { FormContextType, FormProps } from "@/components/form/Form";
 import React from "react";
-import EditWidgetFields from "@/components/blocks/Admin/Widget/EditWidgetFields";
 
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;

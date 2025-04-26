@@ -7,8 +7,8 @@ import RegisterBlock from "@/components/blocks/Auth/RegisterBlock";
 import ManagePage from "@/components/blocks/Admin/Page/ManagePage";
 import ManageListing from "@/components/blocks/Admin/Listing/ManageListing";
 import ManageSidebar from "@/components/blocks/Admin/Sidebar/ManageSidebar";
-import ManageWidget from "@/components/blocks/Admin/Widget/ManageWidget";
 import ManageMenu from "@/components/blocks/Admin/Menu/ManageMenu";
+import ManageWidget from "@/components/blocks/Admin/Widget/ManageWidget";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';

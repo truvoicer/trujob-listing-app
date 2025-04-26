@@ -8,21 +8,21 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { Widget } from "@/types/Widget";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import EditWidget from "./EditWidget";
+import EditSidebarWidget from "./EditSidebarWidget";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { FormContextType } from "@/components/form/Form";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
-export type WidgetFormProps = {
+export type SidebarWidgetFormProps = {
     sidebarId?: number;
     data?: Array<Widget> | null;
     onChange?: (data: Array<Widget>) => void;
 }
-function WidgetForm({
+function SidebarWidgetForm({
     sidebarId,
     data,
     onChange
-}: WidgetFormProps) {
+}: SidebarWidgetFormProps) {
     const [widgets, setWidgets] = useState([]);
 
     const appModalContext = useContext(AppModalContext);
@@ -186,7 +186,7 @@ function WidgetForm({
 
     }
 
-    function handleEditWidget({
+    function handleEditSidebarWidget({
         reorderData,
         onChange,
         itemSchema,
@@ -286,7 +286,7 @@ function WidgetForm({
                     data={widgets || []}
                     onChange={handleChange}
                     onAdd={handleAddWidget}
-                    onEdit={handleEditWidget}
+                    onEdit={handleEditSidebarWidget}
                     onDelete={handleDeleteWidget}
                     onMove={handleMoveWidget}
                     onOk={async ({
@@ -357,7 +357,8 @@ function WidgetForm({
                     }) => {
                         return (
                         <>
-                            <EditWidget
+                            <EditSidebarWidget
+                                sidebarId={sidebarId}
                                 data={item}
                                 operation={'edit'}
                                 inModal={true}
@@ -370,4 +371,4 @@ function WidgetForm({
         </div>
     );
 }
-export default WidgetForm;
+export default SidebarWidgetForm;

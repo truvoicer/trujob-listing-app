@@ -1,8 +1,11 @@
 import { FormContext } from "@/components/form/Form";
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
-import RoleForm from "../Role/RoleForm";
+import RoleForm from "@/components/blocks/Admin/Role/RoleForm";
 import { Role } from "@/types/Role";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 export type RolesModal = {
     show: boolean;
@@ -14,9 +17,14 @@ export type WidgetModal = {
     title: string;
     footer: boolean;
 };
-export type EditWidgetFields = {
+export type EditSidebarWidgetFields = {
+    sidebarId?: number;
+    makeRequest?: () => Promise<void>;
 };
-function EditWidgetFields() {
+function EditSidebarWidgetFields({
+    sidebarId,
+    makeRequest,
+}: EditSidebarWidgetFields) {
     const [rolesModal, setRolesModal] = useState<RolesModal>({
         show: false,
         title: '',
@@ -166,6 +174,28 @@ function EditWidgetFields() {
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
                                 }}
+                                onAdd={async (role: Role) => {
+                                    if (!sidebarId) {
+                                        return false;
+                                    }
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${values.id}/role/${role.id}/create`,
+                                            method: ApiMiddleware.METHOD.POST,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when adding role');
+                                        return false;
+                                    }
+                                    // if  (typeof makeRequest === 'function') {
+                                    //     await makeRequest();
+                                    // }
+                                    return true;
+                                }}
                             />
                         </Modal.Body>
                         {rolesModal.footer &&
@@ -175,6 +205,7 @@ function EditWidgetFields() {
                                 </Button>
                                 <Button variant="primary" onClick={() => {
                                     setFieldValue('roles', selectedRoles);
+                                    console.log('selectedRoles', sidebarId, selectedRoles);
                                     hideModal(setRolesModal)
                                 }}>
                                     Save Changes
@@ -188,4 +219,4 @@ function EditWidgetFields() {
         </div>
     );
 }
-export default EditWidgetFields;
+export default EditSidebarWidgetFields;

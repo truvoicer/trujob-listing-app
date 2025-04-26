@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import { Accordion } from "react-bootstrap";
 import SelectSidebar from "./SelectSidebar";
-import WidgetForm from "../Widget/WidgetForm";
+import SidebarWidgetForm from "../Sidebar/Widget/SidebarWidgetForm";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { Sidebar } from "@/types/Sidebar";
 
@@ -98,7 +98,7 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
                                         e.stopPropagation();
                                         dataTableContext.modal.show({
                                             component: (
-                                                <WidgetForm
+                                                <SidebarWidgetForm
                                                     sidebarId={item?.id}
                                                     data={item?.widgets || []}
                                                 />
