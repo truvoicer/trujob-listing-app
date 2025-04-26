@@ -281,6 +281,16 @@ function Form({
         const { name, value } = e.target;
         setFieldValue(name, value);
     }
+    useEffect(() => {
+        if (typeof initialValues !== 'object' || isObjectEmpty(initialValues)) {
+            return;
+        }
+        setFormContextState(prevState => {
+            let newState = { ...prevState };
+            newState.values = JSON.parse(JSON.stringify(initialValues));
+            return newState;
+        });
+    }, [initialValues]);
     return (
         <FormContext.Provider value={formContextState}>
             <form onSubmit={formContextState.onSubmit} className={className || ''}>

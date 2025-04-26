@@ -8,11 +8,12 @@ import AdminLayout from '../Layouts/AdminLayout';
 import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
 import Loader from '@/components/Loader';
 import ErrorView from '../Error/ErrorView';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import TabLayout, { TabItem } from '@/components/Layout/TabLayout';
 import { Page } from '@/types/Page';
 import { PageBlock } from '@/types/PageBlock';
 import { SESSION_STATE } from '@/library/redux/constants/session-constants';
+import { UrlHelpers } from '@/helpers/UrlHelpers';
 
 type Props = {
     data: Page;
@@ -25,6 +26,7 @@ type BlockData = {
 }
 function AdminPageView({ data, page, session }: Props) {
     const router = useRouter();
+    const searchParams = useSearchParams();
     const blockFactory = new BlockFactory();
     function buildBlocks(blockData: Array<PageBlock>) {
         return blockData.map((item, index) => {
@@ -85,9 +87,18 @@ function AdminPageView({ data, page, session }: Props) {
     function renderView(blocks: Array<BlockData>) {
         return (
             <AccessControlComponent
-            roles={page?.roles}
+                roles={page?.roles}
                 fallback={() => {
-                    router.push('/login');
+                    const redirectStr = UrlHelpers.createQueryString(
+                        searchParams,
+                        [
+                            {
+                                name: 'redirect',
+                                value: window.location.pathname + window.location.search,
+                            }
+                        ]
+                    );
+                    router.push('/login' + '?' + redirectStr);
                     return null;
                 }}
             >
@@ -106,7 +117,7 @@ function AdminPageView({ data, page, session }: Props) {
             </AccessControlComponent>
         );
     }
-    console.log('AdminPageView', {data, session});
+    console.log('AdminPageView', { data, session });
 
     return renderView(
         buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])

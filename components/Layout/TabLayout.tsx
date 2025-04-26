@@ -1,3 +1,4 @@
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { PageBlock } from "@/types/PageBlock";
 import { useRouter, useSearchParams } from "next/navigation";
 import { use, useEffect, useState } from "react";
@@ -30,37 +31,6 @@ function TabLayout({
         return null;
     }
 
-    function createQueryString(query: Array<{
-        name: string;
-        value: string | number | boolean | null | undefined;
-    }> = []) {
-        const params = new URLSearchParams(searchParams.toString())
-        if (query.length === 0) {
-            return params.toString()
-        }
-        query.forEach(({ name, value }) => {
-            if (typeof value === 'object') {
-                console.warn('Query value should not be an object', { name, value });
-                return;
-            }
-            if (value === null || value === undefined) {
-                console.warn('Query value should not be null or undefined', { name, value });
-                return;
-            }
-            if (typeof value === 'string') {
-                params.set(name, value);
-            } else if (typeof value === 'number') {
-                params.set(name, value.toString());
-            } else if (typeof value === 'boolean') {
-                params.set(name, value ? 'true' : 'false');
-            } else {
-                console.warn('Query value should be a string, number or boolean', { name, value });
-                return;
-            }
-        });
-    
-        return params.toString()
-    }
     function buildTabId(tabItem: TabItem) {
         const filterTabsByType = config.filter(item => item?.type === tabItem?.type);
         if (filterTabsByType.length === 1) {
@@ -98,7 +68,7 @@ function TabLayout({
                     console.error('Tab key not found', eventKey);
                     return;
                 }
-                const query = createQueryString([
+                const query = UrlHelpers.createQueryString(searchParams, [
                     {
                         name: 'tab',
                         value: buildTabId(findKey),

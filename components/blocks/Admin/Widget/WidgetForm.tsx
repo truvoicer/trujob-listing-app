@@ -10,6 +10,8 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import EditWidget from "./EditWidget";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { FormContextType } from "@/components/form/Form";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type WidgetFormProps = {
     sidebarId?: number;
@@ -71,7 +73,7 @@ function WidgetForm({
                 operation: 'add',
                 initialValues: { widget: null },
             },
-            onOk: async ({ formHelpers }) => {
+            onOk: async (formHelpers: FormContextType) => {
                 if (!validateSidebarId()) {
                     return;
                 }
@@ -247,6 +249,9 @@ function WidgetForm({
     }
 
     async function sidebarWidgetsRequest() {
+        if (!validateSidebarId()) {
+            return;
+        }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.sidebarWidget.replace('%s', sidebarId.toString())}`,
             method: TruJobApiMiddleware.METHOD.GET,
@@ -287,11 +292,58 @@ function WidgetForm({
                     onOk={async ({
                         formHelpers
                      }: ReorderOnOk) => {
-                        console.log('onOk', formHelpers);
+                        if (!formHelpers) {
+                            return;
+                        }
                         if (!validateSidebarId()) {
                             return;
                         }
-
+                        const item = {...formHelpers.values};
+                        if (!item?.id) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                title: 'Error',
+                                component: (
+                                    <p>
+                                        Sidebar widget id not found
+                                    </p>
+                                ),
+                            }, 'sidebar-widget-update-error');
+                            console.warn('Sidebar widget id not found', item);
+                            return false;
+                        }
+                        if (Array.isArray(item?.roles)) {
+                            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+                        }
+                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                            endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${item.id}/update`,
+                            method: TruJobApiMiddleware.METHOD.PATCH,
+                            protectedReq: true,
+                            data: item
+                        });
+                        if (response) {
+                            notificationContext.show({
+                                variant: 'success',
+                                title: 'Success',
+                                component: (
+                                    <p>
+                                        Sidebar widget updated successfully
+                                    </p>
+                                ),
+                            }, 'sidebar-widget-update-success');
+                            sidebarWidgetsRequest();
+                            return true;
+                        }
+                        notificationContext.show({
+                            variant: 'danger',
+                            title: 'Error',
+                            component: (
+                                <p>
+                                    Sidebar widget update failed
+                                </p>
+                            ),
+                        }, 'sidebar-widget-update-error');
+                        return false;
                     }}
                 >
                     {({

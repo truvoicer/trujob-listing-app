@@ -1,8 +1,9 @@
 import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
-import Form, { FormProps } from "@/components/form/Form";
+import Form, { FormContextType, FormProps } from "@/components/form/Form";
 import React from "react";
+import EditWidgetFields from "@/components/blocks/Admin/Widget/EditWidgetFields";
 
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
@@ -64,28 +65,16 @@ export class ModalService extends MessageService {
         return modalState.items.findIndex((item: ModalItem) => item?.id === id);
     }
 
-    renderModal(children: any, modal: any, index: number, formHelpers?: any) {
+    renderFormModal(modal: any, index: number) {
         return (
-            <Modal show={modal.show} onHide={() => this.handleCancel(index, { formHelpers })}>
-                {children}
-            </Modal>
-        )
-    }
-
-    renderFormModal(children: any, modal: any, index: number, formHelpers?: any) {
-        return this.renderModal((
             <Form
                 {...modal.formProps}
             >
-                {(formHelpers: FormProps) => {
-                    return children;
+                {(formHelpers: FormContextType) => {
+                    return this.renderModalContent(modal, index, formHelpers);
                 }}
             </Form>
-        ),
-            modal,
-            index,
-            formHelpers
-        );
+        )
     }
 
     render() {
@@ -103,18 +92,8 @@ export class ModalService extends MessageService {
                     return (
                         <React.Fragment key={index}>
                             {(isObject(modal?.formProps) && !isObjectEmpty(modal?.formProps))
-                                ? this.renderFormModal(
-                                    this.renderModalContent(modal, index, modal?.formProps),
-                                    modal,
-                                    index,
-                                    modal?.formProps
-                                )
-
-                                : this.renderModal(
-                                    this.renderModalContent(modal, index),
-                                    modal,
-                                    index
-                                )
+                                ? this.renderFormModal(modal, index)
+                                : this.renderModalContent(modal, index)
                             }
                         </React.Fragment>
                     );
@@ -125,7 +104,7 @@ export class ModalService extends MessageService {
 
     renderModalContent(modal: ModalItem, index: number, formHelpers?: any) {
         return (
-            <>
+            <Modal show={modal.show} onHide={() => this.handleCancel(index, { formHelpers })}>
                 <Modal.Header closeButton>
                     <Modal.Title>{modal?.title || ''}</Modal.Title>
                 </Modal.Header>
@@ -142,7 +121,7 @@ export class ModalService extends MessageService {
                         </Button>
                     </Modal.Footer>
                 }
-            </>
+            </Modal>
         );
     }
 }

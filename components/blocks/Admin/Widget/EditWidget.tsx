@@ -1,4 +1,4 @@
-import Form, { FormContextType } from "@/components/form/Form";
+import Form, { FormContext, FormContextType } from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -24,6 +24,7 @@ function EditWidget({
 }: EditWidgetProps) {
 
     const initialValues: Widget = {
+        id: data?.id,
         name: data?.name || '',
         title: data?.title || '',
         description: data?.description || '',
@@ -107,7 +108,6 @@ function EditWidget({
         return requiredFields;
     }
     async function handleSubmit(values: Widget) {
-        console.log('edit widget values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
@@ -153,6 +153,7 @@ function EditWidget({
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
     }
     const dataTableContext = useContext(DataTableContext);
+    const formContext = useContext(FormContext);
     useEffect(() => {
         if (!inModal) {
             return;
@@ -160,7 +161,7 @@ function EditWidget({
         if (!modalId) {
             return;
         }
-        console.log('modalId', {modalId, initialValues, dataTableContext});
+        
         dataTableContext.modal.update(
             {
                 formProps: {

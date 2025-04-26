@@ -1,14 +1,23 @@
-import Form, { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/Form";
+import Form, { FormContextType, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { use } from "react";
 import { connect } from "react-redux";
 
-function LoginBlock({ session }) {
+export type LoginBlockProps = {
+    session: any;
+}
+function LoginBlock({ 
+    session
+ }: LoginBlockProps) {
     const router = useRouter();
-    async function formSubmitHandler(values, errors) {
+    const searchParams = useSearchParams();
+
+    async function formSubmitHandler(values: any, errors: any) {
         let requestData = { ...values };
         requestData.auth_provider = "local";
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -21,7 +30,12 @@ function LoginBlock({ session }) {
         )) {
             return;
         }
-        router.push("/");
+        router.push(
+            UrlHelpers.getRedirectUrl(
+                searchParams,
+                '/'
+            )
+        );
     }
 
     return (
@@ -32,6 +46,7 @@ function LoginBlock({ session }) {
                     <h2 className="mb-5 text-black">Log In</h2>
 
                     <Form className="p-5 bg-white"
+                        operation="create"
                         onSubmit={formSubmitHandler}
                         initialValues={{
                             email: "",
@@ -53,7 +68,7 @@ function LoginBlock({ session }) {
                             errors,
                             onChange,
                             onSubmit
-                        }) => (
+                        }: FormContextType) => (
                             <>
                                 <div className="row form-group">
                                     <div className="col-md-12">
@@ -124,7 +139,7 @@ function LoginBlock({ session }) {
     );
 }
 export default connect(
-    state => ({
+    (state: any) => ({
         session: state[SESSION_STATE]
     })
 )(LoginBlock);

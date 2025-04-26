@@ -12,6 +12,7 @@ import RoleForm from "../Role/RoleForm";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 import EditMenuFields from "./EditMenuFields";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type EditMenuProps = {
     data?: Menu | null;
@@ -47,18 +48,7 @@ function EditMenu({
             return menu.id;
         });
     }
-    function buildRoleIdData(roles: Array<Role>): Array<number> {
-        const filterRoleData: Array<Role> = roles
-            .filter((role: Role | number) => {
-                if (typeof role === 'object') {
-                    return role.id;
-                }
-                return false;
-            });
-        return filterRoleData.map((role: Role) => {
-            return role.id;
-        });
-    }
+    
     function buildMenuItemRequestData(menuItems: Array<MenuItem>) {
         let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
         menuItems.forEach((menuItem: MenuItem, index: number) => {
@@ -83,7 +73,7 @@ function EditMenu({
                 if (!Array.isArray(newMenuItems?.[index]?.roles)) {
                     newMenuItems[index].roles = [];
                 }
-                newMenuItems[index].roles = buildRoleIdData(menuItem.roles);
+                newMenuItems[index].roles = RequestHelpers.extractIdsFromArray(menuItem.roles);
             }
             if (Array.isArray(menuItem?.menus)) {
                 if (!Array.isArray(newMenuItems?.[index]?.menus)) {
@@ -106,7 +96,7 @@ function EditMenu({
             requestData.active = values.active;
         }
         if (Array.isArray(values?.roles)) {
-            requestData.roles = buildRoleIdData(values.roles);
+            requestData.roles = RequestHelpers.extractIdsFromArray(values.roles);
         }
         if (Array.isArray(values?.menu_items)) {
             requestData.menu_items = buildMenuItemRequestData(values.menu_items);
@@ -125,7 +115,7 @@ function EditMenu({
             requestData.active = values.active;
         }
         if (Array.isArray(values?.roles)) {
-            requestData.roles = buildRoleIdData(values.roles);
+            requestData.roles = RequestHelpers.extractIdsFromArray(values.roles);
         }
         if (Array.isArray(values?.menu_items)) {
             requestData.menu_items = buildMenuItemRequestData(values.menu_items);
