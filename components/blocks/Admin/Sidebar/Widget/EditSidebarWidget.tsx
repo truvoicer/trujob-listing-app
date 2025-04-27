@@ -199,7 +199,10 @@ function EditSidebarWidget({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditSidebarWidgetFields makeRequest={sidebarWidgetRequest} sidebarId={sidebarId} />
+                        <EditSidebarWidgetFields
+                            operation={operation}
+                            sidebarId={sidebarId}
+                        />
                     )
                     : (
                         <Form
@@ -215,7 +218,10 @@ function EditSidebarWidget({
                                 onChange,
                             }: FormContextType) => {
                                 return (
-                                    <EditSidebarWidgetFields sidebarId={sidebarId} />
+                                    <EditSidebarWidgetFields
+                                        sidebarId={sidebarId}
+                                        operation={operation}
+                                    />
                                 )
                             }}
                         </Form>

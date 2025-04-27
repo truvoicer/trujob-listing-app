@@ -7,10 +7,12 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { CreateMenuItem, Menu, MenuItem, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 import { Page } from "@/types/Page";
-import { MenuModal, RolesModal } from "./EditMenu";
 import { Button, Modal } from "react-bootstrap";
 import { Dispatch } from "redux";
 import SelectLinkTarget from "./SelectLinkTarget";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 export type RolesModal = {
     show: boolean;
@@ -23,12 +25,14 @@ export type MenuModal = {
     footer: boolean;
 };
 export type MenuItemFormProps = {
+    menuId?: number;
     data?: MenuItem;
     index?: number;
     onChange?: (key: string, value: string | number | boolean | Array<Role> | Array<Menu> | Page | null) => void;
     onSubmit?: (data: MenuItem) => void;
 }
 function MenuItemForm({
+    menuId,
     data,
     index,
     onChange,
@@ -95,7 +99,7 @@ function MenuItemForm({
             return newState;
         });
     }
-    
+
     return (
         <form
             onSubmit={e => {
@@ -257,6 +261,69 @@ function MenuItemForm({
                         onChange={(roles) => {
                             console.log('roles', roles);
                             handleChange('roles', roles);
+                        }}
+                        makeRequest={async () => {
+                            if (!menuId) {
+                                console.warn('No menu item id found');
+                                return false;
+                            }
+                            const response = await TruJobApiMiddleware.getInstance()
+                                .resourceRequest({
+                                    endpoint: truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()) + '/' + menuItem.id + '/role',
+                                    method: ApiMiddleware.METHOD.GET,
+                                    protectedReq: true,
+                                })
+                            if (!response) {
+                                console.warn('No response from API when getting roles');
+                                return false;
+                            }
+                            if (!response?.data) {
+                                console.warn('No data found');
+                                return false;
+                            }
+                            if (!Array.isArray(response?.data)) {
+                                console.warn('Response is not an array');
+                                return false;
+                            }
+                            return response.data;
+                        }}
+                        onAdd={async (role: Role) => {
+                            if (!menuId) {
+                                return false;
+                            }
+                            if (!role) {
+                                return false;
+                            }
+                            const response = await TruJobApiMiddleware.getInstance()
+                                .resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItem.id}/role/${role.id}/create`,
+                                    method: ApiMiddleware.METHOD.POST,
+                                    protectedReq: true,
+                                })
+                            if (!response) {
+                                console.warn('No response from API when adding role');
+                                return false;
+                            }
+                            return true;
+                        }}
+                        onDelete={async (role: Role) => {
+                            if (!menuId) {
+                                return false;
+                            }
+                            if (!role) {
+                                return false;
+                            }
+                            const response = await TruJobApiMiddleware.getInstance()
+                                .resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItem.id}/role/${role.id}/delete`,
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true,
+                                })
+                            if (!response) {
+                                console.warn('No response from API when adding role');
+                                return false;
+                            }
+                            return true;
                         }}
                     />
                 </Modal.Body>

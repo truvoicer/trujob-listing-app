@@ -74,7 +74,7 @@ export class SessionService {
         // Clear access token and ID token from local storage
         localStorage.removeItem('token');
         localStorage.removeItem('expires_at');
-    }ß
+    }
     
     static getSessionObject() {
         if (typeof localStorage === 'undefined') {

@@ -1,5 +1,6 @@
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import {
+    setAuthenticatedAction,
     setIsAuthenticatingAction, setSessionErrorAction,
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -288,6 +289,13 @@ export class ApiMiddleware {
         return `${url}${queryString}`;
     }
 
+    handleUnauthorizedResponse(response: Response, data: any): void {
+        console.log('handleUnauthorizedResponse', { response, data });
+        SessionService.removeLocalSession();
+        setAuthenticatedAction(false);
+        setIsAuthenticatingAction(false)
+    }
+
     async handleResponse(requestUrl: string, response: Response | Promise<Response>) {
         if (!response) {
             return false;
@@ -298,7 +306,10 @@ export class ApiMiddleware {
             case 200:
             case 202:
                 return responseData;
+            case 401:
+                this.handleUnauthorizedResponse(responsePromise, responseData);
             default:
+                console.log({responsePromise, responseData});
                 this.addError(
                     'api_error',
                     responseData?.message || 'API Error',

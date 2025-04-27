@@ -266,6 +266,7 @@ function Form({
         }
         const errors = validationHandler();
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
+            console.warn(`Form has validation errors`, errors);
             return;
         }
         let requestData = { ...formContextState.values };
@@ -281,16 +282,16 @@ function Form({
         const { name, value } = e.target;
         setFieldValue(name, value);
     }
-    useEffect(() => {
-        if (typeof initialValues !== 'object' || isObjectEmpty(initialValues)) {
-            return;
-        }
-        setFormContextState(prevState => {
-            let newState = { ...prevState };
-            newState.values = JSON.parse(JSON.stringify(initialValues));
-            return newState;
-        });
-    }, [initialValues]);
+    // useEffect(() => {
+    //     if (typeof initialValues !== 'object' || isObjectEmpty(initialValues)) {
+    //         return;
+    //     }
+    //     setFormContextState(prevState => {
+    //         let newState = { ...prevState };
+    //         newState.values = JSON.parse(JSON.stringify(initialValues));
+    //         return newState;
+    //     });
+    // }, [initialValues]);
     return (
         <FormContext.Provider value={formContextState}>
             <form onSubmit={formContextState.onSubmit} className={className || ''}>

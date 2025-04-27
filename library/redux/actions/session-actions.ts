@@ -59,14 +59,17 @@ export function getSessionAction() {
     return { ...store.getState().session };
 }
 
-export function setSessionUserIdAction(userId) {
+export function setSessionUserIdAction(userId: number) {
     store.dispatch(setUserId(userId));
 }
 
-export function setPasswordResetKeyAction(passwordResetKey) {
+export function setPasswordResetKeyAction(passwordResetKey: string) {
     store.dispatch(setPasswordResetKey(passwordResetKey));
 }
 
-export function setIsAuthenticatingAction(isAuthenticating) {
+export function setAuthenticatedAction(isAuthenticated: boolean) {
+    store.dispatch(setAuthenticated(isAuthenticated));
+}
+export function setIsAuthenticatingAction(isAuthenticating: boolean) {
     store.dispatch(setIsAuthenticating(isAuthenticating));
 }

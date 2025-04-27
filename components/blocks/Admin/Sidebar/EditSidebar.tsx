@@ -83,17 +83,14 @@ function EditSidebar({
         let requestData: UpdateSidebar = {
             id: values?.id,
         };
+        if (values.hasOwnProperty('name')) {
+            requestData.name = values.name;
+        }
         if (values.hasOwnProperty('title')) {
             requestData.title = values.title;
         }
         if (values.hasOwnProperty('icon')) {
             requestData.icon = values.icon;
-        }
-        if (Array.isArray(values?.roles)) {
-            requestData.roles = buildRoleIdData(values.roles);
-        }
-        if (Array.isArray(values?.widgets)) {
-            requestData.widgets = buildWidgetIdData(values.widgets);
         }
         return requestData;
     }
@@ -184,7 +181,7 @@ function EditSidebar({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditSidebarFields />
+                        <EditSidebarFields operation={operation} />
                     )
                     : (
                         <Form
@@ -200,7 +197,7 @@ function EditSidebar({
                                 onChange,
                             }: FormContextType) => {
                                 return (
-                                    <EditSidebarFields />
+                                    <EditSidebarFields operation={operation} />
                                 )
                             }}
                         </Form>

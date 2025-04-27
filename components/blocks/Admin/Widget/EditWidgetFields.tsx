@@ -3,6 +3,9 @@ import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 export type RolesModal = {
     show: boolean;
@@ -165,6 +168,67 @@ function EditWidgetFields() {
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
+                                }}
+                                makeRequest={async () => {
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: truJobApiConfig.endpoints.widget + '/' + values.id + '/role',
+                                            method: ApiMiddleware.METHOD.GET,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when getting roles');
+                                        return false;
+                                    }
+                                    if (!response?.data) {
+                                        console.warn('No data found');
+                                        return false;
+                                    }
+                                    if (!Array.isArray(response?.data)) {
+                                        console.warn('Response is not an array');
+                                        return false;
+                                    }
+                                    return response.data;
+                                }}
+                                onAdd={async (role: Role) => {
+                                    if (!values?.id) {
+                                        console.warn('Widget ID is required');
+                                        return false;
+                                    }
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/create`,
+                                            method: ApiMiddleware.METHOD.POST,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when adding role');
+                                        return false;
+                                    }
+                                    return true;
+                                }}
+                                onDelete={async (role: Role) => {
+                                    if (!values?.id) {
+                                        console.warn('Widget ID is required');
+                                        return false;
+                                    }
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/delete`,
+                                            method: ApiMiddleware.METHOD.DELETE,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when adding role');
+                                        return false;
+                                    }
+                                    return true;
                                 }}
                             />
                         </Modal.Body>

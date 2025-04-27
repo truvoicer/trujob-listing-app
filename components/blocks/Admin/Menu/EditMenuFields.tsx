@@ -162,6 +162,67 @@ function EditMenuFields() {
                                 onChange={(roles: Array<Role>) => {
                                     setFieldValue('roles', roles);
                                 }}
+                                makeRequest={async () => {
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: truJobApiConfig.endpoints.menu + '/' + values.id + '/role',
+                                            method: ApiMiddleware.METHOD.GET,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when getting roles');
+                                        return false;
+                                    }
+                                    if (!response?.data) {
+                                        console.warn('No data found');
+                                        return false;
+                                    }
+                                    if (!Array.isArray(response?.data)) {
+                                        console.warn('Response is not an array');
+                                        return false;
+                                    }
+                                    return response.data;
+                                }}
+                                onAdd={async (role: Role) => {
+                                    if (!values?.id) {
+                                        console.warn('Menu ID is required');
+                                        return false;
+                                    }
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: `${truJobApiConfig.endpoints.menu}/${values.id}/role/${role.id}/create`,
+                                            method: ApiMiddleware.METHOD.POST,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when adding role');
+                                        return false;
+                                    }
+                                    return true;
+                                }}
+                                onDelete={async (role: Role) => {
+                                    if (!values?.id) {
+                                        console.warn('Menu ID is required');
+                                        return false;
+                                    }
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    const response = await TruJobApiMiddleware.getInstance()
+                                        .resourceRequest({
+                                            endpoint: `${truJobApiConfig.endpoints.menu}/${values.id}/role/${role.id}/delete`,
+                                            method: ApiMiddleware.METHOD.DELETE,
+                                            protectedReq: true,
+                                        })
+                                    if (!response) {
+                                        console.warn('No response from API when adding role');
+                                        return false;
+                                    }
+                                    return true;
+                                }}
                             />
                         </Modal.Body>
                         {rolesModal.footer &&
@@ -193,7 +254,7 @@ function EditMenuFields() {
                                 <Button variant="secondary" onClick={() => hideModal(setMenuItemsModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => {hideModal(setMenuItemsModal)}}>
+                                <Button variant="primary" onClick={() => { hideModal(setMenuItemsModal) }}>
                                     Save Changes
                                 </Button>
                             </Modal.Footer>

@@ -212,6 +212,7 @@ function ManageMenuItems({
                         index,
                     }) => (
                         <MenuItemForm
+                            menuId={menuId}
                             data={item}
                             onChange={(key, value) => {
                                 updateFieldValue(index, key, value);

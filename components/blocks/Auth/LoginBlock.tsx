@@ -11,13 +11,14 @@ import { connect } from "react-redux";
 export type LoginBlockProps = {
     session: any;
 }
-function LoginBlock({ 
+function LoginBlock({
     session
- }: LoginBlockProps) {
+}: LoginBlockProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
 
     async function formSubmitHandler(values: any, errors: any) {
+        console.log('LoginBlock formSubmitHandler', values, errors);
         let requestData = { ...values };
         requestData.auth_provider = "local";
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -68,69 +69,72 @@ function LoginBlock({
                             errors,
                             onChange,
                             onSubmit
-                        }: FormContextType) => (
-                            <>
-                                <div className="row form-group">
-                                    <div className="col-md-12">
-                                        <label
-                                            className="text-black"
-                                            htmlFor="email">
-                                            Email
-                                        </label>
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            className="form-control"
-                                            value={values?.email || ""}
-                                            onChange={onChange}
-                                        />
-                                        {errors?.email && <span className="text-danger">{errors?.email || ''}</span>}
+                        }: FormContextType) => {
+
+                            return (
+                                <>
+                                    <div className="row form-group">
+                                        <div className="col-md-12">
+                                            <label
+                                                className="text-black"
+                                                htmlFor="email">
+                                                Email
+                                            </label>
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                className="form-control"
+                                                value={values?.email || ""}
+                                                onChange={onChange}
+                                            />
+                                            {errors?.email && <span className="text-danger">{errors?.email || ''}</span>}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="row form-group">
+                                    <div className="row form-group">
 
-                                    <div className="col-md-12">
-                                        <label
-                                            className="text-black"
-                                            htmlFor="password">
-                                            Password
-                                        </label>
-                                        <input
-                                            type="password"
-                                            id="password"
-                                            name="password"
-                                            className="form-control"
-                                            value={values?.password || ""}
-                                            onChange={onChange}
-                                        />
-                                        {errors?.password && <span className="text-danger">{errors?.password || ''}</span>}
+                                        <div className="col-md-12">
+                                            <label
+                                                className="text-black"
+                                                htmlFor="password">
+                                                Password
+                                            </label>
+                                            <input
+                                                type="password"
+                                                id="password"
+                                                name="password"
+                                                className="form-control"
+                                                value={values?.password || ""}
+                                                onChange={onChange}
+                                            />
+                                            {errors?.password && <span className="text-danger">{errors?.password || ''}</span>}
+                                        </div>
                                     </div>
-                                </div>
 
-                                <div className="row form-group">
-                                    <div className="col-12">
-                                        <p>No account yet? <a href="register.html">Register</a></p>
+                                    <div className="row form-group">
+                                        <div className="col-12">
+                                            <p>No account yet? <a href="register.html">Register</a></p>
+                                        </div>
                                     </div>
-                                </div>
 
 
-                                <div className="row form-group">
-                                    <div className="col-md-12">
-                                        <input
-                                            type="submit"
-                                            value="Sign In"
-                                            className="btn btn-primary py-2 px-4 text-white"
-                                            onClick={e => {
-                                                e.preventDefault();
-                                                onSubmit(e);
-                                            }}
-                                        />
+                                    <div className="row form-group">
+                                        <div className="col-md-12">
+                                            <input
+                                                type="submit"
+                                                value="Sign In"
+                                                className="btn btn-primary py-2 px-4 text-white"
+                                                onClick={e => {
+                                                    e.preventDefault();
+                                                    onSubmit(e);
+                                                }}
+                                            />
+                                        </div>
                                     </div>
-                                </div>
-                            </>
-                        )}
+                                </>
+                            )
+                        }}
                     </Form>
                 </div>
 

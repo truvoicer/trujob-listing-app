@@ -5,6 +5,10 @@ import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { Widget } from "@/types/Widget";
 import SidebarWidgetForm from "../Sidebar/Widget/SidebarWidgetForm";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { isObjectEmpty } from "@/helpers/utils";
 
 export type RolesModal = {
     show: boolean;
@@ -17,8 +21,12 @@ export type WidgetModal = {
     footer: boolean;
 };
 export type EditMenuFields = {
+    operation: 'edit' | 'update' | 'add' | 'create';
 };
-function EditSidebarFields() {
+function EditSidebarFields({
+    operation
+}: EditMenuFields) {
+    const [selectedRoles, setSelectedRoles] = useState<Array<Role>>([]);
     const [rolesModal, setRolesModal] = useState<RolesModal>({
         show: false,
         title: '',
@@ -152,7 +160,99 @@ function EditSidebarFields() {
                             <RoleForm
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
-                                    setFieldValue('roles', roles);
+                                    setSelectedRoles(roles);
+                                }}
+                                makeRequest={async () => {
+                                    if (['edit', 'update'].includes(operation)) {
+                                        if (!values?.id) {
+                                            console.warn('Sidebar ID is required');
+                                            return false;
+                                        }
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: truJobApiConfig.endpoints.sidebar + '/' + values.id + '/role',
+                                                method: ApiMiddleware.METHOD.GET,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when getting roles');
+                                            return false;
+                                        }
+                                        if (!response?.data) {
+                                            console.warn('No data found');
+                                            return false;
+                                        }
+                                        if (!Array.isArray(response?.data)) {
+                                            console.warn('Response is not an array');
+                                            return false;
+                                        }
+                                        return response.data;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        if (Array.isArray(values?.roles)) {
+                                            return values.roles;
+                                        }
+                                    }
+                                    return [];
+                                }}
+
+                                onAdd={async (role: Role) => {
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    if (['edit', 'update'].includes(operation)) {
+                                        if (!values?.id) {
+                                            console.warn('Sidebar ID is required');
+                                            return false;
+                                        }
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.sidebar}/${values.id}/role/${role.id}/create`,
+                                                method: ApiMiddleware.METHOD.POST,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when adding role');
+                                            return false;
+                                        }
+                                        return true;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        const buildRoles = [...values?.roles, role];
+                                        console.log('buildRoles', buildRoles);
+                                        setFieldValue('roles', buildRoles);
+                                        return true;
+                                    }
+                                    console.warn('Invalid operation');
+                                    return false;
+                                }}
+                                onDelete={async (role: Role) => {
+                                    if (!role) {
+                                        return false;
+                                    }
+                                    if (['edit', 'update'].includes(operation)) {
+                                        if (!values?.id) {
+                                            console.warn('Sidebar ID is required');
+                                            return false;
+                                        }
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.sidebar}/${values.id}/role/${role.id}/delete`,
+                                                method: ApiMiddleware.METHOD.DELETE,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when adding role');
+                                            return false;
+                                        }
+                                        return true;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        const buildRoles = values.roles.filter((r: Role) => {
+                                            return r.id !== role.id;
+                                        });
+                                        setFieldValue('roles', buildRoles);
+                                        return true;
+                                    }
+                                    console.warn('Invalid operation');
+                                    return false;
                                 }}
                             />
                         </Modal.Body>
@@ -160,9 +260,6 @@ function EditSidebarFields() {
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={() => hideModal(setRolesModal)}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         }
@@ -173,6 +270,7 @@ function EditSidebarFields() {
                         </Modal.Header>
                         <Modal.Body>
                             <SidebarWidgetForm
+                                operation={operation}
                                 sidebarId={values?.id}
                                 data={values?.widgets || []}
                                 onChange={(widget: Array<Widget>) => {
@@ -184,9 +282,6 @@ function EditSidebarFields() {
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={() => hideModal(setWidgetModal)}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={() => {hideModal(setWidgetModal)}}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         }

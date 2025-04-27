@@ -9,12 +9,12 @@ export type ReorderProps = {
     data?: Array<any>;
     itemHeader?: string | ((item: any, index: number) => React.ReactNode);
     itemSchema?: any;
-    onAdd?: (props: any) => any;
-    onEdit?: (props: any) => any;
-    onDelete?: (props: any) => any;
-    onMove?: (props: any) => any;
+    onAdd?: (props: ReorderOnAdd) => any;
+    onEdit?: (props: ReorderOnEdit) => any;
+    onDelete?: (props: ReorderOnDelete) => any;
+    onMove?: (props: ReorderOnMove) => any;
     onChange?: (data: Array<any>) => void;
-    onOk?: (props: any) => any;
+    onOk?: (props: ReorderOnOk) => any;
     onCancel?: (props: any) => any;
     enableControls?: boolean;
     enableEdit?: boolean;

@@ -17,13 +17,15 @@ export type SidebarWidgetFormProps = {
     sidebarId?: number;
     data?: Array<Widget> | null;
     onChange?: (data: Array<Widget>) => void;
+    operation?: 'edit' | 'update' | 'add' | 'create';
 }
 function SidebarWidgetForm({
     sidebarId,
     data,
-    onChange
+    onChange,
+    operation
 }: SidebarWidgetFormProps) {
-    const [widgets, setWidgets] = useState([]);
+    const [widgets, setWidgets] = useState<Array<Widget>>([]);
 
     const appModalContext = useContext(AppModalContext);
     const formContext = useContext(FormContext);
@@ -73,10 +75,9 @@ function SidebarWidgetForm({
                 operation: 'add',
                 initialValues: { widget: null },
             },
-            onOk: async (formHelpers: FormContextType) => {
-                if (!validateSidebarId()) {
-                    return;
-                }
+            onOk: async ({formHelpers}: {
+                formHelpers: FormContextType | null;
+            }) => {
                 const selectedWidget = formHelpers?.values?.widget;
                 if (!selectedWidget) {
                     notificationContext.show({
@@ -102,6 +103,17 @@ function SidebarWidgetForm({
                         ),
                     }, 'widget-form-select-widget-id-error');
                     console.warn('Widget id not found', selectedWidget);
+                    return;
+                }
+
+                if (['add', 'create'].includes(operation || '')) {
+                    setWidgets(
+                        [...widgets, formHelpers?.values?.widget]
+                    );
+                    return true;
+                }
+
+                if (!validateSidebarId()) {
                     return;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -150,6 +162,9 @@ function SidebarWidgetForm({
             return false;
         }
 
+        if (['add', 'create'].includes(operation || '')) {
+            return true;
+        }
         if (!validateSidebarId()) {
             return;
         }
@@ -200,6 +215,14 @@ function SidebarWidgetForm({
         item
     }: ReorderOnDelete) {
 
+        if (['add', 'create'].includes(operation || '')) {
+            setWidgets(
+                widgets.filter((widget: Widget) => {
+                    return widget.id !== item.id;
+                })
+            );
+            return true;
+        }
         if (!validateSidebarId()) {
             return;
         }
@@ -271,11 +294,28 @@ function SidebarWidgetForm({
     }, [widgets]);
 
     useEffect(() => {
+        if (['create', 'add'].includes(operation || '')) {
+            return;
+        }
         if (!sidebarId) {
             return;
         }
         sidebarWidgetsRequest();
     }, [sidebarId]);
+    // useEffect(() => {
+    //     if (!['create', 'add'].includes(operation || '')) {
+    //         return;
+    //     }
+    //     if (!data) {
+    //         return;
+    //     }
+    //     if (!Array.isArray(data)) {
+    //         console.warn('Sidebar widget data is not an array');
+    //         return;
+    //     }
+    //     setWidgets(data);
+        
+    // }, [data]);
     return (
         <div className="row">
             <div className="col-12">
@@ -295,9 +335,6 @@ function SidebarWidgetForm({
                         if (!formHelpers) {
                             return;
                         }
-                        if (!validateSidebarId()) {
-                            return;
-                        }
                         const item = {...formHelpers.values};
                         if (!item?.id) {
                             notificationContext.show({
@@ -314,6 +351,15 @@ function SidebarWidgetForm({
                         }
                         if (Array.isArray(item?.roles)) {
                             item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+                        }
+                        if (['add', 'create'].includes(operation || '')) {
+                            setWidgets(
+                                [...widgets, item]
+                            );
+                            return true;
+                        }
+                        if (!validateSidebarId()) {
+                            return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                             endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${item.id}/update`,
