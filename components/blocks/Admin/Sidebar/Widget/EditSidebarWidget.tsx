@@ -172,7 +172,12 @@ function EditSidebarWidget({
         if (!data?.id) {
             return;
         }
-        sidebarWidgetRequest()
+        if (['add', 'create'].includes(operation)) {
+            setInitialValues(data);
+        } else if (['edit', 'update'].includes(operation)) {
+            sidebarWidgetRequest()
+            return;
+        }
     }, [data?.id]);
     useEffect(() => {
         if (!inModal) {

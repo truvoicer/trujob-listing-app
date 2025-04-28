@@ -21,16 +21,20 @@ function ManageSidebar() {
             formProps: {},
             show: true,
             showFooter: true,
-            onOk: ({ formHelpers }: {
+            onOk: async ({ formHelpers }: {
                 formHelpers?: FormContextType | null
             }) => {
                 if (!formHelpers) {
-                    return;
+                    return false;
                 }
                 if (typeof formHelpers?.onSubmit !== 'function') {
-                    return;
+                    return false;
                 }
-                formHelpers.onSubmit();
+                const response = await formHelpers.onSubmit();
+                if (!response) {
+                    return false;
+                }
+                return true;
             },
             fullscreen: true
         }

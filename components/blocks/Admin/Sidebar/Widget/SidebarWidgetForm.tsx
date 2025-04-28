@@ -17,7 +17,7 @@ export type SidebarWidgetFormProps = {
     sidebarId?: number;
     data?: Array<Widget> | null;
     onChange?: (data: Array<Widget>) => void;
-    operation?: 'edit' | 'update' | 'add' | 'create';
+    operation: 'edit' | 'update' | 'add' | 'create';
 }
 function SidebarWidgetForm({
     sidebarId,
@@ -302,20 +302,20 @@ function SidebarWidgetForm({
         }
         sidebarWidgetsRequest();
     }, [sidebarId]);
-    // useEffect(() => {
-    //     if (!['create', 'add'].includes(operation || '')) {
-    //         return;
-    //     }
-    //     if (!data) {
-    //         return;
-    //     }
-    //     if (!Array.isArray(data)) {
-    //         console.warn('Sidebar widget data is not an array');
-    //         return;
-    //     }
-    //     setWidgets(data);
+    useEffect(() => {
+        if (!['create', 'add'].includes(operation || '')) {
+            return;
+        }
+        if (!data) {
+            return;
+        }
+        if (!Array.isArray(data)) {
+            console.warn('Sidebar widget data is not an array');
+            return;
+        }
+        setWidgets(data);
         
-    // }, [data]);
+    }, []);
     return (
         <div className="row">
             <div className="col-12">
@@ -406,7 +406,7 @@ function SidebarWidgetForm({
                             <EditSidebarWidget
                                 sidebarId={sidebarId}
                                 data={item}
-                                operation={'edit'}
+                                operation={operation}
                                 inModal={true}
                                 modalId={'reorder-modal'}
                             />

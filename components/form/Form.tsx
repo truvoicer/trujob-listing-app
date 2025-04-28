@@ -24,7 +24,7 @@ export type FormContextType = {
     setValues: (values: any) => void;
     setFieldValue: (key: string, value: any) => void;
     onChange: (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => void;
-    onSubmit: (e?: React.FormEvent<HTMLFormElement>) => void;
+    onSubmit: (e?: React.FormEvent<HTMLFormElement>) => Promise<boolean>;
     onBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
     validate: () => any;
     errors: any;
@@ -275,7 +275,7 @@ function Form({
             requestData = buildFinalValues(requestData);
         }
         
-        onSubmit(requestData, errors);
+        return onSubmit(requestData, errors);
     }
 
     function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
@@ -286,6 +286,7 @@ function Form({
     //     if (typeof initialValues !== 'object' || isObjectEmpty(initialValues)) {
     //         return;
     //     }
+    //     console.log('Form initial values', initialValues);
     //     setFormContextState(prevState => {
     //         let newState = { ...prevState };
     //         newState.values = JSON.parse(JSON.stringify(initialValues));

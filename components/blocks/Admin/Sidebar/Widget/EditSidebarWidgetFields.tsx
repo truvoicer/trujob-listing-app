@@ -19,7 +19,7 @@ export type WidgetModal = {
 };
 export type EditSidebarWidgetFields = {
     sidebarId?: number;
-    operation: 'edit' | 'update' | 'add' | 'create';
+    operation?: 'edit' | 'update' | 'add' | 'create';
 };
 function EditSidebarWidgetFields({
     sidebarId,
@@ -69,6 +69,7 @@ function EditSidebarWidgetFields({
         setFieldValue,
         onChange,
     } = useContext(FormContext);
+    console.log('EditSidebarWidgetFields', values, errors);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">

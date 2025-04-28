@@ -113,7 +113,7 @@ function EditSidebar({
         console.log('edit sidebar values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
-            return;
+            return false;
         }
         let response = null;
         let requestData: CreateSidebar | UpdateSidebar;
@@ -149,8 +149,9 @@ function EditSidebar({
                 console.warn('Invalid operation');
                 break;
         }
+        console.log('edit sidebar response', response);
         if (!response) {
-            return;
+            return false;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
