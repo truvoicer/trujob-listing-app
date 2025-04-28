@@ -160,25 +160,31 @@ function EditMenuFields() {
                                     setFieldValue('roles', roles);
                                 }}
                                 makeRequest={async () => {
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: truJobApiConfig.endpoints.menu + '/' + values.id + '/role',
-                                            method: ApiMiddleware.METHOD.GET,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when getting roles');
-                                        return false;
+                                    if (['edit', 'update'].includes(operation)) {
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: truJobApiConfig.endpoints.menu + '/' + values.id + '/role',
+                                                method: ApiMiddleware.METHOD.GET,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when getting roles');
+                                            return false;
+                                        }
+                                        if (!response?.data) {
+                                            console.warn('No data found');
+                                            return false;
+                                        }
+                                        if (!Array.isArray(response?.data)) {
+                                            console.warn('Response is not an array');
+                                            return false;
+                                        }
+                                        setFieldValue('roles', response.data);
+                                        return true;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        return true;
                                     }
-                                    if (!response?.data) {
-                                        console.warn('No data found');
-                                        return false;
-                                    }
-                                    if (!Array.isArray(response?.data)) {
-                                        console.warn('Response is not an array');
-                                        return false;
-                                    }
-                                    return response.data;
+                                    return false;
                                 }}
                                 onAdd={async (role: Role) => {
                                     if (!values?.id) {

@@ -9,7 +9,7 @@ export type RoleFormProps = {
     data?: Array<Role>;
     onChange: (data: Array<Role>) => void;
     onAdd?: (data: Role) => Promise<boolean>;
-    makeRequest?: () => Promise<Array<Role>>;
+    makeRequest?: () => Promise<boolean>;
     onDelete?: (data: Role) => Promise<boolean>;
 }
 function RoleForm({ 
@@ -103,13 +103,7 @@ function RoleForm({
         const response = await makeRequest()
         if (!response) {
             console.warn('No response from makeRequest');
-            return;
         }
-        if (!Array.isArray(response)) {
-            console.warn('Response is not an array');
-            return;
-        }
-        setRoles(response);
     }
     useEffect(() => {
         initRequest();
@@ -124,7 +118,7 @@ function RoleForm({
                         return `${item?.label} | name: ${item?.name} | ability: ${item?.ability}` || 'Item label error';
                     }
                     }
-                    data={roles || []}
+                    data={data || []}
                     onChange={handleChange}
                     onAdd={handleAdd}
                     onDelete={handleDelete}

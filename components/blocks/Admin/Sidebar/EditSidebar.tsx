@@ -74,7 +74,7 @@ function EditSidebar({
             requestData.roles = buildRoleIdData(values.roles);
         }
         if (Array.isArray(values?.widgets)) {
-            requestData.widgets = buildWidgetIdData(values.widgets);
+            requestData.widgets = values.widgets;
         }
         return requestData;
     }

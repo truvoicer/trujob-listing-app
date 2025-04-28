@@ -14,13 +14,13 @@ export type Sidebar = {
 }
 
 export type CreateSidebar = {
-    [key: string]: string | number | null | Array<number> | boolean | undefined;
+    [key: string]: string | number | null | Array<number> | boolean | undefined | Array<Widget>;
     name: string;
     title: string;
     icon?: string;
     properties?: any;
     roles?: Array<number>;
-    widgets?: Array<number>;
+    widgets?: Array<Widget>;
 }
 
 export type UpdateSidebar = {

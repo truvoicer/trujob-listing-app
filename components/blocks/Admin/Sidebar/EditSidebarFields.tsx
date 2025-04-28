@@ -186,13 +186,12 @@ function EditSidebarFields({
                                             console.warn('Response is not an array');
                                             return false;
                                         }
-                                        return response.data;
+                                        setFieldValue('roles', response.data);
+                                        return true;
                                     } else if (['add', 'create'].includes(operation)) {
-                                        if (Array.isArray(values?.roles)) {
-                                            return values.roles;
-                                        }
+                                        return true;
                                     }
-                                    return [];
+                                    return false;
                                 }}
 
                                 onAdd={async (role: Role) => {
