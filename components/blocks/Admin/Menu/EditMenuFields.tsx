@@ -1,16 +1,13 @@
-import Form, { FormContext, FormContextType } from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { Dispatch, SetStateAction, use, useContext, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
-import { DataTableContext } from "@/contexts/DataTableContext";
-import { isObjectEmpty } from "@/helpers/utils";
 import MenuItemForm from "./ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
+import { FormikValues, useFormikContext } from "formik";
 
 export type RolesModal = {
     show: boolean;
@@ -72,8 +69,8 @@ function EditMenuFields() {
         values,
         errors,
         setFieldValue,
-        onChange,
-    } = useContext(FormContext);
+        handleChange,
+    } = useFormikContext<FormikValues>() || {};
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -83,7 +80,7 @@ function EditMenuFields() {
                             <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
                                     onChange={e => {
-                                        onChange(e);
+                                        handleChange(e);
                                     }}
                                     type="checkbox"
                                     className="custom-control-input"
@@ -103,7 +100,7 @@ function EditMenuFields() {
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.name || ""} />
                                 <label className="form-label" htmlFor="name">Name</label>
                             </div>
@@ -116,7 +113,7 @@ function EditMenuFields() {
                                     type="text"
                                     name="ul_class"
                                     id="ul_class"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.ul_class || ""} />
                                 <label className="form-label" htmlFor="ul_class">
                                     UL Class

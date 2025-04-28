@@ -1,4 +1,4 @@
-import Form, { FormContext, FormContextType } from "@/components/form/Form";
+import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -153,7 +153,7 @@ function EditWidget({
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
     }
     const dataTableContext = useContext(DataTableContext);
-    const formContext = useContext(FormContext);
+
     useEffect(() => {
         if (!inModal) {
             return;
@@ -188,12 +188,7 @@ function EditWidget({
                             initialValues={initialValues}
                             onSubmit={handleSubmit}
                         >
-                            {({
-                                values,
-                                errors,
-                                setFieldValue,
-                                onChange,
-                            }: FormContextType) => {
+                            {() => {
                                 return (
                                     <EditWidgetFields />
                                 )

@@ -1,4 +1,4 @@
-import Form, { FormContext, FormContextType } from "@/components/form/Form";
+import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -216,12 +216,7 @@ function EditSidebarWidget({
                             initialValues={initialValues}
                             onSubmit={handleSubmit}
                         >
-                            {({
-                                values,
-                                errors,
-                                setFieldValue,
-                                onChange,
-                            }: FormContextType) => {
+                            {() => {
                                 return (
                                     <EditSidebarWidgetFields
                                         sidebarId={sidebarId}

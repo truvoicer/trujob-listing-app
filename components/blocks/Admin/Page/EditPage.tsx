@@ -1,4 +1,4 @@
-import Form, { FormContextType } from "@/components/form/Form";
+import Form from "@/components/form/Form";
 import DataTable from "@/components/Table/DataTable";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";

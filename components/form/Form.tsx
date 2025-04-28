@@ -1,10 +1,11 @@
 import { ObjectDifference } from "@/helpers/ObjectDfference";
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
+import { Formik, FormikValues } from "formik";
 import React, { useState, useEffect } from 'react';
 
 export type FormProps = {
     operation: string;
-    className?: string  | null;
+    className?: string | null;
     initialValues?: any;
     requiredFields?: any;
     validation?: any;
@@ -59,18 +60,6 @@ export const VALIDATION_RULES = [
     VALIDATION_ALPHA_NUMERIC_SYMBOLS,
 ];
 
-export const formContextData: FormContextType = {
-    values: {},
-    setValues: () => {},
-    setFieldValue: () => {},
-    onChange: () => {},
-    onSubmit: () => {},
-    onBlur: () => {},
-    validate: () => {},
-    errors: {},
-};
-export const FormContext = React.createContext(formContextData);
-
 function Form({
     operation = 'create',
     className = '',
@@ -81,42 +70,6 @@ function Form({
     preventSubmitOnErrors = true,
     children
 }: FormProps) {
-
-    const [formContextState, setFormContextState] = useState({
-        ...formContextData,
-        values: JSON.parse(JSON.stringify(initialValues)),
-        setValues: setValues,
-        setFieldValue: setFieldValue,
-        onChange: handleChange,
-        onSubmit: handleSubmit,
-        onBlur: handleBlur,
-        validate: validationHandler,
-    });
-
-    function setValues(values: any) {
-        if (typeof values !== 'object') {
-            return;
-        }
-        setFormContextState(prevState => {
-            let newState = { ...prevState };
-            Object.keys(values).forEach(key => {
-                newState.values[key] = values[key];
-            });
-            return newState;
-        });
-    }
-
-    function setFieldValue(key: string, value: any) {
-        setFormContextState(prevState => {
-            let newState = { ...prevState };
-            if (typeof newState.values?.[key] === 'undefined') {
-                console.warn(`Form value ${key} does not exist in values`);
-                return newState;
-            }
-            newState.values[key] = value;
-            return newState;
-        });
-    }
 
     function checkValidationRule(rule: ValidationRule, requiredFields: Array<string> = []) {
         for (let i = 0; i < requiredFields.length; i++) {
@@ -133,8 +86,7 @@ function Form({
         return true;
     }
 
-    function validationHandler() {
-        const values = formContextState.values;
+    function validationHandler(values: FormikValues) {
         if (!isObject(validation) || isObjectEmpty(validation)) {
             return {};
         }
@@ -240,65 +192,50 @@ function Form({
         });
         return validationErrors;
     }
-    function handleChange(e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) {
-        const { name, value } = e.target;
-        if (e.target.hasOwnProperty('checked')) {
-            setFieldValue(name, e.target.checked);
-            return;
-        }
-        setFieldValue(name, value);
-    }
 
-    function buildFinalValues(values: any) {
+    function buildFinalValues(values: FormikValues) {
         return ObjectDifference.getDifference(
-            values, 
-            initialValues, 
+            values,
+            initialValues,
             requiredFields
         );
     }
-    function handleSubmit(e?: React.FormEvent<HTMLFormElement>) {
-        if (e) {
-            e.preventDefault();
-        }
+    function handleSubmit(values: FormikValues, formikHelpers: any) {
         if (typeof operation !== 'string') {
             console.warn(`Form operation is not a string`);
             return;
         }
-        const errors = validationHandler();
+        let requestData = { ...values };
+        const errors = validationHandler(requestData);
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
             console.warn(`Form has validation errors`, errors);
             return;
         }
-        let requestData = { ...formContextState.values };
 
         if (['update', 'edit'].includes(operation)) {
             requestData = buildFinalValues(requestData);
         }
-        
+
         return onSubmit(requestData, errors);
     }
 
-    function handleBlur(e: React.FocusEvent<HTMLInputElement>) {
-        const { name, value } = e.target;
-        setFieldValue(name, value);
-    }
-    // useEffect(() => {
-    //     if (typeof initialValues !== 'object' || isObjectEmpty(initialValues)) {
-    //         return;
-    //     }
-    //     console.log('Form initial values', initialValues);
-    //     setFormContextState(prevState => {
-    //         let newState = { ...prevState };
-    //         newState.values = JSON.parse(JSON.stringify(initialValues));
-    //         return newState;
-    //     });
-    // }, [initialValues]);
+
     return (
-        <FormContext.Provider value={formContextState}>
-            <form onSubmit={formContextState.onSubmit} className={className || ''}>
-                {children(formContextState)}
-            </form>
-        </FormContext.Provider>
+        <Formik
+            initialValues={initialValues}
+            enableReinitialize={true}
+            validateOnMount={true}
+            validateOnBlur={true}
+            validateOnChange={true}
+            validate={validationHandler}
+            onSubmit={handleSubmit}
+        >
+            {(formikHelpers) => (
+                <form onSubmit={formikHelpers.handleSubmit} className={className || ''}>
+                    {children(formikHelpers)}
+                </form>
+            )}
+        </Formik>
     )
 }
 export default Form;

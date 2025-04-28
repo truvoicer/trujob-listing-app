@@ -1,11 +1,11 @@
-import { FormContext } from "@/components/form/Form";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 
 export type RolesModal = {
     show: boolean;
@@ -62,8 +62,8 @@ function EditWidgetFields() {
         values,
         errors,
         setFieldValue,
-        onChange,
-    } = useContext(FormContext);
+        handleChange,
+    } = useFormikContext<FormikValues>() || {};
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -77,7 +77,7 @@ function EditWidgetFields() {
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.name || ""} />
                                 <label className="form-label" htmlFor="name">Name</label>
                             </div>
@@ -90,7 +90,7 @@ function EditWidgetFields() {
                                     type="text"
                                     name="title"
                                     id="title"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.title || ""} />
                                 <label className="form-label" htmlFor="title">
                                     Title
@@ -105,7 +105,7 @@ function EditWidgetFields() {
                                     type="text"
                                     name="description"
                                     id="description"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.description || ""} />
                                 <label className="form-label" htmlFor="description">
                                     Description
@@ -119,7 +119,7 @@ function EditWidgetFields() {
                                     type="text"
                                     name="icon"
                                     id="icon"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.icon || ""} />
                                 <label className="form-label" htmlFor="icon">
                                     Icon
@@ -130,7 +130,7 @@ function EditWidgetFields() {
                             <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
                                     onChange={e => {
-                                        onChange(e);
+                                        handleChange(e);
                                     }}
                                     type="checkbox"
                                     className="custom-control-input"

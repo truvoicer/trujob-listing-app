@@ -1,4 +1,4 @@
-import Form, { FormContextType } from "@/components/form/Form";
+import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Dispatch, SetStateAction, use, useContext, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
@@ -223,7 +223,7 @@ function EditMenu({
                                 errors,
                                 setFieldValue,
                                 onChange,
-                            }: FormContextType) => {
+                            }: FormikProps<FormikValues>) => {
                                 return (
                                     <EditMenuFields />
                                 )

@@ -8,9 +8,8 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-
-import { FormContextType, FormProps } from "@/components/form/Form";
 import EditWidget from "./EditWidget";
+import { FormikProps, FormikValues } from "formik";
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-widget-modal';
 
@@ -22,15 +21,15 @@ function ManageWidget() {
             show: true,
             showFooter: true,
             onOk: ({ formHelpers }: {
-                formHelpers?: FormContextType | null
+                formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.onSubmit !== 'function') {
+                if (typeof formHelpers?.submitForm !== 'function') {
                     return;
                 }
-                formHelpers.onSubmit();
+                formHelpers.submitForm();
             },
             fullscreen: true
         }

@@ -117,7 +117,7 @@ function AdminPageView({ data, page, session }: Props) {
             </AccessControlComponent>
         );
     }
-    console.log('AdminPageView', { data, session });
+    
 
     return renderView(
         buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])

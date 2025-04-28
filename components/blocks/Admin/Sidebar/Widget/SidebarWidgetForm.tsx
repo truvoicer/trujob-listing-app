@@ -1,6 +1,4 @@
-import { FormContext } from "@/components/form/contexts/FormContext";
 import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnEdit, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import SelectWidget from "@/components/blocks/Admin/Widget/SelectWidget";
@@ -10,8 +8,8 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import EditSidebarWidget from "./EditSidebarWidget";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { FormContextType } from "@/components/form/Form";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { FormikProps, FormikValues } from "formik";
 
 export type SidebarWidgetFormProps = {
     sidebarId?: number;
@@ -27,8 +25,6 @@ function SidebarWidgetForm({
 }: SidebarWidgetFormProps) {
     const [widgets, setWidgets] = useState<Array<Widget>>([]);
 
-    const appModalContext = useContext(AppModalContext);
-    const formContext = useContext(FormContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
     const pageWidgetSchema = {
@@ -76,7 +72,7 @@ function SidebarWidgetForm({
                 initialValues: { widget: null },
             },
             onOk: async ({formHelpers}: {
-                formHelpers: FormContextType | null;
+                formHelpers: FormikProps<FormikValues>;
             }) => {
                 const selectedWidget = formHelpers?.values?.widget;
                 if (!selectedWidget) {

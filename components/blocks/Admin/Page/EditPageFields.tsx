@@ -1,4 +1,3 @@
-import { FormContext, FormContextType } from "@/components/form/Form";
 import { Dispatch, useContext, useState } from "react";
 import PageBlockForm from "./PageBlockForm";
 import { Button, Modal } from "react-bootstrap";
@@ -6,6 +5,7 @@ import SidebarForm from "../Sidebar/SidebarForm";
 import SelectPageViews from "./SelectPageViews";
 import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
+import { FormikProps, FormikValues, useFormikContext } from "formik";
 
 type EditPageFields = {
 }
@@ -62,8 +62,7 @@ function EditPageFields(
         });
     }
 
-    const formContext = useContext(FormContext);
-    const { values, setFieldValue, onChange } = formContext as FormContextType;
+    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">

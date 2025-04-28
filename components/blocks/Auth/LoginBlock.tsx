@@ -1,11 +1,11 @@
-import Form, { FormContextType, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/Form";
+import Form, { VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_REQUIRED } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { FormikContextType, FormikHandlers, FormikProps, FormikValues } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
-import { use } from "react";
 import { connect } from "react-redux";
 
 export type LoginBlockProps = {
@@ -18,7 +18,6 @@ function LoginBlock({
     const searchParams = useSearchParams();
 
     async function formSubmitHandler(values: any, errors: any) {
-        console.log('LoginBlock formSubmitHandler', values, errors);
         let requestData = { ...values };
         requestData.auth_provider = "local";
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -67,9 +66,10 @@ function LoginBlock({
                         {({
                             values,
                             errors,
-                            onChange,
-                            onSubmit
-                        }: FormContextType) => {
+                            handleChange,
+                            handleSubmit,
+                            submitForm
+                        }: FormikProps<FormikValues>) => {
 
                             return (
                                 <>
@@ -86,7 +86,7 @@ function LoginBlock({
                                                 name="email"
                                                 className="form-control"
                                                 value={values?.email || ""}
-                                                onChange={onChange}
+                                                onChange={handleChange}
                                             />
                                             {errors?.email && <span className="text-danger">{errors?.email || ''}</span>}
                                         </div>
@@ -106,7 +106,7 @@ function LoginBlock({
                                                 name="password"
                                                 className="form-control"
                                                 value={values?.password || ""}
-                                                onChange={onChange}
+                                                onChange={handleChange}
                                             />
                                             {errors?.password && <span className="text-danger">{errors?.password || ''}</span>}
                                         </div>
@@ -127,7 +127,7 @@ function LoginBlock({
                                                 className="btn btn-primary py-2 px-4 text-white"
                                                 onClick={e => {
                                                     e.preventDefault();
-                                                    onSubmit(e);
+                                                    submitForm();
                                                 }}
                                             />
                                         </div>

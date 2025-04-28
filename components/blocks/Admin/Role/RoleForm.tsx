@@ -3,8 +3,7 @@ import { useContext, useEffect, useState } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectRole from "./SelectRole";
 import { Role } from "@/types/Role";
-import { FormContextType } from "@/components/form/Form";
-import { init } from "next/dist/compiled/webpack/webpack";
+import { FormikProps, FormikValues } from "formik";
 
 export type RoleFormProps = {
     data?: Array<Role>;
@@ -42,7 +41,7 @@ function RoleForm({
             formProps: {},
             showFooter: true,
             onOk: async ({formHelpers}: {
-                formHelpers: FormContextType | null;
+                formHelpers: FormikProps<FormikValues>;
             })  => {
                 if (!formHelpers) {
                     console.warn('No form helpers found');

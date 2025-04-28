@@ -1,11 +1,11 @@
-import { FormContext } from "@/components/form/Form";
-import { Dispatch, SetStateAction, useContext, useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import RoleForm from "@/components/blocks/Admin/Role/RoleForm";
 import { Role } from "@/types/Role";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 
 export type RolesModal = {
     show: boolean;
@@ -67,8 +67,8 @@ function EditSidebarWidgetFields({
         values,
         errors,
         setFieldValue,
-        onChange,
-    } = useContext(FormContext);
+        handleChange,
+    } = useFormikContext<FormikValues>() || {};
     console.log('EditSidebarWidgetFields', values, errors);
     return (
         <div className="row justify-content-center align-items-center">
@@ -83,7 +83,7 @@ function EditSidebarWidgetFields({
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.name || ""} />
                                 <label className="form-label" htmlFor="name">Name</label>
                             </div>
@@ -96,7 +96,7 @@ function EditSidebarWidgetFields({
                                     type="text"
                                     name="title"
                                     id="title"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.title || ""} />
                                 <label className="form-label" htmlFor="title">
                                     Title
@@ -111,7 +111,7 @@ function EditSidebarWidgetFields({
                                     type="text"
                                     name="description"
                                     id="description"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.description || ""} />
                                 <label className="form-label" htmlFor="description">
                                     Description
@@ -125,7 +125,7 @@ function EditSidebarWidgetFields({
                                     type="text"
                                     name="icon"
                                     id="icon"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.icon || ""} />
                                 <label className="form-label" htmlFor="icon">
                                     Icon
@@ -136,7 +136,7 @@ function EditSidebarWidgetFields({
                             <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
                                     onChange={e => {
-                                        onChange(e);
+                                        handleChange(e);
                                     }}
                                     type="checkbox"
                                     className="custom-control-input"
@@ -219,6 +219,7 @@ function EditSidebarWidgetFields({
                                         return true;
                                     } else if (['add', 'create'].includes(operation)) {
                                         setFieldValue('roles', [...values?.roles, role]);
+                                        return true;
                                     }
                                     return false;
                                 }}

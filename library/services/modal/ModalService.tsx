@@ -1,8 +1,9 @@
 import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
-import Form, { FormContextType, FormProps } from "@/components/form/Form";
+import Form, { FormProps } from "@/components/form/Form";
 import React from "react";
+import { FormikProps, FormikValues } from "formik";
 
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
@@ -69,7 +70,7 @@ export class ModalService extends MessageService {
             <Form
                 {...modal.formProps}
             >
-                {(formHelpers: FormContextType) => {
+                {(formHelpers: FormikProps<FormikValues>) => {
                     return this.renderModalContent(modal, index, formHelpers);
                 }}
             </Form>

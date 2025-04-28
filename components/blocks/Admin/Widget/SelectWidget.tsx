@@ -1,8 +1,8 @@
-import { FormContext } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Widget } from "@/types/Widget";
+import { FormikValues, useFormikContext } from "formik";
 import { useContext, useEffect, useState } from "react";
 
 export type SelectWidgetProps = {
@@ -14,7 +14,7 @@ function SelectWidget({
     const [widgets, setWidgets] = useState<Array<Widget>>([]);
     const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
 
-    const formContext = useContext(FormContext);
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchWidgets() {
         // Fetch widgets from the API or any other source

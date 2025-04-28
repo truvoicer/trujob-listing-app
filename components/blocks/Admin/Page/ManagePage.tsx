@@ -10,7 +10,7 @@ import DataManager, { DataTableContextType, DatatableSearchParams } from "@/comp
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Page } from "@/types/Page";
-import { FormContextType } from "@/components/form/Form";
+import { FormikProps, FormikValues } from "formik";
 
 export type ManagePageProps = {
 }
@@ -25,15 +25,15 @@ function ManagePage({ }: ManagePageProps) {
             show: true,
             showFooter: true,
             onOk: ({ formHelpers }: {
-                formHelpers?: FormContextType | null
+                formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.onSubmit !== 'function') {
+                if (typeof formHelpers?.submitForm !== 'function') {
                     return;
                 }
-                formHelpers.onSubmit();
+                formHelpers.submitForm();
             },
             fullscreen: true
         }

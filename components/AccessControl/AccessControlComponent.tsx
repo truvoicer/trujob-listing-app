@@ -2,6 +2,7 @@ import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE, SESSIO
 import { connect } from "react-redux";
 import Loader from "../Loader";
 import { Role } from "@/types/Role";
+import { useEffect, useState } from "react";
 
 type Props = {
     session: any;
@@ -19,35 +20,41 @@ function AccessControlComponent({
     hasPermission = false,
     roles = [], 
 }: Props) {
+    const [show, setShow] = useState<boolean>(false);
     
     function hasRole(roleData: Array<Role>, name: string) {
         return roleData.find(r => r?.name === name) || false;
     }
     function showComponent() {
         if (!Array.isArray(roles)) {
-            return true;
+            setShow(true);
+            return;
         }
 
         if (roles.length === 0) {
-            return true;
+            setShow(true);
+            return;
         }
         const hasSite = hasRole(roles, 'site');
 
         if (hasSite) {
-            return true;
+            setShow(true);
+            return;
         }
         const userRoles = session?.[SESSION_USER]?.[SESSION_USER_ROLES];
         if (
             !Array.isArray(userRoles) ||
             userRoles.length === 0
         ) {
-            return false;
+            setShow(false);
+            return;
         }
         const userRolesHasAdmin = ['admin', 'superuser'].some(role => {
             return hasRole(userRoles, role);
         });
         if (userRolesHasAdmin) {
-            return true;
+            setShow(true);
+            return;
         }
         for (let i = 0; i < roles.length; i++) {
             const role = roles[i];
@@ -55,10 +62,12 @@ function AccessControlComponent({
                 continue;
             }
             if (hasRole(userRoles, role?.name)) {
-                return true;
+                setShow(true);
+                return;
             }
         }
-        return false;
+        setShow(false);
+        return;
     }
     function renderFallback() {
         if (typeof fallback === 'function') {
@@ -79,18 +88,23 @@ function AccessControlComponent({
         }
         return <Loader fullScreen />;
     }
-    
+
+    useEffect(() => {
+        showComponent();
+    }, [roles, session?.[SESSION_USER]?.[SESSION_USER_ROLES]]);
+    // console.log({show, session, roles});
     return (
         <>
             {session?.[SESSION_IS_AUTHENTICATING]
                 ? (
                     renderLoader()
                 )
-                : showComponent()
+                : show
                     ? (
                         children
                     ) : (
-                        renderFallback()
+                        <p>Ad</p>
+                        // renderFallback()
                     )}
         </>
     )

@@ -1,15 +1,8 @@
-import { FormContext } from "@/components/form/contexts/FormContext";
-import Form from "@/components/form/Form";
 import Reorder from "@/components/Reorder/Reorder";
-import DataTable from "@/components/Table/DataTable";
-import { AppModalContext } from "@/contexts/AppModalContext";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
-import { Accordion } from "react-bootstrap";
 import SelectSidebar from "./SelectSidebar";
 import SidebarWidgetForm from "../Sidebar/Widget/SidebarWidgetForm";
-import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
+import { DataTableContext } from "@/contexts/DataTableContext";
 import { Sidebar } from "@/types/Sidebar";
 
 type SidebarFormProps = {
@@ -21,7 +14,6 @@ function SidebarForm({ data, onChange }: SidebarFormProps) {
     const [sidebars, setSidebars] = useState(data || []);
 
     const dataTableContext = useContext(DataTableContext);
-    const formContext = useContext(FormContext);
 
     // async function pageSidebarRequest() {
     //     const response = await TruJobApiMiddleware.getInstance().pageSidebarsRequest(data?.id);

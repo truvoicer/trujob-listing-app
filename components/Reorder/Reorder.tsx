@@ -1,8 +1,7 @@
 import { ModalItem, ModalService, ModalState } from "@/library/services/modal/ModalService";
-import { init } from "next/dist/compiled/webpack/webpack";
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
-import { FormContextType } from "../form/Form";
+import { FormikProps, FormikValues } from "formik";
 
 export type ReorderProps = {
     children: (props: any) => React.ReactNode;
@@ -54,7 +53,7 @@ export type ReorderOnOk = {
     itemSchema: any;
     index: number;
     item: any;
-    formHelpers?: FormContextType | null;
+    formHelpers?: FormikProps<FormikValues>;
 }
 function Reorder({
     modalState,
@@ -203,7 +202,7 @@ function Reorder({
                 initialValues: {},
             },
             onOk: async ({ formHelpers }: {
-                formHelpers?: FormContextType | null
+                formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (typeof onOk === 'function') {
                     const response = await onOk({

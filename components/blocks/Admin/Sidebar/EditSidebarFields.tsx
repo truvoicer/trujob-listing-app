@@ -1,4 +1,3 @@
-import { FormContext } from "@/components/form/Form";
 import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import RoleForm from "../Role/RoleForm";
@@ -9,6 +8,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { isObjectEmpty } from "@/helpers/utils";
+import { FormikValues, useFormikContext } from "formik";
 
 export type RolesModal = {
     show: boolean;
@@ -74,8 +74,8 @@ function EditSidebarFields({
         values,
         errors,
         setFieldValue,
-        onChange,
-    } = useContext(FormContext);
+        handleChange,
+    } = useFormikContext<FormikValues>() || {};
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -89,7 +89,7 @@ function EditSidebarFields({
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.name || ""} />
                                 <label className="form-label" htmlFor="name">Name</label>
                             </div>
@@ -102,7 +102,7 @@ function EditSidebarFields({
                                     type="text"
                                     name="title"
                                     id="title"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.title || ""} />
                                 <label className="form-label" htmlFor="title">
                                     Title
@@ -116,7 +116,7 @@ function EditSidebarFields({
                                     type="text"
                                     name="icon"
                                     id="icon"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.icon || ""} />
                                 <label className="form-label" htmlFor="icon">
                                     Icon

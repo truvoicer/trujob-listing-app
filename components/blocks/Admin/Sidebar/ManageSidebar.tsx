@@ -8,9 +8,8 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-
-import { FormContextType, FormProps } from "@/components/form/Form";
 import EditSidebar from "./EditSidebar";
+import { FormikProps, FormikValues } from "formik";
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-sidebar-modal';
 
@@ -22,15 +21,15 @@ function ManageSidebar() {
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
-                formHelpers?: FormContextType | null
+                formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
                     return false;
                 }
-                if (typeof formHelpers?.onSubmit !== 'function') {
+                if (typeof formHelpers?.submitForm !== 'function') {
                     return false;
                 }
-                const response = await formHelpers.onSubmit();
+                const response = await formHelpers.submitForm();
                 if (!response) {
                     return false;
                 }

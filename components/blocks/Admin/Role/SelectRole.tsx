@@ -1,10 +1,10 @@
-import { FormContext } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { ModalState } from "@/library/services/modal/ModalService";
 import { Role } from "@/types/Role";
+import { FormikValues, useFormikContext } from "formik";
 import { useContext, useEffect, useState } from "react";
 
 export type SelectRoleProps = {
@@ -23,7 +23,7 @@ function SelectRole({
 }: SelectRoleProps) {
     const [roles, setRoles] = useState<Array<Role>>([]);
     const [selectedRole, setSelectedRole] = useState<Role>();
-    const formContext = useContext(FormContext);
+    const formContext = useFormikContext<FormikValues>() || {}
     async function fetchRoles() {
         // Fetch roles from the API or any other source
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({

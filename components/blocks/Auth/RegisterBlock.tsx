@@ -2,6 +2,7 @@ import Form, { VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOL
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { FormikProps, FormikValues } from "formik";
 
 function RegisterBlock() {
 
@@ -59,8 +60,9 @@ function RegisterBlock() {
                         {({
                             values,
                             errors,
-                            onChange,
-                        }) => (
+                            handleChange,
+                            submitForm,
+                        }: FormikProps<FormikValues>) => (
                             <>
                                 <div className="row form-group">
 
@@ -76,7 +78,7 @@ function RegisterBlock() {
                                             name="username"
                                             className="form-control"
                                             value={values?.username || ""}
-                                            onChange={onChange}
+                                            onChange={handleChange}
                                         />
                                         {errors?.username && <span className="text-danger">{errors?.username || ''}</span>}
                                     </div>
@@ -95,7 +97,7 @@ function RegisterBlock() {
                                             name="email"
                                             className="form-control"
                                             value={values?.email || ""}
-                                            onChange={onChange}
+                                            onChange={handleChange}
                                         />
                                         {errors?.email && <span className="text-danger">{errors?.email || ''}</span>}
                                     </div>
@@ -114,7 +116,7 @@ function RegisterBlock() {
                                             name="password"
                                             className="form-control"
                                             value={values?.password || ""}
-                                            onChange={onChange}
+                                            onChange={handleChange}
                                         />
                                         {errors?.password && <span className="text-danger">{errors?.password || ''}</span>}
                                     </div>
@@ -133,7 +135,7 @@ function RegisterBlock() {
                                             name="password_confirmation"
                                             className="form-control"
                                             value={values?.password_confirmation || ""}
-                                            onChange={onChange}
+                                            onChange={handleChange}
                                         />
                                         {errors?.password_confirmation && <span className="text-danger">{errors?.password_confirmation || ''}</span>}
                                     </div>
@@ -153,7 +155,7 @@ function RegisterBlock() {
                                             className="btn btn-primary py-2 px-4 text-white"
                                             onClick={e => {
                                                 e.preventDefault();
-                                                onSubmit(e);
+                                                submitForm();
                                             }}
                                         />
                                     </div>
