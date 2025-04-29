@@ -11,6 +11,7 @@ export default {
         site: '/site',
         page: '/page',
         block: '/block',
+        pageBlock: '/page/%s/block',
         sidebar: '/sidebar',
         widget: '/widget',
         sidebarWidget: '/sidebar/%s/widget',

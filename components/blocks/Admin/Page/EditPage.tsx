@@ -3,12 +3,7 @@ import DataTable from "@/components/Table/DataTable";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Dispatch, useContext, useEffect, useState } from "react";
-import PageBlockForm from "./PageBlockForm";
-import { formContextData } from "@/components/form/contexts/FormContext";
-import { Button, Modal } from "react-bootstrap";
-import SidebarForm from "../Sidebar/SidebarForm";
-import SelectPageViews from "./SelectPageViews";
+import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
@@ -21,7 +16,7 @@ import EditPageFields from "./EditPageFields";
 
 type EditPageProps = {
     data?: Page;
-    operation: string;
+    operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
@@ -52,7 +47,7 @@ function EditPage({
         footer: true,
     });
 
-    const initialValues = {
+    const initialValues: Page = {
         view: data?.view || '',
         name: data?.name || '',
         title: data?.title || '',
@@ -80,34 +75,6 @@ function EditPage({
             meta_og_site_name: data?.settings?.meta_og_site_name || ''
         }
     };
-    function hideModal(setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = false;
-            return newState;
-        });
-    }
-    function showModal(setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = true;
-            return newState;
-        });
-    }
-    function setModalTitle(title: string, setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.title = title;
-            return newState;
-        });
-    }
-    function setModalFooter(hasFooter: boolean = false, setter: Dispatch<React.SetStateAction<SidebarModalState | BlocksModalState>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.footer = hasFooter;
-            return newState;
-        });
-    }
 
     async function handleSubmit(values: Page) {
         let requestData = { ...values };
@@ -203,7 +170,7 @@ function EditPage({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditPageFields />
+                        <EditPageFields operation={operation} />
                     )
                     : (
                         <Form
@@ -213,7 +180,7 @@ function EditPage({
                         >
                             {() => {
                                 return (
-                                    <EditPageFields />
+                                    <EditPageFields operation={operation} />
                                 )
                             }}
                         </Form>

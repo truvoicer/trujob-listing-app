@@ -8,6 +8,7 @@ import { PageBlock } from "@/types/PageBlock";
 import { FormikProps, FormikValues, useFormikContext } from "formik";
 
 type EditPageFields = {
+    operation: 'edit' | 'update' | 'add' | 'create';
 }
 type SidebarModalState = {
     show: boolean;
@@ -19,9 +20,9 @@ type BlocksModalState = {
     title: string;
     footer: boolean;
 }
-function EditPageFields(
-
-) {
+function EditPageFields({
+    operation
+}: EditPageFields) {
     const [blocksModal, setBlocksModal] = useState<BlocksModalState>({
         show: false,
         title: '',
@@ -63,6 +64,7 @@ function EditPageFields(
     }
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -80,14 +82,12 @@ function EditPageFields(
                         <div className="col-12 col-lg-6">
                             <div className="custom-control custom-checkbox mb-3 text-left">
                                 <input
-                                    onChange={e => {
-                                        onChange(e);
-                                    }}
+                                    onChange={handleChange}
                                     type="checkbox"
                                     className="custom-control-input"
                                     id="is_active"
                                     name="is_active"
-                                    checked={values?.is_active || false} />
+                                    value={values?.is_active || false} />
                                 <label className="custom-control-label" htmlFor="is_active">
                                     Is active
                                 </label>
@@ -101,8 +101,8 @@ function EditPageFields(
                                     className="custom-control-input"
                                     id="is_featured"
                                     name="is_featured"
-                                    onChange={onChange}
-                                    checked={values?.is_featured || false} />
+                                    onChange={handleChange}
+                                    value={values?.is_featured || false} />
                                 <label className="custom-control-label" htmlFor="is_featured">
                                     Is Featured
                                 </label>
@@ -116,8 +116,8 @@ function EditPageFields(
                                     className="custom-control-input"
                                     id="is_home"
                                     name="is_home"
-                                    onChange={onChange}
-                                    checked={values?.is_home || false} />
+                                    onChange={handleChange}
+                                    value={values?.is_home || false} />
                                 <label className="custom-control-label" htmlFor="is_home">
                                     Is Home
                                 </label>
@@ -130,7 +130,7 @@ function EditPageFields(
                                     type="text"
                                     name="title"
                                     id="title"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.title || ""} />
                                 <label className="form-label" htmlFor="title">Title</label>
                             </div>
@@ -142,7 +142,7 @@ function EditPageFields(
                                     type="text"
                                     name="name"
                                     id="name"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.name || ""} />
                                 <label className="form-label" htmlFor="name">Name</label>
                             </div>
@@ -154,7 +154,7 @@ function EditPageFields(
                                     type="text"
                                     name="permalink"
                                     id="permalink"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.permalink || ""} />
                                 <label className="form-label" htmlFor="permalink">Permalink</label>
                             </div>
@@ -167,7 +167,7 @@ function EditPageFields(
                                     className="form-control"
                                     name="content"
                                     id="content"
-                                    onChange={onChange}
+                                    onChange={handleChange}
                                     value={values?.content || ""}></textarea>
                                 <label className="form-label" htmlFor="content">Content</label>
                             </div>
@@ -207,11 +207,13 @@ function EditPageFields(
                         </Modal.Header>
                         <Modal.Body>
                             <PageBlockForm
+                                pageId={values?.id}
                                 data={values?.blocks || []}
                                 onChange={(blocks: Array<PageBlock>) => {
                                     console.log('blocks', blocks);
                                     setFieldValue('blocks', blocks);
                                 }}
+                                operation={operation}
                             />
                         </Modal.Body>
                         {blocksModal.footer &&

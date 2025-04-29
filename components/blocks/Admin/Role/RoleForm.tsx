@@ -19,7 +19,6 @@ function RoleForm({
     onAdd,
     makeRequest
  }: RoleFormProps) {
-    const [roles, setRoles] = useState<Array<Role>>([]);
     const dataTableContext = useContext(DataTableContext);
 
     const roleSchema = {
@@ -122,6 +121,7 @@ function RoleForm({
                     onChange={handleChange}
                     onAdd={handleAdd}
                     onDelete={handleDelete}
+                    modalState={dataTableContext.modal}
                 >
                     {({
                         item,
