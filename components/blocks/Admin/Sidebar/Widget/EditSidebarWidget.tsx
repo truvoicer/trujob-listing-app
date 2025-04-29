@@ -16,8 +16,10 @@ export type EditSidebarWidgetProps = {
     inModal?: boolean;
     modalId?: string;
     sidebarId?: number;
+    index?: number;
 };
 function EditSidebarWidget({
+    index,
     sidebarId,
     data,
     operation,

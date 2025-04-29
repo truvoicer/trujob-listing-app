@@ -216,7 +216,6 @@ function EditSidebarFields({
                                         return true;
                                     } else if (['add', 'create'].includes(operation)) {
                                         const buildRoles = [...values?.roles, role];
-                                        console.log('buildRoles', buildRoles);
                                         setFieldValue('roles', buildRoles);
                                         return true;
                                     }

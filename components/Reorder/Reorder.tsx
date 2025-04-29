@@ -237,6 +237,15 @@ function Reorder({
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
+                                                            if (typeof onEdit === 'function') {
+                                                                onEdit({
+                                                                    reorderData,
+                                                                     onChange, 
+                                                                     itemSchema, 
+                                                                     index, 
+                                                                     item
+                                                                });
+                                                            }
                                                             showModal(index, item)
                                                         }}>
                                                         Edit

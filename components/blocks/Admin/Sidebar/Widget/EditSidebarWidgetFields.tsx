@@ -69,7 +69,7 @@ function EditSidebarWidgetFields({
         setFieldValue,
         handleChange,
     } = useFormikContext<FormikValues>() || {};
-    console.log('EditSidebarWidgetFields', values, errors);
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -171,6 +171,7 @@ function EditSidebarWidgetFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
                                 }}
@@ -227,7 +228,9 @@ function EditSidebarWidgetFields({
                                         }
                                         return true;
                                     } else if (['add', 'create'].includes(operation)) {
-                                        setFieldValue('roles', [...values?.roles, role]);
+                                        const buildRoles = [...values?.roles, role];
+                                        console.log('buildRoles', buildRoles);
+                                        setFieldValue('roles', buildRoles);
                                         return true;
                                     }
                                     return false;

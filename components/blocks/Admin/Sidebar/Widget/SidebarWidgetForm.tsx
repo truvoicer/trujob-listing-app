@@ -197,16 +197,6 @@ function SidebarWidgetForm({
 
     }
 
-    function handleEditSidebarWidget({
-        reorderData,
-        onChange,
-        itemSchema,
-        index,
-        item
-    }: ReorderOnEdit) {
-
-    }
-
     async function handleDeleteWidget({
         item
     }: ReorderOnDelete) {
@@ -322,7 +312,6 @@ function SidebarWidgetForm({
                     data={widgets || []}
                     onChange={handleChange}
                     onAdd={handleAddWidget}
-                    onEdit={handleEditSidebarWidget}
                     onDelete={handleDeleteWidget}
                     onMove={handleMoveWidget}
                     onOk={async ({
@@ -349,9 +338,17 @@ function SidebarWidgetForm({
                             item.roles = RequestHelpers.extractIdsFromArray(item.roles);
                         }
                         if (['add', 'create'].includes(operation || '')) {
-                            setWidgets(
-                                [...widgets, item]
-                            );
+                            if (item.hasOwnProperty('index')) {
+                                setWidgets(prevState => {
+                                    let newState = [...prevState];
+                                    if (newState?.[item.index]) { 
+                                        newState[item.index] = item;
+                                    }
+                                    return newState;
+                                });
+                            } else {
+                                setWidgets([...widgets, item]);
+                            }
                             return true;
                         }
                         if (!validateSidebarId()) {
@@ -401,7 +398,10 @@ function SidebarWidgetForm({
                         <>
                             <EditSidebarWidget
                                 sidebarId={sidebarId}
-                                data={item}
+                                data={{
+                                    ...item,
+                                    index: index,
+                                }}
                                 operation={operation}
                                 inModal={true}
                                 modalId={'reorder-modal'}
