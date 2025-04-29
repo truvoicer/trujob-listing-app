@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 type Props = {
     session: any;
     children: React.Component | React.ReactNode;
-    hasPermission?: boolean | null;
+    onUnauthorization?: () => void;
     loader?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     fallback?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     roles?: Array<Role>;
@@ -17,13 +17,21 @@ function AccessControlComponent({
     session,
     loader,
     fallback,
-    hasPermission = false,
+    onUnauthorization,
     roles = [], 
 }: Props) {
     const [show, setShow] = useState<boolean>(false);
     
     function hasRole(roleData: Array<Role>, name: string) {
         return roleData.find(r => r?.name === name) || false;
+    }
+    function handleUnauthorized() {
+        setShow(false);
+        if (typeof onUnauthorization === 'function') {
+            onUnauthorization();
+            return;
+        }
+        return;
     }
     function showComponent() {
         if (!Array.isArray(roles)) {
@@ -46,7 +54,7 @@ function AccessControlComponent({
             !Array.isArray(userRoles) ||
             userRoles.length === 0
         ) {
-            setShow(false);
+            handleUnauthorized();
             return;
         }
         const userRolesHasAdmin = ['admin', 'superuser'].some(role => {
@@ -66,7 +74,7 @@ function AccessControlComponent({
                 return;
             }
         }
-        setShow(false);
+        handleUnauthorized();
         return;
     }
     function renderFallback() {
@@ -90,8 +98,11 @@ function AccessControlComponent({
     }
 
     useEffect(() => {
+        if (session?.[SESSION_IS_AUTHENTICATING]) {
+            return;
+        }
         showComponent();
-    }, [roles, session?.[SESSION_USER]?.[SESSION_USER_ROLES]]);
+    }, [roles, session?.[SESSION_USER]?.[SESSION_USER_ROLES], session?.[SESSION_IS_AUTHENTICATING]]);
     // console.log({show, session, roles});
     return (
         <>
@@ -103,8 +114,7 @@ function AccessControlComponent({
                     ? (
                         children
                     ) : (
-                        <p>Ad</p>
-                        // renderFallback()
+                        renderFallback()
                     )}
         </>
     )

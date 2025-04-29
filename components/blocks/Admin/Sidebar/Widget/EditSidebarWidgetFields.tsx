@@ -203,6 +203,7 @@ function EditSidebarWidgetFields({
                                             return false;
                                         }
                                         setFieldValue('roles', response.data);
+                                        return true;
                                     } else if (['add', 'create'].includes(operation)) {
                                         return true;
                                     }

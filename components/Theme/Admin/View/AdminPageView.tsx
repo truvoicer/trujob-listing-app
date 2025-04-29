@@ -88,7 +88,7 @@ function AdminPageView({ data, page, session }: Props) {
         return (
             <AccessControlComponent
                 roles={page?.roles}
-                fallback={() => {
+                onUnauthorization={() => {
                     const redirectStr = UrlHelpers.createQueryString(
                         searchParams,
                         [
@@ -99,6 +99,8 @@ function AdminPageView({ data, page, session }: Props) {
                         ]
                     );
                     router.push('/login' + '?' + redirectStr);
+                }}
+                fallback={() => {
                     return null;
                 }}
             >

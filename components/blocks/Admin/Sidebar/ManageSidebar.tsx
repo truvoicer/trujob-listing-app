@@ -29,6 +29,7 @@ function ManageSidebar() {
                 if (typeof formHelpers?.submitForm !== 'function') {
                     return false;
                 }
+                console.log('formHelpers', formHelpers.values);
                 const response = await formHelpers.submitForm();
                 if (!response) {
                     return false;

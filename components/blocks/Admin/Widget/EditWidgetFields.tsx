@@ -24,7 +24,7 @@ export type EditWidgetFields = {
 };
 function EditWidgetFields({
     operation,
-}: EditWidgetFields ) {
+}: EditWidgetFields) {
     const [rolesModal, setRolesModal] = useState<RolesModal>({
         show: false,
         title: '',
@@ -131,22 +131,6 @@ function EditWidgetFields({
                                 </label>
                             </div>
                         </div>
-                        <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    onChange={e => {
-                                        handleChange(e);
-                                    }}
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="has_container"
-                                    name="has_container"
-                                    checked={values?.has_container || false} />
-                                <label className="custom-control-label" htmlFor="has_container">
-                                    Has Container?
-                                </label>
-                            </div>
-                        </div>
 
                         <div className="col-12 my-3">
                             <h4>Manage</h4>
@@ -206,44 +190,62 @@ function EditWidgetFields({
                                     return false;
                                 }}
                                 onAdd={async (role: Role) => {
-                                    if (!values?.id) {
-                                        console.warn('Widget ID is required');
-                                        return false;
+                                    if (['edit', 'update'].includes(operation)) {
+                                        if (!values?.id) {
+                                            console.warn('Widget ID is required');
+                                            return false;
+                                        }
+                                        if (!role) {
+                                            return false;
+                                        }
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/create`,
+                                                method: ApiMiddleware.METHOD.POST,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when adding role');
+                                            return false;
+                                        }
+                                        return true;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        const buildRoles = [...values?.roles, role];
+                                        setFieldValue('roles', buildRoles);
+                                        return true;
                                     }
-                                    if (!role) {
-                                        return false;
-                                    }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/create`,
-                                            method: ApiMiddleware.METHOD.POST,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding role');
-                                        return false;
-                                    }
-                                    return true;
+                                    console.warn('Invalid operation');
+                                    return false;
                                 }}
                                 onDelete={async (role: Role) => {
-                                    if (!values?.id) {
-                                        console.warn('Widget ID is required');
-                                        return false;
-                                    }
                                     if (!role) {
                                         return false;
                                     }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/delete`,
-                                            method: ApiMiddleware.METHOD.DELETE,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding role');
-                                        return false;
+                                    if (['edit', 'update'].includes(operation)) {
+                                        if (!values?.id) {
+                                            console.warn('Widget ID is required');
+                                            return false;
+                                        }
+                                        const response = await TruJobApiMiddleware.getInstance()
+                                            .resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/delete`,
+                                                method: ApiMiddleware.METHOD.DELETE,
+                                                protectedReq: true,
+                                            })
+                                        if (!response) {
+                                            console.warn('No response from API when adding role');
+                                            return false;
+                                        }
+                                        return true;
+                                    } else if (['add', 'create'].includes(operation)) {
+                                        const buildRoles = values.roles.filter((r: Role) => {
+                                            return r.id !== role.id;
+                                        });
+                                        setFieldValue('roles', buildRoles);
+                                        return true;
                                     }
-                                    return true;
+                                    console.warn('Invalid operation');
+                                    return false;
                                 }}
                             />
                         </Modal.Body>

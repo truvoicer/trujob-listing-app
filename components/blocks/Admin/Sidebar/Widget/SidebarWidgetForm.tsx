@@ -27,10 +27,14 @@ function SidebarWidgetForm({
 
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
-    const pageWidgetSchema = {
-        'title': '',
-        'name': '',
-        'icon': '',
+    const sidebarWidgetSchema = {
+        title: '',
+        name: '',
+        icon: '',
+        description: '',
+        roles: [],
+        properties: {},
+        has_container: true,
     };
     function validateSidebarId() {
         if (!sidebarId) {
@@ -104,7 +108,10 @@ function SidebarWidgetForm({
 
                 if (['add', 'create'].includes(operation || '')) {
                     setWidgets(
-                        [...widgets, formHelpers?.values?.widget]
+                        [...widgets, {
+                            ...sidebarWidgetSchema,
+                            ...formHelpers?.values?.widget
+                        }]
                     );
                     return true;
                 }
@@ -307,7 +314,7 @@ function SidebarWidgetForm({
             <div className="col-12">
                 <Reorder
                     modalState={dataTableContext.modal}
-                    itemSchema={pageWidgetSchema}
+                    itemSchema={sidebarWidgetSchema}
                     itemHeader={(item, index) => `${item?.title} (${item?.name})` || 'Item type error'}
                     data={widgets || []}
                     onChange={handleChange}
@@ -320,6 +327,7 @@ function SidebarWidgetForm({
                         if (!formHelpers) {
                             return;
                         }
+                        console.log('formHelpers', formHelpers.values);
                         const item = {...formHelpers.values};
                         if (!item?.id) {
                             notificationContext.show({
@@ -334,9 +342,6 @@ function SidebarWidgetForm({
                             console.warn('Sidebar widget id not found', item);
                             return false;
                         }
-                        if (Array.isArray(item?.roles)) {
-                            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
-                        }
                         if (['add', 'create'].includes(operation || '')) {
                             if (item.hasOwnProperty('index')) {
                                 setWidgets(prevState => {
@@ -350,6 +355,10 @@ function SidebarWidgetForm({
                                 setWidgets([...widgets, item]);
                             }
                             return true;
+                        }
+
+                        if (Array.isArray(item?.roles)) {
+                            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
                         }
                         if (!validateSidebarId()) {
                             return;

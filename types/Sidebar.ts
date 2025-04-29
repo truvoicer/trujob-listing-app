@@ -1,5 +1,5 @@
 import { Role } from "./Role";
-import { Widget } from "./Widget";
+import { CreateWidget, Widget } from "./Widget";
 
 export type Sidebar = {
     [key: string]: string | number | null | Array<Role> | Array<Widget> | boolean;
@@ -14,13 +14,13 @@ export type Sidebar = {
 }
 
 export type CreateSidebar = {
-    [key: string]: string | number | null | Array<number> | boolean | undefined | Array<Widget>;
+    [key: string]: string | number | null | Array<number> | boolean | undefined | Array<CreateWidget>;
     name: string;
     title: string;
     icon?: string;
     properties?: any;
     roles?: Array<number>;
-    widgets?: Array<Widget>;
+    widgets?: Array<CreateWidget>;
 }
 
 export type UpdateSidebar = {

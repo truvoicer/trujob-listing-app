@@ -9,7 +9,7 @@ import { Role } from "@/types/Role";
 import EditSidebarFields from "./EditSidebarFields";
 import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
 import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
-import { Widget } from "@/types/Widget";
+import { CreateWidget, Widget } from "@/types/Widget";
 
 export type EditSidebarProps = {
     data?: Sidebar | null;
@@ -34,17 +34,22 @@ function EditSidebar({
         roles: data?.roles || [],
         widgets: data?.widgets || [],
     };
-    function buildWidgetIdData(sidebars: Array<Widget>): Array<number> {
-        const filterWidgetData: Array<Widget> = sidebars
-            .filter((widget: Widget) => {
-                if (typeof widget === 'object') {
-                    return widget.id;
-                }
-                return false;
+    function buildWidgetData(widgets: Array<Widget>): Array<CreateWidget> {
+        let filteredWidgetData: Array<CreateWidget> = [];
+        widgets.forEach((widget: Widget) => {
+            if (!Array.isArray(widget?.roles)) {
+                filteredWidgetData.push({
+                    ...widget,
+                    roles: [],
+                });
+                return;
+            }
+            filteredWidgetData.push({
+                ...widget,
+                roles: buildRoleIdData(widget.roles),
             });
-        return filterWidgetData.map((widget: Widget) => {
-            return widget.id;
         });
+        return filteredWidgetData;
     }
     function buildRoleIdData(roles: Array<Role>): Array<number> {
         const filterRoleData: Array<Role> = roles
@@ -74,7 +79,7 @@ function EditSidebar({
             requestData.roles = buildRoleIdData(values.roles);
         }
         if (Array.isArray(values?.widgets)) {
-            requestData.widgets = values.widgets;
+            requestData.widgets = buildWidgetData(values.widgets);
         }
         return requestData;
     }

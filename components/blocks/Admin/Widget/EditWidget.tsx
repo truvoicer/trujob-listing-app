@@ -24,12 +24,11 @@ function EditWidget({
 }: EditWidgetProps) {
 
     const initialValues: Widget = {
-        id: data?.id,
+        id: data?.id || 0,
         name: data?.name || '',
         title: data?.title || '',
         description: data?.description || '',
         icon: data?.icon || '',
-        has_container: data?.has_container || false,
         order: data?.order || 0,
         properties: data?.properties || {},
         roles: data?.roles || [],
@@ -59,9 +58,6 @@ function EditWidget({
         if (values.hasOwnProperty('icon')) {
             requestData.icon = values.icon;
         }
-        if (values.hasOwnProperty('has_container')) {
-            requestData.has_container = values.has_container;
-        }
         if (values.hasOwnProperty('description')) {
             requestData.description = values.description;
         }
@@ -80,9 +76,6 @@ function EditWidget({
         }
         if (values.hasOwnProperty('icon')) {
             requestData.icon = values.icon;
-        }
-        if (values.hasOwnProperty('has_container')) {
-            requestData.has_container = values.has_container;
         }
         if (values.hasOwnProperty('description')) {
             requestData.description = values.description;
@@ -179,7 +172,7 @@ function EditWidget({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 {inModal
                     ? (
-                        <EditWidgetFields />
+                        <EditWidgetFields operation={operation} />
                     )
                     : (
                         <Form
@@ -190,7 +183,7 @@ function EditWidget({
                         >
                             {() => {
                                 return (
-                                    <EditWidgetFields />
+                                    <EditWidgetFields operation={operation} />
                                 )
                             }}
                         </Form>
