@@ -253,7 +253,7 @@ function EditPageBlock({
             {inModal
                     ? (
                         <EditPageBlockFields
-                            index={index}
+                            operation={operation}
                         />
                     )
                     : (
@@ -266,7 +266,7 @@ function EditPageBlock({
                             {() => {
                                 return (
                                     <EditPageBlockFields
-                                    index={index}
+                                        operation={operation}
                                     />
                                 )
                             }}

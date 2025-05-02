@@ -72,7 +72,6 @@ function EditWidgetFields({
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <>
                     <div className="row">
 
                         <div className="col-12 col-lg-6">
@@ -263,7 +262,6 @@ function EditWidgetFields({
                             </Modal.Footer>
                         }
                     </Modal>
-                </>
 
             </div>
         </div>

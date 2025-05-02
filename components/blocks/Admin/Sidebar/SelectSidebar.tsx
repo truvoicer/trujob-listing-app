@@ -8,8 +8,10 @@ type Props = {
     sidebarId?: number;
     onChange?: (sidebar: any) => void;
     onSubmit?: (sidebar: any) => void;
+    name?: string;
 }
 function SelectSidebar({
+    name = 'sidebar',
     sidebarId,
     onChange,
     onSubmit
@@ -59,16 +61,9 @@ function SelectSidebar({
 
     return (
         <div>
-            <h2>Select Sidebar</h2>
-            <p>Select a sidebar to add to the page.</p>
-            <form onSubmit={e => {
-                e.preventDefault();
-                console.log('Selected Sidebar:', selectedSidebar);
-                if (typeof onSubmit === 'function') {
-                    onSubmit(selectedSidebar);
-                }
-            }}>
             <select
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                     let selectedValue = parseInt(e.target.value);
@@ -87,8 +82,9 @@ function SelectSidebar({
                     </option>
                 ))}
             </select>
-            <button type="submit" className="btn btn-primary">Select</button>
-            </form>
+            <label className="form-label" htmlFor={name}>
+                Sidebar
+            </label>
         </div>
     );
 }
