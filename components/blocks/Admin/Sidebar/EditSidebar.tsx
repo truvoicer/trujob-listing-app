@@ -29,7 +29,6 @@ function EditSidebar({
         name: data?.name || '',
         title: data?.title || '',
         icon: data?.icon || '',
-        order: data?.order || 0,
         properties: data?.properties || {},
         roles: data?.roles || [],
         widgets: data?.widgets || [],

@@ -2,6 +2,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Page } from "@/types/Page";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
 export type SelectPageProps = {
@@ -19,6 +20,8 @@ function SelectPage({
 }: SelectPageProps) {
     const [pages, setPages] = useState<Array<Page>>([]);
     const [selectedPage, setSelectedPage] = useState<number | null>(null);
+
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchPages() {
         // Fetch pages from the API or any other source
@@ -44,10 +47,8 @@ function SelectPage({
         }
     }, [value]);
 
-    console.log('Selected page:', selectedPage);
     return (
         <div>
-
             <select
                 id={id || 'page'}
                 className="form-control"
@@ -69,9 +70,6 @@ function SelectPage({
                 ))}
             </select>
             <label className="form-label" htmlFor={id || 'page'}>Page</label>
-            {showSubmitButton && (
-                <button type="submit" className="btn btn-primary">Select</button>
-            )}
         </div>
     );
 }

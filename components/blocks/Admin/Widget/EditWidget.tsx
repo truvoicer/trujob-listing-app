@@ -29,7 +29,6 @@ function EditWidget({
         title: data?.title || '',
         description: data?.description || '',
         icon: data?.icon || '',
-        order: data?.order || 0,
         properties: data?.properties || {},
         roles: data?.roles || [],
     };

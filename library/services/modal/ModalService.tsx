@@ -2,9 +2,14 @@ import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
 import Form, { FormProps } from "@/components/form/Form";
-import React from "react";
+import React, { SetStateAction, Dispatch } from "react";
 import { FormikProps, FormikValues } from "formik";
 
+export type LocalModal = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+};
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
 }
@@ -41,6 +46,39 @@ export class ModalService extends MessageService {
         onCancel: () => { return true; },
         onOk: () => { return true; },
     };
+
+    static hideModal(setter: Dispatch<SetStateAction<{
+        show: boolean;
+        title: string;
+        footer: boolean;
+    }>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = false;
+            return newState;
+        });
+    }
+    static showModal(setter: Dispatch<SetStateAction<LocalModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.show = true;
+            return newState;
+        });
+    }
+    static setModalTitle(title: string, setter: Dispatch<SetStateAction<LocalModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.title = title;
+            return newState;
+        });
+    }
+    static setModalFooter(hasFooter: boolean = false, setter: Dispatch<SetStateAction<LocalModal>>) {
+        setter(prevState => {
+            let newState = { ...prevState };
+            newState.footer = hasFooter;
+            return newState;
+        });
+    }
 
     buildItemData(data: any, id: null | string = null) {
         let item: ModalItem = ModalService.INIT_ITEM_DATA;

@@ -39,7 +39,7 @@ function EditPageBlock({
             return;
         }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.pageBlock.replace('%s', pageId.toString())}/${data.id}`,
+            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${data.id}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
         });
@@ -111,9 +111,6 @@ function EditPageBlock({
         }
         if (values.hasOwnProperty('properties')) {
             requestData.properties = values.properties;
-        }
-        if (values.hasOwnProperty('order')) {
-            requestData.order = values.order;
         }
         if (values.hasOwnProperty('has_sidebar')) {
             requestData.has_sidebar = values.has_sidebar;

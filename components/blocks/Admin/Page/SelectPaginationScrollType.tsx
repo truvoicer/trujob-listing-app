@@ -1,20 +1,21 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
-type Props = {
+export type SelectPaginationScrollTypesProps = {
+    name?: string;
     value?: string;
-    onChange?: (value: string) => void;
-    showSubmitButton?: boolean;
 }
 function SelectPaginationScrollTypes({
     value,
-    onChange,
-    showSubmitButton = true,
-}: Props) {
+    name = 'pagination_scroll_type',
+}: SelectPaginationScrollTypesProps) {
     const [paginationScrollTypes, setPaginationScrollTypes] = useState<Array<string>>([]);
-    const [selectedPaginationScrollType, setSelectedPaginationScrollType] = useState<string>('');
+    const [selectedPaginationScrollType, setSelectedPaginationScrollType] = useState<string | null>(value || null);
+
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchPaginationScrollTypes() {
         // Fetch paginationScrollTypes from the API or any other source
@@ -41,16 +42,25 @@ function SelectPaginationScrollTypes({
     }, [value]);
 
     useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(selectedPaginationScrollType);
+        if (!selectedPaginationScrollType) {
+            return;
         }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedPaginationScrollType);
     }, [selectedPaginationScrollType]);
 
     return (
-        <div>
-            <h2>Select a Pagination Type</h2>
-            <p>Select a pagination type.</p>
+        <div className="floating-input form-group">
             <select
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     setSelectedPaginationScrollType(e.target.value);
@@ -66,9 +76,9 @@ function SelectPaginationScrollTypes({
                     </option>
                 ))}
             </select>
-            {showSubmitButton && (
-                <button type="submit" className="btn btn-primary">Select</button>
-            )}
+            <label className="form-label" htmlFor={name}>
+                Pagination Scroll Type
+            </label>
         </div>
     );
 }

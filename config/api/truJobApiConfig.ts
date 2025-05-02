@@ -12,6 +12,7 @@ export default {
         page: '/page',
         block: '/block',
         pageBlock: '/page/%s/block',
+        pageBlockRel: '/page/%s/block/rel',
         sidebar: '/sidebar',
         widget: '/widget',
         sidebarWidget: '/sidebar/%s/widget',

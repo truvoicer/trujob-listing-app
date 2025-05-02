@@ -263,7 +263,78 @@ function SidebarWidgetForm({
 
         return false;
     }
+    async function handleOk({
+        formHelpers
+     }: ReorderOnOk){
+        if (!formHelpers) {
+            return;
+        }
+        console.log('formHelpers', formHelpers.values);
+        const item = {...formHelpers.values};
+        if (!item?.id) {
+            notificationContext.show({
+                variant: 'danger',
+                title: 'Error',
+                component: (
+                    <p>
+                        Sidebar widget id not found
+                    </p>
+                ),
+            }, 'sidebar-widget-update-error');
+            console.warn('Sidebar widget id not found', item);
+            return false;
+        }
+        if (['add', 'create'].includes(operation || '')) {
+            if (item.hasOwnProperty('index')) {
+                setWidgets(prevState => {
+                    let newState = [...prevState];
+                    if (newState?.[item.index]) { 
+                        newState[item.index] = item;
+                    }
+                    return newState;
+                });
+            } else {
+                setWidgets([...widgets, item]);
+            }
+            return true;
+        }
 
+        if (Array.isArray(item?.roles)) {
+            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+        }
+        if (!validateSidebarId()) {
+            return;
+        }
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${item.id}/update`,
+            method: TruJobApiMiddleware.METHOD.PATCH,
+            protectedReq: true,
+            data: item
+        });
+        if (response) {
+            notificationContext.show({
+                variant: 'success',
+                title: 'Success',
+                component: (
+                    <p>
+                        Sidebar widget updated successfully
+                    </p>
+                ),
+            }, 'sidebar-widget-update-success');
+            sidebarWidgetsRequest();
+            return true;
+        }
+        notificationContext.show({
+            variant: 'danger',
+            title: 'Error',
+            component: (
+                <p>
+                    Sidebar widget update failed
+                </p>
+            ),
+        }, 'sidebar-widget-update-error');
+        return false;
+    }
     async function sidebarWidgetsRequest() {
         if (!validateSidebarId()) {
             return;
@@ -321,78 +392,7 @@ function SidebarWidgetForm({
                     onAdd={handleAddWidget}
                     onDelete={handleDeleteWidget}
                     onMove={handleMoveWidget}
-                    onOk={async ({
-                        formHelpers
-                     }: ReorderOnOk) => {
-                        if (!formHelpers) {
-                            return;
-                        }
-                        console.log('formHelpers', formHelpers.values);
-                        const item = {...formHelpers.values};
-                        if (!item?.id) {
-                            notificationContext.show({
-                                variant: 'danger',
-                                title: 'Error',
-                                component: (
-                                    <p>
-                                        Sidebar widget id not found
-                                    </p>
-                                ),
-                            }, 'sidebar-widget-update-error');
-                            console.warn('Sidebar widget id not found', item);
-                            return false;
-                        }
-                        if (['add', 'create'].includes(operation || '')) {
-                            if (item.hasOwnProperty('index')) {
-                                setWidgets(prevState => {
-                                    let newState = [...prevState];
-                                    if (newState?.[item.index]) { 
-                                        newState[item.index] = item;
-                                    }
-                                    return newState;
-                                });
-                            } else {
-                                setWidgets([...widgets, item]);
-                            }
-                            return true;
-                        }
-
-                        if (Array.isArray(item?.roles)) {
-                            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
-                        }
-                        if (!validateSidebarId()) {
-                            return;
-                        }
-                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${item.id}/update`,
-                            method: TruJobApiMiddleware.METHOD.PATCH,
-                            protectedReq: true,
-                            data: item
-                        });
-                        if (response) {
-                            notificationContext.show({
-                                variant: 'success',
-                                title: 'Success',
-                                component: (
-                                    <p>
-                                        Sidebar widget updated successfully
-                                    </p>
-                                ),
-                            }, 'sidebar-widget-update-success');
-                            sidebarWidgetsRequest();
-                            return true;
-                        }
-                        notificationContext.show({
-                            variant: 'danger',
-                            title: 'Error',
-                            component: (
-                                <p>
-                                    Sidebar widget update failed
-                                </p>
-                            ),
-                        }, 'sidebar-widget-update-error');
-                        return false;
-                    }}
+                    onOk={handleOk}
                 >
                     {({
                         item,

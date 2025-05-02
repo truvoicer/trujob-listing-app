@@ -58,7 +58,6 @@ function EditMenu({
                 type: menuItem?.type,
                 url: menuItem?.url,
                 target: menuItem?.target,
-                order: menuItem?.order,
                 icon: menuItem?.icon,
                 li_class: menuItem?.li_class,
                 a_class: menuItem?.a_class

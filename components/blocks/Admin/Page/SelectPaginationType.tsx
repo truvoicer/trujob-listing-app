@@ -1,20 +1,21 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
-type Props = {
+export type SelectPaginationTypesProps = {
+    name?: string;
     value?: string;
-    onChange?: (value: string) => void;
-    showSubmitButton?: boolean;
 }
 function SelectPaginationTypes({
     value,
-    onChange,
-    showSubmitButton = true,
-}: Props) {
+    name = 'pagination_type',
+}: SelectPaginationTypesProps) {
     const [paginationTypes, setPaginationTypes] = useState<Array<string>>([]);
-    const [selectedPaginationType, setSelectedPaginationType] = useState<string>('');
+    const [selectedPaginationType, setSelectedPaginationType] = useState<string | null>(value || null);
+
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchPaginationTypes() {
         // Fetch paginationTypes from the API or any other source
@@ -40,17 +41,26 @@ function SelectPaginationTypes({
         }
     }, [value]);
 
-    useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(selectedPaginationType);
-        }
-    }, [selectedPaginationType]);
 
+    useEffect(() => {
+        if (!selectedPaginationType) {
+            return;
+        }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedPaginationType);
+    }, [selectedPaginationType]);
     return (
-        <div>
-            <h2>Select a Pagination Type</h2>
-            <p>Select a pagination type.</p>
+        <div className="floating-input form-group">
             <select
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     setSelectedPaginationType(e.target.value);
@@ -66,9 +76,9 @@ function SelectPaginationTypes({
                     </option>
                 ))}
             </select>
-            {showSubmitButton && (
-                <button type="submit" className="btn btn-primary">Select</button>
-            )}
+            <label className="form-label" htmlFor={name}>
+                Pagination Type
+            </label>
         </div>
     );
 }

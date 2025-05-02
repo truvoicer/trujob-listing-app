@@ -175,19 +175,6 @@ function MenuItemForm({
                 }}
                 showSubmitButton={false}
             />
-
-            <div className="floating-input form-group">
-                <input
-                    className="form-control"
-                    type="text"
-                    name="order"
-                    id={"order" + index}
-                    onChange={e => {
-                        handleChange('order', e.target.value);
-                    }}
-                    value={menuItem?.order || ""} />
-                <label className="form-label" htmlFor={'order' + index}>Order</label>
-            </div>
             <div className="floating-input form-group">
                 <input
                     className="form-control"

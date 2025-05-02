@@ -48,6 +48,7 @@ function EditPage({
     });
 
     const initialValues: Page = {
+        id: data?.id || 0,
         view: data?.view || '',
         name: data?.name || '',
         title: data?.title || '',
