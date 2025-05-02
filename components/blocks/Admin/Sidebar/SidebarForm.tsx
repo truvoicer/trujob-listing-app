@@ -7,11 +7,18 @@ import { Sidebar } from "@/types/Sidebar";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 
+export const sidebarSchema = {
+    'title': '',
+    'name': '',
+    'icon': '',
+};
+
 export type SidebarFormOnAdd = {
     reorderData: Array<Sidebar>;
     onChange: (data: Array<Sidebar>) => void;
     sidebars: Array<Sidebar>;
     setSidebars: React.Dispatch<React.SetStateAction<Array<Sidebar>>>;
+    sidebarsRequest?: () => Promise<void>;
 }
 export type SidebarFormMakeRequest = {
     sidebars: Array<Sidebar>;
@@ -22,6 +29,7 @@ export type SidebarFormOnDelete = {
     item: Sidebar;
     sidebars: Array<Sidebar>;
     setSidebars: React.Dispatch<React.SetStateAction<Array<Sidebar>>>;
+    sidebarsRequest?: () => Promise<void>;
 }
 export type SidebarFormOnMove = {
     direction: 'up' | 'down';
@@ -33,11 +41,13 @@ export type SidebarFormOnMove = {
     item: Sidebar;
     sidebars: Array<Sidebar>;
     setSidebars: React.Dispatch<React.SetStateAction<Array<Sidebar>>>;
+    sidebarsRequest?: () => Promise<void>;
 }
 export type SidebarFormOnOk = {
     formHelpers: FormikProps<FormikValues>;
     sidebars: Array<Sidebar>;
     setSidebars: React.Dispatch<React.SetStateAction<Array<Sidebar>>>;
+    sidebarsRequest?: () => Promise<void>;
 }
 export type SidebarFormProps = {
     data?: Array<Sidebar>;
@@ -46,7 +56,8 @@ export type SidebarFormProps = {
         reorderData,
         onChange,
         sidebars,
-        setSidebars
+        setSidebars,
+        sidebarsRequest
     }: SidebarFormOnAdd) => Promise<boolean>;
     makeRequest?: ({
         sidebars,
@@ -55,7 +66,8 @@ export type SidebarFormProps = {
     onDelete?: ({
         item,
         sidebars,
-        setSidebars
+        setSidebars,
+        sidebarsRequest
     }: SidebarFormOnDelete) => Promise<boolean>;
     onMove?: ({
         direction,
@@ -66,12 +78,14 @@ export type SidebarFormProps = {
         index,
         item,
         sidebars,
-        setSidebars
+        setSidebars,
+        sidebarsRequest
     }: SidebarFormOnMove) => Promise<boolean>;
     onOk?: ({
         formHelpers,
         sidebars,
-        setSidebars
+        setSidebars,
+        sidebarsRequest
     }: SidebarFormOnOk) => Promise<boolean>;
     operation: 'edit' | 'update' | 'add' | 'create';
 }
@@ -90,11 +104,6 @@ function SidebarForm({
 
     const dataTableContext = useContext(DataTableContext);
 
-    const sidebarSchema = {
-        'title': '',
-        'name': '',
-        'icon': '',
-    };
     
     function handleChange(values: Array<Sidebar>) {
         setSidebars(values);

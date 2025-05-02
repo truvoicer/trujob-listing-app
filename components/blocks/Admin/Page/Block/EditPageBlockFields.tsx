@@ -10,7 +10,7 @@ import { Role } from "@/types/Role";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { Sidebar } from "@/types/Sidebar";
-import SidebarForm, { SidebarFormMakeRequest, SidebarFormOnAdd, SidebarFormOnDelete, SidebarFormOnMove, SidebarFormOnOk } from "../../Sidebar/SidebarForm";
+import SidebarForm, { SidebarFormMakeRequest, SidebarFormOnAdd, SidebarFormOnDelete, SidebarFormOnMove, SidebarFormOnOk, sidebarSchema } from "../../Sidebar/SidebarForm";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -45,6 +45,8 @@ function EditPageBlockFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+
 
     function validatePageId(): boolean {
         if (!pageId) {
@@ -67,6 +69,7 @@ function EditPageBlockFields({
         onChange,
         sidebars,
         setSidebars,
+        sidebarsRequest,
     }: SidebarFormOnAdd) {
         dataTableContext.modal.show({
             component: (
@@ -126,7 +129,7 @@ function EditPageBlockFields({
                     return;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.sidebar.replace('%s', pageId.toString())}/${selectedSidebar.id}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${selectedSidebar.id}/create`,
                     method: TruJobApiMiddleware.METHOD.POST,
                     protectedReq: true,
                 });
@@ -152,7 +155,9 @@ function EditPageBlockFields({
                         </p>
                     ),
                 }, 'sidebar-sidebar-add-success');
+                if (typeof sidebarsRequest === 'function') {
                 sidebarsRequest();
+                }
                 dataTableContext.modal.close('sidebar-form-select-sidebar');
             }
         }, 'sidebar-form-select-sidebar');
@@ -180,7 +185,7 @@ function EditPageBlockFields({
             return;
         }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.sidebarRel.replace('%s', pageId.toString())}/${item.id}/reorder`,
+            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${item.id}/reorder`,
             method: TruJobApiMiddleware.METHOD.POST,
             protectedReq: true,
             data: {
@@ -216,6 +221,7 @@ function EditPageBlockFields({
         item,
         sidebars,
         setSidebars,
+        sidebarsRequest,
     }: SidebarFormOnDelete) {
 
         if (['add', 'create'].includes(operation || '')) {
@@ -245,7 +251,7 @@ function EditPageBlockFields({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.sidebarRel.replace('%s', pageId.toString())}/${item.id}/delete`,
+            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${item.id}/delete`,
             method: TruJobApiMiddleware.METHOD.DELETE,
             protectedReq: true,
         });
@@ -278,6 +284,7 @@ function EditPageBlockFields({
         formHelpers,
         sidebars,
         setSidebars,
+        sidebarsRequest
     }: SidebarFormOnOk) {
         if (!formHelpers) {
             return;
@@ -319,7 +326,7 @@ function EditPageBlockFields({
             return;
         }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.sidebarRel.replace('%s', pageId.toString())}/${item.id}/update`,
+            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${item.id}/update`,
             method: TruJobApiMiddleware.METHOD.PATCH,
             protectedReq: true,
             data: item
@@ -334,7 +341,9 @@ function EditPageBlockFields({
                     </p>
                 ),
             }, 'sidebar-sidebar-update-success');
-            sidebarsRequest();
+            if (typeof sidebarsRequest === 'function') {
+                sidebarsRequest();
+            }
             return true;
         }
         notificationContext.show({
@@ -366,8 +375,6 @@ function EditPageBlockFields({
         }
         return response?.data || [];
     }
-
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
     console.log("EditPageBlockFields", values);
     return (
         <div className="row justify-content-center align-items-center">
