@@ -1,24 +1,24 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
 export type SelectLinkTargetProps = {
-    id?: string | null;
+    name?: string;
     value?: string | null;
     onChange?: (value: string | null) => void;
     onSubmit?: (value: string | null) => void;
     showSubmitButton?: boolean;
 }
 function SelectLinkTarget({
-    id = null,
+    name = 'link_target',
     value,
-    onChange,
-    onSubmit,
-    showSubmitButton = true,
 }: SelectLinkTargetProps) {
     const [linkTargets, setLinkTargets] = useState<Array<string>>([]);
     const [selectedLinkTarget, setSelectedLinkTarget] = useState<string | null>(null);
+
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchLinkTargets() {
         // Fetch linkTargets from the API or any other source
@@ -44,17 +44,30 @@ function SelectLinkTarget({
         }
     }, [value]);
 
+    useEffect(() => {
+        if (!selectedLinkTarget) {
+            return;
+        }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedLinkTarget);
+
+    }, [selectedLinkTarget]);
 
     return (
         <div className="floating-input form-group">
             <select
-                id={id || 'linkTarget'}
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     setSelectedLinkTarget(e.target.value);
-                    if (typeof onChange === 'function') {
-                        onChange(e.target.value);
-                    }
                 }}
                 value={selectedLinkTarget || ''}
             >
@@ -67,12 +80,9 @@ function SelectLinkTarget({
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={id || 'linkTarget'}>
+            <label className="form-label" htmlFor={name}>
                 Link Target
             </label>
-            {showSubmitButton && (
-                <button type="submit" className="btn btn-primary">Select</button>
-            )}
         </div>
     );
 }

@@ -1,6 +1,7 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
 export type SelectMenuItemTypeProps = {
@@ -17,6 +18,8 @@ function SelectMenuItemType({
 }: SelectMenuItemTypeProps) {
     const [menuItemTypes, setMenuItemTypes] = useState<Array<string>>([]);
     const [selectedMenuItemType, setSelectedMenuItemType] = useState<string | null>(null);
+
+        const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchMenuItemTypes() {
         // Fetch menuItemTypes from the API or any other source
@@ -40,8 +43,24 @@ function SelectMenuItemType({
         if (value) {
             setSelectedMenuItemType(value);
         }
-    }, [value]);
+    }, [value, menuItemTypes]);
 
+
+    useEffect(() => {
+        if (!selectedMenuItemType) {
+            return;
+        }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedMenuItemType);
+
+    }, [selectedMenuItemType]);
 
     return (
         <div className="floating-input form-group">
@@ -51,9 +70,6 @@ function SelectMenuItemType({
                 className="form-control"
                 onChange={e => {
                     setSelectedMenuItemType(e.target.value);
-                    if (typeof onChange === 'function') {
-                        onChange(e.target.value);
-                    }
                 }}
                 value={selectedMenuItemType || ''}
             >

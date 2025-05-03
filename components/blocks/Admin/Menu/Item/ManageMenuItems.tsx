@@ -1,7 +1,7 @@
 import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnEdit, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
 import { useContext, useEffect, useState } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import MenuItemForm from "./MenuItemForm";
+import EditMenuItem from "./EditMenuItem";
 import { CreateMenuItem, MenuItem, UpdateMenuItem } from "@/types/Menu";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
@@ -13,7 +13,7 @@ export type ManageMenuItemsProps = {
     menuId?: number;
     data?: Array<MenuItem>;
     onChange?: (data: Array<MenuItem>) => void;
-    operation: string;
+    operation: 'add' | 'create' | 'edit' | 'update';
 }
 function ManageMenuItems({
     operation,
@@ -37,18 +37,6 @@ function ManageMenuItems({
         }
         onChange(newData);
     }
-    
-    function handleEditMenuItem({
-        reorderData,
-        onChange,
-        itemSchema,
-        index,
-        item
-    }: ReorderOnEdit) {
-
-    }
-
-
 
 
     function handleChange(values: Array<MenuItem>) {
@@ -79,7 +67,7 @@ function ManageMenuItems({
             component: (
                 <div className="row">
                     <div className="col-12 col-lg-12">
-                        <MenuItemForm
+                        <EditMenuItem
                             onSubmit={selectedMenu => {
                                 const newData = [...reorderData];
                                 newData.push({ ...menuItemSchema, ...selectedMenu });
@@ -418,7 +406,6 @@ function ManageMenuItems({
                     data={menuItems || []}
                     onChange={handleChange}
                     onAdd={handleAddMenuItem}
-                    onEdit={handleEditMenuItem}
                     onDelete={handleDeleteMenuItem}
                     onMove={handleMoveMenuItem}
                     onOk={handleOk}
@@ -427,12 +414,16 @@ function ManageMenuItems({
                         item,
                         index,
                     }) => (
-                        <MenuItemForm
+                        <EditMenuItem
                             menuId={menuId}
-                            data={item}
-                            onChange={(key, value) => {
-                                updateFieldValue(index, key, value);
+                            data={{
+                                ...item,
+                                index: index,
                             }}
+                            operation={operation}
+                            inModal={true}
+                            modalId={'reorder-modal'}
+                            index={index}
                         />
                     )}
                 </Reorder>

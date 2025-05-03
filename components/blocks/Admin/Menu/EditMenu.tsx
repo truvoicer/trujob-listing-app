@@ -7,7 +7,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import MenuItemForm from "./ManageMenuItems";
+import MenuItemForm from "./Item/ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";

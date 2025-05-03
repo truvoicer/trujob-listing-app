@@ -1,6 +1,4 @@
 import { useContext, useState } from "react";
-import SelectPaginationTypes from "../SelectPaginationType";
-import SelectPaginationScrollTypes from "../SelectPaginationScrollType";
 import { FormikProps, FormikValues, useFormikContext } from "formik";
 import { Button, Modal } from "react-bootstrap";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
@@ -16,31 +14,38 @@ import { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } from "@/com
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectSidebar from "../../Sidebar/SelectSidebar";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Menu } from "@/types/Menu";
+import MenuForm from "./Menu/MenuItemMenuForm";
+import SelectMenuItemType from "./SelectMenuItemType";
+import SelectPage from "../../Page/SelectPage";
+import SelectLinkTarget from "../SelectLinkTarget";
 
-type EditPageBlockFieldsProps = {
+type EditMenuItemFieldsProps = {
+    menuId?: number;
     index?: number;
     pageId?: number;
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditPageBlockFields({
+function EditMenuItemFields({
+    menuId,
     index = 0,
     pageId,
     operation,
-}: EditPageBlockFieldsProps) {
+}: EditMenuItemFieldsProps) {
 
-    const [roleModal, setRoleModal] = useState<LocalModal>({
+    const [rolesModal, setRolesModal] = useState<LocalModal>({
         show: false,
         title: '',
         footer: true,
     });
-    const [sidebarModal, setSidebarModal] = useState<LocalModal>({
+    const [menuModal, setMenuModal] = useState<LocalModal>({
         show: false,
         title: '',
         footer: true,
     });
 
     const [selectedRoles, setSelectedRoles] = useState<Array<Role>>([]);
-    const [selectedSidebars, setSelectedSidebars] = useState<Array<Sidebar>>([]);
+    const [selectedMenus, setSelectedMenus] = useState<Array<Menu>>([]);
 
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -388,317 +393,251 @@ function EditPageBlockFields({
         }
         return response?.data || [];
     }
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
+
                     <div className="col-12 col-lg-6">
                         <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
                                 type="checkbox"
                                 className="custom-control-input"
-                                name="default"
-                                id={"default" + index}
-                                checked={values?.default || false}
+                                name="active"
+                                id={"active" + index}
+                                checked={values?.active || false}
                                 onChange={handleChange}
                             />
-                            <label className="custom-control-label" htmlFor={'default' + index}>
-                                Default?
-                            </label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="nav_title"
-                                id={"nav_title" + index}
-                                onChange={handleChange}
-                                value={values?.nav_title || ""} />
-                            <label className="form-label" htmlFor={'nav_title' + index}>Nav Title</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="title"
-                                id={"title" + index}
-                                onChange={handleChange}
-                                value={values?.title || ""} />
-                            <label className="form-label" htmlFor={'title' + index}>Title</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="subtitle"
-                                id={"subtitle" + index}
-                                onChange={handleChange}
-                                value={values?.subtitle || ""} />
-                            <label className="form-label" htmlFor={'subtitle' + index}>Subtitle</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="background_image"
-                                id={"background_image" + index}
-                                onChange={handleChange}
-                                value={values?.background_image || ""} />
-                            <label className="form-label" htmlFor={'background_image' + index}>Background Image</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="background_color"
-                                id={"background_color" + index}
-                                onChange={handleChange}
-                                value={values?.background_color || ""} />
-                            <label className="form-label" htmlFor={'background_color' + index}>Background Color</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="pagination"
-                                id={"pagination" + index}
-                                checked={values?.pagination || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'pagination' + index}>
-                                Pagination
-                            </label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <SelectPaginationTypes
-                            name="pagination_type"
-                            value={values?.pagination_type}
-                        />
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <SelectPaginationScrollTypes
-                            name="pagination_scroll_type"
-                            value={values?.pagination_scroll_type}
-                        />
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <textarea
-                                className="form-control"
-                                name="content"
-                                id={"content" + index}
-                                onChange={handleChange}
-                                value={values?.content || ""}></textarea>
-                            <label className="form-label" htmlFor={'content' + index}>Content</label>
-                        </div>
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="has_sidebar"
-                                id={"has_sidebar" + index}
-                                checked={values?.has_sidebar || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'has_sidebar' + index}>
-                                Has Sidebar
+                            <label className="custom-control-label" htmlFor={'active' + index}>
+                                Active?
                             </label>
                         </div>
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <h4>Manage</h4>
-                        <button
-                            type="button"
-                            className="btn btn-primary mr-2"
-                            onClick={(e) => {
-                                ModalService.setModalTitle('Manage Roles', setRoleModal);
-                                ModalService.setModalFooter(true, setRoleModal);
-                                ModalService.showModal(setRoleModal);
-                            }}
-                        >
-                            Manage Roles
-                        </button>
-                        <button
-                            type="button"
-                            className="btn btn-primary mr-2"
-                            onClick={(e) => {
-                                ModalService.setModalTitle('Manage Sidebars', setSidebarModal);
-                                ModalService.setModalFooter(true, setSidebarModal);
-                                ModalService.showModal(setSidebarModal);
-                            }}
-                        >
-                            Manage Sidebars
-                        </button>
+                        <SelectMenuItemType
+                            name={'menuItemType' + index}
+                            value={values?.type}
+                        />
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        {values?.type === 'page' && (
+                            <SelectPage
+                                name={'page_id' + index}
+                                value={values?.page?.id || null}
+                            />
+                        )}
+                    </div>
+                    <div className="col-12 col-lg-6">
+
+                        <div className="floating-input form-group">
+                            <input
+                                className="form-control"
+                                type="text"
+                                name="label"
+                                id={"label" + index}
+                                onChange={handleChange}
+                                value={values?.label || ""} />
+                            <label className="form-label" htmlFor={'label' + index}>Nav Title</label>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
+                            <input
+                                className="form-control"
+                                type="text"
+                                name="url"
+                                id={"url" + index}
+                                onChange={handleChange}
+                                value={values?.url || ""} />
+                            <label className="form-label" htmlFor={'url' + index}>URL</label>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <SelectLinkTarget
+                            name={'linktarget' + index}
+                            value={values?.target}
+                        />
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
+                            <input
+                                className="form-control"
+                                type="text"
+                                name="icon"
+                                id={"icon" + index}
+                                onChange={handleChange}
+                                value={values?.icon || ""} />
+                            <label className="form-label" htmlFor={'icon' + index}>Icon</label>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
+                            <input
+                                className="form-control"
+                                type="text"
+                                name="li_class"
+                                id={"li_class" + index}
+                                onChange={handleChange}
+                                value={values?.li_class || ""} />
+                            <label className="form-label" htmlFor={'li_class' + index}>Li Class</label>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
+                            <input
+                                className="form-control"
+                                type="text"
+                                name="a_class"
+                                id={"a_class" + index}
+                                onChange={handleChange}
+                                value={values?.a_class || ""} />
+                            <label className="form-label" htmlFor={'a_class' + index}>A Class</label>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+
+                        <div className="floating-input form-group">
+                            <button
+                                type="button"
+                                className="btn btn-primary mr-2"
+                                onClick={(e) => {
+                                    ModalService.setModalTitle('Manage Roles', setRolesModal);
+                                    ModalService.setModalFooter(true, setRolesModal);
+                                    ModalService.showModal(setRolesModal);
+                                }}
+                            >
+                                Roles
+                            </button>
+                        </div>
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
+                            <button
+                                type="button"
+                                className="btn btn-primary mr-2"
+                                onClick={(e) => {
+                                    ModalService.setModalTitle('Manage Menus', setMenuModal);
+                                    ModalService.setModalFooter(true, setMenuModal);
+                                    ModalService.showModal(setMenuModal);
+                                }}
+                            >
+                                Menus
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <Modal show={roleModal.show} onHide={() => ModalService.hideModal(setRoleModal)}>
+                <Modal show={rolesModal.show} onHide={() => ModalService.hideModal(setRolesModal)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{roleModal?.title || ''}</Modal.Title>
+                        <Modal.Title>{rolesModal?.title || ''}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <RoleForm
                             data={values?.roles || []}
-                            onChange={(roles: Array<Role>) => {
+                            onChange={(roles) => {
                                 setSelectedRoles(roles);
                             }}
                             makeRequest={async () => {
-                                if (!operation) {
-                                    console.warn('No operation found');
+                                if (!menuId) {
+                                    console.warn('No menu item id found');
                                     return false;
                                 }
-                                if (['edit', 'update'].includes(operation)) {
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: truJobApiConfig.endpoints.widget + '/' + values.id + '/role',
-                                            method: ApiMiddleware.METHOD.GET,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when getting roles');
-                                        return false;
-                                    }
-                                    if (!response?.data) {
-                                        console.warn('No data found');
-                                        return false;
-                                    }
-                                    if (!Array.isArray(response?.data)) {
-                                        console.warn('Response is not an array');
-                                        return false;
-                                    }
-                                    setFieldValue('roles', response?.data);
-                                    return true;
-                                } else if (['create', 'add'].includes(operation)) {
-                                    return true;
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()) + '/' + values.id + '/role',
+                                        method: ApiMiddleware.METHOD.GET,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when getting roles');
+                                    return false;
                                 }
-                                return false;
+                                if (!response?.data) {
+                                    console.warn('No data found');
+                                    return false;
+                                }
+                                if (!Array.isArray(response?.data)) {
+                                    console.warn('Response is not an array');
+                                    return false;
+                                }
+                                return response.data;
                             }}
                             onAdd={async (role: Role) => {
-                                if (!operation) {
-                                    console.warn('No operation found');
-                                    return false;
-                                }
-                                if (['edit', 'update'].includes(operation)) {
-                                    if (!values?.id) {
-                                        console.warn('Widget ID is required');
-                                        return false;
-                                    }
-                                    if (!role) {
-                                        return false;
-                                    }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/create`,
-                                            method: ApiMiddleware.METHOD.POST,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding role');
-                                        return false;
-                                    }
-                                    return true;
-                                } else if (['add', 'create'].includes(operation)) {
-                                    const buildRoles = [...values?.roles, role];
-                                    setFieldValue('roles', buildRoles);
-                                    return true;
-                                }
-                                console.warn('Invalid operation');
-                                return false;
-                            }}
-                            onDelete={async (role: Role) => {
-                                if (!operation) {
-                                    console.warn('No operation found');
+                                if (!menuId) {
                                     return false;
                                 }
                                 if (!role) {
                                     return false;
                                 }
-                                if (['edit', 'update'].includes(operation)) {
-                                    if (!values?.id) {
-                                        console.warn('Widget ID is required');
-                                        return false;
-                                    }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/delete`,
-                                            method: ApiMiddleware.METHOD.DELETE,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding role');
-                                        return false;
-                                    }
-                                    return true;
-                                } else if (['add', 'create'].includes(operation)) {
-                                    const buildRoles = values.roles.filter((r: Role) => {
-                                        return r.id !== role.id;
-                                    });
-                                    setFieldValue('roles', buildRoles);
-                                    return true;
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${values.id}/role/${role.id}/create`,
+                                        method: ApiMiddleware.METHOD.POST,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when adding role');
+                                    return false;
                                 }
-                                console.warn('Invalid operation');
-                                return false;
+                                return true;
+                            }}
+                            onDelete={async (role: Role) => {
+                                if (!menuId) {
+                                    return false;
+                                }
+                                if (!role) {
+                                    return false;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${values.id}/role/${role.id}/delete`,
+                                        method: ApiMiddleware.METHOD.DELETE,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when adding role');
+                                    return false;
+                                }
+                                return true;
                             }}
                         />
                     </Modal.Body>
-                    {roleModal.footer &&
+                    {rolesModal.footer &&
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => ModalService.hideModal(setRoleModal)}>
+                            <Button variant="secondary" onClick={() => ModalService.hideModal(setRolesModal)}>
                                 Close
                             </Button>
                             <Button variant="primary" onClick={() => {
-                                // setFieldValue('roles', selectedRoles);
-                                ModalService.hideModal(setRoleModal)
+                                setFieldValue('roles', selectedRoles);
+                                ModalService.hideModal(setRolesModal)
                             }}>
                                 Save Changes
                             </Button>
                         </Modal.Footer>
                     }
                 </Modal>
-
-                <Modal show={sidebarModal.show} onHide={() => ModalService.hideModal(setSidebarModal)}>
+                <Modal show={menuModal.show} onHide={() => ModalService.hideModal(setMenuModal)}>
                     <Modal.Header closeButton>
-                        <Modal.Title>{sidebarModal?.title || ''}</Modal.Title>
+                        <Modal.Title>{menuModal?.title || ''}</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
-                        <SidebarForm
-                            operation={operation}
-                            data={values?.sidebars || []}
-                            onChange={(sidebars: Array<Sidebar>) => {
-                                setSelectedSidebars(sidebars);
+                        <MenuForm
+                            data={values?.menus || []}
+                            onChange={(menus) => {
+                                setSelectedMenus(menus);
                             }}
-                            onOk={handleOk}
-                            onAdd={handleAddSidebar}
-                            onMove={handleMoveSidebar}
-                            onDelete={handleDeleteSidebar}
-                            makeRequest={makeRequest}
                         />
                     </Modal.Body>
-                    {sidebarModal.footer &&
+                    {menuModal.footer &&
                         <Modal.Footer>
-                            <Button variant="secondary" onClick={() => ModalService.hideModal(setSidebarModal)}>
+                            <Button variant="secondary" onClick={() => ModalService.hideModal(setMenuModal)}>
                                 Close
                             </Button>
+
                             <Button variant="primary" onClick={() => {
-                                setFieldValue('sidebars', selectedSidebars);
-                                ModalService.hideModal(setSidebarModal)
+                                setFieldValue('menus', selectedMenus);
+                                ModalService.hideModal(setMenuModal)
                             }}>
                                 Save Changes
                             </Button>
@@ -709,4 +648,4 @@ function EditPageBlockFields({
         </div>
     );
 }
-export default EditPageBlockFields;
+export default EditMenuItemFields;

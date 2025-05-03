@@ -3,7 +3,7 @@ import { Dispatch, SetStateAction, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import MenuItemForm from "./ManageMenuItems";
+import MenuItemForm from "./Item/ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
