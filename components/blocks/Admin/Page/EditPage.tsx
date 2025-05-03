@@ -1,11 +1,9 @@
 import Form from "@/components/form/Form";
-import DataTable from "@/components/Table/DataTable";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_PAGE_MODAL_ID } from "./ManagePage";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
@@ -14,21 +12,11 @@ import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
 import EditPageFields from "./EditPageFields";
 
-type EditPageProps = {
+export type EditPageProps = {
     data?: Page;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
-}
-type SidebarModalState = {
-    show: boolean;
-    title: string;
-    footer: boolean;
-}
-type BlocksModalState = {
-    show: boolean;
-    title: string;
-    footer: boolean;
 }
 function EditPage({
     data,
@@ -36,17 +24,14 @@ function EditPage({
     inModal = false,
     modalId,
 }: EditPageProps) {
-    const [blocksModal, setBlocksModal] = useState<BlocksModalState>({
-        show: false,
-        title: '',
-        footer: true,
-    });
-    const [sidebarsModal, setSidebarsModal] = useState<SidebarModalState>({
-        show: false,
-        title: '',
-        footer: true,
-    });
+    
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
 
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: Page = {
         id: data?.id || 0,
         view: data?.view || '',
@@ -115,7 +100,7 @@ function EditPage({
                 if (!data?.id) {
                     throw new Error('Page ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.page}/${data.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -124,7 +109,7 @@ function EditPage({
                 break;
             case 'add':
             case 'create':
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.page}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -135,8 +120,22 @@ function EditPage({
                 console.warn('Invalid operation');
                 break;
         }
-        console.log('edit page response', response);
+
         if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong> 
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
             return;
         }
         dataTableContext.refresh();
@@ -165,11 +164,16 @@ function EditPage({
         );
     }, [inModal, modalId]);
 
-    const appModalContext = useContext(AppModalContext);
+    
     const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
                 {inModal
                     ? (
                         <EditPageFields operation={operation} />

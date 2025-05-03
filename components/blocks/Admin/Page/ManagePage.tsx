@@ -11,6 +11,7 @@ import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Page } from "@/types/Page";
 import { FormikProps, FormikValues } from "formik";
+import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 
 export type ManagePageProps = {
 }
@@ -18,13 +19,14 @@ export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function ManagePage({ }: ManagePageProps) {
     const appModalContext = useContext(AppModalContext);
+    const notificationContext = useContext(AppNotificationContext);
 
     function getPageFormModalProps() {
         return {
             formProps: {},
             show: true,
             showFooter: true,
-            onOk: ({ formHelpers }: {
+            onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
@@ -33,7 +35,11 @@ function ManagePage({ }: ManagePageProps) {
                 if (typeof formHelpers?.submitForm !== 'function') {
                     return;
                 }
-                formHelpers.submitForm();
+                const response = await formHelpers.submitForm();
+                if (!response) {
+                    return false;
+                }
+                return true;
             },
             fullscreen: true
         }
@@ -101,17 +107,34 @@ function ManagePage({ }: ManagePageProps) {
                                             <p>Are you sure you want to delete this page ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
-                                            // if (!item?.id || item?.id === '') {
-                                            //     throw new Error('Page ID is required');
-                                            // }
+                                            if (!item?.id) {
+                                                notificationContext.show({      
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Page ID is required</p>
+                                                    ),
+                                                }, 'page-delete-error');
+                                                return;
+                                            }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.page}/${item.id}`,
+                                                endpoint: `${truJobApiConfig.endpoints.page}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
                                             if (!response) {
+                                                notificationContext.show({      
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Failed to delete page</p>
+                                                    ),
+                                                }, 'page-delete-error');
                                                 return;
                                             }
+                                            dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true

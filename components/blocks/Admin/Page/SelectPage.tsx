@@ -6,22 +6,20 @@ import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
 export type SelectPageProps = {
-    id?: string | null;
+    name?: string;
     value?: number | null;
     onChange?: (pageId: number | null) => void;
     onSubmit?: (pageId: number | null) => void;
     showSubmitButton?: boolean;
 }
 function SelectPage({
-    id = null,
+    name = 'page',
     value,
     onChange,
-    showSubmitButton = true,
 }: SelectPageProps) {
     const [pages, setPages] = useState<Array<Page>>([]);
     const [selectedPage, setSelectedPage] = useState<number | null>(null);
 
-    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchPages() {
         // Fetch pages from the API or any other source
@@ -48,9 +46,10 @@ function SelectPage({
     }, [value]);
 
     return (
-        <div>
+        <div className="floating-input form-group">
             <select
-                id={id || 'page'}
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     setSelectedPage(parseInt(e.target.value));
@@ -69,7 +68,7 @@ function SelectPage({
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={id || 'page'}>Page</label>
+            <label className="form-label" htmlFor={name}>Page</label>
         </div>
     );
 }

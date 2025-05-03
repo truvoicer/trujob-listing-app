@@ -5,6 +5,7 @@ import { Menu } from "@/types/Menu";
 import { useEffect, useState } from "react";
 
 export type SelectMenuProps = {
+    name?: string;
     pageId?: string | null;
     menuId?: number | null;
     menuName?: string | null;
@@ -12,6 +13,7 @@ export type SelectMenuProps = {
     onSubmit?: (menu: any) => void;
 }
 function SelectMenu({
+    name = 'menu',
     menuId,
     menuName,
     onChange,
@@ -65,16 +67,13 @@ function SelectMenu({
         }
     }, [selectedMenu]);
 
+    
+
     return (
-        <div>
-            <form onSubmit={e => {
-                e.preventDefault();
-                console.log('Selected Menu:', selectedMenu);
-                if (typeof onSubmit === 'function') {
-                    onSubmit(selectedMenu);
-                }
-            }}>
+        <div className="floating-input form-group">
                 <select
+                    id={name}
+                    name={name}
                     className="form-control"
                     onChange={e => {
                         const findSelectedMenu = menus.find(menu => menu?.id === parseInt(e.target.value));
@@ -95,8 +94,9 @@ function SelectMenu({
                         </option>
                     ))}
                 </select>
-                <button type="submit" className="btn btn-primary">Select</button>
-            </form>
+                <label className="form-label" htmlFor={name}>
+                    Menu
+                </label>
         </div>
     );
 }

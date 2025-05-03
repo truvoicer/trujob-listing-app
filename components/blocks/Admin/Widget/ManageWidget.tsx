@@ -20,7 +20,7 @@ function ManageWidget() {
             formProps: {},
             show: true,
             showFooter: true,
-            onOk: ({ formHelpers }: {
+            onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
@@ -29,7 +29,11 @@ function ManageWidget() {
                 if (typeof formHelpers?.submitForm !== 'function') {
                     return;
                 }
-                formHelpers.submitForm();
+                const response = await formHelpers.submitForm();
+                if (!response) {
+                    return false;
+                }
+                return true;
             },
             fullscreen: true
         }

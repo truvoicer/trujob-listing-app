@@ -99,7 +99,7 @@ function SelectRole({
     }, [modalId, modalId]);
 
     return (
-        <div>
+        <div className="floating-input form-group">
             <select
                 id={name}
                 name={name}

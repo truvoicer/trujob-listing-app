@@ -7,6 +7,11 @@ import {
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppManager } from "@/library/AppManager";
 import { SessionService } from "@/library/services/session/SessionService";
+export type ErrorItem = {
+    code: string;
+    message: string | null;
+    data: any;
+}
 export type Method = "GET" | "POST" | "PATCH" | "DELETE" | 'get' | 'post' | 'patch' | 'delete';
 export type MethodObject = {
     GET: 'GET' | 'get';
@@ -31,7 +36,7 @@ export class ApiMiddleware {
         DELETE: 'DELETE',
     }
 
-    errors: Array<any> = [];
+    errors: Array<ErrorItem> = [];
 
     buildQueryString(queryObject: any = false) {
         if (queryObject.length === 0) {

@@ -67,7 +67,7 @@ function SelectSidebar({
     }, [selectedSidebar]);
 
     return (
-        <div>
+        <div className="floating-input form-group">
             <select
                 id={name}
                 name={name}

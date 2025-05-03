@@ -4,18 +4,16 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useEffect, useState } from "react";
 
 export type SelectMenuItemTypeProps = {
-    id?: string | null;
+    name?: string;
     value?: string | null;
     onChange?: (value: string | null) => void;
     onSubmit?: (value: string | null) => void;
     showSubmitButton?: boolean;
 }
 function SelectMenuItemType({
-    id = null,
+    name = 'menu_item_type',
     value,
     onChange,
-    onSubmit,
-    showSubmitButton = true,
 }: SelectMenuItemTypeProps) {
     const [menuItemTypes, setMenuItemTypes] = useState<Array<string>>([]);
     const [selectedMenuItemType, setSelectedMenuItemType] = useState<string | null>(null);
@@ -48,7 +46,8 @@ function SelectMenuItemType({
     return (
         <div className="floating-input form-group">
             <select
-                id={id || 'menuItemType'}
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     setSelectedMenuItemType(e.target.value);
@@ -67,12 +66,9 @@ function SelectMenuItemType({
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={id || 'menuItemType'}>
+            <label className="form-label" htmlFor={name}>
                 Menu Item Type
             </label>
-            {showSubmitButton && (
-                <button type="submit" className="btn btn-primary">Select</button>
-            )}
         </div>
     );
 }
