@@ -3,6 +3,7 @@ import {
     setAuthenticated, setIsAuthenticating,
     setPasswordResetKey,
     setSessionError,
+    setShowLoginModal,
     setUser, setUserId
 } from "../reducers/session-reducer";
 import { produce } from "immer";
@@ -72,4 +73,7 @@ export function setAuthenticatedAction(isAuthenticated: boolean) {
 }
 export function setIsAuthenticatingAction(isAuthenticating: boolean) {
     store.dispatch(setIsAuthenticating(isAuthenticating));
+}
+export function setShowLoginModalAction(showLoginModal: boolean) {
+    store.dispatch(setShowLoginModal(showLoginModal));
 }

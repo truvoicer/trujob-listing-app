@@ -52,9 +52,9 @@ function SelectWidget({
 
     return (
         <div>
-            <h2>Select Widget</h2>
-            <p>Select a widget to add to the page.</p>
                 <select
+                    id={name}
+                    name={name}
                     className="form-control"
                     onChange={e => {
                         const findSelectedWidget = widgets.find(widget => parseInt(widget?.id) === parseInt(e.target.value));
@@ -75,6 +75,9 @@ function SelectWidget({
                         </option>
                     ))}
                 </select>
+            <label className="form-label" htmlFor={name}>
+                Widget
+            </label>
         </div>
     );
 }

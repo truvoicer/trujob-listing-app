@@ -1,6 +1,7 @@
 export const SESSION_STATE = "session";
 export const SESSION_AUTHENTICATED = "authenticated";
 export const SESSION_IS_AUTHENTICATING = "SESSION_IS_AUTHENTICATING";
+export const SESSION_SHOW_LOGIN_MODAL = "showLoginModal";
 export const SESSION_AUTH_PROVIDER = "auth_provider";
 export const SESSION_AUTH_PROVIDER_USER_ID = "auth_provider_user_id";
 export const SESSION_PASSWORD_RESET_KEY = "passwordResetKey";

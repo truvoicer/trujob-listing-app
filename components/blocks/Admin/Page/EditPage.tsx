@@ -135,6 +135,7 @@ function EditPage({
                 console.warn('Invalid operation');
                 break;
         }
+        console.log('edit page response', response);
         if (!response) {
             return;
         }

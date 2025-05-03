@@ -91,7 +91,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                         ),
                     }, 'pageBlock-form-select-pageBlock-error');
                     console.warn('PageBlock not found', selectedPageBlock);
-                    return;
+                    return false;
                 }
                 if (!selectedPageBlock?.id) {
                     notificationContext.show({
@@ -104,7 +104,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                         ),
                     }, 'pageBlock-form-select-pageBlock-id-error');
                     console.warn('PageBlock id not found', selectedPageBlock);
-                    return;
+                    return false;
                 }
 
                 if (['add', 'create'].includes(operation || '')) {
@@ -118,7 +118,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                 }
 
                 if (!validatePageId() || !pageId) {
-                    return;
+                    return false;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.pageBlock.replace('%s', pageId.toString())}/${selectedPageBlock.id}/create`,
@@ -136,7 +136,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                         ),
                     }, 'sidebar-pageBlock-add-error');
                     console.warn('pageBlock add failed', response);
-                    return;
+                    return false;
                 }
                 notificationContext.show({
                     variant: 'success',
@@ -149,6 +149,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                 }, 'sidebar-pageBlock-add-success');
                 pageBlocksRequest();
                 dataTableContext.modal.close('pageBlock-form-select-pageBlock');
+                return true;
             }
         }, 'pageBlock-form-select-pageBlock');
     }
@@ -206,7 +207,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
     }
 
     async function handleDeletePageBlock({
-        item
+        item,
     }: ReorderOnDelete) {
 
         if (['add', 'create'].includes(operation || '')) {
@@ -339,6 +340,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
     }
 
     async function pageBlocksRequest() {
+        console.log('pageBlocksRequest', pageId);
         if (!validatePageId() || !pageId) {
             return;
         }

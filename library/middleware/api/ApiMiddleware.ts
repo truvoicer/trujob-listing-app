@@ -2,6 +2,7 @@ import { isObject, isObjectEmpty } from "@/helpers/utils";
 import {
     setAuthenticatedAction,
     setIsAuthenticatingAction, setSessionErrorAction,
+    setShowLoginModalAction,
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppManager } from "@/library/AppManager";
@@ -294,6 +295,7 @@ export class ApiMiddleware {
         SessionService.removeLocalSession();
         setAuthenticatedAction(false);
         setIsAuthenticatingAction(false)
+        setShowLoginModalAction(true);
     }
 
     async handleResponse(requestUrl: string, response: Response | Promise<Response>) {

@@ -118,7 +118,8 @@ function SidebarForm({
                 reorderData,
                 onChange,
                 sidebars,
-                setSidebars
+                setSidebars,
+                sidebarsRequest: sidebarsRequest
             });
         }
         console.warn('onAdd is not a function');
@@ -144,7 +145,8 @@ function SidebarForm({
                 index,
                 item,
                 sidebars,
-                setSidebars
+                setSidebars,
+                sidebarsRequest: sidebarsRequest
             });
         }
         console.warn('onMove is not a function');
@@ -158,7 +160,8 @@ function SidebarForm({
             return await onDelete({
                 item,
                 sidebars,
-                setSidebars
+                setSidebars,
+                sidebarsRequest: sidebarsRequest
             });
         }
         console.warn('onDelete is not a function');
@@ -172,7 +175,8 @@ function SidebarForm({
             return await onOk({
                 formHelpers,
                 sidebars,
-                setSidebars
+                setSidebars,
+                sidebarsRequest: sidebarsRequest
             });
         }
         console.warn('onOk is not a function');
@@ -215,7 +219,7 @@ function SidebarForm({
             sidebarsRequest();
         }
     }, []);
-    
+    console.log('sidebar form', operation, sidebars);
     return (
         <div className="row">
             <div className="col-12">

@@ -254,6 +254,7 @@ function EditPageBlock({
                     ? (
                         <EditPageBlockFields
                             operation={operation}
+                            pageId={pageId}
                         />
                     )
                     : (
@@ -267,6 +268,7 @@ function EditPageBlock({
                                 return (
                                     <EditPageBlockFields
                                         operation={operation}
+                                        pageId={pageId}
                                     />
                                 )
                             }}

@@ -2,23 +2,21 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Sidebar } from "@/types/Sidebar";
+import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
-type Props = {
+export type SelectSidebarProps = {
     sidebarId?: number;
-    onChange?: (sidebar: any) => void;
-    onSubmit?: (sidebar: any) => void;
     name?: string;
 }
 function SelectSidebar({
     name = 'sidebar',
     sidebarId,
-    onChange,
-    onSubmit
-}: Props) {
+}: SelectSidebarProps) {
     const [sidebars, setSidebars] = useState<Array<Sidebar>>([]);
     const [selectedSidebar, setSelectedSidebar] = useState<Sidebar>();
 
+    const formContext = useFormikContext<FormikValues>() || {};
     async function fetchSidebars() {
         // Fetch sidebars from the API or any other source
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -52,11 +50,20 @@ function SelectSidebar({
         
     }, [sidebarId, sidebars]);
 
-
     useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(selectedSidebar);
+        if (!selectedSidebar) {
+            return;
         }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedSidebar);
+        
     }, [selectedSidebar]);
 
     return (

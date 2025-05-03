@@ -9,7 +9,7 @@ export type SelectPageViewsProps = {
     value?: string;
 }
 function SelectPageViews({
-    name = 'pageView',
+    name = 'view',
     value,
 }: SelectPageViewsProps) {
     const [pageViews, setPageViews] = useState<Array<string>>([]);

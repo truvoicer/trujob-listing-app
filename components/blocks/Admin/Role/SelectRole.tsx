@@ -13,8 +13,10 @@ export type SelectRoleProps = {
     modalId?: string;
     modalState?: ModalState;
     inModal?: boolean;
+    name?: string;
 }
 function SelectRole({
+    name = 'role',
     roleId,
     onChange,
     modalId,
@@ -98,8 +100,9 @@ function SelectRole({
 
     return (
         <div>
-            <h2>Select Role</h2>
             <select
+                id={name}
+                name={name}
                 className="form-control"
                 onChange={e => {
                     const findSelectedRole: Role | undefined = roles.find(role => role.id === parseInt(e.target.value));
@@ -116,6 +119,9 @@ function SelectRole({
                     </option>
                 ))}
             </select>
+            <label className="form-label" htmlFor={name}>
+                Role
+            </label>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import {
     SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID,
     SESSION_AUTHENTICATED, SESSION_ERROR,
     SESSION_IS_AUTHENTICATING, SESSION_PASSWORD_RESET_KEY,
+    SESSION_SHOW_LOGIN_MODAL,
     SESSION_USER,
     SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME,
     SESSION_USER_ID, SESSION_USER_LASTNAME,
@@ -24,6 +25,7 @@ const defaultState = {
         [SESSION_USER_TOKEN]: null,
         [SESSION_USER_ROLES]: []
     },
+    [SESSION_SHOW_LOGIN_MODAL]: false,
     [SESSION_PASSWORD_RESET_KEY]: null,
     [SESSION_AUTHENTICATED]: false,
     [SESSION_IS_AUTHENTICATING]: true,
@@ -52,6 +54,9 @@ const defaultReducers = {
     setIsAuthenticating: (state, action) => {
         state[SESSION_IS_AUTHENTICATING] = action.payload;
     },
+    setShowLoginModal: (state, action) => {
+        state[SESSION_SHOW_LOGIN_MODAL] = action.payload;
+    },
     setSessionError: (state, action) => {
         state.error = action.payload;
         console.error(state.error)
@@ -65,4 +70,4 @@ export const sessionSlice = createSlice({
 });
 
 export const sessionReducer = sessionSlice.reducer;
-export const {setUser, setToken, setAuthenticated, setIsAuthenticating, setUserId, setPasswordResetKey, setSessionError} = sessionSlice.actions;
+export const {setUser, setToken, setAuthenticated, setIsAuthenticating, setUserId, setPasswordResetKey, setSessionError, setShowLoginModal} = sessionSlice.actions;

@@ -20,7 +20,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 type EditPageBlockFieldsProps = {
     index?: number;
     pageId?: number;
-    operation?: 'edit' | 'update' | 'add' | 'create';
+    operation: 'edit' | 'update' | 'add' | 'create';
 }
 function EditPageBlockFields({
     index = 0,
@@ -98,8 +98,10 @@ function EditPageBlockFields({
                             </p>
                         ),
                     }, 'sidebar-form-select-sidebar-error');
-                    console.warn('Sidebar not found', selectedSidebar);
-                    return;
+                    console.warn('Sidebar not found', {
+                        values: formHelpers?.values,
+                    });
+                    return false;
                 }
                 if (!selectedSidebar?.id) {
                     notificationContext.show({
@@ -112,7 +114,7 @@ function EditPageBlockFields({
                         ),
                     }, 'sidebar-form-select-sidebar-id-error');
                     console.warn('Sidebar id not found', selectedSidebar);
-                    return;
+                    return false;
                 }
 
                 if (['add', 'create'].includes(operation || '')) {
@@ -126,7 +128,7 @@ function EditPageBlockFields({
                 }
 
                 if (!validatePageId() || !pageId) {
-                    return;
+                    return false;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${selectedSidebar.id}/create`,
@@ -144,21 +146,24 @@ function EditPageBlockFields({
                         ),
                     }, 'sidebar-sidebar-add-error');
                     console.warn('sidebar add failed', response);
-                    return;
+                    return false;
                 }
                 notificationContext.show({
                     variant: 'success',
                     title: 'Success',
                     component: (
                         <p>
-                            sidebar added successfully
+                            Sidebar added successfully
                         </p>
                     ),
                 }, 'sidebar-sidebar-add-success');
+                console.log('sidebarsRequest', sidebarsRequest);
                 if (typeof sidebarsRequest === 'function') {
-                sidebarsRequest();
+                    console.log('sidebarsRequest', sidebarsRequest);
+                    sidebarsRequest();
                 }
                 dataTableContext.modal.close('sidebar-form-select-sidebar');
+                return false;
             }
         }, 'sidebar-form-select-sidebar');
     }
@@ -173,6 +178,7 @@ function EditPageBlockFields({
         item,
         sidebars,
         setSidebars,
+        sidebarsRequest
     }: SidebarFormOnMove) {
         if (!['up', 'down'].includes(direction)) {
             return false;
@@ -202,6 +208,9 @@ function EditPageBlockFields({
                     </p>
                 ),
             }, 'sidebar-item-move-success');
+            if (typeof sidebarsRequest === 'function') {
+                sidebarsRequest();
+            }
             return true;
         }
         notificationContext.show({
@@ -265,6 +274,9 @@ function EditPageBlockFields({
                     </p>
                 ),
             }, 'sidebar-item-delete-success');
+            if (typeof sidebarsRequest === 'function') {
+                sidebarsRequest();
+            }
             return true;
         }
         notificationContext.show({
@@ -358,15 +370,16 @@ function EditPageBlockFields({
         return false;
     }
 
-    async function sidebarsRequest({
+    async function makeRequest({
         sidebars,
         setSidebars
     }: SidebarFormMakeRequest) {
+        console.log('sidebarsRequest', sidebars);
         if (!validatePageId() || !pageId) {
             return [];
         }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.sidebar.replace('%s', pageId.toString())}`,
+            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar`,
             method: TruJobApiMiddleware.METHOD.GET,
             protectedReq: true,
         });
@@ -375,7 +388,7 @@ function EditPageBlockFields({
         }
         return response?.data || [];
     }
-    console.log("EditPageBlockFields", values);
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -522,6 +535,17 @@ function EditPageBlockFields({
                         >
                             Manage Roles
                         </button>
+                        <button
+                            type="button"
+                            className="btn btn-primary mr-2"
+                            onClick={(e) => {
+                                ModalService.setModalTitle('Manage Sidebars', setSidebarModal);
+                                ModalService.setModalFooter(true, setSidebarModal);
+                                ModalService.showModal(setSidebarModal);
+                            }}
+                        >
+                            Manage Sidebars
+                        </button>
                     </div>
                 </div>
 
@@ -655,118 +679,17 @@ function EditPageBlockFields({
                     </Modal.Header>
                     <Modal.Body>
                         <SidebarForm
+                            operation={operation}
                             data={values?.sidebars || []}
                             onChange={(sidebars: Array<Sidebar>) => {
                                 setSelectedSidebars(sidebars);
                             }}
+                            onOk={handleOk}
                             onAdd={handleAddSidebar}
                             onMove={handleMoveSidebar}
                             onDelete={handleDeleteSidebar}
-                            makeRequest={sidebarsRequest}
+                            makeRequest={makeRequest}
                         />
-                        {/* <RoleForm
-                            data={values?.sidebars || []}
-                            onChange={(sidebars: Array<Role>) => {
-                                setSelectedRoles(sidebars);
-                            }}
-                            makeRequest={async () => {
-                                if (!operation) {
-                                    console.warn('No operation found');
-                                    return false;
-                                }
-                                if (['edit', 'update'].includes(operation)) {
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: truJobApiConfig.endpoints.widget + '/' + values.id + '/role',
-                                            method: ApiMiddleware.METHOD.GET,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when getting roles');
-                                        return false;
-                                    }
-                                    if (!response?.data) {
-                                        console.warn('No data found');
-                                        return false;
-                                    }
-                                    if (!Array.isArray(response?.data)) {
-                                        console.warn('Response is not an array');
-                                        return false;
-                                    }
-                                    setFieldValue('sidebars', response?.data);
-                                    return true;
-                                } else if (['create', 'add'].includes(operation)) {
-                                    return true;
-                                }
-                                return false;
-                            }}
-                            onAdd={async (sidebar: Sidebar) => {
-                                if (!operation) {
-                                    console.warn('No operation found');
-                                    return false;
-                                }
-                                if (['edit', 'update'].includes(operation)) {
-                                    if (!values?.id) {
-                                        console.warn('Widget ID is required');
-                                        return false;
-                                    }
-                                    if (!sidebar) {
-                                        return false;
-                                    }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${sidebar.id}/create`,
-                                            method: ApiMiddleware.METHOD.POST,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding sidebar');
-                                        return false;
-                                    }
-                                    return true;
-                                } else if (['add', 'create'].includes(operation)) {
-                                    const buildSidebars = [...values?.sidebars, sidebar];
-                                    setFieldValue('sidebars', buildSidebars);
-                                    return true;
-                                }
-                                console.warn('Invalid operation');
-                                return false;
-                            }}
-                            onDelete={async (sidebar: Sidebar) => {
-                                if (!operation) {
-                                    console.warn('No operation found');
-                                    return false;
-                                }
-                                if (!sidebar) {
-                                    return false;
-                                }
-                                if (['edit', 'update'].includes(operation)) {
-                                    if (!values?.id) {
-                                        console.warn('Sidebar ID is required');
-                                        return false;
-                                    }
-                                    const response = await TruJobApiMiddleware.getInstance()
-                                        .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${sidebar.id}/delete`,
-                                            method: ApiMiddleware.METHOD.DELETE,
-                                            protectedReq: true,
-                                        })
-                                    if (!response) {
-                                        console.warn('No response from API when adding role');
-                                        return false;
-                                    }
-                                    return true;
-                                } else if (['add', 'create'].includes(operation)) {
-                                    const buildSidebars = values.roles.filter((r: Sidebar) => {
-                                        return r.id !== sidebar.id;
-                                    });
-                                    setFieldValue('sidebars', buildSidebars);
-                                    return true;
-                                }
-                                console.warn('Invalid operation');
-                                return false;
-                            }}
-                        /> */}
                     </Modal.Body>
                     {roleModal.footer &&
                         <Modal.Footer>
