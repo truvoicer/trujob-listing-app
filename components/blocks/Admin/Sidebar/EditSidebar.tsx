@@ -1,8 +1,8 @@
 import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
@@ -10,6 +10,7 @@ import EditSidebarFields from "./EditSidebarFields";
 import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
 import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
 import { CreateWidget, Widget } from "@/types/Widget";
+import { ModalService } from "@/library/services/modal/ModalService";
 
 export type EditSidebarProps = {
     data?: Sidebar | null;
@@ -23,6 +24,14 @@ function EditSidebar({
     inModal = false,
     modalId,
 }: EditSidebarProps) {
+
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
+
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
     const initialValues: Sidebar = {
         id: data?.id || 0,
@@ -130,7 +139,7 @@ function EditSidebar({
                 if (!requestData?.id) {
                     throw new Error('Sidebar ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.sidebar}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -142,7 +151,7 @@ function EditSidebar({
                 requestData = buildCreateData(values);
                 console.log('create requestData', requestData, values);
                 // return;
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.sidebar}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -155,7 +164,21 @@ function EditSidebar({
         }
         console.log('edit sidebar response', response);
         if (!response) {
-            return false;
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
@@ -168,7 +191,7 @@ function EditSidebar({
         if (!modalId) {
             return;
         }
-        
+
         dataTableContext.modal.update(
             {
                 formProps: {
@@ -184,24 +207,31 @@ function EditSidebar({
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                {inModal
-                    ? (
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
                         <EditSidebarFields operation={operation} />
                     )
-                    : (
-                        <Form
-                            operation={operation}
-                            requiredFields={getRequiredFields()}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditSidebarFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        requiredFields={getRequiredFields()}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditSidebarFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
         </div>
     );

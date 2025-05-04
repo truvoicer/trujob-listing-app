@@ -11,6 +11,7 @@ import { Page } from "@/types/Page";
 import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
 import EditPageFields from "./EditPageFields";
+import { ModalService } from "@/library/services/modal/ModalService";
 
 export type EditPageProps = {
     data?: Page;
@@ -24,7 +25,7 @@ function EditPage({
     inModal = false,
     modalId,
 }: EditPageProps) {
-    
+
     const [alert, setAlert] = useState<{
         show: boolean;
         message: string | React.ReactNode | React.Component;
@@ -126,7 +127,7 @@ function EditPage({
                 show: true,
                 message: (
                     <div>
-                        <strong>Error:</strong> 
+                        <strong>Error:</strong>
                         {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
                             return (
                                 <div key={index}>{error.message}</div>
@@ -164,7 +165,7 @@ function EditPage({
         );
     }, [inModal, modalId]);
 
-    
+
     const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
@@ -174,23 +175,25 @@ function EditPage({
                         {alert.message}
                     </div>
                 )}
-                {inModal
-                    ? (
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
                         <EditPageFields operation={operation} />
                     )
-                    : (
-                        <Form
-                            operation={operation}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditPageFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditPageFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
         </div>
     );

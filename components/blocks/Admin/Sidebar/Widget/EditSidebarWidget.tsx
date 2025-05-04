@@ -2,7 +2,7 @@ import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
@@ -26,6 +26,14 @@ function EditSidebarWidget({
     inModal = false,
     modalId,
 }: EditSidebarWidgetProps) {
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
+
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
     const [initialValues, setInitialValues] = useState<Widget | null>(null);
 
     async function sidebarWidgetRequest() {
@@ -37,7 +45,7 @@ function EditSidebarWidget({
             console.warn('Sidebar widget ID is required');
             return;
         }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.sidebarWidgetRel.replace('%s', sidebarId.toString())}/${data.id}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -139,7 +147,7 @@ function EditSidebarWidget({
                 if (!requestData?.id) {
                     throw new Error('Widget ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -151,7 +159,7 @@ function EditSidebarWidget({
                 requestData = buildCreateData(values);
                 console.log('create requestData', requestData);
                 // return;
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -163,6 +171,20 @@ function EditSidebarWidget({
                 break;
         }
         if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
             return;
         }
         dataTableContext.refresh();
@@ -204,6 +226,11 @@ function EditSidebarWidget({
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
                 {inModal
                     ? (
                         <EditSidebarWidgetFields

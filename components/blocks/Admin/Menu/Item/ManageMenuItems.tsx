@@ -1,13 +1,13 @@
 import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnEdit, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
 import { useContext, useEffect, useState } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import EditMenuItem from "./EditMenuItem";
 import { CreateMenuItem, MenuItem, UpdateMenuItem } from "@/types/Menu";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import EditMenuItem from "./EditMenuItem";
 
 export type ManageMenuItemsProps = {
     menuId?: number;
@@ -25,6 +25,7 @@ function ManageMenuItems({
     
     const dataTableContext = useContext(DataTableContext);
     const notificationContext = useContext(AppNotificationContext);
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
     const menuItemSchema: CreateMenuItem = {
         type: ''
@@ -127,7 +128,7 @@ function ManageMenuItems({
                 if (!validateMenuId() || !menuId) {
                     return false;
                 }
-                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                const response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${selectedMenuItem.id}/create`,
                     method: TruJobApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -180,7 +181,7 @@ function ManageMenuItems({
         if (!validateMenuId() || !menuId) {
             return;
         }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${item.id}/reorder`,
             method: TruJobApiMiddleware.METHOD.POST,
             protectedReq: true,
@@ -243,7 +244,7 @@ function ManageMenuItems({
             return false;
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${item.id}/delete`,
             method: TruJobApiMiddleware.METHOD.DELETE,
             protectedReq: true,
@@ -309,14 +310,21 @@ function ManageMenuItems({
             return true;
         }
 
+        if (item.hasOwnProperty('page') && item.page && item.page?.id) {
+            item.page_id = item.page.id;
+            delete item.page;
+        }
         if (Array.isArray(item?.roles)) {
             item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+        }
+        if (Array.isArray(item?.menus)) {
+            item.menus = RequestHelpers.extractIdsFromArray(item.menus);
         }
         if (!validateMenuId() || !menuId) {
             return;
         }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.menuItemRel.replace('%s', menuId.toString())}/${item.id}/update`,
+        const response = await truJobApiMiddleware.resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${item.id}/update`,
             method: TruJobApiMiddleware.METHOD.PATCH,
             protectedReq: true,
             data: item
@@ -338,9 +346,14 @@ function ManageMenuItems({
             variant: 'danger',
             title: 'Error',
             component: (
-                <p>
-                    menuItem update failed
-                </p>
+                <div>
+                    <strong>Error:</strong>
+                    {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                        return (
+                            <div key={index}>{error.message}</div>
+                        )
+                    })}
+                </div>
             ),
         }, 'sidebar-menuItem-update-error');
         return false;
@@ -351,7 +364,7 @@ function ManageMenuItems({
         if (!validateMenuId() || !menuId) {
             return;
         }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}`,
             method: TruJobApiMiddleware.METHOD.GET,
             protectedReq: true,

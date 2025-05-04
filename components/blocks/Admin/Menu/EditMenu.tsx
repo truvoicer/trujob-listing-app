@@ -3,16 +3,18 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { Dispatch, SetStateAction, use, useContext, useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import { isObjectEmpty } from "@/helpers/utils";
+import { isObject, isObjectEmpty } from "@/helpers/utils";
 import MenuItemForm from "./Item/ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 import EditMenuFields from "./EditMenuFields";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { FormikProps, FormikValues } from "formik";
+import { ModalService } from "@/library/services/modal/ModalService";
 
 export type EditMenuProps = {
     data?: Menu | null;
@@ -27,14 +29,22 @@ function EditMenu({
     modalId,
 }: EditMenuProps) {
 
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
+
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
     const initialValues = {
-        'id': data?.id,
-        'name': data?.name || '',
-        'has_parent': data?.has_parent || false,
-        'ul_class': data?.ul_class || '',
-        'active': data?.active || false,
-        'roles': data?.roles || [],
-        'menu_items': data?.menu_items || [],
+        id: data?.id || 0,
+        name: data?.name || '',
+        has_parent: data?.has_parent || false,
+        ul_class: data?.ul_class || '',
+        active: data?.active || false,
+        roles: data?.roles || [],
+        menu_items: data?.menu_items || [],
     };
     function buildMenuIdData(menus: Array<Menu>): Array<number> {
         const filterMenuData: Array<Menu> = menus
@@ -48,7 +58,7 @@ function EditMenu({
             return menu.id;
         });
     }
-    
+
     function buildMenuItemRequestData(menuItems: Array<MenuItem>) {
         let newMenuItems: Array<CreateMenuItem | UpdateMenuItem> = [];
         menuItems.forEach((menuItem: MenuItem, index: number) => {
@@ -153,7 +163,7 @@ function EditMenu({
                 if (!requestData?.id) {
                     throw new Error('Menu ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.menu}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -165,7 +175,7 @@ function EditMenu({
                 requestData = buildCreateData(values);
                 console.log('create requestData', requestData);
                 // return;
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.menu}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -177,8 +187,23 @@ function EditMenu({
                 break;
         }
         if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
             return;
         }
+
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_MENU_MODAL_ID);
     }
@@ -190,7 +215,7 @@ function EditMenu({
         if (!modalId) {
             return;
         }
-        
+
         dataTableContext.modal.update(
             {
                 formProps: {
@@ -203,32 +228,40 @@ function EditMenu({
             modalId
         );
     }, [inModal, modalId]);
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                {inModal
-                    ? (
-                        <EditMenuFields />
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
+                        <EditMenuFields operation={operation} />
                     )
-                    : (
-                        <Form
-                            operation={operation}
-                            requiredFields={getRequiredFields()}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {({
-                                values,
-                                errors,
-                                setFieldValue,
-                                onChange,
-                            }: FormikProps<FormikValues>) => {
-                                return (
-                                    <EditMenuFields />
-                                )
-                            }}
-                        </Form>
-                    )}
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        requiredFields={getRequiredFields()}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {({
+                            values,
+                            errors,
+                            setFieldValue,
+                            handleChange,
+                        }: FormikProps<FormikValues>) => {
+                            return (
+                                <EditMenuFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
         </div>
     );

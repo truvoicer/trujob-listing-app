@@ -24,7 +24,7 @@ export type MenuItem = {
     icon: string|null;
     li_class: string|null;
     a_class: string|null;
-    page_id: Page|null;
+    page: Page|null;
     roles: Array<Role>;
     has_permission: boolean;
     menus: Array<Menu>;
@@ -49,7 +49,7 @@ export type MenuItemPostRequest = {
     icon?: string|null;
     li_class?: string|null;
     a_class?: string|null;
-    page?: Page|null;
+    page_id?: number;
     roles?: Array<number>;
     menus?: Array<number>;
 }

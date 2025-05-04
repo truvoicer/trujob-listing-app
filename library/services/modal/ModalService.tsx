@@ -103,6 +103,22 @@ export class ModalService extends MessageService {
         return modalState.items.findIndex((item: ModalItem) => item?.id === id);
     }
 
+    static modalItemHasFormProps(modalState: ModalState, id?: string | null): boolean {
+        if (typeof id !== "string") {
+            return false;
+        }
+        const findIndex = modalState.items.findIndex((item: ModalItem) => item?.id === id);
+        if (findIndex === -1) {
+            return false;
+        }
+        const modal = modalState.items[findIndex];
+
+        if (typeof modal?.formProps === "object" && !isObjectEmpty(modal?.formProps)) {
+            return true;
+        }
+        return false;
+    }
+
     renderFormModal(modal: any, index: number) {
         return (
             <Form

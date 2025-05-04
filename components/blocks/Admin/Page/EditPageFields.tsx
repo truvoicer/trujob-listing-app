@@ -693,7 +693,7 @@ function EditPageFields({
                                     Close
                                 </Button>
                                 <Button variant="primary" onClick={() => {
-                                    // setFieldValue('roles', selectedRoles);
+                                    setFieldValue('roles', selectedRoles);
                                     ModalService.hideModal(setRoleModal)
                                 }}>
                                     Save Changes

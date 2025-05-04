@@ -1,14 +1,15 @@
 import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
 import EditWidgetFields from "./EditWidgetFields";
 import { EDIT_SIDEBAR_MODAL_ID } from "./ManageWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
+import { ModalService } from "@/library/services/modal/ModalService";
 
 export type EditWidgetProps = {
     data?: Widget | null;
@@ -23,6 +24,14 @@ function EditWidget({
     modalId,
 }: EditWidgetProps) {
 
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
+
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
     const initialValues: Widget = {
         id: data?.id || 0,
         name: data?.name || '',
@@ -32,7 +41,7 @@ function EditWidget({
         properties: data?.properties || {},
         roles: data?.roles || [],
     };
-    
+
     function buildRoleIdData(roles: Array<Role>): Array<number> {
         const filterRoleData: Array<Role> = roles
             .filter((role: Role | number) => {
@@ -115,7 +124,7 @@ function EditWidget({
                 if (!requestData?.id) {
                     throw new Error('Widget ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -127,7 +136,7 @@ function EditWidget({
                 requestData = buildCreateData(values);
                 console.log('create requestData', requestData);
                 // return;
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -139,6 +148,20 @@ function EditWidget({
                 break;
         }
         if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
             return;
         }
         dataTableContext.refresh();
@@ -153,7 +176,7 @@ function EditWidget({
         if (!modalId) {
             return;
         }
-        
+
         dataTableContext.modal.update(
             {
                 formProps: {
@@ -169,24 +192,31 @@ function EditWidget({
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                {inModal
-                    ? (
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
                         <EditWidgetFields operation={operation} />
                     )
-                    : (
-                        <Form
-                            operation={operation}
-                            requiredFields={getRequiredFields()}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditWidgetFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        requiredFields={getRequiredFields()}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditWidgetFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
         </div>
     );

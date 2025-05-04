@@ -4,7 +4,7 @@ import { CreatePageBlock, PageBlock, PageBlockRequest, UpdatePageBlock } from "@
 import EditPageBlockFields from "./EditPageBlockFields";
 import { Form } from "formik";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Role } from "@/types/Role";
 import { Sidebar } from "@/types/Sidebar";
@@ -27,6 +27,14 @@ function EditPageBlock({
     modalId,
  }: EditPageBlockProps) {
 
+    const [alert, setAlert] = useState<{
+        show: boolean;
+        message: string | React.ReactNode | React.Component;
+        type: string;
+    } | null>(null);
+
+    const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
     const [initialValues, setInitialValues] = useState<PageBlock | null>(null);
 
     async function pageBlockRequest() {
@@ -38,7 +46,7 @@ function EditPageBlock({
             console.warn('Page block ID is required');
             return;
         }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${data.id}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -185,7 +193,7 @@ function EditPageBlock({
                 if (!requestData?.id) {
                     throw new Error('PageBlock ID is required');
                 }
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.pageBlock.replace('%s', pageId.toString())}/${requestData.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -197,7 +205,7 @@ function EditPageBlock({
                 requestData = buildCreateData(values);
                 console.log('create requestData', requestData);
                 // return;
-                response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.pageBlock.replace('%s', pageId.toString())}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -209,6 +217,20 @@ function EditPageBlock({
                 break;
         }
         if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
             return;
         }
         dataTableContext.refresh();
@@ -250,6 +272,11 @@ function EditPageBlock({
     return (
         <div className="row">
             <div className="col-12">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
             {inModal
                     ? (
                         <EditPageBlockFields

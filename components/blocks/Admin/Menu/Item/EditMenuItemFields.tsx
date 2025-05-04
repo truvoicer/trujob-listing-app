@@ -162,9 +162,8 @@ function EditMenuItemFields({
                         </p>
                     ),
                 }, 'sidebar-sidebar-add-success');
-                console.log('sidebarsRequest', sidebarsRequest);
+                
                 if (typeof sidebarsRequest === 'function') {
-                    console.log('sidebarsRequest', sidebarsRequest);
                     sidebarsRequest();
                 }
                 dataTableContext.modal.close('sidebar-form-select-sidebar');
@@ -306,7 +305,7 @@ function EditMenuItemFields({
         if (!formHelpers) {
             return;
         }
-        console.log('formHelpers', formHelpers.values);
+        
         const item = { ...formHelpers.values };
         if (!item?.id) {
             notificationContext.show({
@@ -379,7 +378,7 @@ function EditMenuItemFields({
         sidebars,
         setSidebars
     }: SidebarFormMakeRequest) {
-        console.log('sidebarsRequest', sidebars);
+        
         if (!validatePageId() || !pageId) {
             return [];
         }
@@ -424,7 +423,7 @@ function EditMenuItemFields({
                     <div className="col-12 col-lg-6">
                         {values?.type === 'page' && (
                             <SelectPage
-                                name={'page_id' + index}
+                                name={'page'}
                                 value={values?.page?.id || null}
                             />
                         )}
@@ -609,7 +608,8 @@ function EditMenuItemFields({
                                 Close
                             </Button>
                             <Button variant="primary" onClick={() => {
-                                setFieldValue('roles', selectedRoles);
+                                // console.log('selected roles', selectedRoles);
+                                // setFieldValue('roles', selectedRoles);
                                 ModalService.hideModal(setRolesModal)
                             }}>
                                 Save Changes
@@ -634,13 +634,12 @@ function EditMenuItemFields({
                             <Button variant="secondary" onClick={() => ModalService.hideModal(setMenuModal)}>
                                 Close
                             </Button>
-
                             <Button variant="primary" onClick={() => {
-                                setFieldValue('menus', selectedMenus);
-                                ModalService.hideModal(setMenuModal)
-                            }}>
-                                Save Changes
-                            </Button>
+                                    setFieldValue('roles', selectedMenus);
+                                    ModalService.hideModal(setMenuModal)
+                                }}>
+                                    Save Changes
+                                </Button>
                         </Modal.Footer>
                     }
                 </Modal>

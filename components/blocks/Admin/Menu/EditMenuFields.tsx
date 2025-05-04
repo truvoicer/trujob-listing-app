@@ -1,76 +1,39 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { Dispatch, SetStateAction, useState } from "react";
+import { useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import MenuItemForm from "./Item/ManageMenuItems";
 import RoleForm from "../Role/RoleForm";
-import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
+import { MenuItem } from "@/types/Menu";
 import { FormikValues, useFormikContext } from "formik";
+import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 
-export type RolesModal = {
-    show: boolean;
-    title: string;
-    footer: boolean;
-};
-export type MenuItemsModal = {
-    show: boolean;
-    title: string;
-    footer: boolean;
-};
 export type EditMenuFields = {
+    operation: 'edit' | 'update' | 'add' | 'create';
 };
-function EditMenuFields() {
-    const [rolesModal, setRolesModal] = useState<RolesModal>({
+function EditMenuFields({
+    operation,
+}: EditMenuFields) {
+    const [rolesModal, setRolesModal] = useState<LocalModal>({
         show: false,
         title: '',
         footer: true,
     });
-    const [menuItemsModal, setMenuItemsModal] = useState<MenuItemsModal>({
+    const [menuItemsModal, setMenuItemsModal] = useState<LocalModal>({
         show: false,
         title: '',
         footer: true,
     });
 
-    function hideModal(setter: Dispatch<SetStateAction<{
-        show: boolean;
-        title: string;
-        footer: boolean;
-    }>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = false;
-            return newState;
-        });
-    }
-    function showModal(setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = true;
-            return newState;
-        });
-    }
-    function setModalTitle(title: string, setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.title = title;
-            return newState;
-        });
-    }
-    function setModalFooter(hasFooter: boolean = false, setter: Dispatch<SetStateAction<RolesModal | MenuItemsModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.footer = hasFooter;
-            return newState;
-        });
-    }
     const {
         values,
         errors,
         setFieldValue,
         handleChange,
     } = useFormikContext<FormikValues>() || {};
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -128,9 +91,9 @@ function EditMenuFields() {
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    setModalTitle('Manage Roles', setRolesModal);
-                                    setModalFooter(true, setRolesModal);
-                                    showModal(setRolesModal);
+                                    ModalService.setModalTitle('Manage Roles', setRolesModal);
+                                    ModalService.setModalFooter(true, setRolesModal);
+                                    ModalService.showModal(setRolesModal);
                                 }}
                             >
                                 Manage Roles
@@ -139,9 +102,9 @@ function EditMenuFields() {
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    setModalTitle('Manage Menu Items', setMenuItemsModal);
-                                    setModalFooter(true, setMenuItemsModal);
-                                    showModal(setMenuItemsModal);
+                                    ModalService.setModalTitle('Manage Menu Items', setMenuItemsModal);
+                                    ModalService.setModalFooter(true, setMenuItemsModal);
+                                    ModalService.showModal(setMenuItemsModal);
                                 }}
                             >
                                 Manage Menu Items
@@ -149,7 +112,7 @@ function EditMenuFields() {
                         </div>
                     </div>
 
-                    <Modal show={rolesModal.show} onHide={() => hideModal(setRolesModal)}>
+                    <Modal show={rolesModal.show} onHide={() => ModalService.hideModal(setRolesModal)}>
                         <Modal.Header closeButton>
                             <Modal.Title>{rolesModal?.title || ''}</Modal.Title>
                         </Modal.Header>
@@ -230,21 +193,22 @@ function EditMenuFields() {
                         </Modal.Body>
                         {rolesModal.footer &&
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
+                                <Button variant="secondary" onClick={() => ModalService.hideModal(setRolesModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => hideModal(setRolesModal)}>
+                                <Button variant="primary" onClick={() => ModalService.hideModal(setRolesModal)}>
                                     Save Changes
                                 </Button>
                             </Modal.Footer>
                         }
                     </Modal>
-                    <Modal show={menuItemsModal.show} onHide={() => hideModal(setMenuItemsModal)}>
+                    <Modal show={menuItemsModal.show} onHide={() => ModalService.hideModal(setMenuItemsModal)}>
                         <Modal.Header closeButton>
                             <Modal.Title>{menuItemsModal?.title || ''}</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
                             <MenuItemForm
+                                operation={operation}
                                 menuId={values?.id}
                                 data={values?.menu_items || []}
                                 onChange={(menuItems: Array<MenuItem>) => {
@@ -254,10 +218,10 @@ function EditMenuFields() {
                         </Modal.Body>
                         {menuItemsModal.footer &&
                             <Modal.Footer>
-                                <Button variant="secondary" onClick={() => hideModal(setMenuItemsModal)}>
+                                <Button variant="secondary" onClick={() => ModalService.hideModal(setMenuItemsModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => { hideModal(setMenuItemsModal) }}>
+                                <Button variant="primary" onClick={() => { ModalService.hideModal(setMenuItemsModal) }}>
                                     Save Changes
                                 </Button>
                             </Modal.Footer>

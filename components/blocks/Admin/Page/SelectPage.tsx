@@ -8,18 +8,16 @@ import { useEffect, useState } from "react";
 export type SelectPageProps = {
     name?: string;
     value?: number | null;
-    onChange?: (pageId: number | null) => void;
-    onSubmit?: (pageId: number | null) => void;
     showSubmitButton?: boolean;
 }
 function SelectPage({
     name = 'page',
     value,
-    onChange,
 }: SelectPageProps) {
     const [pages, setPages] = useState<Array<Page>>([]);
-    const [selectedPage, setSelectedPage] = useState<number | null>(null);
+    const [selectedPage, setSelectedPage] = useState<Page | null>(null);
 
+    const formContext = useFormikContext<FormikValues>() || {};
 
     async function fetchPages() {
         // Fetch pages from the API or any other source
@@ -41,9 +39,28 @@ function SelectPage({
 
     useEffect(() => {
         if (value) {
-            setSelectedPage(value);
+            const findPage = pages.find((page: Page) => page?.id === value);
+            
+            if (findPage) {
+                setSelectedPage(findPage);
+            }
         }
-    }, [value]);
+    }, [value, pages]);
+    useEffect(() => {
+        if (!selectedPage) {
+            return;
+        }
+        if (!formContext) {
+            console.warn('Form context not found');
+            return;
+        }
+        if (!formContext.setFieldValue) {
+            console.warn('setFieldValue function not found in form context');
+            return;
+        }
+        formContext.setFieldValue(name, selectedPage);
+
+    }, [selectedPage]);
 
     return (
         <div className="floating-input form-group">
@@ -52,12 +69,18 @@ function SelectPage({
                 name={name}
                 className="form-control"
                 onChange={e => {
-                    setSelectedPage(parseInt(e.target.value));
-                    if (typeof onChange === 'function') {
-                        onChange(parseInt(e.target.value));
+                    if (!e.target.value) {
+                        setSelectedPage(null);
+                        return;
                     }
+                    const findPage = pages.find((page: Page) => page?.id === parseInt(e.target.value));
+                    if (!findPage) {
+                        console.warn('Selected page not found');
+                        return;
+                    }
+                    setSelectedPage(findPage);
                 }}
-                value={selectedPage || ''}
+                value={selectedPage?.id || ''}
             >
                 <option value="">Select Page</option>
                 {pages.map((page, index) => (
