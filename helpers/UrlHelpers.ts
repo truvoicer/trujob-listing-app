@@ -44,4 +44,23 @@ export class UrlHelpers {
 
         return params.toString()
     }
+
+    static urlFromArray(
+        array: Array<string | number>,
+        separator: string = '/'
+    ) {
+        if (array.length === 0) {
+            return '';
+        }
+        return array.map((item) => {
+            if (typeof item === 'string') {
+                return item;
+            } else if (typeof item === 'number') {
+                return item.toString();
+            } else {
+                console.warn('Array item should be a string or number', { item });
+                return '';
+            }
+        }).join(separator);
+    }
 }

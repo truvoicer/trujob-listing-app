@@ -22,13 +22,16 @@ function ManageMenuItems({
     onChange
 }: ManageMenuItemsProps) {
     const [menuItems, setMenuItems] = useState<Array<MenuItem>>([]);
-    
+
     const dataTableContext = useContext(DataTableContext);
     const notificationContext = useContext(AppNotificationContext);
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
     const menuItemSchema: CreateMenuItem = {
-        type: ''
+        type: '',
+        active: false,
+        label: '',
+        url: '',
     };
     function updateFieldValue(index: number, field: string, value: string | number | boolean) {
         const newData: Array<MenuItem> = [...menuItems];
@@ -60,6 +63,7 @@ function ManageMenuItems({
         }
         return true;
     }
+    console.log(dataTableContext.modal);
     function handleAddMenuItem({
         reorderData,
         onChange,
@@ -69,12 +73,10 @@ function ManageMenuItems({
                 <div className="row">
                     <div className="col-12 col-lg-12">
                         <EditMenuItem
-                            onSubmit={selectedMenu => {
-                                const newData = [...reorderData];
-                                newData.push({ ...menuItemSchema, ...selectedMenu });
-                                onChange(newData);
-                                dataTableContext.modal.close('menu-item-create-form');
-                            }}
+                            menuId={menuId}
+                            operation={'add'}
+                            inModal={true}
+                            modalId={'menuItem-form-select-menuItem'}
                         />
                     </div>
                 </div>
@@ -82,12 +84,12 @@ function ManageMenuItems({
             showFooter: true,
             formProps: {
                 operation: 'add',
-                initialValues: { menuItem: null },
+                initialValues: menuItemSchema,
             },
             onOk: async ({ formHelpers }: {
-                formHelpers: FormikProps<FormikValues>;
+                formHelpers: FormikProps<CreateMenuItem>;
             }) => {
-                const selectedMenuItem = formHelpers?.values?.menuItem;
+                const selectedMenuItem = formHelpers?.values;
                 if (!selectedMenuItem) {
                     notificationContext.show({
                         variant: 'danger',
@@ -101,6 +103,20 @@ function ManageMenuItems({
                     console.warn('MenuItem not found', selectedMenuItem);
                     return false;
                 }
+
+                if (['add', 'create'].includes(operation || '')) {
+                    setMenuItems(
+                        [
+                            ...menuItems,
+                            {
+                                ...menuItemSchema,
+                                ...formHelpers.values
+                            }
+                        ]
+                    );
+                    return true;
+                }
+
                 if (!selectedMenuItem?.id) {
                     notificationContext.show({
                         variant: 'danger',
@@ -114,17 +130,6 @@ function ManageMenuItems({
                     console.warn('MenuItem id not found', selectedMenuItem);
                     return false;
                 }
-
-                if (['add', 'create'].includes(operation || '')) {
-                    setMenuItems(
-                        [...menuItems, {
-                            ...menuItemSchema,
-                            ...formHelpers?.values?.menuItem
-                        }]
-                    );
-                    return true;
-                }
-
                 if (!validateMenuId() || !menuId) {
                     return false;
                 }
@@ -282,19 +287,6 @@ function ManageMenuItems({
         }
         console.log('formHelpers', formHelpers.values);
         const item = { ...formHelpers.values };
-        if (!item?.id) {
-            notificationContext.show({
-                variant: 'danger',
-                title: 'Error',
-                component: (
-                    <p>
-                        menuItem id not found
-                    </p>
-                ),
-            }, 'sidebar-menuItem-update-error');
-            console.warn('menuItem id not found', item);
-            return false;
-        }
         if (['add', 'create'].includes(operation || '')) {
             if (item.hasOwnProperty('index')) {
                 setMenuItems(prevState => {
@@ -310,6 +302,19 @@ function ManageMenuItems({
             return true;
         }
 
+        if (!item?.id) {
+            notificationContext.show({
+                variant: 'danger',
+                title: 'Error',
+                component: (
+                    <p>
+                        menuItem id not found
+                    </p>
+                ),
+            }, 'sidebar-menuItem-update-error');
+            console.warn('menuItem id not found', item);
+            return false;
+        }
         if (item.hasOwnProperty('page') && item.page && item.page?.id) {
             item.page_id = item.page.id;
             delete item.page;

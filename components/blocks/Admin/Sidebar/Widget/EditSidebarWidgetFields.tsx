@@ -19,7 +19,7 @@ export type WidgetModal = {
 };
 export type EditSidebarWidgetFields = {
     sidebarId?: number;
-    operation?: 'edit' | 'update' | 'add' | 'create';
+    operation: 'edit' | 'update' | 'add' | 'create';
 };
 function EditSidebarWidgetFields({
     sidebarId,
@@ -171,6 +171,7 @@ function EditSidebarWidgetFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                operation={operation}
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
@@ -267,13 +268,6 @@ function EditSidebarWidgetFields({
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={() => {
-                                    setFieldValue('roles', selectedRoles);
-                                    console.log('selectedRoles', sidebarId, selectedRoles);
-                                    hideModal(setRolesModal)
-                                }}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         }

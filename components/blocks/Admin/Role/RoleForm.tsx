@@ -6,19 +6,22 @@ import { Role } from "@/types/Role";
 import { FormikProps, FormikValues } from "formik";
 
 export type RoleFormProps = {
+    operation: 'edit' | 'update' | 'add' | 'create';
     data?: Array<Role>;
     onChange: (data: Array<Role>) => void;
     onAdd?: (data: Role) => Promise<boolean>;
     makeRequest?: () => Promise<boolean>;
     onDelete?: (data: Role) => Promise<boolean>;
 }
-function RoleForm({ 
-    data = [], 
+function RoleForm({
+    operation,
+    data = [],
     onChange,
     onDelete,
     onAdd,
     makeRequest
- }: RoleFormProps) {
+}: RoleFormProps) {
+    const [roles, setRoles] = useState<Array<Role>>([]);
     const dataTableContext = useContext(DataTableContext);
 
     const roleSchema = {
@@ -39,14 +42,14 @@ function RoleForm({
             ),
             formProps: {},
             showFooter: true,
-            onOk: async ({formHelpers}: {
+            onOk: async ({ formHelpers }: {
                 formHelpers: FormikProps<FormikValues>;
-            })  => {
+            }) => {
                 if (!formHelpers) {
                     console.warn('No form helpers found');
                     return false;
                 }
-                
+
                 if (!formHelpers?.values?.role) {
                     console.warn('No role found');
                     return false;
@@ -70,7 +73,7 @@ function RoleForm({
         }, 'role-select');
     }
 
-    async function handleDelete({index, item, itemSchema, reorderData}: ReorderOnDelete) {
+    async function handleDelete({ index, item, itemSchema, reorderData }: ReorderOnDelete) {
         if (!item) {
             console.warn('No item found');
             return false;
@@ -80,6 +83,7 @@ function RoleForm({
             return false;
         }
         const response = await onDelete(item);
+        console.log('delete response', response);
         if (!response) {
             console.warn('No response from onDelete function');
             return false;
@@ -89,25 +93,44 @@ function RoleForm({
     }
 
     function handleChange(values: Array<Role>) {
-        if (typeof onChange !== 'function') {
-            console.warn('No onChange function found');
-            return;
-        }
-        onChange(values);
+        setRoles(values);
     }
     async function initRequest() {
         if (typeof makeRequest !== 'function') {
             return;
         }
-        const response = await makeRequest()
-        if (!response) {
-            console.warn('No response from makeRequest');
+        const response = await makeRequest();
+        if (Array.isArray(response)) {
+            setRoles(response);
+            return;
         }
+        console.warn('No response from makeRequest');
     }
+
     useEffect(() => {
+        if (typeof onChange === 'function') {
+            onChange(roles);
+        }
+    }, [roles]);
+
+    useEffect(() => {
+        if (['create', 'add'].includes(operation || '')) {
+            return;
+        }
         initRequest();
     }, []);
-    
+
+
+    function getRoles() {
+        if (['create', 'add'].includes(operation || '')) {
+            return Array.isArray(data)? data : [];
+        } 
+        if (['edit', 'update'].includes(operation || '')) {
+            return roles || [];
+        }
+        return [];
+    }
+
     return (
         <div className="row">
             <div className="col-12">
@@ -115,9 +138,8 @@ function RoleForm({
                     itemSchema={roleSchema}
                     itemHeader={(item, index) => {
                         return `${item?.label} | name: ${item?.name} | ability: ${item?.ability}` || 'Item label error';
-                    }
-                    }
-                    data={data || []}
+                    }}
+                    data={getRoles()}
                     onChange={handleChange}
                     onAdd={handleAdd}
                     onDelete={handleDelete}

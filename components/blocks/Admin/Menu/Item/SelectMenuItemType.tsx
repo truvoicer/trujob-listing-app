@@ -20,7 +20,7 @@ function SelectMenuItemType({
     const [selectedMenuItemType, setSelectedMenuItemType] = useState<string | null>(null);
 
         const formContext = useFormikContext<FormikValues>() || {};
-
+        
     async function fetchMenuItemTypes() {
         // Fetch menuItemTypes from the API or any other source
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -58,6 +58,7 @@ function SelectMenuItemType({
             console.warn('setFieldValue function not found in form context');
             return;
         }
+        
         formContext.setFieldValue(name, selectedMenuItemType);
 
     }, [selectedMenuItemType]);

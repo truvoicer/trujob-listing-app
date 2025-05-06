@@ -27,6 +27,8 @@ function EditMenuFields({
         footer: true,
     });
 
+    const [selectedRoles, setSelectedRoles] = useState<Array<Role>>([]);
+    const [selectedMenuItems, setSelectedMenuItems] = useState<Array<MenuItem>>([]);
     const {
         values,
         errors,
@@ -118,9 +120,10 @@ function EditMenuFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                operation={operation}
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
-                                    setFieldValue('roles', roles);
+                                    setSelectedRoles(roles);
                                 }}
                                 makeRequest={async () => {
                                     if (['edit', 'update'].includes(operation)) {
@@ -142,14 +145,17 @@ function EditMenuFields({
                                             console.warn('Response is not an array');
                                             return false;
                                         }
-                                        setFieldValue('roles', response.data);
-                                        return true;
+                                        return response.data;
                                     } else if (['add', 'create'].includes(operation)) {
-                                        return true;
+                                        return values?.roles || [];
                                     }
-                                    return false;
+                                    return [];
                                 }}
                                 onAdd={async (role: Role) => {
+                                    if (['add', 'create'].includes(operation)) {
+                                        setFieldValue('roles', [...values.roles, role]);
+                                        return true;
+                                    }
                                     if (!values?.id) {
                                         console.warn('Menu ID is required');
                                         return false;
@@ -170,6 +176,9 @@ function EditMenuFields({
                                     return true;
                                 }}
                                 onDelete={async (role: Role) => {
+                                    if (['add', 'create'].includes(operation)) {
+                                        return true;
+                                    }
                                     if (!values?.id) {
                                         console.warn('Menu ID is required');
                                         return false;
@@ -196,9 +205,6 @@ function EditMenuFields({
                                 <Button variant="secondary" onClick={() => ModalService.hideModal(setRolesModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => ModalService.hideModal(setRolesModal)}>
-                                    Save Changes
-                                </Button>
                             </Modal.Footer>
                         }
                     </Modal>
@@ -212,7 +218,7 @@ function EditMenuFields({
                                 menuId={values?.id}
                                 data={values?.menu_items || []}
                                 onChange={(menuItems: Array<MenuItem>) => {
-                                    setFieldValue('menu_items', menuItems);
+                                    setSelectedMenuItems(menuItems);
                                 }}
                             />
                         </Modal.Body>
@@ -221,7 +227,10 @@ function EditMenuFields({
                                 <Button variant="secondary" onClick={() => ModalService.hideModal(setMenuItemsModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => { ModalService.hideModal(setMenuItemsModal) }}>
+                                <Button variant="primary" onClick={() => { 
+                                    setFieldValue('menu_items', selectedMenuItems);
+                                    ModalService.hideModal(setMenuItemsModal);
+                                }}>
                                     Save Changes
                                 </Button>
                             </Modal.Footer>

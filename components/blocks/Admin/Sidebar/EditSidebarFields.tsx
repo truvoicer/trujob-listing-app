@@ -158,6 +158,7 @@ function EditSidebarFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                operation={operation}
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);

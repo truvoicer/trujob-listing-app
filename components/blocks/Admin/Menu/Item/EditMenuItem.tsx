@@ -9,6 +9,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { isObjectEmpty } from "@/helpers/utils";
+import { ModalService } from "@/library/services/modal/ModalService";
 
 export type EditMenuItemProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -179,7 +180,7 @@ function EditMenuItem({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', {values, requestData});
+                console.log('edit requestData', { values, requestData });
                 // return;
                 if (!requestData?.id) {
                     throw new Error('MenuItem ID is required');
@@ -230,15 +231,12 @@ function EditMenuItem({
     const dataTableContext = useContext(DataTableContext);
 
     useEffect(() => {
-        if (!data?.id) {
-            return;
-        }
         if (['add', 'create'].includes(operation)) {
             setInitialValues(data);
         } else if (['edit', 'update'].includes(operation)) {
             menuItemRequest();
         }
-    }, [data?.id]);
+    }, [data]);
 
     useEffect(() => {
         if (!inModal) {
@@ -268,30 +266,32 @@ function EditMenuItem({
                         {alert.message}
                     </div>
                 )}
-                {inModal
-                    ? (
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
                         <EditMenuItemFields
                             operation={operation}
                             menuId={menuId}
                         />
                     )
-                    : (
-                        <Form
-                            operation={operation}
-                            requiredFields={getRequiredFields()}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditMenuItemFields
-                                        operation={operation}
-                                        menuId={menuId}
-                                    />
-                                )
-                            }}
-                        </Form>
-                    )}
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        requiredFields={getRequiredFields()}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditMenuItemFields
+                                    operation={operation}
+                                    menuId={menuId}
+                                />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
         </div>
     );

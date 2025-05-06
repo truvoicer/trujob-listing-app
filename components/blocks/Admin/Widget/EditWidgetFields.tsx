@@ -153,6 +153,7 @@ function EditWidgetFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                operation={operation}
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
@@ -252,12 +253,6 @@ function EditWidgetFields({
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={() => hideModal(setRolesModal)}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={() => {
-                                    setFieldValue('roles', selectedRoles);
-                                    hideModal(setRolesModal)
-                                }}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         }

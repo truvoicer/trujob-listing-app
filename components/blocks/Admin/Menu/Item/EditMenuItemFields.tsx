@@ -14,11 +14,12 @@ import { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } from "@/com
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectSidebar from "../../Sidebar/SelectSidebar";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { Menu } from "@/types/Menu";
+import { Menu, MenuItemMenu } from "@/types/Menu";
 import MenuForm from "./Menu/MenuItemMenuForm";
 import SelectMenuItemType from "./SelectMenuItemType";
 import SelectPage from "../../Page/SelectPage";
 import SelectLinkTarget from "../SelectLinkTarget";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 type EditMenuItemFieldsProps = {
     menuId?: number;
@@ -50,7 +51,8 @@ function EditMenuItemFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    const formikContext = useFormikContext<FormikValues>() || {};
+    const { values, setFieldValue, handleChange } = formikContext;
 
 
     function validatePageId(): boolean {
@@ -162,7 +164,7 @@ function EditMenuItemFields({
                         </p>
                     ),
                 }, 'sidebar-sidebar-add-success');
-                
+
                 if (typeof sidebarsRequest === 'function') {
                     sidebarsRequest();
                 }
@@ -305,7 +307,7 @@ function EditMenuItemFields({
         if (!formHelpers) {
             return;
         }
-        
+
         const item = { ...formHelpers.values };
         if (!item?.id) {
             notificationContext.show({
@@ -378,7 +380,7 @@ function EditMenuItemFields({
         sidebars,
         setSidebars
     }: SidebarFormMakeRequest) {
-        
+
         if (!validatePageId() || !pageId) {
             return [];
         }
@@ -392,7 +394,7 @@ function EditMenuItemFields({
         }
         return response?.data || [];
     }
-
+console.log('edit menu item fields', values);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -435,10 +437,10 @@ function EditMenuItemFields({
                                 className="form-control"
                                 type="text"
                                 name="label"
-                                id={"label" + index}
+                                id={"label"}
                                 onChange={handleChange}
                                 value={values?.label || ""} />
-                            <label className="form-label" htmlFor={'label' + index}>Nav Title</label>
+                            <label className="form-label" htmlFor={'label'}>Label</label>
                         </div>
                     </div>
                     <div className="col-12 col-lg-6">
@@ -447,10 +449,10 @@ function EditMenuItemFields({
                                 className="form-control"
                                 type="text"
                                 name="url"
-                                id={"url" + index}
+                                id={"url"}
                                 onChange={handleChange}
                                 value={values?.url || ""} />
-                            <label className="form-label" htmlFor={'url' + index}>URL</label>
+                            <label className="form-label" htmlFor={'url'}>URL</label>
                         </div>
                     </div>
                     <div className="col-12 col-lg-6">
@@ -533,11 +535,15 @@ function EditMenuItemFields({
                     </Modal.Header>
                     <Modal.Body>
                         <RoleForm
+                            operation={operation}
                             data={values?.roles || []}
                             onChange={(roles) => {
                                 setSelectedRoles(roles);
                             }}
                             makeRequest={async () => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    return values?.roles || [];
+                                }
                                 if (!menuId) {
                                     console.warn('No menu item id found');
                                     return false;
@@ -563,6 +569,10 @@ function EditMenuItemFields({
                                 return response.data;
                             }}
                             onAdd={async (role: Role) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    setFieldValue('roles', [...values?.roles, role]);
+                                    return true;
+                                }
                                 if (!menuId) {
                                     return false;
                                 }
@@ -582,6 +592,9 @@ function EditMenuItemFields({
                                 return true;
                             }}
                             onDelete={async (role: Role) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    return true;
+                                }
                                 if (!menuId) {
                                     return false;
                                 }
@@ -624,8 +637,136 @@ function EditMenuItemFields({
                     <Modal.Body>
                         <MenuForm
                             data={values?.menus || []}
-                            onChange={(menus) => {
+                            onChange={(menus: Array<Menu>) => {
                                 setSelectedMenus(menus);
+                            }}
+                            makeRequest={async () => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    return values?.menus || [];
+                                }
+                                if (!menuId) {
+                                    console.warn('No menu item id found');
+                                    return null;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: UrlHelpers.urlFromArray([
+                                            truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()),
+                                            values.id,
+                                            'menu'
+                                        ]),
+                                        method: ApiMiddleware.METHOD.GET,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when getting roles');
+                                    return null;
+                                }
+                                if (!response?.data) {
+                                    console.warn('No data found');
+                                    return null;
+                                }
+                                if (!Array.isArray(response?.data)) {
+                                    console.warn('Response is not an array');
+                                    return null;
+                                }
+                                return response.data;
+                            }}
+                            onMove={async ({
+                                direction,
+                                item,
+                            }: ReorderOnMove) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    return true;
+                                }
+                                if (!menuId) {
+                                    return false;
+                                }
+                                if (!item) {
+                                    return false;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: UrlHelpers.urlFromArray([
+                                            truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()),
+                                            values.id,
+                                            'menu',
+                                            'rel',
+                                            item.id,
+                                            'reorder'
+                                        ]),
+                                        method: ApiMiddleware.METHOD.POST,
+                                        protectedReq: true,
+                                        data: {
+                                            direction
+                                        }
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when adding role');
+                                    return false;
+                                }
+                                return true;
+                            }}
+                            onAdd={async (menu: Menu) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    setSelectedMenus((prevState: Array<Menu>) => {
+                                        return [...prevState, menu];
+                                    });
+                                    return true;
+                                }
+                                if (!menuId) {
+                                    return false;
+                                }
+                                if (!menu) {
+                                    return false;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: UrlHelpers.urlFromArray([
+                                            truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()),
+                                            values.id,
+                                            'menu',
+                                            menu.id,
+                                            'create'
+                                        ]),
+                                        method: ApiMiddleware.METHOD.POST,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when adding role');
+                                    return false;
+                                }
+                                return true;
+                            }}
+                            onDelete={async (menuItemMenu: MenuItemMenu) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    return true;
+                                }
+                                if (!menuId) {
+                                    return false;
+                                }
+                                if (!menuItemMenu) {
+                                    return false;
+                                }
+
+                                const response = await TruJobApiMiddleware.getInstance()
+                                    .resourceRequest({
+                                        endpoint: UrlHelpers.urlFromArray([
+                                            truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString()),
+                                            values.id,
+                                            'menu',
+                                            'rel',
+                                            menuItemMenu.id,
+                                            'delete'
+                                        ]),
+                                        method: ApiMiddleware.METHOD.DELETE,
+                                        protectedReq: true,
+                                    })
+                                if (!response) {
+                                    console.warn('No response from API when adding role');
+                                    return false;
+                                }
+                                return true;
                             }}
                         />
                     </Modal.Body>
@@ -635,11 +776,11 @@ function EditMenuItemFields({
                                 Close
                             </Button>
                             <Button variant="primary" onClick={() => {
-                                    setFieldValue('roles', selectedMenus);
-                                    ModalService.hideModal(setMenuModal)
-                                }}>
-                                    Save Changes
-                                </Button>
+                                setFieldValue('menus', selectedMenus);
+                                ModalService.hideModal(setMenuModal)
+                            }}>
+                                Save Changes
+                            </Button>
                         </Modal.Footer>
                     }
                 </Modal>

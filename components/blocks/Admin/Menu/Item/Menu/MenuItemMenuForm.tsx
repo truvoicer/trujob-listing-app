@@ -2,27 +2,35 @@ import Reorder, { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } fr
 import { useContext, useEffect, useState } from "react";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectMenu from "../../SelectMenu";
-import { CreateMenu, CreateMenuItem, Menu, MenuItem } from "@/types/Menu";
-import { Role } from "@/types/Role";
+import { Menu, MenuItemMenu } from "@/types/Menu";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { FormikProps, FormikValues } from "formik";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type MenuItemMenuFormProps = {
-    menuId?: number;
-    menuItemId?: number;
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    data?: Array<Menu>;
-    onChange?: (data: Array<Menu>) => void;
+    operation: 'edit' | 'update' | 'add' | 'create';
+    data?: Array<MenuItemMenu>;
+    onMove?: ({
+        index,
+        item,
+        itemSchema,
+        reorderData,
+        direction
+    }: ReorderOnMove) => Promise<boolean>;
+    onOk?: (data: Array<MenuItemMenu>) => void;
+    onChange: (data: Array<MenuItemMenu>) => void;
+    onAdd?: (data: MenuItemMenu) => Promise<boolean>;
+    makeRequest?: () => Promise<Array<MenuItemMenu>> | null;
+    onDelete?: (data: MenuItemMenu) => Promise<boolean>;
 }
 function MenuItemMenuForm({
-    menuId,
-    menuItemId,
     operation,
     data = [],
-    onChange
+    onChange,
+    onDelete,
+    onAdd,
+    onMove,
+    onOk,
+    makeRequest
 }: MenuItemMenuFormProps) {
 
     const [menus, setMenus] = useState<Array<Menu>>([]);
@@ -30,74 +38,63 @@ function MenuItemMenuForm({
     const dataTableContext = useContext(DataTableContext);
     const notificationContext = useContext(AppNotificationContext);
 
-    const menuSchema: Menu = {
+    const menuSchema: MenuItemMenu = {
         id: 0,
         active: false,
-        name: '',
-        ul_class: '',
-        roles: [],
-        menu_items: [],
-        has_parent: false,
+        order: 0,
     };
-    function updateFieldValue(
-        index: number,
-        field: string,
-        value: string | number | boolean | Array<MenuItem> | Array<Role>
-    ) {
-        const newData = [...data];
-        newData[index][field] = value;
-        if (typeof onChange !== 'function') {
-            return;
-        }
-        onChange(newData);
-    }
-    function handleChange(
-        values: Array<Menu>
-    ) {
-        if (typeof onChange !== 'function') {
-            return;
-        }
-        onChange(values);
-    }
 
-    function validateMenuId(): boolean {
-        if (!menuId) {
-            notificationContext.show({
-                variant: 'danger',
-                title: 'Error',
-                component: (
-                    <p>
-                        Menu id not found
-                    </p>
-                ),
-            }, 'menu-item-menu-form-validate-menu-id-error');
-            console.warn('Menu id not found', menuId);
-            return false;
-        }
-        return true;
-    }
-
-    function validateMenuItemId(): boolean {
-        if (!menuItemId) {
-            notificationContext.show({
-                variant: 'danger',
-                title: 'Error',
-                component: (
-                    <p>
-                        Menu item id not found
-                    </p>
-                ),
-            }, 'menu-item-menu-form-validate-menu-item-id-error');
-            console.warn('Menu item id not found', menuItemId);
-            return false;
-        }
-        return true;
-    }
-
-    function handleAddMenuItem({
+    async function handleMove({
+        direction,
+        item,
+        itemSchema,
+        index,
         reorderData,
         onChange,
-    }: ReorderOnAdd) {
+        newIndex
+    }: ReorderOnMove) {
+        if (!item) {
+            console.warn('No item found');
+            return false;
+        }
+        if (typeof onMove !== 'function') {
+            console.warn('No onMove function found');
+            return false;
+        }
+        const response = await onMove({
+            direction,
+            item,
+            itemSchema,
+            index,
+            reorderData,
+            onChange,
+            newIndex
+        });
+        if (!response) {
+            console.warn('No response from onMove function');
+            return false;
+        }
+        initRequest();
+        return true;
+    }
+    async function handleOk({ index, item, itemSchema, reorderData }: ReorderOnOk) {
+        if (!item) {
+            console.warn('No item found');
+            return false;
+        }
+        if (typeof onOk !== 'function') {
+            console.warn('No onOk function found');
+            return false;
+        }
+        const response = await onOk(reorderData);
+        if (!response) {
+            console.warn('No response from onOk function');
+            return false;
+        }
+        initRequest();
+        return true;
+    }
+    function handleAdd() {
         dataTableContext.modal.show({
             component: (
                 <div className="row">
@@ -108,303 +105,70 @@ function MenuItemMenuForm({
                     </div>
                 </div>
             ),
+            formProps: { menu: null },
             showFooter: true,
-            formProps: {
-                operation: 'add',
-                initialValues: { menu: null },
-            },
             onOk: async ({ formHelpers }: {
                 formHelpers: FormikProps<FormikValues>;
             }) => {
-                const selectedMenu = formHelpers?.values?.menu;
-                if (!selectedMenu) {
-                    notificationContext.show({
-                        variant: 'danger',
-                        title: 'Error',
-                        component: (
-                            <p>
-                                Menu not found
-                            </p>
-                        ),
-                    }, 'menu-item-menu-form-select-menu-error');
-                    console.warn('Menu not found', selectedMenu);
-                    return false;
-                }
-                if (!selectedMenu?.id) {
-                    notificationContext.show({
-                        variant: 'danger',
-                        title: 'Error',
-                        component: (
-                            <p>
-                                MenuItem id not found
-                            </p>
-                        ),
-                    }, 'menu-item-menu-form-select-menu-error');
-                    console.warn('MenuItem id not found', selectedMenu);
+                if (!formHelpers) {
+                    console.warn('No form helpers found');
                     return false;
                 }
 
-                if (['add', 'create'].includes(operation || '')) {
-                    setMenus(
-                        [...menus, {
-                            ...menuSchema,
-                            ...formHelpers.values.menu
-                        }]
-                    );
-                    return true;
-                }
-
-                if (!validateMenuId() || !menuId) {
+                if (!formHelpers?.values?.menu) {
+                    console.warn('No menu found');
                     return false;
                 }
-                if (!validateMenuItemId() || !menuItemId) {
+                if (typeof onAdd !== 'function') {
+                    console.warn('No onAdd function found');
                     return false;
                 }
-                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItemId}/menu/${selectedMenu.id}/create`,
-                    method: TruJobApiMiddleware.METHOD.POST,
-                    protectedReq: true,
-                });
+                const response = await onAdd(
+                    formHelpers?.values?.menu
+                );
                 if (!response) {
-                    notificationContext.show({
-                        variant: 'danger',
-                        title: 'Error',
-                        component: (
-                            <p>
-                                Menu add failed
-                            </p>
-                        ),
-                    }, 'menu-item-menu-add-error');
-                    console.warn('menu add failed', response);
+                    console.warn('No response from onAdd function');
                     return false;
                 }
-                notificationContext.show({
-                    variant: 'success',
-                    title: 'Success',
-                    component: (
-                        <p>
-                            Menu added successfully
-                        </p>
-                    ),
-                }, 'menu-item-menu-add-success');
-                menusRequest();
-                dataTableContext.modal.close('menu-item-menu-form-select-menu');
-                return true;
+                initRequest();
+                console.log('Successfully added menu');
+                dataTableContext.modal.close('menu-select');
+                return false;
             }
-        }, 'menu-item-menu-form-select-menu');
+        }, 'menu-select');
     }
 
-    async function handleMoveMenuItem({
-        direction,
-        reorderData,
-        onChange,
-        itemSchema,
-        newIndex,
-        index,
-        item
-    }: ReorderOnMove) {
-        if (!['up', 'down'].includes(direction)) {
+    async function handleDelete({ index, item, itemSchema, reorderData }: ReorderOnDelete) {
+        if (!item) {
+            console.warn('No item found');
             return false;
         }
-
-        if (['add', 'create'].includes(operation || '')) {
-            return true;
-        }
-        if (!validateMenuId() || !menuId) {
-            return;
-        }
-        if (!validateMenuItemId() || !menuItemId) {
-            return;
-        }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItemId}/menu/${item.id}/reorder`,
-            method: TruJobApiMiddleware.METHOD.POST,
-            protectedReq: true,
-            data: {
-                direction
-            }
-        });
-        if (response) {
-            notificationContext.show({
-                variant: 'success',
-                title: 'Success',
-                component: (
-                    <p>
-                        Menu moved successfully
-                    </p>
-                ),
-            }, 'menu-item-menu-move-success');
-            return true;
-        }
-        notificationContext.show({
-            variant: 'danger',
-            title: 'Error',
-            component: (
-                <p>
-                    Menu move failed
-                </p>
-            ),
-        }, 'menu-item-menu-move-error');
-        return false;
-
-    }
-
-    async function handleDeleteMenuItem({
-        item,
-    }: ReorderOnDelete) {
-
-        if (['add', 'create'].includes(operation || '')) {
-            setMenus(
-                menus.filter((menu: Menu) => {
-                    return menu.id !== item.id;
-                })
-            );
-            return true;
-        }
-        if (!validateMenuId() || !menuId) {
-            return;
-        }
-        if (!validateMenuItemId() || !menuItemId) {
-            return;
-        }
-
-        if (!item?.id) {
-            notificationContext.show({
-                variant: 'danger',
-                title: 'Error',
-                component: (
-                    <p>
-                        Menu id not found
-                    </p>
-                ),
-            }, 'menu-item-menu-delete-error');
-            console.warn('Menu id not found', item);
+        if (typeof onDelete !== 'function') {
+            console.warn('No onDelete function found');
             return false;
         }
-
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItemId}/menu/${item.id}/delete`,
-            method: TruJobApiMiddleware.METHOD.DELETE,
-            protectedReq: true,
-        });
-        if (response) {
-            notificationContext.show({
-                variant: 'success',
-                title: 'Success',
-                component: (
-                    <p>
-                        Menu deleted successfully
-                    </p>
-                ),
-            }, 'menu-item-menu-delete-success');
-            return true;
-        }
-        notificationContext.show({
-            variant: 'danger',
-            title: 'Error',
-            component: (
-                <p>
-                    Menu delete failed
-                </p>
-            ),
-        }, 'menu-item-menu-delete-error');
-
-        return false;
-    }
-
-    async function handleOk({
-        formHelpers
-    }: ReorderOnOk) {
-        if (!formHelpers) {
-            return;
-        }
-        console.log('formHelpers', formHelpers.values);
-        const item = { ...formHelpers.values };
-        if (!item?.id) {
-            notificationContext.show({
-                variant: 'danger',
-                title: 'Error',
-                component: (
-                    <p>
-                        Menu id not found
-                    </p>
-                ),
-            }, 'menu-item-menu-update-error');
-            console.warn('menu id not found', item);
-            return false;
-        }
-        if (['add', 'create'].includes(operation || '')) {
-            if (item.hasOwnProperty('index')) {
-                setMenus(prevState => {
-                    let newState = [...prevState];
-                    if (newState?.[item.index]) {
-                        newState[item.index] = item;
-                    }
-                    return newState;
-                });
-            } else {
-                setMenus([...menus, item]);
-            }
-            return true;
-        }
-
-        if (Array.isArray(item?.roles)) {
-            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
-        }
-        if (!validateMenuId() || !menuId) {
-            return;
-        }
-        if (!validateMenuItemId() || !menuItemId) {
-            return;
-        }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.menuItemRel.replace('%s', menuId.toString())}/${item.id}/update`,
-            method: TruJobApiMiddleware.METHOD.PATCH,
-            protectedReq: true,
-            data: item
-        });
-        if (response) {
-            notificationContext.show({
-                variant: 'success',
-                title: 'Success',
-                component: (
-                    <p>
-                        menu updated successfully
-                    </p>
-                ),
-            }, 'menu-item-menu-update-success');
-            menusRequest();
-            return true;
-        }
-        notificationContext.show({
-            variant: 'danger',
-            title: 'Error',
-            component: (
-                <p>
-                    menuItem update failed
-                </p>
-            ),
-        }, 'menu-item-menu-update-error');
-        return false;
-    }
-
-    async function menusRequest() {
-        if (!validateMenuId() || !menuId) {
-            return;
-        }
-        if (!validateMenuItemId() || !menuItemId) {
-            return;
-        }
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${menuItemId}/menu`,
-            method: TruJobApiMiddleware.METHOD.GET,
-            protectedReq: true,
-        });
+        const response = await onDelete(item);
         if (!response) {
+            console.warn('No response from onDelete function');
+            return false;
+        }
+        initRequest();
+        return true
+    }
+
+    function handleChange(values: Array<Menu>) {
+        setMenus(values);
+    }
+    async function initRequest() {
+        if (typeof makeRequest !== 'function') {
             return;
         }
-        const data = response?.data || [];
-        setMenus(data);
+        const response = await makeRequest()
+        if (Array.isArray(response)) {
+            setMenus(response);
+            return;
+        }
+        console.warn('No response from makeRequest');
     }
 
     useEffect(() => {
@@ -417,11 +181,8 @@ function MenuItemMenuForm({
         if (['create', 'add'].includes(operation || '')) {
             return;
         }
-        if (!menuId) {
-            return;
-        }
-        menusRequest();
-    }, [menuId]);
+        initRequest();
+    }, []);
 
     useEffect(() => {
         if (!['create', 'add'].includes(operation || '')) {
@@ -431,16 +192,11 @@ function MenuItemMenuForm({
             return;
         }
         if (!Array.isArray(data)) {
-            console.warn('menuItem data is not an array');
+            console.warn('Sidebar widget data is not an array');
             return;
         }
         setMenus(data);
-
     }, []);
-
-
-
-
     return (
         <div className="row">
             <div className="col-12">
@@ -448,12 +204,12 @@ function MenuItemMenuForm({
                     modalState={dataTableContext.modal}
                     enableEdit={false}
                     itemSchema={menuSchema}
-                    itemHeader={(item, index) => `${item?.name}` || 'Item type error'}
-                    data={data || []}
+                    itemHeader={(item, index) => `${item?.menu?.name}` || 'Item type error'}
+                    data={menus || []}
                     onChange={handleChange}
-                    onAdd={handleAddMenuItem}
-                    onMove={handleMoveMenuItem}
-                    onDelete={handleDeleteMenuItem}
+                    onAdd={handleAdd}
+                    onMove={handleMove}
+                    onDelete={handleDelete}
                     onOk={handleOk}
                 >
                     {({
@@ -461,7 +217,7 @@ function MenuItemMenuForm({
                         index,
                     }) => (
                         <>
-                            
+
                         </>
                     )}
                 </Reorder>

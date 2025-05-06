@@ -12,6 +12,15 @@ export type Menu = {
     has_permission: boolean;
     menu_items: Array<MenuItem>;
 }
+export type MenuItemMenu = {
+    [key: string]: string | number | boolean | Menu | MenuItem;
+    id: number;
+    active: boolean;
+    order: number;
+    menu: Menu;
+    MenuItem: MenuItem;
+}
+
 export type MenuItem = {
     [key: string]: string | number | boolean | null | Array<Role> | Array<Menu> | Page;
     id: number;

@@ -584,6 +584,7 @@ function EditPageFields({
                         </Modal.Header>
                         <Modal.Body>
                             <RoleForm
+                                operation={operation}
                                 data={values?.roles || []}
                                 onChange={(roles: Array<Role>) => {
                                     setSelectedRoles(roles);
@@ -691,12 +692,6 @@ function EditPageFields({
                             <Modal.Footer>
                                 <Button variant="secondary" onClick={() => ModalService.hideModal(setRoleModal)}>
                                     Close
-                                </Button>
-                                <Button variant="primary" onClick={() => {
-                                    setFieldValue('roles', selectedRoles);
-                                    ModalService.hideModal(setRoleModal)
-                                }}>
-                                    Save Changes
                                 </Button>
                             </Modal.Footer>
                         }
