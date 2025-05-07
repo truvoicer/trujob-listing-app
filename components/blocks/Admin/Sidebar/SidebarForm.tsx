@@ -225,7 +225,14 @@ function SidebarForm({
             <div className="col-12">
                 <Reorder
                     itemSchema={sidebarSchema}
-                    itemHeader={(item, index) => `${item?.title} (${item?.name})` || 'Item type error'}
+                    itemHeader={(item, index) => {
+                        if (['create', 'add'].includes(operation || '')) {
+                            return `${item?.title} (${item?.name})` || 'Item type error';
+                        } else if (['edit', 'update'].includes(operation || '')) {
+                            return `${item?.sidebar?.title} (${item?.sidebar?.name})` || 'Item type error';
+                        }
+                        return `Item type error | ${operation}`;
+                    }}
                     data={sidebars || []}
                     onChange={handleChange}
                     onAdd={handleAddSidebar}

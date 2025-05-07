@@ -132,7 +132,13 @@ function EditPageBlockFields({
                     return false;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${selectedSidebar.id}/create`,
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString()),
+                        values.id,
+                        'sidebar',
+                        selectedSidebar.id,
+                        'create'
+                    ]),
                     method: TruJobApiMiddleware.METHOD.POST,
                     protectedReq: true,
                 });
@@ -192,7 +198,14 @@ function EditPageBlockFields({
             return;
         }
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${item.id}/reorder`,
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString()),
+                values.id,
+                'sidebar',
+                'rel',
+                item.id,
+                'reorder'
+            ]),
             method: TruJobApiMiddleware.METHOD.POST,
             protectedReq: true,
             data: {
@@ -261,7 +274,14 @@ function EditPageBlockFields({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString())}/${values.id}/sidebar/${item.id}/delete`,
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId.toString()),
+                values.id,
+                'sidebar',
+                'rel',
+                item.id,
+                'delete'
+            ]),
             method: TruJobApiMiddleware.METHOD.DELETE,
             protectedReq: true,
         });

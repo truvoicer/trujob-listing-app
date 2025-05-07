@@ -123,12 +123,6 @@ function EditPageBlock({
         if (values.hasOwnProperty('has_sidebar')) {
             requestData.has_sidebar = values.has_sidebar;
         }
-        if (Array.isArray(values?.sidebars)) {
-            requestData.sidebars = buildSidebarIdData(values.sidebars);
-        }
-        if (Array.isArray(values?.roles)) {
-            requestData.roles = buildRoleIdData(values.roles);
-        }
         return requestData;
     }
 
@@ -137,6 +131,13 @@ function EditPageBlock({
             type: values?.type || '',
             default: values?.default || false,
         };
+
+        if (Array.isArray(values?.sidebars)) {
+            requestData.sidebars = buildSidebarIdData(values.sidebars);
+        }
+        if (Array.isArray(values?.roles)) {
+            requestData.roles = buildRoleIdData(values.roles);
+        }
         requestData = {
             ...requestData,
             ...buildRequestData(values),

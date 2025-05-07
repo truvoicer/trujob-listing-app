@@ -272,7 +272,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
         if (!formHelpers) {
             return;
         }
-        console.log('formHelpers', formHelpers.values);
+        
         const item = { ...formHelpers.values };
         if (!item?.id) {
             notificationContext.show({
@@ -301,9 +301,16 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
             }
             return true;
         }
-
-        if (Array.isArray(item?.roles)) {
-            item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+        if (['add', 'create'].includes(operation || '')) {
+            if (Array.isArray(item?.roles)) {
+                item.roles = RequestHelpers.extractIdsFromArray(item.roles);
+            }
+            if (Array.isArray(item?.sidebars)) {
+                item.sidebars = RequestHelpers.extractIdsFromArray(item.sidebars);
+            }
+        } else if (['edit', 'update'].includes(operation || '')) {
+            delete item?.roles;
+            delete item?.sidebars;
         }
         if (!validatePageId() || !pageId) {
             return;
