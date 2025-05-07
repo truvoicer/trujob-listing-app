@@ -12,6 +12,7 @@ import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
 import EditPageFields from "./EditPageFields";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type EditPageProps = {
     data?: Page;
@@ -70,6 +71,9 @@ function EditPage({
             console.warn('No data to update');
             return;
         }
+        if (Array.isArray(values?.roles)) {
+            requestData.roles = RequestHelpers.extractIdsFromArray(values.roles);
+        }
         if (Array.isArray(requestData?.sidebars)) {
             requestData.sidebars = requestData?.sidebars.filter((sidebar: Sidebar) => {
                 return sidebar?.id;
@@ -81,13 +85,10 @@ function EditPage({
         if (Array.isArray(requestData?.blocks)) {
             requestData.blocks = requestData?.blocks.map((block: PageBlock) => {
                 if (Array.isArray(block?.sidebars)) {
-                    block.sidebars = block.sidebars
-                        .filter((sidebar: Sidebar) => {
-                            return sidebar?.id;
-                        })
-                        .map((sidebar: Sidebar) => {
-                            return sidebar.id;
-                        });
+                    block.sidebars = RequestHelpers.extractIdsFromArray(block.sidebars);
+                }
+                if (Array.isArray(block?.roles)) {
+                    block.roles = RequestHelpers.extractIdsFromArray(block.roles);
                 }
                 return block;
             });

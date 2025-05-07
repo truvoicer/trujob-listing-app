@@ -16,6 +16,7 @@ import { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } from "@/com
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectSidebar from "../../Sidebar/SelectSidebar";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 type EditPageBlockFieldsProps = {
     index?: number;
@@ -388,7 +389,7 @@ function EditPageBlockFields({
         }
         return response?.data || [];
     }
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -555,9 +556,12 @@ function EditPageBlockFields({
                     </Modal.Header>
                     <Modal.Body>
                         <RoleForm
+                            operation={operation}
                             data={values?.roles || []}
-                            onChange={(roles: Array<Role>) => {
-                                setSelectedRoles(roles);
+                            onChange={(roles) => {
+                                if (['add', 'create'].includes(operation || '')) {
+                                    setFieldValue('roles', roles);
+                                }
                             }}
                             makeRequest={async () => {
                                 if (!operation) {
@@ -567,7 +571,11 @@ function EditPageBlockFields({
                                 if (['edit', 'update'].includes(operation)) {
                                     const response = await TruJobApiMiddleware.getInstance()
                                         .resourceRequest({
-                                            endpoint: truJobApiConfig.endpoints.widget + '/' + values.id + '/role',
+                                            endpoint: UrlHelpers.urlFromArray([
+                                                truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId?.toString() || ''),
+                                                values.id,
+                                                'role'
+                                            ]),
                                             method: ApiMiddleware.METHOD.GET,
                                             protectedReq: true,
                                         })
@@ -583,10 +591,9 @@ function EditPageBlockFields({
                                         console.warn('Response is not an array');
                                         return false;
                                     }
-                                    setFieldValue('roles', response?.data);
-                                    return true;
+                                    return response.data;
                                 } else if (['create', 'add'].includes(operation)) {
-                                    return true;
+                                    return values?.roles || [];
                                 }
                                 return false;
                             }}
@@ -605,7 +612,13 @@ function EditPageBlockFields({
                                     }
                                     const response = await TruJobApiMiddleware.getInstance()
                                         .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/create`,
+                                            endpoint: UrlHelpers.urlFromArray([
+                                                truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId?.toString() || ''),
+                                                values.id,
+                                                'role',
+                                                role.id,
+                                                'create'
+                                            ]),
                                             method: ApiMiddleware.METHOD.POST,
                                             protectedReq: true,
                                         })
@@ -614,9 +627,9 @@ function EditPageBlockFields({
                                         return false;
                                     }
                                     return true;
-                                } else if (['add', 'create'].includes(operation)) {
-                                    const buildRoles = [...values?.roles, role];
-                                    setFieldValue('roles', buildRoles);
+                                } else if (['add', 'create'].includes(operation || '')) {
+                                    let roles = values?.roles || [];
+                                    setFieldValue('roles', [...roles, role]);
                                     return true;
                                 }
                                 console.warn('Invalid operation');
@@ -637,7 +650,13 @@ function EditPageBlockFields({
                                     }
                                     const response = await TruJobApiMiddleware.getInstance()
                                         .resourceRequest({
-                                            endpoint: `${truJobApiConfig.endpoints.widget}/${values.id}/role/${role.id}/delete`,
+                                            endpoint: UrlHelpers.urlFromArray([
+                                                truJobApiConfig.endpoints.pageBlockRel.replace('%s', pageId?.toString() || ''),
+                                                values.id,
+                                                'role',
+                                                role.id,
+                                                'delete'
+                                            ]),
                                             method: ApiMiddleware.METHOD.DELETE,
                                             protectedReq: true,
                                         })

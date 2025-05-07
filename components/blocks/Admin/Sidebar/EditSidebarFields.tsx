@@ -160,8 +160,10 @@ function EditSidebarFields({
                             <RoleForm
                                 operation={operation}
                                 data={values?.roles || []}
-                                onChange={(roles: Array<Role>) => {
-                                    setSelectedRoles(roles);
+                                onChange={(roles) => {
+                                    if (['add', 'create'].includes(operation || '')) {
+                                        setFieldValue('roles', roles);
+                                    }
                                 }}
                                 makeRequest={async () => {
                                     if (['edit', 'update'].includes(operation)) {
@@ -215,9 +217,9 @@ function EditSidebarFields({
                                             return false;
                                         }
                                         return true;
-                                    } else if (['add', 'create'].includes(operation)) {
-                                        const buildRoles = [...values?.roles, role];
-                                        setFieldValue('roles', buildRoles);
+                                    } else if (['add', 'create'].includes(operation || '')) { 
+                                        let roles = values?.roles || [];
+                                        setFieldValue('roles', [...roles, role]);
                                         return true;
                                     }
                                     console.warn('Invalid operation');

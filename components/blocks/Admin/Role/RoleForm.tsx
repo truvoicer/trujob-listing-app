@@ -93,7 +93,9 @@ function RoleForm({
     }
 
     function handleChange(values: Array<Role>) {
-        setRoles(values);
+        if (typeof onChange === 'function') {
+            onChange(values);
+        }
     }
     async function initRequest() {
         if (typeof makeRequest !== 'function') {
@@ -106,12 +108,6 @@ function RoleForm({
         }
         console.warn('No response from makeRequest');
     }
-
-    useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(roles);
-        }
-    }, [roles]);
 
     useEffect(() => {
         if (['create', 'add'].includes(operation || '')) {

@@ -33,15 +33,6 @@ function ManageMenuItems({
         label: '',
         url: '',
     };
-    function updateFieldValue(index: number, field: string, value: string | number | boolean) {
-        const newData: Array<MenuItem> = [...menuItems];
-        newData[index][field] = value;
-        if (typeof onChange !== 'function') {
-            return;
-        }
-        onChange(newData);
-    }
-
 
     function handleChange(values: Array<MenuItem>) {
         setMenuItems(values);
@@ -63,7 +54,7 @@ function ManageMenuItems({
         }
         return true;
     }
-    console.log(dataTableContext.modal);
+
     function handleAddMenuItem({
         reorderData,
         onChange,
@@ -73,6 +64,7 @@ function ManageMenuItems({
                 <div className="row">
                     <div className="col-12 col-lg-12">
                         <EditMenuItem
+                            data={menuItemSchema}
                             menuId={menuId}
                             operation={'add'}
                             inModal={true}
@@ -105,6 +97,10 @@ function ManageMenuItems({
                 }
 
                 if (['add', 'create'].includes(operation || '')) {
+                    console.log('menuItem add', {
+                        ...menuItemSchema,
+                        ...formHelpers.values
+                    });
                     setMenuItems(
                         [
                             ...menuItems,

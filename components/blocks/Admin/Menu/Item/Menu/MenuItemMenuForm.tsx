@@ -157,7 +157,9 @@ function MenuItemMenuForm({
     }
 
     function handleChange(values: Array<Menu>) {
-        setMenus(values);
+        if (typeof onChange === 'function') {
+            onChange(values);
+        }
     }
     async function initRequest() {
         if (typeof makeRequest !== 'function') {
@@ -172,31 +174,21 @@ function MenuItemMenuForm({
     }
 
     useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(menus);
-        }
-    }, [menus]);
-
-    useEffect(() => {
         if (['create', 'add'].includes(operation || '')) {
             return;
         }
         initRequest();
     }, []);
 
-    useEffect(() => {
-        if (!['create', 'add'].includes(operation || '')) {
-            return;
+    function getMenus() {
+        if (['create', 'add'].includes(operation || '')) {
+            return Array.isArray(data)? data : [];
+        } 
+        if (['edit', 'update'].includes(operation || '')) {
+            return menus || [];
         }
-        if (!data) {
-            return;
-        }
-        if (!Array.isArray(data)) {
-            console.warn('Sidebar widget data is not an array');
-            return;
-        }
-        setMenus(data);
-    }, []);
+        return [];
+    }
     return (
         <div className="row">
             <div className="col-12">
@@ -204,8 +196,16 @@ function MenuItemMenuForm({
                     modalState={dataTableContext.modal}
                     enableEdit={false}
                     itemSchema={menuSchema}
-                    itemHeader={(item, index) => `${item?.menu?.name}` || 'Item type error'}
-                    data={menus || []}
+                    itemHeader={(item, index) => {
+                        console.log('item', item);
+                        if (['create', 'add'].includes(operation || '')) {
+                            return `${item?.name}` || 'Item type error'
+                        } else if (['edit', 'update'].includes(operation || '')) {
+                            return `${item?.menu?.name}` || 'Item type error'
+                        }
+                        return `Item name error | ${operation}`;
+                    }}
+                    data={getMenus()}
                     onChange={handleChange}
                     onAdd={handleAdd}
                     onMove={handleMove}

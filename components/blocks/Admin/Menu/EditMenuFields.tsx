@@ -122,8 +122,10 @@ function EditMenuFields({
                             <RoleForm
                                 operation={operation}
                                 data={values?.roles || []}
-                                onChange={(roles: Array<Role>) => {
-                                    setSelectedRoles(roles);
+                                onChange={(roles) => {
+                                    if (['add', 'create'].includes(operation || '')) {
+                                        setFieldValue('roles', roles);
+                                    }
                                 }}
                                 makeRequest={async () => {
                                     if (['edit', 'update'].includes(operation)) {
@@ -152,10 +154,12 @@ function EditMenuFields({
                                     return [];
                                 }}
                                 onAdd={async (role: Role) => {
-                                    if (['add', 'create'].includes(operation)) {
-                                        setFieldValue('roles', [...values.roles, role]);
-                                        return true;
-                                    }
+                                    
+                                let roles = values?.roles || [];
+                                if (['add', 'create'].includes(operation || '')) {
+                                    setFieldValue('roles', [...roles, role]);
+                                    return true;
+                                }
                                     if (!values?.id) {
                                         console.warn('Menu ID is required');
                                         return false;

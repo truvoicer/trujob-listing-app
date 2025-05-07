@@ -74,11 +74,21 @@ function EditMenu({
             if (menuItem.hasOwnProperty('page_id')) {
                 newMenuItems[index].page_id = menuItem.page_id;
             }
+            
+            if (menuItem.hasOwnProperty('page') && menuItem.page && menuItem.page?.id) {
+                newMenuItems[index].page_id = menuItem.page.id;
+            }
             if (Array.isArray(menuItem?.roles)) {
                 if (!Array.isArray(newMenuItems?.[index]?.roles)) {
                     newMenuItems[index].roles = [];
                 }
                 newMenuItems[index].roles = RequestHelpers.extractIdsFromArray(menuItem.roles);
+            }
+            if (Array.isArray(menuItem?.menus)) {
+                if (!Array.isArray(newMenuItems?.[index]?.menus)) {
+                    newMenuItems[index].menus = [];
+                }
+                newMenuItems[index].menus = RequestHelpers.extractIdsFromArray(menuItem.menus);
             }
             if (Array.isArray(menuItem?.menus)) {
                 if (!Array.isArray(newMenuItems?.[index]?.menus)) {

@@ -370,7 +370,7 @@ function EditPageFields({
     }
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
+    console.log('values', values);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -393,7 +393,7 @@ function EditPageFields({
                                     className="custom-control-input"
                                     id="is_active"
                                     name="is_active"
-                                    value={values?.is_active || false} />
+                                    checked={values?.is_active || false} />
                                 <label className="custom-control-label" htmlFor="is_active">
                                     Is active
                                 </label>
@@ -408,7 +408,7 @@ function EditPageFields({
                                     id="is_featured"
                                     name="is_featured"
                                     onChange={handleChange}
-                                    value={values?.is_featured || false} />
+                                    checked={values?.is_featured || false} />
                                 <label className="custom-control-label" htmlFor="is_featured">
                                     Is Featured
                                 </label>
@@ -423,7 +423,7 @@ function EditPageFields({
                                     id="is_home"
                                     name="is_home"
                                     onChange={handleChange}
-                                    value={values?.is_home || false} />
+                                    checked={values?.is_home || false} />
                                 <label className="custom-control-label" htmlFor="is_home">
                                     Is Home
                                 </label>
@@ -586,13 +586,15 @@ function EditPageFields({
                             <RoleForm
                                 operation={operation}
                                 data={values?.roles || []}
-                                onChange={(roles: Array<Role>) => {
-                                    setSelectedRoles(roles);
+                                onChange={(roles) => {
+                                    if (['add', 'create'].includes(operation || '')) {
+                                        setFieldValue('roles', roles);
+                                    }
                                 }}
                                 makeRequest={async () => {
                                     if (!operation) {
                                         console.warn('No operation found');
-                                        return false;
+                                        return [];
                                     }
                                     if (['edit', 'update'].includes(operation)) {
                                         const response = await TruJobApiMiddleware.getInstance()
@@ -613,12 +615,11 @@ function EditPageFields({
                                             console.warn('Response is not an array');
                                             return false;
                                         }
-                                        setFieldValue('roles', response?.data);
-                                        return true;
+                                        return response.data;
                                     } else if (['create', 'add'].includes(operation)) {
-                                        return true;
+                                        return values?.roles || [];
                                     }
-                                    return false;
+                                    return [];
                                 }}
                                 onAdd={async (role: Role) => {
                                     if (!operation) {
@@ -644,9 +645,9 @@ function EditPageFields({
                                             return false;
                                         }
                                         return true;
-                                    } else if (['add', 'create'].includes(operation)) {
-                                        const buildRoles = [...values?.roles, role];
-                                        setFieldValue('roles', buildRoles);
+                                    } else if (['add', 'create'].includes(operation || '')) { 
+                                        let roles = values?.roles || [];
+                                        setFieldValue('roles', [...roles, role]);
                                         return true;
                                     }
                                     console.warn('Invalid operation');
