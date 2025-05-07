@@ -5,16 +5,18 @@ import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager from "@/components/Table/DataManager";
+import DataManager, { DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditWidget from "./EditWidget";
 import { FormikProps, FormikValues } from "formik";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-widget-modal';
 
 function ManageWidget() {
     const appModalContext = useContext(AppModalContext);
+    const notificationContext = useContext(AppModalContext);
     function getWidgetFormModalProps() {
         return {
             formProps: {},
@@ -192,9 +194,89 @@ function ManageWidget() {
             ...getWidgetFormModalProps(),
         }, EDIT_SIDEBAR_MODAL_ID);
     }
+
+        function getRowSelectActions() {
+            let actions = [];
+            actions.push({
+                label: 'Delete',
+                name: 'delete',
+                onClick: ({
+                    action,
+                    data,
+                    dataTableContextState,
+                }: DMOnRowSelectActionClick) => {
+    
+                    dataTableContextState.confirmation.show({
+                        title: 'Bulk Delete Widgets',
+                        message: 'Are you sure you want to delete selected widgets?',
+                        onOk: async () => {
+                            console.log('Yes')
+                            if (!data?.length) {
+                                notificationContext.show({
+                                    variant: 'danger',
+                                    type: 'toast',
+                                    title: 'Error',
+                                    component: (
+                                        <p>No widgets selected</p>
+                                    ),
+                                }, 'widget-bulk-delete-error');
+                                return;
+                            }
+                            const ids = RequestHelpers.extractIdsFromArray(data);
+                            if (!ids?.length) {
+                                notificationContext.show({
+                                    variant: 'danger',
+                                    type: 'toast',
+                                    title: 'Error',
+                                    component: (
+                                        <p>Widget IDs are required</p>
+                                    ),
+                                }, 'widget-bulk-delete-error');
+                                return;
+                            }
+                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                endpoint: `${truJobApiConfig.endpoints.widget}/bulk/delete`,
+                                method: ApiMiddleware.METHOD.DELETE,
+                                protectedReq: true,
+                                data: {
+                                    ids: ids
+                                }
+                            })
+                            if (!response) {
+                                notificationContext.show({
+                                    variant: 'danger',
+                                    type: 'toast',
+                                    title: 'Error',
+                                    component: (
+                                        <p>Failed to delete widgets</p>
+                                    ),
+                                }, 'widget-bulk-delete-error');
+                                return;
+                            }
+    
+                            notificationContext.show({
+                                variant: 'success',
+                                type: 'toast',
+                                title: 'Success',
+                                component: (
+                                    <p>Widgets deleted successfully</p>
+                                ),
+                            }, 'widget-bulk-delete-success');
+                            dataTableContextState.refresh();
+                        },
+                        onCancel: () => {
+                            console.log('Cancel delete');
+                        },
+                    }, 'delete-bulk-page-confirmation');
+                }
+            });
+            return actions;
+        }
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelectActions={getRowSelectActions()}
+                multiRowSelection={true}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={widgetRequest}

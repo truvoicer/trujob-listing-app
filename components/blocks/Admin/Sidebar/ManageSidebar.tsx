@@ -5,16 +5,18 @@ import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager from "@/components/Table/DataManager";
+import DataManager, { DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditSidebar from "./EditSidebar";
 import { FormikProps, FormikValues } from "formik";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-sidebar-modal';
 
 function ManageSidebar() {
     const appModalContext = useContext(AppModalContext);
+    const notificationContext = useContext(AppModalContext);
     function getSidebarFormModalProps() {
         return {
             formProps: {},
@@ -192,9 +194,90 @@ function ManageSidebar() {
             ...getSidebarFormModalProps(),
         }, EDIT_SIDEBAR_MODAL_ID);
     }
+
+
+    function getRowSelectActions() {
+        let actions = [];
+        actions.push({
+            label: 'Delete',
+            name: 'delete',
+            onClick: ({
+                action,
+                data,
+                dataTableContextState,
+            }: DMOnRowSelectActionClick) => {
+
+                dataTableContextState.confirmation.show({
+                    title: 'Bulk Delete Sidebars',
+                    message: 'Are you sure you want to delete selected sidebars?',
+                    onOk: async () => {
+                        console.log('Yes')
+                        if (!data?.length) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>No sidebars selected</p>
+                                ),
+                            }, 'sidebar-bulk-delete-error');
+                            return;
+                        }
+                        const ids = RequestHelpers.extractIdsFromArray(data);
+                        if (!ids?.length) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Sidebar IDs are required</p>
+                                ),
+                            }, 'sidebar-bulk-delete-error');
+                            return;
+                        }
+                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                            endpoint: `${truJobApiConfig.endpoints.sidebar}/bulk/delete`,
+                            method: ApiMiddleware.METHOD.DELETE,
+                            protectedReq: true,
+                            data: {
+                                ids: ids
+                            }
+                        })
+                        if (!response) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Failed to delete sidebars</p>
+                                ),
+                            }, 'sidebar-bulk-delete-error');
+                            return;
+                        }
+
+                        notificationContext.show({
+                            variant: 'success',
+                            type: 'toast',
+                            title: 'Success',
+                            component: (
+                                <p>Sidebars deleted successfully</p>
+                            ),
+                        }, 'sidebar-bulk-delete-success');
+                        dataTableContextState.refresh();
+                    },
+                    onCancel: () => {
+                        console.log('Cancel delete');
+                    },
+                }, 'delete-bulk-page-confirmation');
+            }
+        });
+        return actions;
+    }
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelectActions={getRowSelectActions()}
+                multiRowSelection={true}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={sidebarRequest}

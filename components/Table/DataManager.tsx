@@ -14,6 +14,7 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+    title?: string;
     rowSelectActions?: Array<any>
     multiRowSelection?: boolean;
     renderActionColumn?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
@@ -46,6 +47,7 @@ export type DatatableSearchParams = {
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
+    title,
     rowSelectActions = [],
     multiRowSelection = false,
     renderActionColumn,
@@ -171,7 +173,9 @@ function DataManager({
                         <div className="card-header">
                             <div className="d-flex justify-content-between">
                                 <div className="iq-header-title">
-                                    <h4 className="card-title mb-0">Pages</h4>
+                                    {title && (
+                                        <h4 className="card-title mb-0">{title}</h4>
+                                    )}
                                 </div>
                                 <a href="#"
                                     className="btn btn-primary"
@@ -186,30 +190,6 @@ function DataManager({
                                 >
                                     Add New
                                 </a>
-                            </div>
-                            <div className="d-flex flex-wrap align-items-end mt-3">
-                                <div>
-                                    <div>
-                                        <label className="mb-0">
-                                            Show
-                                            <select
-                                                name="DataTables_Table_0_length"
-                                                aria-controls="DataTables_Table_0"
-                                            >
-                                                <option value="10">10</option>
-                                                <option value="25">25</option>
-                                                <option value="50">50</option>
-                                                <option value="100">100</option>
-                                            </select>
-                                            entries
-                                        </label>
-                                    </div>
-                                </div>
-                                <div className="iq-search-bar search-device ml-auto mb-0 ">
-                                    <form action="#" className="searchbox">
-                                        <input type="text" className="text search-input" placeholder="Search..." />
-                                    </form>
-                                </div>
                             </div>
                         </div>
                         <div className="card-body">
@@ -227,22 +207,8 @@ function DataManager({
                                             }
                                         }}
                                     />
-                                    <div className="row">
-                                        <div className="col-sm-12 col-md-9">
-
-                                            <Pagination
-                                                data={dataTableContextState?.meta}
-                                                showIndicator={true}
-                                                onPageClick={(e, page) => {
-                                                    console.log('Page Clicked', page);
-                                                }} />
-                                        </div>
-                                    </div>
                                 </>
                             )}
-                        </div>
-                        <div className="card-footer">
-
                         </div>
                     </div>
                 </div>

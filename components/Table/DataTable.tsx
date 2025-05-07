@@ -1,5 +1,7 @@
 import { isNotEmpty } from "@/helpers/utils";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import Pagination from "../listings/Pagination";
+import { DataTableContext } from "@/contexts/DataTableContext";
 
 export type DataTableColumn = {
     label?: string;
@@ -33,6 +35,8 @@ function DataTable({
     const [tableData, setTableData] = useState<Array<any>>(data);
 
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
+
+    const dataTableContext = useContext(DataTableContext);
 
     function getValue(column: DataTableColumn, item: DataTableItem) {
         if (typeof column?.render === 'function') {
@@ -139,6 +143,32 @@ function DataTable({
                 <div className="col-sm-12 col-md-3">
                     {renderRowSelectActions()}
                 </div>
+                <div className="col-sm-12 col-md-3">
+                    <label className="mb-0">
+                        Show
+                        <select
+                            name="DataTables_Table_0_length"
+                            aria-controls="DataTables_Table_0"
+                        >
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        entries
+                    </label>
+                </div>
+                <div className="col-sm-12 col-md-6">
+                    <div className="iq-search-bar search-device ml-auto mb-0 ">
+                        <form action="#" className="searchbox">
+                            <input 
+                            type="text" 
+                            className="text search-input w-auto" 
+                            placeholder="Search..." 
+                            />
+                        </form>
+                    </div>
+                </div>
             </div>
             <div className="table-responsive data-table">
                 <table className="data-tables table w-100">
@@ -212,6 +242,14 @@ function DataTable({
             <div className="row">
                 <div className="col-sm-12 col-md-3">
                     {renderRowSelectActions()}
+                </div>
+                <div className="col-sm-12 col-md-3">
+                    <Pagination
+                        data={dataTableContext?.meta}
+                        showIndicator={true}
+                        onPageClick={(e, page) => {
+                            console.log('Page Clicked', page);
+                        }} />
                 </div>
             </div>
         </>

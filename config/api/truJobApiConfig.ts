@@ -5,6 +5,7 @@ import { SessionService } from "@/library/services/session/SessionService";
 export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
+        listing: '/listing',
         settings: '/settings',
         menu: '/menu',
         menuItem: '/menu/%s/item',

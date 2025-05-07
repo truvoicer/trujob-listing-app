@@ -29,9 +29,6 @@ function ManageMenuItems({
 
     const menuItemSchema: CreateMenuItem = {
         type: '',
-        active: false,
-        label: '',
-        url: '',
     };
 
     function handleChange(values: Array<MenuItem>) {
@@ -96,6 +93,10 @@ function ManageMenuItems({
                     return false;
                 }
 
+                let saveData = {
+                    ...menuItemSchema,
+                    ...formHelpers.values
+                };
                 if (['add', 'create'].includes(operation || '')) {
                     console.log('menuItem add', {
                         ...menuItemSchema,
@@ -104,35 +105,27 @@ function ManageMenuItems({
                     setMenuItems(
                         [
                             ...menuItems,
-                            {
-                                ...menuItemSchema,
-                                ...formHelpers.values
-                            }
+                            saveData
                         ]
                     );
                     return true;
                 }
 
-                if (!selectedMenuItem?.id) {
-                    notificationContext.show({
-                        variant: 'danger',
-                        title: 'Error',
-                        component: (
-                            <p>
-                                MenuItem id not found
-                            </p>
-                        ),
-                    }, 'menuItem-form-select-menuItem-id-error');
-                    console.warn('MenuItem id not found', selectedMenuItem);
-                    return false;
-                }
                 if (!validateMenuId() || !menuId) {
                     return false;
                 }
+                if (selectedMenuItem?.page && selectedMenuItem?.page &&selectedMenuItem?.page?.id) {
+                    saveData.page_id = selectedMenuItem.page.id;
+                    delete saveData.page;
+                }
+                if (Array.isArray(selectedMenuItem?.roles)) {
+                    saveData.roles = RequestHelpers.extractIdsFromArray(selectedMenuItem.roles);
+                }
                 const response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/${selectedMenuItem.id}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/create`,
                     method: TruJobApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: saveData
                 });
                 if (!response) {
                     notificationContext.show({

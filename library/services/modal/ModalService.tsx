@@ -91,18 +91,6 @@ export class ModalService extends MessageService {
         return item;
     }
 
-    findItemIndexById(id: string): number {
-        if (typeof id !== "string") {
-            return -1;
-        }
-        const modalState = this.findStateData();
-        if (!modalState) {
-            console.error("state not found");
-            return -1;
-        }
-        return modalState.items.findIndex((item: ModalItem) => item?.id === id);
-    }
-
     static modalItemHasFormProps(modalState: ModalState, id?: string | null): boolean {
         if (typeof id !== "string") {
             return false;

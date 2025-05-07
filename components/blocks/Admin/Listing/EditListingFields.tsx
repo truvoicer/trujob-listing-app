@@ -1,8 +1,6 @@
 import { Dispatch, useContext, useState } from "react";
-import PageBlockForm from "./PageBlockForm";
 import { Button, Modal } from "react-bootstrap";
 import SidebarForm, { SidebarFormMakeRequest, SidebarFormOnAdd, SidebarFormOnDelete, SidebarFormOnMove, SidebarFormOnOk, sidebarSchema } from "../Sidebar/SidebarForm";
-import SelectPageViews from "./SelectPageViews";
 import { Sidebar } from "@/types/Sidebar";
 import { PageBlock } from "@/types/PageBlock";
 import { FormikProps, FormikValues, useFormikContext } from "formik";
@@ -16,11 +14,13 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import SelectPageViews from "../Page/SelectPageViews";
+import PageBlockForm from "../Page/PageBlockForm";
 
 type EditPageFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditPageFields({
+function EditListingFields({
     operation
 }: EditPageFields) {
     const [selectedSidebars, setSelectedSidebars] = useState<Array<Sidebar>>([]);
@@ -700,4 +700,4 @@ function EditPageFields({
         </div>
     );
 }
-export default EditPageFields;
+export default EditListingFields;

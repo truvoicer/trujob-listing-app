@@ -7,7 +7,7 @@ export interface ConfirmationState extends MessageState {
     items: Array<ConfirmationItem>;
 }
 export type ConfirmationItem = {
-    [key: string]: string | number | boolean | null | Function | undefined | FormProps | any;
+    [key: string]: string | number | boolean | null | Function | undefined  | any;
     id?: string | null;
     title: string | null;
     size: "sm" | "md" | "lg" | "xl";
@@ -34,6 +34,16 @@ export class ConfirmationService extends MessageService {
         onOk: () => { return true; },
     };
 
+    buildItemData(data: any, id: null | string = null) {
+        let item: ConfirmationItem = ConfirmationService.INIT_ITEM_DATA;
+        Object.keys(ConfirmationService.INIT_ITEM_DATA).forEach((key: string) => {
+            if (Object.keys(data).includes(key)) {
+                item[key] = data[key];
+            }
+        });
+        item.id = id;
+        return item;
+    }
     render() {
 
         const itemState = this.findStateData();
@@ -48,7 +58,7 @@ export class ConfirmationService extends MessageService {
                         return null;
                     }
                     return (
-                        <Modal show={confirmation.show} onHide={() => this.handleCancel(index)}>
+                        <Modal key={index} show={confirmation.show} onHide={() => this.handleCancel(index)}>
                             <Modal.Header closeButton>
                                 <Modal.Title>{confirmation?.title || ''}</Modal.Title>
                             </Modal.Header>

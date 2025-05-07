@@ -14,6 +14,7 @@ import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type ManagePageProps = {
 }
@@ -244,6 +245,58 @@ function ManagePage({ }: ManagePageProps) {
                     message: 'Are you sure you want to delete selected pages?',
                     onOk: async () => { 
                         console.log('Yes')
+                        if (!data?.length) {
+                            notificationContext.show({      
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>No pages selected</p>
+                                ),
+                            }, 'page-bulk-delete-error');
+                            return;
+                        }
+                        const ids = RequestHelpers.extractIdsFromArray(data);
+                        if (!ids?.length) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Page IDs are required</p>
+                                ),
+                            }, 'page-bulk-delete-error');
+                            return;
+                        }
+                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                            endpoint: `${truJobApiConfig.endpoints.page}/bulk/delete`,
+                            method: ApiMiddleware.METHOD.DELETE,
+                            protectedReq: true,
+                            data: {
+                                ids: ids
+                            }
+                        })
+                        if (!response) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Failed to delete pages</p>
+                                ),
+                            }, 'page-bulk-delete-error');
+                            return;
+                        }
+                        
+                        notificationContext.show({
+                            variant: 'success',
+                            type: 'toast',
+                            title: 'Success',
+                            component: (
+                                <p>Pages deleted successfully</p>
+                            ),
+                        }, 'page-bulk-delete-success');
+                        dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
