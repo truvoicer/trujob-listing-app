@@ -6,12 +6,14 @@ import EditPage from "./EditPage";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams } from "@/components/Table/DataManager";
+import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Page } from "@/types/Page";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
+import { OnRowSelectActionClick } from "@/components/Table/DataTable";
+import { DataTableContext } from "@/contexts/DataTableContext";
 
 export type ManagePageProps = {
 }
@@ -20,6 +22,7 @@ export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 function ManagePage({ }: ManagePageProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
+    const dataTableContext = useContext(DataTableContext);
 
     function getPageFormModalProps() {
         return {
@@ -45,7 +48,7 @@ function ManagePage({ }: ManagePageProps) {
         }
     }
 
-    function renderActions(item: Page, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Page, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -224,11 +227,40 @@ function ManagePage({ }: ManagePageProps) {
             ...getPageFormModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
+
+    function getRowSelectActions() {
+        let actions = [];
+        actions.push({
+            label: 'Delete',
+            name: 'delete',
+            onClick: ({
+                action,
+                data,
+                dataTableContextState,
+            }: DMOnRowSelectActionClick) => {
+                
+                dataTableContextState.confirmation.show({
+                    title: 'Edit Menu',
+                    message: 'Are you sure you want to delete selected pages?',
+                    onOk: async () => { 
+                        console.log('Yes')
+                    },
+                    onCancel: () => {
+                        console.log('Cancel delete');
+                    },
+                }, 'delete-bulk-page-confirmation');
+            }
+        }); 
+        return actions;
+    }
+    
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelectActions={getRowSelectActions()}
+                multiRowSelection={true}
                 renderAddNew={renderAddNew}
-                renderActions={renderActions}
+                renderActionColumn={renderActionColumn}
                 request={pageRequest}
                 columns={[
                     { label: 'ID', key: 'id' },

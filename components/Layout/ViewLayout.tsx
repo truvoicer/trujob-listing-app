@@ -9,6 +9,8 @@ import { Button, Modal } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { ModalService, ModalState } from "@/library/services/modal/ModalService";
 import { NotificationService, NotificationState } from "@/library/services/notification/NotificationService";
+import { ConfirmationService, ConfirmationState } from "@/library/services/confirmation/ConfirmationService";
+import { AppConfirmationContext } from "@/contexts/AppConfirmationContext";
 
 export type ViewLayoutProps = {
     page: any;
@@ -27,6 +29,14 @@ function ViewLayout({ page }: ViewLayoutProps) {
         ...ModalService.INIT_DATA
     });
 
+    const [confirmationState, setConfirmationState] = useState<ConfirmationState>({
+        ...ConfirmationService.INIT_DATA
+    });
+
+    const confirmationService = new ConfirmationService(
+        confirmationState,
+        setConfirmationState
+    );
     const modalService = new ModalService(
         modalState,
         setModalState
@@ -42,7 +52,17 @@ function ViewLayout({ page }: ViewLayoutProps) {
         setModalState(prevState => {
             let newState = {
                 ...prevState,
-                ...modalService.getState()
+                ...modalService.getState(),
+            };
+            return newState;
+        });
+    }, []);
+
+    useEffect(() => {
+        setConfirmationState(prevState => {
+            let newState = {
+                ...prevState,
+                ...confirmationService.getState(),
             };
             return newState;
         });
@@ -58,20 +78,21 @@ function ViewLayout({ page }: ViewLayoutProps) {
         });
     }, []);
     return (
-
         <AppNotificationContext.Provider value={notificationState}>
             <AppModalContext.Provider value={modalState}>
-                {view
-                    ? (
-                        <SessionLayout>
-                            {view}
-                        </SessionLayout>
-                    )
-                    : <Loader fullScreen />
-                }
+                <AppConfirmationContext value={confirmationState}>
+                    {view
+                        ? (
+                            <SessionLayout>
+                                {view}
+                            </SessionLayout>
+                        )
+                        : <Loader fullScreen />
+                    }
 
-                {modalService.render()}
-                {notificationService.render()}
+                    {modalService.render()}
+                    {notificationService.render()}
+                </AppConfirmationContext>
             </AppModalContext.Provider>
         </AppNotificationContext.Provider>
     );

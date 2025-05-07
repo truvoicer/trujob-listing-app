@@ -1,5 +1,7 @@
 import React from 'react'
 import { ModalService } from '@/library/services/modal/ModalService';
+import { ConfirmationService } from '@/library/services/confirmation/ConfirmationService';
+import { NotificationService } from '@/library/services/notification/NotificationService';
 
 export const dataTableContextData = {
     requestStatus: 'idle',
@@ -10,6 +12,12 @@ export const dataTableContextData = {
     post: {},
     modal: {
         ...ModalService.INIT_DATA,
+    },
+    // notification: {
+    //     ...NotificationService.INIT_DATA,
+    // },
+    confirmation: {
+        // ...ConfirmationService.INIT_DATA,
     },
     refresh: () => {},
     update: () => {},

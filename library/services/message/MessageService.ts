@@ -134,9 +134,7 @@ export class MessageService {
             this.handleClose(findItemIdex);
         }
     }
-    findItemIndexById(id: string): number {
-        return -1;
-    }
+    
     buildItemData(data: any, id: null | string = null) {
         return {};
     }
@@ -200,6 +198,22 @@ export class MessageService {
         }
         return findKeyData;
     }
+
+    findItemIndexById(id: string): number {
+        if (typeof id !== "string") {
+            return -1;
+        }
+        const modalState = this.findStateData();
+        if (!modalState) {
+            console.error("state not found");
+            return -1;
+        }
+        if (!Array.isArray(modalState?.items)) {
+            return -1;
+        }
+        return modalState.items.findIndex((item: any) => item?.id === id);
+    }
+    
     getState() {
         const findKeyData = this.findStateData();
         if (!findKeyData) {

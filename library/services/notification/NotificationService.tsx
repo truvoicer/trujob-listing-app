@@ -24,6 +24,7 @@ export class NotificationService extends MessageService {
         show: () => { },
         close: () => { },
         hide: () => { },
+        update: () => { },
     };
     static INIT_ITEM_DATA: NotificationItem = {
         variant: 'info',
@@ -36,18 +37,6 @@ export class NotificationService extends MessageService {
         onOk: () => { },
         onCancel: () => { },
     };
-
-    findItemIndexById(id: string): number {
-        if (typeof id !== "string") {
-            return -1;
-        }
-        const modalState = this.findStateData();
-        if (!modalState) {
-            console.error("state not found");
-            return -1;
-        }
-        return modalState.items.findIndex((item: NotificationItem) => item.id === id);
-    }
 
     buildItemData(data: any, id: null | string = null) {
         let item: NotificationItem = NotificationService.INIT_ITEM_DATA;

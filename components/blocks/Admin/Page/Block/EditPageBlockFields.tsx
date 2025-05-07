@@ -12,7 +12,6 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { Sidebar } from "@/types/Sidebar";
 import SidebarForm, { SidebarFormMakeRequest, SidebarFormOnAdd, SidebarFormOnDelete, SidebarFormOnMove, SidebarFormOnOk, sidebarSchema } from "../../Sidebar/SidebarForm";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { ReorderOnAdd, ReorderOnDelete, ReorderOnMove, ReorderOnOk } from "@/components/Reorder/Reorder";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectSidebar from "../../Sidebar/SelectSidebar";
 import { RequestHelpers } from "@/helpers/RequestHelpers";

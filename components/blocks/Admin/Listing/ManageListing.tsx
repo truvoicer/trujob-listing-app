@@ -8,7 +8,7 @@ import DataManager from "@/components/Table/DataManager";
 export const EDIT_LISTING_MODAL_ID = 'edit-listing-modal';
 
 function ManageListing() {
-    function renderActions(item, index, dataTableContextState) {
+    function renderActionColumn(item, index, dataTableContextState) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -129,7 +129,7 @@ function ManageListing() {
     return (
         <DataManager
             renderAddNew={renderAddNew}
-            renderActions={renderActions}
+            renderActionColumn={renderActionColumn}
             request={pageRequest}
             columns={[
                 { label: 'ID', key: 'id' },

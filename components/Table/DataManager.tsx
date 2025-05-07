@@ -1,15 +1,22 @@
-import DataTable from "@/components/Table/DataTable";
-import { useContext, useEffect, useState } from "react";
-import { Button, Modal, Nav, Tab } from "react-bootstrap";
-import { ModalItem, ModalService } from "@/library/services/modal/ModalService";
+import DataTable, { OnRowSelectActionClick } from "@/components/Table/DataTable";
+import { useEffect, useState } from "react";
+import { ModalService } from "@/library/services/modal/ModalService";
 import Pagination from "@/components/listings/Pagination";
 import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
-import { createContext } from "vm";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
+import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
+
+export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
+    data: Array<any>;
+    dataTableContextState: any;
+    setDataTableContextState: (data: any) => void;
+}
 
 export type DataManagerProps = {
-    renderActions?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
+    rowSelectActions?: Array<any>
+    multiRowSelection?: boolean;
+    renderActionColumn?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
     renderAddNew?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLAnchorElement, MouseEvent>, context: any) => void;
     request?: (context: any) => void;
     columns?: Array<any>;
@@ -39,7 +46,9 @@ export type DatatableSearchParams = {
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
-    renderActions,
+    rowSelectActions = [],
+    multiRowSelection = false,
+    renderActionColumn,
     renderAddNew,
     request,
     columns = [],
@@ -61,6 +70,7 @@ function DataManager({
         page_size: searchParamPageSize,
     };
 
+
     const [dataTableContextState, setDataTableContextState] = useState<DataTableContextType>({
         ...dataTableContextData,
         refresh: () => {
@@ -70,7 +80,9 @@ function DataManager({
     });
 
     const modalService = new ModalService(dataTableContextState, setDataTableContextState);
+    const confirmationService = new ConfirmationService(dataTableContextState, setDataTableContextState);
     modalService.setKey('modal');
+    confirmationService.setKey('confirmation');
 
     async function makeRequest() {
         if (typeof request === 'function') {
@@ -92,6 +104,18 @@ function DataManager({
         }
     }
 
+    function handleRowSelectActionClick({action, data}: OnRowSelectActionClick) {
+        if (!isObject(action)) {
+             return;
+         }
+         if (typeof action?.onClick === 'function') {
+             action.onClick({
+                 action,
+                 data,
+                 dataTableContextState,
+             });
+         }
+     }
     useEffect(() => {
         const someSet = Object.keys(searchParams).some(key => {
             return searchParams[key] !== null && searchParams[key] !== undefined;
@@ -106,12 +130,13 @@ function DataManager({
         setDataTableContextState(prevState => {
             let newState = {
                 ...prevState,
-                ...modalService.getState()
+                ...modalService.getState(),
+                ...confirmationService.getState(),
             };
             return newState;
         });
     }, []);
-
+    
     useEffect(() => {
         if (dataTableContextState?.requestStatus !== 'idle') {
             return;
@@ -136,7 +161,8 @@ function DataManager({
         }
         makeRequest();
     }, [dataTableContextState.query]);
-    
+
+
     return (
         <DataTableContext.Provider value={dataTableContextState}>
             <div className="row">
@@ -188,45 +214,41 @@ function DataManager({
                         </div>
                         <div className="card-body">
                             {Array.isArray(dataTableContextState?.data) && dataTableContextState.data.length && (
-                                <DataTable
-                                    columns={columns}
-                                    data={dataTableContextState.data}
-                                    actions={(item, index) => {
-                                        if (typeof renderActions === 'function') {
-                                            return renderActions(item, index, dataTableContextState);
-                                        }
-                                    }}
-                                />
+                                <>
+                                    <DataTable
+                                        onRowSelectActionClick={handleRowSelectActionClick}
+                                        rowSelectActions={rowSelectActions}
+                                        multiRowSelection={multiRowSelection}
+                                        columns={columns}
+                                        data={dataTableContextState.data}
+                                        actionColumn={(item, index) => {
+                                            if (typeof renderActionColumn === 'function') {
+                                                return renderActionColumn(item, index, dataTableContextState);
+                                            }
+                                        }}
+                                    />
+                                    <div className="row">
+                                        <div className="col-sm-12 col-md-9">
+
+                                            <Pagination
+                                                data={dataTableContextState?.meta}
+                                                showIndicator={true}
+                                                onPageClick={(e, page) => {
+                                                    console.log('Page Clicked', page);
+                                                }} />
+                                        </div>
+                                    </div>
+                                </>
                             )}
                         </div>
                         <div className="card-footer">
-                            <Pagination
-                                data={dataTableContextState?.meta}
-                                showIndicator={true}
-                                onPageClick={(e, page) => {
-                                    // e.preventDefault();
-                                    console.log('Page Clicked', page);
 
-                                    // setDataTableContextState(prevState => {
-                                    //     let newState = { ...prevState };
-                                    //     newState.query = {
-                                    //         ...prevState.query,
-                                    //         page: page
-                                    //     };
-                                    //     return newState;
-                                    // });
-                                    // listingsService.contextService.updateContext({
-                                    //     query: {
-                                    //         ...listingsService.contextService.context.query,
-                                    //         [ListingsFetch.PAGINATION.PAGE]: pageNumber
-                                    //     }
-                                    // });
-                                }} />
                         </div>
                     </div>
                 </div>
             </div>
             {modalService.render()}
+            {confirmationService.render()}
         </DataTableContext.Provider>
     );
 }

@@ -39,7 +39,7 @@ function ManageSidebarWidget() {
             fullscreen: true
         }
     }
-    function renderActions(item: SidebarWidget, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: SidebarWidget, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -205,7 +205,7 @@ function ManageSidebarWidget() {
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
                 renderAddNew={renderAddNew}
-                renderActions={renderActions}
+                renderActionColumn={renderActionColumn}
                 request={widgetRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
