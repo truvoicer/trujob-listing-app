@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 
 type Props = {
     session: any;
-    children: React.Component | React.ReactNode;
+    children?: React.Component | React.ReactNode;
     onUnauthorization?: () => void;
     loader?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     fallback?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
-    roles?: Array<Role>;
+    roles?: Array<Role | {
+        name: string;
+    }>;
 }
 function AccessControlComponent({
     children,

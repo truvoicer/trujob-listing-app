@@ -5,6 +5,11 @@ import { SessionService } from "@/library/services/session/SessionService";
 export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
+        category: '/category',
+        brand: '/brand',
+        listingType: '/listing-type',
+        color: '/color',
+        productType: '/product-type',
         listing: '/listing',
         settings: '/settings',
         menu: '/menu',
@@ -34,16 +39,7 @@ export default {
             verifyEmail: '/auth/verify-email',
             resendVerificationEmail: '/auth/resend-verification-email',
         },
-        user: {
-            profile: '/user/profile',
-            update: '/user/update',
-            delete: '/user/delete',
-            create: '/user/create',
-            forgotPassword: '/user/forgot-password',
-            resetPassword: '/user/reset-password',
-            verifyEmail: '/user/verify-email',
-            resendVerificationEmail: '/user/resend-verification-email',
-        }
+        user: '/user',
     },
     tokenResponseHandler: async (response) => {
             const responseData = await response.json();

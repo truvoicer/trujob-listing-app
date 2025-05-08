@@ -9,6 +9,7 @@ import ManageListing from "@/components/blocks/Admin/Listing/ManageListing";
 import ManageSidebar from "@/components/blocks/Admin/Sidebar/ManageSidebar";
 import ManageMenu from "@/components/blocks/Admin/Menu/ManageMenu";
 import ManageWidget from "@/components/blocks/Admin/Widget/ManageWidget";
+import ManageUser from "@/components/blocks/Admin/User/ManageUser";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -22,6 +23,7 @@ export class Blocks {
     static MANAGE_SIDEBARS_BLOCK = 'manage-sidebars-block';
     static MANAGE_WIDGETS_BLOCK = 'manage-widgets-block';
     static MANAGE_MENUS_BLOCK = 'manage-menus-block';
+    static MANAGE_USERS_BLOCK = 'manage-users-block';
 
     static getBlocks() {
         return {
@@ -87,9 +89,15 @@ export class Blocks {
             },
             [Blocks.MANAGE_MENUS_BLOCK]: {
                 title: 'Manage Menus',
-                description: 'This is the manage manus',
+                description: 'This is the manage menus',
                 icon: 'manage-listings-block-icon',
                 component: ManageMenu,
+            },
+            [Blocks.MANAGE_USERS_BLOCK]: {
+                title: 'Manage Users',
+                description: 'This is the manage users',
+                icon: 'manage-users-block-icon',
+                component: ManageUser,
             },
         };
     }

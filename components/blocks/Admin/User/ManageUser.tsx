@@ -2,30 +2,30 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditListing from "./EditListing";
+import EditUser from "./EditUser";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { User } from "@/types/User";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
-export type ManageListingProps = {
+export type ManageUserProps = {
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_PAGE_MODAL_ID = 'edit-user-modal';
 
-function ManageListing({ }: ManageListingProps) {
+function ManageUser({ }: ManageUserProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getListingFormModalProps() {
+    function getUserFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -49,7 +49,7 @@ function ManageListing({ }: ManageListingProps) {
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: User, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -59,16 +59,16 @@ function ManageListing({ }: ManageListingProps) {
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit User',
                             component: (
-                                <EditListing
+                                <EditUser
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PAGE_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getUserFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
                     }}
                 >
@@ -84,16 +84,16 @@ function ManageListing({ }: ManageListingProps) {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
+                                        title: 'Edit User',
                                         component: (
-                                            <EditListing
+                                            <EditUser
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PAGE_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getUserFormModalProps(),
                                     }, EDIT_PAGE_MODAL_ID);
                                 }
                             }
@@ -106,9 +106,9 @@ function ManageListing({ }: ManageListingProps) {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Listing',
+                                        title: 'Delete User',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this user ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -117,13 +117,13 @@ function ManageListing({ }: ManageListingProps) {
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Listing ID is required</p>
+                                                        <p>User ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'user-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.user}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -133,9 +133,9 @@ function ManageListing({ }: ManageListingProps) {
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete user</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'user-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
@@ -163,15 +163,15 @@ function ManageListing({ }: ManageListingProps) {
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
+        // if (isNotEmpty(searchParams?.user_size)) {
+        //     query[fetcherApiConfig.userSizeKey] = parseInt(searchParams.user_size);
         // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.user)) {
+            query['user'] = searchParams.user;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function userRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -184,7 +184,7 @@ function ManageListing({ }: ManageListingProps) {
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.listing}`,
+            endpoint: `${truJobApiConfig.endpoints.user}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -215,17 +215,17 @@ function ManageListing({ }: ManageListingProps) {
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        console.log('Add New Listing', dataTableContextState.modal);
+        console.log('Add New User', dataTableContextState.modal);
         dataTableContextState.modal.show({
-            title: 'Add New Listing',
+            title: 'Add New User',
             component: (
-                <EditListing
+                <EditUser
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}
                 />
             ),
-            ...getListingFormModalProps(),
+            ...getUserFormModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
 
@@ -242,7 +242,7 @@ function ManageListing({ }: ManageListingProps) {
                 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected users?',
                     onOk: async () => { 
                         console.log('Yes')
                         if (!data?.length) {
@@ -251,9 +251,9 @@ function ManageListing({ }: ManageListingProps) {
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No users selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'user-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -263,13 +263,13 @@ function ManageListing({ }: ManageListingProps) {
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>User IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'user-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.user}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -282,9 +282,9 @@ function ManageListing({ }: ManageListingProps) {
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete users</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'user-bulk-delete-error');
                             return;
                         }
                         
@@ -293,15 +293,15 @@ function ManageListing({ }: ManageListingProps) {
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Users deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'user-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-user-confirmation');
             }
         }); 
         return actions;
@@ -310,19 +310,20 @@ function ManageListing({ }: ManageListingProps) {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-                title={'Manage Listings'}
+                title={'Manage Users'}
                 rowSelectActions={getRowSelectActions()}
                 multiRowSelection={true}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={userRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Title', key: 'title' },
-                    { label: 'Permalink', key: 'permalink' }
+                    { label: 'First name', key: 'first_name' },
+                    { label: 'Last name', key: 'last_name' },
+                    { label: 'Email', key: 'email' },
                 ]}
             />
         </Suspense>
     );
 }
-export default ManageListing;
+export default ManageUser;

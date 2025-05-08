@@ -10,62 +10,44 @@ import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { title } from "process";
-import SelectListingType from "./SelectListingType";
-import SelectUser from "../User/SelectUser";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageUser from "../User/ManageUser";
 
-type EditListingFields = {
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+
+type EditUserFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingFields({
+function EditUserFields({
     operation
-}: EditListingFields) {
+}: EditUserFields) {
     const modalService = new ModalService();
     modalService.setUseStateHook(useState)
     modalService.setConfig([
         {
-            id: 'listingUser',
-            title: 'Select User',
-            component: (
-                <AccessControlComponent
-                    roles={[
-                        { name: 'admin' },
-                        { name: 'superuser' },
-                    ]}
-                >
-                    <ManageUser
-
-                    />
-                </AccessControlComponent>
-            ),
-        },
-        {
-            id: 'listingReviewModal',
+            id: 'userReviewModal',
             title: 'Manage Reviews',
         },
         {
-            id: 'listingFeatureModal',
+            id: 'userFeatureModal',
             title: 'Manage Features',
         },
         {
-            id: 'listingFollowModal',
+            id: 'userFollowModal',
             title: 'Manage Follows',
         },
         {
-            id: 'listingCategory',
+            id: 'userCategory',
             title: 'Manage Category',
         },
         {
-            id: 'listingBrand',
+            id: 'userBrand',
             title: 'Manage Brand',
         },
         {
-            id: 'listingColor',
+            id: 'userColor',
             title: 'Manage Color',
         },
         {
-            id: 'listingProductType',
+            id: 'userProductType',
             title: 'Manage Product Type',
         },
         {
@@ -84,9 +66,9 @@ function EditListingFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <SelectListingType
-                            name="listing_type"
-                        />
+                        {/* <SelectUserType
+                            name="user_type"
+                        /> */}
                     </div>
 
                     <div className="col-12 col-lg-6">
@@ -170,42 +152,47 @@ function EditListingFields({
                         </div>
                     </div>
 
-
-                    <div className="col-12 my-3">
-                        <h4>Select User</h4>
-                        {modalService.renderLocalTriggerButton(
-                            'listingUser',
-                            'Select User',
-                        )}
+                    <div className="col-12 col-lg-6">
+                        {/* <AccessControlComponent
+                            roles={[
+                                { name: 'admin' },
+                                { name: 'superuser' },
+                            ]}
+                        >
+                            <SelectUser
+                                name="user_user"
+                            />
+                        </AccessControlComponent> */}
                     </div>
+
                     <div className="col-12 my-3">
                         <h4>Manage</h4>
                         {modalService.renderLocalTriggerButton(
-                            'listingReviewModal',
+                            'userReviewModal',
                             'Manage Reviews',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingFeatureModal',
+                            'userFeatureModal',
                             'Manage Features',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingFollowModal',
+                            'userFollowModal',
                             'Manage Follows',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingCategory',
+                            'userCategory',
                             'Manage Category',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingBrand',
+                            'userBrand',
                             'Manage Brand',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingColor',
+                            'userColor',
                             'Manage Color',
                         )}
                         {modalService.renderLocalTriggerButton(
-                            'listingProductType',
+                            'userProductType',
                             'Manage Product Type',
                         )}
                         {modalService.renderLocalTriggerButton(
@@ -220,4 +207,4 @@ function EditListingFields({
         </div>
     );
 }
-export default EditListingFields;
+export default EditUserFields;

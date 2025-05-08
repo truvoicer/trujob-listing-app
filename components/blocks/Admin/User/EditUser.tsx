@@ -4,28 +4,27 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_PAGE_MODAL_ID } from "./ManageListing";
+import { EDIT_PAGE_MODAL_ID } from "./ManageUser";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
+import { User } from "@/types/User";
 import { Sidebar } from "@/types/Sidebar";
-import { ListingBlock } from "@/types/ListingBlock";
-import EditListingFields from "./EditListingFields";
+import EditUserFields from "./EditUserFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
-export type EditListingProps = {
-    data?: Listing;
+export type EditUserProps = {
+    data?: User;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListing({
+function EditUser({
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingProps) {
+}: EditUserProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -34,42 +33,15 @@ function EditListing({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Listing = {
+    const initialValues: User = {
         id: data?.id || 0,
-        name: data?.name || '',
-        title: data?.title || '',
-        description: data?.description || '',
-        active: data?.active || false,
-        allow_offers: data?.allow_offers || false,
-        quantity: data?.quantity || 0,
-        listing_type: data?.listing_type || {
-            id: data?.listing_type?.id || 0,
-            name: data?.listing_type?.name || '',
-            label: data?.listing_type?.label || '',
-            description: data?.listing_type?.description || '',
-        },
-        listing_user: data?.listing_user || {
-            id: data?.listing_user?.id || 0,
-            first_name: data?.listing_user?.first_name || '',
-            last_name: data?.listing_user?.last_name || '',
-            username: data?.listing_user?.username || '',
-            email: data?.listing_user?.email || '',
-            created_at: data?.listing_user?.created_at || '',
-            updated_at: data?.listing_user?.updated_at || '',
-        },
-        listing_follow: data?.listing_follow || [],
-        listing_feature: data?.listing_feature || [],
-        listing_review: data?.listing_review || [],
-        listing_category: data?.listing_category || [],
-        listing_brand: data?.listing_brand || [],
-        listing_color: data?.listing_color || [],
-        listing_product_type: data?.listing_product_type || [],
-        media: data?.media || [],
-        created_at: data?.created_at || '',
-        updated_at: data?.updated_at || '',
+        first_name: data?.first_name || '',
+        last_name: data?.last_name || '',
+        username: data?.username || '',
+        email: data?.email || '',
     };
 
-    async function handleSubmit(values: Listing) {
+    async function handleSubmit(values: User) {
         let requestData = { ...values };
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
@@ -88,7 +60,7 @@ function EditListing({
                 });
         }
         if (Array.isArray(requestData?.blocks)) {
-            requestData.blocks = requestData?.blocks.map((block: ListingBlock) => {
+            requestData.blocks = requestData?.blocks.map((block: User) => {
                 if (Array.isArray(block?.sidebars)) {
                     block.sidebars = RequestHelpers.extractIdsFromArray(block.sidebars);
                 }
@@ -105,10 +77,10 @@ function EditListing({
             case 'edit':
             case 'update':
                 if (!data?.id) {
-                    throw new Error('Listing ID is required');
+                    throw new Error('User ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.listing}/${data.id}/update`,
+                    endpoint: `${truJobApiConfig.endpoints.user}/${data.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
                     data: requestData,
@@ -117,7 +89,7 @@ function EditListing({
             case 'add':
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.listing}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.user}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
                     data: requestData,
@@ -184,7 +156,7 @@ function EditListing({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditListingFields operation={operation} />
+                        <EditUserFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -195,7 +167,7 @@ function EditListing({
                     >
                         {() => {
                             return (
-                                <EditListingFields operation={operation} />
+                                <EditUserFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -204,4 +176,4 @@ function EditListing({
         </div>
     );
 }
-export default EditListing;
+export default EditUser;

@@ -1,5 +1,5 @@
 import { findInObject } from "@/helpers/utils";
-import { ModalItem } from "../modal/ModalService";
+import { LocalModal, ModalItem } from "../modal/ModalService";
 import { FormProps } from "@/components/form/Form";
 export type MessageState = {
     items: Array<any>;
@@ -10,10 +10,12 @@ export type MessageState = {
 }
 export class MessageService {
     key: null | string = null;
-    state: any;
-    setter: any;
+    state?: any;
+    setter?: any;
+    config: Array<any> = [];
+    useStateHook: () => any = () => {};
     
-    constructor(state: any, setter: any) {
+    constructor(state?: any, setter?: any) {
         this.state = state;
         this.setter = setter;
     }
@@ -31,7 +33,166 @@ export class MessageService {
         this.key = key;
         return this;
     }
+    setConfig(config: Array<any>) {
+        if (!Array.isArray(config)) {
+            console.error("config is not an array");
+            return this;
+        }
+        this.config = config.map((item: any) => {
+            if (typeof item !== "object") {
+                console.error("config item is not an object", {
+                    item: item,
+                    config: config
+                });
+                return item;
+            }
+            let newItem = { ...item };
+            if (typeof newItem?.id !== "string") {
+                console.error("config item id is not a string", {
+                    item: item,
+                    config: config
+                });
+                return item;
+            }
+            newItem.state = this.useStateHook<LocalModal>({
+                show: false,
+                title: null,
+                footer: true,
+            })
+            return newItem;
+        });
+        return this;
+    }
+    getConfig() {
+        return this.config;
+    }
+    
+    updateMessageConfigItem(id: string, data: any) {
+        if (typeof data !== "object") {
+            console.error("data is not an object", {
+                data: data,
+                config: this.config
+            });
+            return null;
+        }
+        if (typeof id !== "string") {
+            console.error("id is not a string", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        const findLocalMessageConfigIndex = this.findLocalMessageConfigIndexById(id);
+        if (findLocalMessageConfigIndex === -1) {
+            console.error("local message config not found", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
 
+        this.config[findLocalMessageConfigIndex] = {
+            ...this.config[findLocalMessageConfigIndex],
+            ...data
+        }
+    }
+    findLocalMessageConfigIndexById(id: string): number {
+        if (typeof id !== "string") {
+            return -1;
+        }
+        return this.config.findIndex((item: any) => item?.id === id);
+    }
+    findLocalMessageConfigById(id: string) {
+        if (typeof id !== "string") {
+            return null;
+        }
+        return this.config.find((item: any) => item?.id === id) || null;
+    }
+    findLocalMessageStateById(id: string) {
+        const findLocalMessageConfig = this.findLocalMessageConfigById(id);
+        if (!findLocalMessageConfig) {
+            console.error("local message config not found", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        if (typeof findLocalMessageConfig?.state !== "object") {
+            console.error("local message config state is not an object", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        return findLocalMessageConfig.state;
+    }
+    onLocalModalCancel(item: any, e?: React.MouseEvent | null) {
+        if (typeof item?.state !== 'object') {
+            console.error('Modal state not found');
+            return null;
+        }
+        const [state, setState] = item.state;
+
+        if (
+            typeof state?.onCancel === 'function' &&
+            !state.onCancel(e)
+        ) {
+            return;
+        }
+
+        MessageService.hideModal(setState)
+    }
+    onLocalModalOk(item: any, e?: React.MouseEvent | null) {
+        if (typeof item?.state !== 'object') {
+            console.error('Modal state not found');
+            return null;
+        }
+        const [state, setState] = item.state;
+
+        if (
+            typeof state?.onOk === 'function' &&
+            !state.onOk(e)
+        ) {
+            return;
+        }
+
+        MessageService.hideModal(setState)
+    }
+    renderLocalTriggerButton(id: string, label: string | null = null) {
+        const findLocalMessageConfig = this.findLocalMessageConfigById(id);
+        if (!findLocalMessageConfig) {
+            console.error("local message config not found", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        if (typeof findLocalMessageConfig?.state !== "object") {
+            console.error("local message config state is not an object", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        const [state, setState] = findLocalMessageConfig.state;
+        return (
+            <button
+                type="button"
+                className="btn btn-primary mr-2"
+                onClick={(e) => {
+                    MessageService.showModal(setState);
+                    MessageService.setModalTitle(findLocalMessageConfig?.title || '', setState);
+                    MessageService.setModalFooter(findLocalMessageConfig?.footer || true, setState);
+                }}
+            >
+                {label || "Open"}
+            </button>
+        )
+    }
+    setUseStateHook(useStateHook: any) {
+        this.useStateHook = useStateHook;
+        return this;
+    }
     static hideModal(setter: any) {
         setter((prevState: any) => {
             let newState = { ...prevState };

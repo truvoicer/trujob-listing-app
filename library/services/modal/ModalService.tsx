@@ -47,39 +47,6 @@ export class ModalService extends MessageService {
         onOk: () => { return true; },
     };
 
-    static hideModal(setter: Dispatch<SetStateAction<{
-        show: boolean;
-        title: string;
-        footer: boolean;
-    }>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = false;
-            return newState;
-        });
-    }
-    static showModal(setter: Dispatch<SetStateAction<LocalModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.show = true;
-            return newState;
-        });
-    }
-    static setModalTitle(title: string, setter: Dispatch<SetStateAction<LocalModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.title = title;
-            return newState;
-        });
-    }
-    static setModalFooter(hasFooter: boolean = false, setter: Dispatch<SetStateAction<LocalModal>>) {
-        setter(prevState => {
-            let newState = { ...prevState };
-            newState.footer = hasFooter;
-            return newState;
-        });
-    }
-
     buildItemData(data: any, id: null | string = null) {
         let item: ModalItem = ModalService.INIT_ITEM_DATA;
         Object.keys(ModalService.INIT_ITEM_DATA).forEach((key: string) => {
@@ -164,6 +131,53 @@ export class ModalService extends MessageService {
                     </Modal.Footer>
                 }
             </Modal>
+        );
+    }
+
+    renderLocalModals() {
+        return (
+            <>
+                {this.config.map((modal: any, index: number) => {
+                    if (typeof modal?.state !== 'object') {
+                        console.error('Modal state not found');
+                        return null;
+                    }
+                    const [state, setState] = modal.state;
+                    return (
+                        <Modal
+                            show={state.show}
+                            onHide={() => {
+                                this.onLocalModalCancel(modal);
+                            }}>
+                            <Modal.Header closeButton>
+                                <Modal.Title>{state?.title || ''}</Modal.Title>
+                            </Modal.Header>
+                            <Modal.Body>
+                                {modal?.component || ''}
+                            </Modal.Body>
+                            {state.footer &&
+                                <Modal.Footer>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={(e: React.MouseEvent) => {
+                                            this.onLocalModalCancel(modal, e);
+                                        }}>
+                                        Close
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={(e: React.MouseEvent) => {
+                                            this.onLocalModalOk(modal, e);
+                                        }}>
+                                        Save Changes
+                                    </Button>
+                                </Modal.Footer>
+                            }
+                        </Modal>
+                    );
+                }
+                )}
+            </>
         );
     }
 }

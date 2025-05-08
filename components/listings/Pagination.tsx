@@ -135,9 +135,8 @@ const Pagination = ({
                         </Link>
                     </li>
                     {left.map((num, index) => (
-                        <li className="page-item">
+                        <li key={index} className="page-item">
                             <Link
-                                key={index}
                                 className="page-link"
                                 {...getPageLinkProps(num)}
                             >
@@ -146,9 +145,8 @@ const Pagination = ({
                         </li>
                     ))}
                     {right.map((num, index) => (
-                        <li className="page-item">
+                        <li key={index} className="page-item">
                             <Link
-                                key={index}
                                 className="page-link"
                                 {...getPageLinkProps(num)}
                             >

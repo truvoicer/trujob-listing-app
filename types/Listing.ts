@@ -1,9 +1,9 @@
-import { Brand } from "../Brand";
-import { category } from "../Category";
-import { Color } from "../Color";
-import { Media } from "../Media";
-import { ProductType } from "../ProductType";
-import { User } from "../User";
+import { Brand } from "./Brand";
+import { Category } from "./Category";
+import { Color } from "./Color";
+import { Media } from "./Media";
+import { ProductType } from "./ProductType";
+import { User } from "./User";
 
 export type Listing = {
     id: number;
@@ -57,7 +57,7 @@ export type ListingReview = {
 export type ListingCategory = {
     id: number;
     listing: Listing;
-    category: category;
+    category: Category;
 }
 export type ListingBrand = {
     id: number;
