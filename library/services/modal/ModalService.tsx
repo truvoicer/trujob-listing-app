@@ -1,14 +1,12 @@
 import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
-import { MessageService, MessageState } from "../message/MessageService";
+import { LocalItem, MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
 import Form, { FormProps } from "@/components/form/Form";
 import React, { SetStateAction, Dispatch } from "react";
 import { FormikProps, FormikValues } from "formik";
 
-export type LocalModal = {
-    show: boolean;
-    title: string;
-    footer: boolean;
+export interface LocalModal extends LocalItem {
+    
 };
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
@@ -27,6 +25,7 @@ export type ModalItem = {
     onCancel: () => boolean;
 }
 export class ModalService extends MessageService {
+    
     static INIT_DATA: ModalState = {
         items: [],
         show: () => { },
@@ -146,6 +145,9 @@ export class ModalService extends MessageService {
                     return (
                         <Modal
                             show={state.show}
+                            key={index}
+                            size={state?.size || 'md'}
+                            fullscreen={state?.fullscreen || false}
                             onHide={() => {
                                 this.onLocalModalCancel(modal);
                             }}>

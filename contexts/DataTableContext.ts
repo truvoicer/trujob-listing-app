@@ -20,7 +20,7 @@ export const dataTableContextData = {
         // ...ConfirmationService.INIT_DATA,
     },
     refresh: () => {},
-    update: () => {},
+    update: (data: any) => {},
 };
 
 export const DataTableContext = React.createContext(dataTableContextData);

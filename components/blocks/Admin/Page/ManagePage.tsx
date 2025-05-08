@@ -17,10 +17,23 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type ManagePageProps = {
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
-function ManagePage({ }: ManagePageProps) {
+function ManagePage({
+    rowSelection = true,
+    multiRowSelection = true,
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true
+}: ManagePageProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -310,8 +323,13 @@ function ManagePage({ }: ManagePageProps) {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelection={rowSelection}
+                multiRowSelection={multiRowSelection}
+                onChange={onChange}
+                enableEdit={enableEdit}
+                paginationMode={paginationMode}
+                enablePagination={enablePagination}
                 rowSelectActions={getRowSelectActions()}
-                multiRowSelection={true}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={pageRequest}

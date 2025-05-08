@@ -6,6 +6,7 @@ import { ListingsFetch } from "@/library/services/listings/ListingsFetch";
 import { SESSION_USER } from "@/library/redux/constants/session-constants";
 
 export type PaginationProps = {
+    paginationMode?: 'router' | 'state';
     data: any;
     onPageClick: null | ((e: React.MouseEvent, pageNumber: number) => void);
     showIndicator?: boolean;
@@ -13,6 +14,7 @@ export type PaginationProps = {
 }
 
 const Pagination = ({
+    paginationMode = 'router',
     data = null,
     onPageClick = null,
     showIndicator = true,
@@ -96,6 +98,9 @@ const Pagination = ({
                 }
             },
             onClick: (e: React.MouseEvent) => {
+                if (paginationMode === 'state') {
+                    e.preventDefault();
+                }
                 paginationClickHandler(e, page)
             }
         }

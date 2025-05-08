@@ -17,10 +17,23 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export type ManageListingProps = {
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
-function ManageListing({ }: ManageListingProps) {
+function ManageListing({
+    rowSelection = true,
+    multiRowSelection = true,
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true
+}: ManageListingProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -112,7 +125,7 @@ function ManageListing({ }: ManageListingProps) {
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -128,7 +141,7 @@ function ManageListing({ }: ManageListingProps) {
                                                 protectedReq: true
                                             })
                                             if (!response) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -239,14 +252,14 @@ function ManageListing({ }: ManageListingProps) {
                 data,
                 dataTableContextState,
             }: DMOnRowSelectActionClick) => {
-                
+
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
-                    onOk: async () => { 
+                    onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
-                            notificationContext.show({      
+                            notificationContext.show({
                                 variant: 'danger',
                                 type: 'toast',
                                 title: 'Error',
@@ -287,7 +300,7 @@ function ManageListing({ }: ManageListingProps) {
                             }, 'listing-bulk-delete-error');
                             return;
                         }
-                        
+
                         notificationContext.show({
                             variant: 'success',
                             type: 'toast',
@@ -303,16 +316,21 @@ function ManageListing({ }: ManageListingProps) {
                     },
                 }, 'delete-bulk-listing-confirmation');
             }
-        }); 
+        });
         return actions;
     }
-    
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelection={rowSelection}
+                multiRowSelection={multiRowSelection}
+                onChange={onChange}
+                enableEdit={enableEdit}
+                paginationMode={paginationMode}
+                enablePagination={enablePagination}
                 title={'Manage Listings'}
                 rowSelectActions={getRowSelectActions()}
-                multiRowSelection={true}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={listingRequest}

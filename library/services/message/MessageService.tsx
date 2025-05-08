@@ -1,6 +1,13 @@
 import { findInObject } from "@/helpers/utils";
-import { LocalModal, ModalItem } from "../modal/ModalService";
-import { FormProps } from "@/components/form/Form";
+import { ModalItem } from "../modal/ModalService";
+
+export type LocalItem = {
+    show: boolean;
+    title: string;
+    footer: boolean;
+    size: "sm" | "md" | "lg" | "xl";
+    fullscreen: string | true | undefined;
+};
 export type MessageState = {
     items: Array<any>;
     show: (data: any, id: string) => void;
@@ -54,10 +61,14 @@ export class MessageService {
                 });
                 return item;
             }
-            newItem.state = this.useStateHook<LocalModal>({
+            newItem.state = this.useStateHook<LocalItem>({
                 show: false,
-                title: null,
-                footer: true,
+                title: item?.title || null,
+                footer: item?.footer || true,
+                size: item?.size || "md",
+                fullscreen: item?.fullscreen || false,
+                onOk: item?.onOk || (() => { return true; }),
+                onCancel: item?.onCancel || (() => { return true; }),
             })
             return newItem;
         });

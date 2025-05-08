@@ -21,12 +21,21 @@ type EditListingFields = {
 function EditListingFields({
     operation
 }: EditListingFields) {
+    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
+
     const modalService = new ModalService();
+    const notificationContext = useContext(AppNotificationContext);
+    const dataTableContext = useContext(DataTableContext);
+
+    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+
     modalService.setUseStateHook(useState)
     modalService.setConfig([
         {
             id: 'listingUser',
             title: 'Select User',
+            size: 'lg',
+            fullscreen: true,
             component: (
                 <AccessControlComponent
                     roles={[
@@ -35,10 +44,36 @@ function EditListingFields({
                     ]}
                 >
                     <ManageUser
-
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
                     />
                 </AccessControlComponent>
             ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return false;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingReviewModal',
@@ -73,10 +108,7 @@ function EditListingFields({
             title: 'Manage Media',
         },
     ]);
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
-
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    
 
     return (
         <div className="row justify-content-center align-items-center">

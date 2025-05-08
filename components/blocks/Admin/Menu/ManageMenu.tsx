@@ -19,10 +19,24 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 export const EDIT_MENU_MODAL_ID = 'edit-menu-modal';
-
-function ManageMenu() {
+export type ManageMenuProps = {
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
+}
+function ManageMenu({
+    rowSelection = true,
+    multiRowSelection = true,
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true
+}: ManageMenuProps) {
     const appModalContext = useContext(AppModalContext);
-        const notificationContext = useContext(AppNotificationContext);
+    const notificationContext = useContext(AppNotificationContext);
     function getMenuFormModalProps() {
         return {
             formProps: {},
@@ -203,87 +217,93 @@ function ManageMenu() {
     }
 
 
-        function getRowSelectActions() {
-            let actions = [];
-            actions.push({
-                label: 'Delete',
-                name: 'delete',
-                onClick: ({
-                    action,
-                    data,
-                    dataTableContextState,
-                }: DMOnRowSelectActionClick) => {
-                    
-                    dataTableContextState.confirmation.show({
-                        title: 'Bulk Delete Menus',
-                        message: 'Are you sure you want to delete selected menus?',
-                        onOk: async () => { 
-                            console.log('Yes')
-                            if (!data?.length) {
-                                notificationContext.show({      
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>No menus selected</p>
-                                    ),
-                                }, 'menu-bulk-delete-error');
-                                return;
-                            }
-                            const ids = RequestHelpers.extractIdsFromArray(data);
-                            if (!ids?.length) {
-                                notificationContext.show({
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>Menu IDs are required</p>
-                                    ),
-                                }, 'menu-bulk-delete-error');
-                                return;
-                            }
-                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                endpoint: `${truJobApiConfig.endpoints.menu}/bulk/delete`,
-                                method: ApiMiddleware.METHOD.DELETE,
-                                protectedReq: true,
-                                data: {
-                                    ids: ids
-                                }
-                            })
-                            if (!response) {
-                                notificationContext.show({
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>Failed to delete menus</p>
-                                    ),
-                                }, 'menu-bulk-delete-error');
-                                return;
-                            }
-                            
+    function getRowSelectActions() {
+        let actions = [];
+        actions.push({
+            label: 'Delete',
+            name: 'delete',
+            onClick: ({
+                action,
+                data,
+                dataTableContextState,
+            }: DMOnRowSelectActionClick) => {
+
+                dataTableContextState.confirmation.show({
+                    title: 'Bulk Delete Menus',
+                    message: 'Are you sure you want to delete selected menus?',
+                    onOk: async () => {
+                        console.log('Yes')
+                        if (!data?.length) {
                             notificationContext.show({
-                                variant: 'success',
+                                variant: 'danger',
                                 type: 'toast',
-                                title: 'Success',
+                                title: 'Error',
                                 component: (
-                                    <p>Menus deleted successfully</p>
+                                    <p>No menus selected</p>
                                 ),
-                            }, 'menu-bulk-delete-success');
-                            dataTableContextState.refresh();
-                        },
-                        onCancel: () => {
-                            console.log('Cancel delete');
-                        },
-                    }, 'delete-bulk-page-confirmation');
-                }
-            }); 
-            return actions;
-        }
+                            }, 'menu-bulk-delete-error');
+                            return;
+                        }
+                        const ids = RequestHelpers.extractIdsFromArray(data);
+                        if (!ids?.length) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Menu IDs are required</p>
+                                ),
+                            }, 'menu-bulk-delete-error');
+                            return;
+                        }
+                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                            endpoint: `${truJobApiConfig.endpoints.menu}/bulk/delete`,
+                            method: ApiMiddleware.METHOD.DELETE,
+                            protectedReq: true,
+                            data: {
+                                ids: ids
+                            }
+                        })
+                        if (!response) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Failed to delete menus</p>
+                                ),
+                            }, 'menu-bulk-delete-error');
+                            return;
+                        }
+
+                        notificationContext.show({
+                            variant: 'success',
+                            type: 'toast',
+                            title: 'Success',
+                            component: (
+                                <p>Menus deleted successfully</p>
+                            ),
+                        }, 'menu-bulk-delete-success');
+                        dataTableContextState.refresh();
+                    },
+                    onCancel: () => {
+                        console.log('Cancel delete');
+                    },
+                }, 'delete-bulk-page-confirmation');
+            }
+        });
+        return actions;
+    }
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelection={rowSelection}
+                multiRowSelection={multiRowSelection}
+                onChange={onChange}
+                enableEdit={enableEdit}
+                paginationMode={paginationMode}
+                enablePagination={enablePagination}
                 rowSelectActions={getRowSelectActions()}
                 multiRowSelection={true}
                 renderAddNew={renderAddNew}

@@ -13,8 +13,22 @@ import { SidebarWidget } from "@/types/Widget";
 import { FormikProps, FormikValues } from "formik";
 
 export const EDIT_SIDEBAR_WIDGET_MODAL_ID = 'edit-sidebar-widget-modal';
-
-function ManageSidebarWidget() {
+export type ManageSidebarWidgetProps = {
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
+}
+function ManageSidebarWidget({
+    rowSelection = true,
+    multiRowSelection = true,
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true
+}: ManageSidebarWidgetProps) {
     const appModalContext = useContext(AppModalContext);
     function getSidebarWidgetFormModalProps() {
         return {
@@ -204,6 +218,12 @@ function ManageSidebarWidget() {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                rowSelection={rowSelection}
+                multiRowSelection={multiRowSelection}
+                onChange={onChange}
+                enableEdit={enableEdit}
+                paginationMode={paginationMode}
+                enablePagination={enablePagination}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={widgetRequest}

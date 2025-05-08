@@ -16,18 +16,28 @@ export type OnRowSelectActionClick = ({
     data: Array<any>
 });
 export type DataTableProps = {
+    onChange: (tableData: Array<any>) => void;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    enableEdit?: boolean;
     onRowSelectActionClick?: ({ action, data }: OnRowSelectActionClick) => void;
     rowSelectActions?: Array<any>
     onRowSelect?: (item: DataTableItem, index: number) => void;
     multiRowSelection?: boolean;
+    rowSelection?: boolean;
     columns?: Array<DataTableColumn>;
     data?: Array<any>;
     actionColumn?: null | ((item: any, index: number) => React.ReactNode | React.Component | string | number | boolean | null);
 }
 function DataTable({
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true,
     onRowSelectActionClick,
     rowSelectActions = [],
     multiRowSelection = false,
+    rowSelection = false,
     columns = [],
     data = [],
     actionColumn
@@ -137,12 +147,19 @@ function DataTable({
             });
         }
     }, [selectedAction]);
+    useEffect(() => {
+        if (typeof onChange === 'function') {
+            onChange(tableData);
+        }
+    }, [tableData]);
     return (
         <>
             <div className="row">
-                <div className="col-sm-12 col-md-3">
-                    {renderRowSelectActions()}
-                </div>
+                {enableEdit && (
+                    <div className="col-sm-12 col-md-3">
+                        {renderRowSelectActions()}
+                    </div>
+                )}
                 <div className="col-sm-12 col-md-3">
                     <label className="mb-0">
                         Show
@@ -161,10 +178,10 @@ function DataTable({
                 <div className="col-sm-12 col-md-6">
                     <div className="iq-search-bar search-device ml-auto mb-0 ">
                         <form action="#" className="searchbox">
-                            <input 
-                            type="text" 
-                            className="text search-input w-auto" 
-                            placeholder="Search..." 
+                            <input
+                                type="text"
+                                className="text search-input w-auto"
+                                placeholder="Search..."
                             />
                         </form>
                     </div>
@@ -174,12 +191,14 @@ function DataTable({
                 <table className="data-tables table w-100">
                     <thead>
                         <tr>
-                            {multiRowSelection && (
+                            {rowSelection && (
                                 <th className="text-center">
-                                    <input
-                                        type="checkbox"
-                                        onChange={handleCheckAll}
-                                    />
+                                    {multiRowSelection && (
+                                        <input
+                                            type="checkbox"
+                                            onChange={handleCheckAll}
+                                        />
+                                    )}
                                 </th>
                             )}
                             {columns.map((column, index) => {
@@ -187,7 +206,7 @@ function DataTable({
                                     <th key={index} className="text-center">{column?.label || ''}</th>
                                 )
                             })}
-                            {typeof actionColumn === 'function' && (
+                            {enableEdit && typeof actionColumn === 'function' && (
                                 <th className="text-center">Actions</th>
                             )}
                         </tr>
@@ -196,7 +215,7 @@ function DataTable({
                         {tableData.map((item, index) => {
                             return (
                                 <tr key={index}>
-                                    {multiRowSelection && (
+                                    {rowSelection && multiRowSelection && (
                                         <td className="text-center">
                                             <input
                                                 type="checkbox"
@@ -218,6 +237,26 @@ function DataTable({
                                             />
                                         </td>
                                     )}
+                                    {rowSelection && !multiRowSelection && (
+                                        <td className="text-center">
+                                            <input
+                                                type="radio"
+                                                checked={item?.checked || false}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                    const checked = e.target.checked;
+                                                    setTableData(prevState => {
+                                                        let newState = [...prevState];
+                                                        return newState.map((item, tableDataItemIndex) => {
+                                                            return {
+                                                                ...item,
+                                                                checked: tableDataItemIndex === index ? checked : false,
+                                                            };
+                                                        });
+                                                    });
+                                                }}
+                                            />
+                                        </td>
+                                    )}
                                     {columns.map((column, index) => {
                                         return (
                                             <td
@@ -227,7 +266,7 @@ function DataTable({
                                             </td>
                                         );
                                     })}
-                                    {typeof actionColumn === 'function' && (
+                                    {enableEdit && typeof actionColumn === 'function' && (
                                         <td>
                                             {renderActionColumn(item, index)}
                                         </td>
@@ -240,14 +279,23 @@ function DataTable({
                 </table>
             </div>
             <div className="row">
-                <div className="col-sm-12 col-md-3">
-                    {renderRowSelectActions()}
-                </div>
+                {enableEdit && (
+                    <div className="col-sm-12 col-md-3">
+                        {renderRowSelectActions()}
+                    </div>
+                )}
                 <div className="col-sm-12 col-md-3">
                     <Pagination
+                        paginationMode={paginationMode}
                         data={dataTableContext?.meta}
                         showIndicator={true}
                         onPageClick={(e, page) => {
+                            dataTableContext.update({
+                                query: {
+                                    ...dataTableContext.query,
+                                    page: page,
+                                },
+                            })
                             console.log('Page Clicked', page);
                         }} />
                 </div>

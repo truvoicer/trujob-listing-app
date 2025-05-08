@@ -14,9 +14,14 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+    onChange: (tableData: Array<any>) => void;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    enableEdit?: boolean;
     title?: string;
     rowSelectActions?: Array<any>
     multiRowSelection?: boolean;
+    rowSelection?: boolean;
     renderActionColumn?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
     renderAddNew?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLAnchorElement, MouseEvent>, context: any) => void;
     request?: (context: any) => void;
@@ -24,6 +29,7 @@ export type DataManagerProps = {
 }
 
 export type DataTableContextType = {
+    [key: string]: any | Array<any> | string | null | undefined;
     requestStatus: string;
     data: Array<any>;
     links: any;
@@ -47,6 +53,11 @@ export type DatatableSearchParams = {
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
+    rowSelection = false,
+    onChange,
+    paginationMode = 'router',
+    enablePagination = true,
+    enableEdit = true,
     title,
     rowSelectActions = [],
     multiRowSelection = false,
@@ -72,13 +83,26 @@ function DataManager({
         page_size: searchParamPageSize,
     };
 
+    function updateDataTableContextState(data: any) {
+        if (!isObject(data)) {
+            return;
+        }
+        setDataTableContextState(prevState => {
+            let newState: DataTableContextType = {...prevState};
+            Object.keys(data).forEach(key => {
+                if (dataTableContextData.hasOwnProperty(key)) {
+                    newState[key] = data[key];
+                }
+            });
+            return newState;
+        });
+    }
+
 
     const [dataTableContextState, setDataTableContextState] = useState<DataTableContextType>({
         ...dataTableContextData,
-        refresh: () => {
-            console.log('refresh');
-            makeRequest();
-        },
+        refresh: makeRequest,
+        update: updateDataTableContextState,
     });
 
     const modalService = new ModalService(dataTableContextState, setDataTableContextState);
@@ -106,18 +130,18 @@ function DataManager({
         }
     }
 
-    function handleRowSelectActionClick({action, data}: OnRowSelectActionClick) {
+    function handleRowSelectActionClick({ action, data }: OnRowSelectActionClick) {
         if (!isObject(action)) {
-             return;
-         }
-         if (typeof action?.onClick === 'function') {
-             action.onClick({
-                 action,
-                 data,
-                 dataTableContextState,
-             });
-         }
-     }
+            return;
+        }
+        if (typeof action?.onClick === 'function') {
+            action.onClick({
+                action,
+                data,
+                dataTableContextState,
+            });
+        }
+    }
     useEffect(() => {
         const someSet = Object.keys(searchParams).some(key => {
             return searchParams[key] !== null && searchParams[key] !== undefined;
@@ -138,7 +162,7 @@ function DataManager({
             return newState;
         });
     }, []);
-    
+
     useEffect(() => {
         if (dataTableContextState?.requestStatus !== 'idle') {
             return;
@@ -177,25 +201,32 @@ function DataManager({
                                         <h4 className="card-title mb-0">{title}</h4>
                                     )}
                                 </div>
-                                <a href="#"
-                                    className="btn btn-primary"
-                                    onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-                                        if (typeof renderAddNew === 'function') {
-                                            renderAddNew(e, {
-                                                dataTableContextState,
-                                                setDataTableContextState
-                                            });
-                                        }
-                                    }}
-                                >
-                                    Add New
-                                </a>
+                                {enableEdit && (
+                                    <a href="#"
+                                        className="btn btn-primary"
+                                        onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+                                            if (typeof renderAddNew === 'function') {
+                                                renderAddNew(e, {
+                                                    dataTableContextState,
+                                                    setDataTableContextState
+                                                });
+                                            }
+                                        }}
+                                    >
+                                        Add New
+                                    </a>
+                                )}
                             </div>
                         </div>
                         <div className="card-body">
                             {Array.isArray(dataTableContextState?.data) && dataTableContextState.data.length && (
                                 <>
                                     <DataTable
+                                        rowSelection={rowSelection}
+                                        onChange={onChange}
+                                        paginationMode={paginationMode}
+                                        enablePagination={enablePagination}
+                                        enableEdit={enableEdit}
                                         onRowSelectActionClick={handleRowSelectActionClick}
                                         rowSelectActions={rowSelectActions}
                                         multiRowSelection={multiRowSelection}
