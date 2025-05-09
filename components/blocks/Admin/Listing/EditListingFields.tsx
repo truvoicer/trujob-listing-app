@@ -14,6 +14,14 @@ import SelectListingType from "./SelectListingType";
 import SelectUser from "../User/SelectUser";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../User/ManageUser";
+import ManageListingReview from "./Review/ManageListingReview";
+import ManageListingFeature from "./Feature/ManageListingFeature";
+import ManageListingFollow from "./Follow/ManageListingFollow";
+import ManageListingCategory from "./Category/ManageListingCategory";
+import ManageListingBrand from "./Brand/ManageListingBrand";
+import ManageListingColor from "./Color/ManageListingColor";
+import ManageListingProductType from "./ProductType/ManageListingProductType";
+import ManageMedia from "../Media/ManageMedia";
 
 type EditListingFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -78,34 +86,354 @@ function EditListingFields({
         {
             id: 'listingReviewModal',
             title: 'Manage Reviews',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingReview
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingFeatureModal',
             title: 'Manage Features',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingFeature
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingFollowModal',
             title: 'Manage Follows',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingFollow
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingCategory',
             title: 'Manage Category',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingCategory
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingBrand',
             title: 'Manage Brand',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingBrand
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingColor',
             title: 'Manage Color',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingColor
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'listingProductType',
             title: 'Manage Product Type',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageListingProductType
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
         {
             id: 'Media',
             title: 'Manage Media',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageMedia
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(values: Array<any>) => {
+                            if (!Array.isArray(values)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+                            setSelectedTableRows(
+                                values.filter((item) => item?.checked)
+                            );
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedTableRows.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+                const selectedUser = selectedTableRows[0];
+                setFieldValue('listing_user', selectedUser);
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
         },
     ]);
     
