@@ -37,6 +37,14 @@ function EditListingFields({
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
+    function getListingComponentProps() {
+        let componentProps: any = {};
+        if (values?.id) {
+            componentProps.listingId = values.id;
+        }
+        return componentProps;
+    }
+
     modalService.setUseStateHook(useState)
     modalService.setConfig([
         {
@@ -96,6 +104,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingReview
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -140,6 +149,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingFeature
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -184,6 +194,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingFollow
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -228,6 +239,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingCategory
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -272,6 +284,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingBrand
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -316,6 +329,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingColor
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -360,6 +374,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingProductType
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}

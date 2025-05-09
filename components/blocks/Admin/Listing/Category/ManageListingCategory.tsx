@@ -15,8 +15,10 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type ManageListingCategoryProps = {
+    listingId: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -27,6 +29,7 @@ export type ManageListingCategoryProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingCategory({
+    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -189,6 +192,10 @@ function ManageListingCategory({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!listingId) {
+            console.warn('Listing ID is required');
+            return;
+        }
         let query = dataTableContextState?.query || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
@@ -197,7 +204,10 @@ function ManageListingCategory({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.category}`,
+           
+                       endpoint: UrlHelpers.urlFromArray([
+                           truJobApiConfig.endpoints.listingCategory.replace(':listingId', listingId.toString()),
+                       ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,

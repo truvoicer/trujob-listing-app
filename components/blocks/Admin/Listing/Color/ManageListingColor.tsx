@@ -7,7 +7,7 @@ import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
-import { isNotEmpty } from "@/helpers/utils";ß
+import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
@@ -15,8 +15,10 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type ManageListingColorProps = {
+    listingId?: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -27,6 +29,7 @@ export type ManageListingColorProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingColor({
+    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -189,6 +192,10 @@ function ManageListingColor({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!listingId) {
+            console.warn('Listing ID is required');
+            return;
+        }
         let query = dataTableContextState?.query || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
@@ -197,7 +204,9 @@ function ManageListingColor({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.color}`,
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.listingColor.replace(':listingId', listingId.toString()),
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,

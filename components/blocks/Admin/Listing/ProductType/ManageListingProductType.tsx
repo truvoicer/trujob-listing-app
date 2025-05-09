@@ -15,8 +15,10 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type ManageListingProductTypeProps = {
+    listingId?: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -27,6 +29,7 @@ export type ManageListingProductTypeProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingProductType({
+    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -189,6 +192,10 @@ function ManageListingProductType({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!listingId) {
+            console.warn('Listing ID is required');
+            return;
+        }
         let query = dataTableContextState?.query || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
@@ -197,7 +204,10 @@ function ManageListingProductType({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.listing}`,
+
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.listingProductType.replace(':listingId', listingId.toString()),
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -336,8 +346,8 @@ function ManageListingProductType({
                 request={listingRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Title', key: 'title' },
-                    { label: 'Permalink', key: 'permalink' }
+                    { label: 'Label', key: 'label' },
+                    { label: 'Name', key: 'name' }
                 ]}
             />
         </Suspense>
