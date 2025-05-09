@@ -6,21 +6,21 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import RoleForm from "../Role/RoleForm";
+import RoleForm from "../../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { title } from "process";
 import SelectListingType from "./SelectListingType";
-import SelectUser from "../User/SelectUser";
+import SelectUser from "../../User/SelectUser";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageUser from "../User/ManageUser";
+import ManageUser from "../../User/ManageUser";
 
-type EditListingFields = {
+type EditListingBrandFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingFields({
+function EditListingBrandFields({
     operation
-}: EditListingFields) {
+}: EditListingBrandFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -252,4 +252,4 @@ function EditListingFields({
         </div>
     );
 }
-export default EditListingFields;
+export default EditListingBrandFields;

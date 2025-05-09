@@ -3,24 +3,16 @@ import { FormikProps, FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
-import RoleForm from "../Role/RoleForm";
-import { Role } from "@/types/Role";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { title } from "process";
 import SelectListingType from "./SelectListingType";
-import SelectUser from "../User/SelectUser";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageUser from "../User/ManageUser";
+import ManageUser from "../../User/ManageUser";
 
-type EditListingFields = {
+type EditListingFeatureFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingFields({
+function EditListingFeatureFields({
     operation
-}: EditListingFields) {
+}: EditListingFeatureFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -252,4 +244,4 @@ function EditListingFields({
         </div>
     );
 }
-export default EditListingFields;
+export default EditListingFeatureFields;

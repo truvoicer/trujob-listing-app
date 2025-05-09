@@ -1,6 +1,7 @@
 //Api config and endpoints
 import {setIsAuthenticatingAction, setSessionUserAction} from "@/library/redux/actions/session-actions";
 import { SessionService } from "@/library/services/session/SessionService";
+import { features } from "process";
 
 export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
@@ -10,6 +11,7 @@ export default {
         listingType: '/listing-type',
         color: '/color',
         productType: '/product-type',
+        feature: '/feature',
         listing: '/listing',
         settings: '/settings',
         menu: '/menu',
