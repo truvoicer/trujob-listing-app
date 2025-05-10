@@ -29,7 +29,16 @@ type EditListingFields = {
 function EditListingFields({
     operation
 }: EditListingFields) {
-    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
+    const [selectedUsers, setSelectedUsers] = useState<Array<any>>([]);
+    const [selectedBrands, setSelectedBrands] = useState<Array<any>>([]);
+    const [selectedCategories, setSelectedCategories] = useState<Array<any>>([]);
+    const [selectedColors, setSelectedColors] = useState<Array<any>>([]);
+    const [selectedProductTypes, setSelectedProductTypes] = useState<Array<any>>([]);
+    const [selectedMedia, setSelectedMedia] = useState<Array<any>>([]);
+    const [selectedReviews, setSelectedReviews] = useState<Array<any>>([]);
+    const [selectedFeatures, setSelectedFeatures] = useState<Array<any>>([]);
+    const [selectedFollows, setSelectedFollows] = useState<Array<any>>([]);
+    const [selectedListingTypes, setSelectedListingTypes] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
@@ -69,25 +78,27 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedUsers(
                                 values.filter((item) => item?.checked)
                             );
+
                         }}
                     />
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
+                if (selectedUsers.length === 0) {
                     console.warn('No user selected');
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                const selectedUser = selectedUsers[0];
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_user', selectedUser);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -114,7 +125,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedReviews(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -122,17 +133,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedReviews.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_reviews', selectedReviews);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -159,7 +169,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedFeatures(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -167,17 +177,17 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedFeatures.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+
+                    setFieldValue('listing_features', selectedFeatures);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -204,7 +214,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedFollows(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -212,17 +222,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedFollows.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_follows', selectedFollows);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -249,7 +258,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedCategories(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -257,17 +266,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedCategories.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_categories', selectedCategories);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -294,7 +302,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedBrands(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -302,17 +310,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedBrands.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_brands', selectedBrands);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -339,7 +346,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedColors(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -347,17 +354,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedColors.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_colors', selectedColors);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -384,7 +390,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedProductTypes(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -392,17 +398,16 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
+                if (selectedProductTypes.length === 0) {
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_product_types', selectedProductTypes);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
                 return true;
             }
         },
@@ -428,7 +433,7 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedTableRows(
+                            setSelectedMedia(
                                 values.filter((item) => item?.checked)
                             );
                         }}
@@ -437,12 +442,15 @@ function EditListingFields({
             ),
             onOk: () => {
                 console.log('ok');
-                if (selectedTableRows.length === 0) {
+                if (selectedMedia.length === 0) {
                     console.warn('No user selected');
                     return true;
                 }
-                const selectedUser = selectedTableRows[0];
-                setFieldValue('listing_user', selectedUser);
+
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('listing_media', selectedMedia);
+                    return true;
+                }
                 return true;
             },
             onCancel: () => {
@@ -451,7 +459,7 @@ function EditListingFields({
             }
         },
     ]);
-    
+
 
     return (
         <div className="row justify-content-center align-items-center">

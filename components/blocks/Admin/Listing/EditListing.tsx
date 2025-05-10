@@ -42,68 +42,128 @@ function EditListing({
         active: data?.active || false,
         allow_offers: data?.allow_offers || false,
         quantity: data?.quantity || 0,
-        listing_type: data?.listing_type || {
-            id: data?.listing_type?.id || 0,
-            name: data?.listing_type?.name || '',
-            label: data?.listing_type?.label || '',
-            description: data?.listing_type?.description || '',
+        type: data?.type || {
+            id: data?.type?.id || 0,
+            name: data?.type?.name || '',
+            label: data?.type?.label || '',
+            description: data?.type?.description || '',
         },
-        listing_user: data?.listing_user || {
-            id: data?.listing_user?.id || 0,
-            first_name: data?.listing_user?.first_name || '',
-            last_name: data?.listing_user?.last_name || '',
-            username: data?.listing_user?.username || '',
-            email: data?.listing_user?.email || '',
-            created_at: data?.listing_user?.created_at || '',
-            updated_at: data?.listing_user?.updated_at || '',
+        user: data?.user || {
+            id: data?.user?.id || 0,
+            first_name: data?.user?.first_name || '',
+            last_name: data?.user?.last_name || '',
+            username: data?.user?.username || '',
+            email: data?.user?.email || '',
+            created_at: data?.user?.created_at || '',
+            updated_at: data?.user?.updated_at || '',
         },
-        listing_follow: data?.listing_follow || [],
-        listing_feature: data?.listing_feature || [],
-        listing_review: data?.listing_review || [],
-        listing_category: data?.listing_category || [],
-        listing_brand: data?.listing_brand || [],
-        listing_color: data?.listing_color || [],
-        listing_product_type: data?.listing_product_type || [],
+        follows: data?.follows || [],
+        features: data?.features || [],
+        reviews: data?.reviews || [],
+        categories: data?.categories || [],
+        brands: data?.brands || [],
+        colors: data?.colors || [],
+        product_types: data?.product_types || [],
         media: data?.media || [],
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
-    async function handleSubmit(values: Listing) {
-        let requestData = { ...values };
 
-        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
+    function buildRequestData(values: Listing) {
+        let requestData: Listing = {
+        };
+        if (values.hasOwnProperty('active')) {
+            requestData.active = values.active;
+        }
+        if (values.hasOwnProperty('name')) {
+            requestData.name = values.name;
+        }
+        if (values.hasOwnProperty('title')) {
+            requestData.title = values.title;
+        }
+        if (values.hasOwnProperty('description')) {
+            requestData.description = values.description;
+        }
+        if (values.hasOwnProperty('allow_offers')) {
+            requestData.allow_offers = values.allow_offers;
+        }
+        if (values.hasOwnProperty('quantity')) {
+            requestData.quantity = values.quantity;
+        }
+        if (values.hasOwnProperty('type')) {
+            requestData.type = values.type.id;
+        }
+        if (values.hasOwnProperty('user')) {
+            requestData.user = values.user.id;
+        }
+        if (Array.isArray(values?.follow_users)) {
+            requestData.follows = RequestHelpers.extractIdsFromArray(values.follow_users);
+        }
+        if (Array.isArray(values?.features)) {
+            requestData.features = RequestHelpers.extractIdsFromArray(values.features);
+        }
+        if (Array.isArray(values?.reviews)) {
+            requestData.reviews = values.reviews;
+        }
+        if (Array.isArray(values?.categories)) {
+            requestData.categories = RequestHelpers.extractIdsFromArray(values.categories);
+        }
+        if (Array.isArray(values?.brands)) {
+            requestData.brands = RequestHelpers.extractIdsFromArray(values.brands);
+        }
+        if (Array.isArray(values?.colors)) {
+            requestData.colors = RequestHelpers.extractIdsFromArray(values.colors);
+        }
+        if (Array.isArray(values?.product_types)) {
+            requestData.product_types = RequestHelpers.extractIdsFromArray(values.product_types);
+        }
+        if (Array.isArray(values?.media)) {
+            requestData.media = [];
+        }
+        return requestData;
+    }
+
+    function buildCreateData(values: Listing) {
+
+        let requestData: CreateMenuItem = {
+            type: values?.type || '',
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
+        return requestData;
+    }
+
+    function buildUpdateData(values: Listing) {
+
+        let requestData: CreateMenuItem = {
+            type: values?.type || '',
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
+        return requestData;
+    }
+
+    async function handleSubmit(values: Listing) {
+
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
-        if (Array.isArray(values?.roles)) {
-            requestData.roles = RequestHelpers.extractIdsFromArray(values.roles);
-        }
-        if (Array.isArray(requestData?.sidebars)) {
-            requestData.sidebars = requestData?.sidebars.filter((sidebar: Sidebar) => {
-                return sidebar?.id;
-            })
-                .map((sidebar: Sidebar) => {
-                    return sidebar.id;
-                });
-        }
-        if (Array.isArray(requestData?.blocks)) {
-            requestData.blocks = requestData?.blocks.map((block: ListingBlock) => {
-                if (Array.isArray(block?.sidebars)) {
-                    block.sidebars = RequestHelpers.extractIdsFromArray(block.sidebars);
-                }
-                if (Array.isArray(block?.roles)) {
-                    block.roles = RequestHelpers.extractIdsFromArray(block.roles);
-                }
-                return block;
-            });
-        }
-
 
         let response = null;
+        let requestData: CreateMenu | UpdateMenu;
         switch (operation) {
             case 'edit':
             case 'update':
+                requestData = buildUpdateData(values);
+                console.log('edit requestData', requestData);
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
                 }
@@ -116,6 +176,8 @@ function EditListing({
                 break;
             case 'add':
             case 'create':
+                requestData = buildCreateData(values);
+                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.listing}/create`,
                     method: ApiMiddleware.METHOD.POST,
