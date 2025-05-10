@@ -562,44 +562,69 @@ function EditListingFields({
                         )}
                     </div>
                     <div className="col-12 my-3">
-                        <h4>Manage</h4>
+                        <h4>Manage Reviews</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingReviewModal',
-                            'Manage Reviews',
+                            'View Reviews',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Features</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingFeatureModal',
                             'Manage Features',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Follows</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingFollowModal',
-                            'Manage Follows',
+                            'View Follows',
                         )}
+                        {modalService.renderLocalTriggerButton(
+                            'listingUser',
+                            'Select Users',
+                        )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Categories</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingCategory',
                             'Manage Category',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Brands</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingBrand',
                             'Manage Brand',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Colors</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingColor',
                             'Manage Color',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Product Types</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingProductType',
                             'Manage Product Type',
                         )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Media</h4>
                         {modalService.renderLocalTriggerButton(
                             'Media',
                             'Manage Media',
                         )}
                     </div>
                 </div>
-
-                {modalService.renderLocalModals()}
             </div>
+
+            {modalService.renderLocalModals()}
         </div>
     );
 }
