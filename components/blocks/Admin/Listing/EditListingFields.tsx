@@ -22,6 +22,8 @@ import ManageListingBrand from "./Brand/ManageListingBrand";
 import ManageListingColor from "./Color/ManageListingColor";
 import ManageListingProductType from "./ProductType/ManageListingProductType";
 import ManageMedia from "../Media/ManageMedia";
+import { stat } from "fs";
+import { objectMerge } from "@/helpers/utils";
 
 type EditListingFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -47,13 +49,15 @@ function EditListingFields({
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
     function getListingComponentProps() {
-        let componentProps: any = {};
+        let componentProps: any = {
+            operation: 'create',
+        };
         if (values?.id) {
             componentProps.listingId = values.id;
+            componentProps.operation = 'edit';
         }
         return componentProps;
     }
-
     modalService.setUseStateHook(useState)
     modalService.setConfig([
         {
@@ -69,24 +73,30 @@ function EditListingFields({
                     ]}
                 >
                     <ManageUser
+                        {...getListingComponentProps()}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(users: Array<any>) => {
+                            if (!Array.isArray(users)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
                             setSelectedUsers(
-                                values.filter((item) => item?.checked)
+                                users.filter((item) => item?.checked)
                             );
-
                         }}
                     />
                 </AccessControlComponent>
             ),
-            onOk: () => {
+            onOk: ({ state }: {
+                state: LocalModal,
+                setState: Dispatch<React.SetStateAction<LocalModal>>,
+                configItem: any,
+            },
+                e?: React.MouseEvent | null
+            ) => {
                 if (selectedUsers.length === 0) {
                     console.warn('No user selected');
                     return true;
@@ -96,7 +106,6 @@ function EditListingFields({
                     setFieldValue('listing_user', selectedUser);
                     return true;
                 }
-                return true;
             },
             onCancel: () => {
                 return true;
@@ -116,9 +125,10 @@ function EditListingFields({
                 >
                     <ManageListingReview
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.reviews || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
                         onChange={(values: Array<any>) => {
                             if (!Array.isArray(values)) {
@@ -160,18 +170,23 @@ function EditListingFields({
                 >
                     <ManageListingFeature
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.features || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(features: Array<any>) => {
+                            if (!Array.isArray(features)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedFeatures(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedFeatures(
+                                    features.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('features', features);
                         }}
                     />
                 </AccessControlComponent>
@@ -182,7 +197,7 @@ function EditListingFields({
                 }
                 if (['add', 'create'].includes(operation)) {
 
-                    setFieldValue('listing_features', selectedFeatures);
+                    setFieldValue('features', selectedFeatures);
                     return true;
                 }
                 return true;
@@ -205,18 +220,23 @@ function EditListingFields({
                 >
                     <ManageListingFollow
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.follows || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(follows: Array<any>) => {
+                            if (!Array.isArray(follows)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedFollows(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedFollows(
+                                    follows.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('follows', follows);
                         }}
                     />
                 </AccessControlComponent>
@@ -249,18 +269,23 @@ function EditListingFields({
                 >
                     <ManageListingCategory
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.categories || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(categories: Array<any>) => {
+                            if (!Array.isArray(categories)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedCategories(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedCategories(
+                                    categories.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('categories', categories);
                         }}
                     />
                 </AccessControlComponent>
@@ -293,18 +318,23 @@ function EditListingFields({
                 >
                     <ManageListingBrand
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.brands || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(brands: Array<any>) => {
+                            if (!Array.isArray(brands)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedBrands(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedBrands(
+                                    brands.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('brands', brands);
                         }}
                     />
                 </AccessControlComponent>
@@ -337,18 +367,23 @@ function EditListingFields({
                 >
                     <ManageListingColor
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.colors || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(colors: Array<any>) => {
+                            if (!Array.isArray(colors)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedColors(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedColors(
+                                    colors.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('colors', colors);
                         }}
                     />
                 </AccessControlComponent>
@@ -381,18 +416,23 @@ function EditListingFields({
                 >
                     <ManageListingProductType
                         {...getListingComponentProps()}
-                        rowSelection={true}
+                        data={values?.product_types || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(productTypes: Array<any>) => {
+                            if (!Array.isArray(productTypes)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedProductTypes(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedProductTypes(
+                                    productTypes.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('product_types', productTypes);
                         }}
                     />
                 </AccessControlComponent>
@@ -424,18 +464,23 @@ function EditListingFields({
                     ]}
                 >
                     <ManageMedia
-                        rowSelection={true}
+                        data={values?.media || []}
+                        rowSelection={false}
                         multiRowSelection={false}
-                        enableEdit={false}
+                        enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(media: Array<any>) => {
+                            if (!Array.isArray(media)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedMedia(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedMedia(
+                                    media.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('media', media);
                         }}
                     />
                 </AccessControlComponent>
@@ -459,7 +504,7 @@ function EditListingFields({
             }
         },
     ]);
-
+    console.log('modalService', values);
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -579,11 +624,7 @@ function EditListingFields({
                         <h4>Manage Follows</h4>
                         {modalService.renderLocalTriggerButton(
                             'listingFollowModal',
-                            'View Follows',
-                        )}
-                        {modalService.renderLocalTriggerButton(
-                            'listingUser',
-                            'Select Users',
+                            'Manage Follows',
                         )}
                     </div>
                     <div className="col-12 my-3">

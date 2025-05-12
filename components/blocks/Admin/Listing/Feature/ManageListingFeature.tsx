@@ -9,7 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { Listing, ListingFeature } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
@@ -18,6 +18,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type ManageListingFeatureProps = {
+    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
@@ -25,10 +26,13 @@ export type ManageListingFeatureProps = {
     onChange: (tableData: Array<any>) => void;
     rowSelection?: boolean;
     multiRowSelection?: boolean;
+    data?: Array<ListingFeature>;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingFeature({
+    data = [],
+    operation,
     listingId,
     rowSelection = true,
     multiRowSelection = true,
@@ -49,10 +53,22 @@ function ManageListingFeature({
             onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
+                if (!operation) {
+                    console.warn('Operation is required');
+                    return;
+                }
                 if (!formHelpers) {
                     return;
                 }
                 if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                
+                if (['add', 'create'].includes(operation)) {
+                    onChange([
+                        ...data,
+                        formHelpers.values.feature
+                    ]);
                     return;
                 }
                 const response = await formHelpers.submitForm();
@@ -192,6 +208,13 @@ function ManageListingFeature({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!operation) {
+            console.warn('Operation is required');
+            return;
+        }
+        if (['add', 'create'].includes(operation)) {
+            return;
+        }
         if (!listingId) {
             console.warn('Listing ID is required');
             return;
@@ -332,6 +355,7 @@ function ManageListingFeature({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

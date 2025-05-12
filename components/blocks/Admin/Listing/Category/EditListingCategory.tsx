@@ -68,10 +68,87 @@ function EditListingCategory({
         updated_at: data?.updated_at || '',
     };
 
-    async function handleSubmit(values: Listing) {
-        let requestData = { ...values };
+    function buildRequestData(values: Listing) {
+        let requestData: Listing = {
+        };
+        if (values.hasOwnProperty('active')) {
+            requestData.active = values.active;
+        }
+        if (values.hasOwnProperty('name')) {
+            requestData.name = values.name;
+        }
+        if (values.hasOwnProperty('title')) {
+            requestData.title = values.title;
+        }
+        if (values.hasOwnProperty('description')) {
+            requestData.description = values.description;
+        }
+        if (values.hasOwnProperty('allow_offers')) {
+            requestData.allow_offers = values.allow_offers;
+        }
+        if (values.hasOwnProperty('quantity')) {
+            requestData.quantity = values.quantity;
+        }
+        if (values.hasOwnProperty('type')) {
+            requestData.type = values.type.id;
+        }
+        if (values.hasOwnProperty('user')) {
+            requestData.user = values.user.id;
+        }
+        if (Array.isArray(values?.follow_users)) {
+            requestData.follows = RequestHelpers.extractIdsFromArray(values.follow_users);
+        }
+        if (Array.isArray(values?.features)) {
+            requestData.features = RequestHelpers.extractIdsFromArray(values.features);
+        }
+        if (Array.isArray(values?.reviews)) {
+            requestData.reviews = values.reviews;
+        }
+        if (Array.isArray(values?.categories)) {
+            requestData.categories = RequestHelpers.extractIdsFromArray(values.categories);
+        }
+        if (Array.isArray(values?.brands)) {
+            requestData.brands = RequestHelpers.extractIdsFromArray(values.brands);
+        }
+        if (Array.isArray(values?.colors)) {
+            requestData.colors = RequestHelpers.extractIdsFromArray(values.colors);
+        }
+        if (Array.isArray(values?.product_types)) {
+            requestData.product_types = RequestHelpers.extractIdsFromArray(values.product_types);
+        }
+        if (Array.isArray(values?.media)) {
+            requestData.media = [];
+        }
+        return requestData;
+    }
 
-        if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
+    function buildCreateData(values: Listing) {
+
+        let requestData: CreateMenuItem = {
+            type: values?.type || '',
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
+        return requestData;
+    }
+
+    function buildUpdateData(values: Listing) {
+
+        let requestData: CreateMenuItem = {
+            type: values?.type || '',
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
+        return requestData;
+    }
+    async function handleSubmit(values: Listing) {
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
@@ -98,11 +175,13 @@ function EditListingCategory({
         //     });
         // }
 
-
         let response = null;
+        let requestData: CreateMenu | UpdateMenu;
         switch (operation) {
             case 'edit':
             case 'update':
+                requestData = buildUpdateData(values);
+                console.log('edit requestData', requestData);
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
                 }
@@ -115,6 +194,8 @@ function EditListingCategory({
                 break;
             case 'add':
             case 'create':
+                requestData = buildCreateData(values);
+                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.listing}/create`,
                     method: ApiMiddleware.METHOD.POST,

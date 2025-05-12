@@ -78,6 +78,9 @@ function DataTable({
             };
         });
         setTableData(newTableData);
+        if (typeof onChange === 'function') {
+            onChange(newTableData);
+        }
 
     }
     function initTableData() {
@@ -92,6 +95,7 @@ function DataTable({
                 })
             );
         } else {
+
             setTableData([]);
         }
     }
@@ -147,11 +151,7 @@ function DataTable({
             });
         }
     }, [selectedAction]);
-    useEffect(() => {
-        if (typeof onChange === 'function') {
-            onChange(tableData);
-        }
-    }, [tableData]);
+
     return (
         <>
             <div className="row">
@@ -222,17 +222,19 @@ function DataTable({
                                                 checked={item?.checked || false}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     const checked = e.target.checked;
-                                                    setTableData(prevState => {
-                                                        let newState = [...prevState];
-                                                        if (typeof newState?.[index] === 'undefined') {
-                                                            return newState;
-                                                        }
-                                                        newState[index] = {
-                                                            ...newState[index],
-                                                            checked: checked,
-                                                        };
+
+                                                    let newState = [...tableData];
+                                                    if (typeof newState?.[index] === 'undefined') {
                                                         return newState;
-                                                    });
+                                                    }
+                                                    newState[index] = {
+                                                        ...newState[index],
+                                                        checked: checked,
+                                                    };
+                                                    setTableData(newState);
+                                                    if (typeof onChange === 'function') {
+                                                        onChange(newState);
+                                                    }
                                                 }}
                                             />
                                         </td>
@@ -244,15 +246,17 @@ function DataTable({
                                                 checked={item?.checked || false}
                                                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                                     const checked = e.target.checked;
-                                                    setTableData(prevState => {
-                                                        let newState = [...prevState];
-                                                        return newState.map((item, tableDataItemIndex) => {
-                                                            return {
-                                                                ...item,
-                                                                checked: tableDataItemIndex === index ? checked : false,
-                                                            };
-                                                        });
+                                                    let newState = [...tableData];
+                                                    newState = newState.map((item, tableDataItemIndex) => {
+                                                        return {
+                                                            ...item,
+                                                            checked: tableDataItemIndex === index ? checked : false,
+                                                        };
                                                     });
+                                                    setTableData(newState);
+                                                    if (typeof onChange === 'function') {
+                                                        onChange(newState);
+                                                    }
                                                 }}
                                             />
                                         </td>

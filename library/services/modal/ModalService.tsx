@@ -136,12 +136,22 @@ export class ModalService extends MessageService {
     renderLocalModals() {
         return (
             <>
-                {this.config.map((modal: any, index: number) => {
-                    if (typeof modal?.state !== 'object') {
+                {this.config.map((configItem: any, index: number) => {
+                    if (typeof configItem?.state !== 'object') {
                         console.error('Modal state not found');
                         return null;
                     }
-                    const [state, setState] = modal.state;
+                    const [state, setState] = configItem.state;
+                    let component: any = null;
+                    if (typeof configItem?.component === 'function') {
+                        component = configItem.component({
+                            state, 
+                            setState,
+                            configItem,
+                        });
+                    } else if (configItem?.component) {
+                        component = configItem.component;
+                    }
                     return (
                         <Modal
                             show={state.show}
@@ -149,27 +159,27 @@ export class ModalService extends MessageService {
                             size={state?.size || 'md'}
                             fullscreen={state?.fullscreen || false}
                             onHide={() => {
-                                this.onLocalModalCancel(modal);
+                                this.onLocalModalCancel(configItem);
                             }}>
                             <Modal.Header closeButton>
                                 <Modal.Title>{state?.title || ''}</Modal.Title>
                             </Modal.Header>
                             <Modal.Body>
-                                {modal?.component || ''}
+                                {component}
                             </Modal.Body>
                             {state.footer &&
                                 <Modal.Footer>
                                     <Button
                                         variant="secondary"
                                         onClick={(e: React.MouseEvent) => {
-                                            this.onLocalModalCancel(modal, e);
+                                            this.onLocalModalCancel(configItem, e);
                                         }}>
                                         Close
                                     </Button>
                                     <Button
                                         variant="primary"
                                         onClick={(e: React.MouseEvent) => {
-                                            this.onLocalModalOk(modal, e);
+                                            this.onLocalModalOk(configItem, e);
                                         }}>
                                         Save Changes
                                     </Button>

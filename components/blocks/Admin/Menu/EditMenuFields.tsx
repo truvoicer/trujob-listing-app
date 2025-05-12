@@ -93,9 +93,11 @@ function EditMenuFields({
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    ModalService.setModalTitle('Manage Roles', setRolesModal);
-                                    ModalService.setModalFooter(true, setRolesModal);
-                                    ModalService.showModal(setRolesModal);
+                                    ModalService.updateLocalItemState({
+                                        show: true,
+                                        title: 'Manage Roles',
+                                        footer: true,
+                                    }, setRolesModal);
                                 }}
                             >
                                 Manage Roles
@@ -104,9 +106,11 @@ function EditMenuFields({
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    ModalService.setModalTitle('Manage Menu Items', setMenuItemsModal);
-                                    ModalService.setModalFooter(true, setMenuItemsModal);
-                                    ModalService.showModal(setMenuItemsModal);
+                                    ModalService.updateLocalItemState({
+                                        show: true,
+                                        title: 'Manage Menu Items',
+                                        footer: true,
+                                    }, setMenuItemsModal);
                                 }}
                             >
                                 Manage Menu Items

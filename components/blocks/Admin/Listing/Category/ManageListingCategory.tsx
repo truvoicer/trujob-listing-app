@@ -18,6 +18,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type ManageListingCategoryProps = {
+    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
@@ -29,6 +30,7 @@ export type ManageListingCategoryProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingCategory({
+    operation,
     listingId,
     rowSelection = true,
     multiRowSelection = true,
@@ -192,6 +194,13 @@ function ManageListingCategory({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!operation) {
+            console.warn('Operation is required');
+            return;
+        }
+        if (['add', 'create'].includes(operation)) {
+            return;
+        }
         if (!listingId) {
             console.warn('Listing ID is required');
             return;

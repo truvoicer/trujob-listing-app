@@ -156,3 +156,16 @@ export function getNextArrayIndex(array) {
 export function compareValues(value1, value2) {
     return (JSON.stringify(value1) === JSON.stringify(value2));
 }
+
+export function objectMerge(obj1: any, obj2: any): any {
+    if (typeof obj1 !== "object" || typeof obj2 !== "object") {
+        return obj1;
+    }
+    const merged = { ...obj1 };
+    for (const key in obj2) {
+        if (obj2.hasOwnProperty(key)) {
+            merged[key] = obj2[key];
+        }
+    }
+    return merged;
+}

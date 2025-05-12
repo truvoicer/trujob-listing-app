@@ -14,6 +14,7 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+    data?: Array<any>;
     onChange: (tableData: Array<any>) => void;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -53,6 +54,7 @@ export type DatatableSearchParams = {
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
+    data,
     rowSelection = false,
     onChange,
     paginationMode = 'router',
@@ -187,7 +189,23 @@ function DataManager({
         }
         makeRequest();
     }, [dataTableContextState.query]);
-
+    
+    useEffect(() => {
+        if (!data) {
+            return;
+        }
+        if (!Array.isArray(data)) {
+            return;
+        }
+        
+        updateDataTableContextState({
+            data,
+            links: [],
+            meta: {},
+            requestStatus: 'idle',
+        });
+        
+    }, [data]);
 
     return (
         <DataTableContext.Provider value={dataTableContextState}>

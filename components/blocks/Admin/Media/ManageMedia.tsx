@@ -15,8 +15,11 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Media } from "@/types/Media";
 
 export type ManageMediaProps = {
+    operation?: 'edit' | 'update' | 'add' | 'create';
+    data?: Array<Media>;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -27,6 +30,8 @@ export type ManageMediaProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageMedia({
+    operation = 'edit',
+    data,
     rowSelection = true,
     multiRowSelection = true,
     onChange,

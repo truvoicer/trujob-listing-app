@@ -548,9 +548,11 @@ function EditPageBlockFields({
                             type="button"
                             className="btn btn-primary mr-2"
                             onClick={(e) => {
-                                ModalService.setModalTitle('Manage Roles', setRoleModal);
-                                ModalService.setModalFooter(true, setRoleModal);
-                                ModalService.showModal(setRoleModal);
+                                ModalService.updateLocalItemState({
+                                    show: true,
+                                    footer: true,
+                                    title: 'Manage Roles',
+                                }, setRoleModal);
                             }}
                         >
                             Manage Roles
@@ -559,9 +561,11 @@ function EditPageBlockFields({
                             type="button"
                             className="btn btn-primary mr-2"
                             onClick={(e) => {
-                                ModalService.setModalTitle('Manage Sidebars', setSidebarModal);
-                                ModalService.setModalFooter(true, setSidebarModal);
-                                ModalService.showModal(setSidebarModal);
+                                ModalService.updateLocalItemState({
+                                    show: true,
+                                    footer: true,
+                                    title: 'Manage Sidebars',
+                                }, setSidebarModal);
                             }}
                         >
                             Manage Sidebars

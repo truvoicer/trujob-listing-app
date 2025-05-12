@@ -137,7 +137,7 @@ function EditPageFields({
                         </p>
                     ),
                 }, 'sidebar-sidebar-add-success');
-                
+
                 if (typeof sidebarsRequest === 'function') {
                     sidebarsRequest();
                 }
@@ -280,7 +280,7 @@ function EditPageFields({
         if (!formHelpers) {
             return;
         }
-        
+
         const item = { ...formHelpers.values };
         if (!item?.id) {
             notificationContext.show({
@@ -353,7 +353,7 @@ function EditPageFields({
         sidebars,
         setSidebars
     }: SidebarFormMakeRequest) {
-        
+
         if (!values?.id) {
             return [];
         }
@@ -369,7 +369,7 @@ function EditPageFields({
     }
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -485,9 +485,11 @@ function EditPageFields({
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    ModalService.setModalTitle('Manage Roles', setRoleModal);
-                                    ModalService.setModalFooter(true, setRoleModal);
-                                    ModalService.showModal(setRoleModal);
+                                    ModalService.updateLocalItemState({
+                                        show: true,
+                                        footer: true,
+                                        title: 'Manage Roles',
+                                    }, setRoleModal);
                                 }}
                             >
                                 Manage Roles
@@ -496,9 +498,11 @@ function EditPageFields({
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    ModalService.setModalTitle('Manage Blocks', setBlocksModal);
-                                    ModalService.setModalFooter(true, setBlocksModal);
-                                    ModalService.showModal(setBlocksModal);
+                                    ModalService.updateLocalItemState({
+                                        show: true,
+                                        footer: true,
+                                        title: 'Manage Blocks',
+                                    }, setBlocksModal);
                                 }}
                             >
                                 Manage Blocks
@@ -507,9 +511,11 @@ function EditPageFields({
                                 type="button"
                                 className="btn btn-primary mr-2"
                                 onClick={(e) => {
-                                    ModalService.setModalTitle('Manage Sidebars', setSidebarsModal);
-                                    ModalService.setModalFooter(true, setSidebarsModal);
-                                    ModalService.showModal(setSidebarsModal);
+                                    ModalService.updateLocalItemState({
+                                        show: true,
+                                        footer: true,
+                                        title: 'Manage Sidebars',
+                                    }, setSidebarsModal);
                                 }}
                             >
                                 Manage Sidebars
@@ -643,7 +649,7 @@ function EditPageFields({
                                             return false;
                                         }
                                         return true;
-                                    } else if (['add', 'create'].includes(operation || '')) { 
+                                    } else if (['add', 'create'].includes(operation || '')) {
                                         let roles = values?.roles || [];
                                         setFieldValue('roles', [...roles, role]);
                                         return true;

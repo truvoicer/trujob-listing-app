@@ -1,12 +1,17 @@
 import { findInObject } from "@/helpers/utils";
 import { ModalItem } from "../modal/ModalService";
+import { SetStateAction } from "react";
 
 export type LocalItem = {
+    id: null | string;
     show: boolean;
     title: string;
-    footer: boolean;
-    size: "sm" | "md" | "lg" | "xl";
-    fullscreen: string | true | undefined;
+    footer?: boolean;
+    props?: any;
+    onOk?: () => boolean;
+    onCancel?: () => boolean;
+    size?: "sm" | "md" | "lg" | "xl";
+    fullscreen?: string | true | undefined;
 };
 export type MessageState = {
     items: Array<any>;
@@ -20,7 +25,7 @@ export class MessageService {
     state?: any;
     setter?: any;
     config: Array<any> = [];
-    useStateHook: () => any = () => {};
+    useStateHook: (prevState: SetStateAction<LocalItem>) => {};
     
     constructor(state?: any, setter?: any) {
         this.state = state;
@@ -54,14 +59,15 @@ export class MessageService {
                 return item;
             }
             let newItem = { ...item };
-            if (typeof newItem?.id !== "string") {
+            if (typeof newItem?.id !== "string" && !Array.isArray(newItem?.id)) {
                 console.error("config item id is not a string", {
                     item: item,
                     config: config
                 });
                 return item;
             }
-            newItem.state = this.useStateHook<LocalItem>({
+            newItem.state = this.useStateHook<SetStateAction<LocalItem>>({
+                id: null,
                 show: false,
                 title: item?.title || null,
                 footer: item?.footer || true,
@@ -69,6 +75,7 @@ export class MessageService {
                 fullscreen: item?.fullscreen || false,
                 onOk: item?.onOk || (() => { return true; }),
                 onCancel: item?.onCancel || (() => { return true; }),
+                props: item?.props || {},
             })
             return newItem;
         });
@@ -111,13 +118,49 @@ export class MessageService {
         if (typeof id !== "string") {
             return -1;
         }
-        return this.config.findIndex((item: any) => item?.id === id);
+        return this.config.findIndex((item: any) => {
+            if (typeof item !== "object") {
+                console.error("config item is not an object", {
+                    item: item,
+                    config: this.config
+                });
+                return false;
+            }
+            if (typeof item?.id === "string") {
+                return item.id === id;
+            } else if (Array.isArray(item?.id)) {
+                return item.id.includes(id);
+            }
+            console.error("config item id is not a string or array", {
+                item: item,
+                config: this.config
+            });
+            return false;
+        });
     }
     findLocalMessageConfigById(id: string) {
         if (typeof id !== "string") {
             return null;
         }
-        return this.config.find((item: any) => item?.id === id) || null;
+        return this.config.find((item: any) => {
+            if (typeof item !== "object") {
+                console.error("config item is not an object", {
+                    item: item,
+                    config: this.config
+                });
+                return false;
+            }
+            if (typeof item?.id === "string") {
+                return item.id === id;
+            } else if (Array.isArray(item?.id)) {
+                return item.id.includes(id);
+            }
+            console.error("config item id is not a string or array", {
+                item: item,
+                config: this.config
+            });
+            return false;
+        }) || null;
     }
     findLocalMessageStateById(id: string) {
         const findLocalMessageConfig = this.findLocalMessageConfigById(id);
@@ -146,7 +189,11 @@ export class MessageService {
 
         if (
             typeof state?.onCancel === 'function' &&
-            !state.onCancel(e)
+            !state.onCancel({
+                state, 
+                setState,
+                configItem: item,
+            }, e)
         ) {
             return;
         }
@@ -162,14 +209,18 @@ export class MessageService {
 
         if (
             typeof state?.onOk === 'function' &&
-            !state.onOk(e)
+            !state.onOk({
+                state, 
+                setState,
+                configItem: item,
+            }, e)
         ) {
             return;
         }
 
         MessageService.hideModal(setState)
     }
-    renderLocalTriggerButton(id: string, label: string | null = null) {
+    renderLocalTriggerButton(id: string, label: string | null = null, props: any = {}) {
         const findLocalMessageConfig = this.findLocalMessageConfigById(id);
         if (!findLocalMessageConfig) {
             console.error("local message config not found", {
@@ -191,9 +242,13 @@ export class MessageService {
                 type="button"
                 className="btn btn-primary mr-2"
                 onClick={(e) => {
-                    MessageService.showModal(setState);
-                    MessageService.setModalTitle(findLocalMessageConfig?.title || '', setState);
-                    MessageService.setModalFooter(findLocalMessageConfig?.footer || true, setState);
+                    MessageService.updateLocalItemState({   
+                        id: id,
+                        props: props || {},
+                        show: true,
+                        title: findLocalMessageConfig?.title || '',
+                        footer: findLocalMessageConfig?.footer || true,
+                    }, setState);
                 }}
             >
                 {label || "Open"}
@@ -212,29 +267,25 @@ export class MessageService {
         });
     }
 
-    static showModal(setter: any) {
+    static updateLocalItemState(data: any, setter: any) {
+        if (typeof data !== "object") {
+            console.error("data is not an object", {
+                data: data,
+                setter: setter
+            });
+            return null;
+        }
         setter((prevState: any) => {
             let newState = { ...prevState };
-            newState.show = true;
+            Object.keys(data).forEach((key: string) => {
+                if (prevState.hasOwnProperty(key)) {
+                    newState[key] = data[key];
+                }
+            });
             return newState;
         });
     }
 
-    static setModalTitle(title: string, setter: any) {
-        setter((prevState: any) => {
-            let newState = { ...prevState };
-            newState.title = title;
-            return newState;
-        });
-    }
-
-    static setModalFooter(hasFooter: boolean = false, setter: any) {
-        setter((prevState: any) => {
-            let newState = { ...prevState };
-            newState.footer = hasFooter;
-            return newState;
-        });
-    }
 
     async handleCancel(index: number, calllbackProps?: any) {
         const handleCallback = await this.handleCallback(index, "onCancel", calllbackProps);
