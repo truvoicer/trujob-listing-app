@@ -39,14 +39,15 @@ function EditListingFollowFields({
                         multiRowSelection={true}
                         enableEdit={false}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(users: Array<any>) => {
+                            if (!Array.isArray(users)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
                             setSelectedTableRows(
-                                values.filter((item) => item?.checked)
+                                users.filter((item) => item?.checked)
                             );
+                            setFieldValue('users', users.filter((item) => item?.checked));
                         }}
                     />
                 </AccessControlComponent>
@@ -57,7 +58,7 @@ function EditListingFollowFields({
                     console.warn('No user selected');
                     return true;
                 }
-                setFieldValue('follows', selectedTableRows);
+                setFieldValue('users', selectedTableRows);
                 return true;
             },
             onCancel: () => {
@@ -66,7 +67,7 @@ function EditListingFollowFields({
             }
         },
     ]);
-    
+    console.log('values', values);
 
     return (
         <div className="row justify-content-center align-items-center">

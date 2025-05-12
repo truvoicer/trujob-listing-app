@@ -94,6 +94,7 @@ function ManageListingFeature({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingFeature
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -119,6 +120,7 @@ function ManageListingFeature({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingFeature
+                                            listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -265,6 +267,7 @@ function ManageListingFeature({
             title: 'Add New Listing',
             component: (
                 <EditListingFeature
+                listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}

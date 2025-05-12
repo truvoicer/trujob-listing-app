@@ -311,6 +311,7 @@ export class ApiMiddleware {
         const responseData = await responsePromise.json();
         switch (responsePromise?.status) {
             case 200:
+            case 201:
             case 202:
                 return responseData;
             case 401:

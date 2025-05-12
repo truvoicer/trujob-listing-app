@@ -80,6 +80,7 @@ function ManageListingBrand({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingBrand
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +106,7 @@ function ManageListingBrand({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingBrand
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -213,9 +215,9 @@ function ManageListingBrand({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                    endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
-                    ]),
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -251,6 +253,7 @@ function ManageListingBrand({
             title: 'Add New Listing',
             component: (
                 <EditListingBrand
+                    listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}

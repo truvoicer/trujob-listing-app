@@ -80,6 +80,7 @@ function ManageListingColor({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingColor
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +106,7 @@ function ManageListingColor({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingColor
+                                            listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -251,6 +253,7 @@ function ManageListingColor({
             title: 'Add New Listing',
             component: (
                 <EditListingColor
+                listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}

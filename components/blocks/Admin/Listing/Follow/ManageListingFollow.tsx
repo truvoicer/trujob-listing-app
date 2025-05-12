@@ -16,6 +16,9 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+import ManageUser from "../../User/ManageUser";
+import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageListingFollowProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
@@ -51,6 +54,7 @@ function ManageListingFollow({
             onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
+                console.log('Form Helpers', formHelpers?.values);
                 if (!formHelpers) {
                     return;
                 }
@@ -80,6 +84,7 @@ function ManageListingFollow({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingFollow
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +110,7 @@ function ManageListingFollow({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingFollow
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -213,10 +219,10 @@ function ManageListingFollow({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(':listingId', listingId.toString()),
-                        ]),
+
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.listingFollow.replace(':listingId', listingId.toString()),
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -246,19 +252,113 @@ function ManageListingFollow({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        console.log('Add New Listing', dataTableContextState.modal);
         dataTableContextState.modal.show({
-            title: 'Add New Listing',
-            component: (
-                <EditListingFollow
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            ),
-            ...getListingFormModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <AccessControlComponent
+                        roles={[
+                            { name: 'admin' },
+                            { name: 'superuser' },
+                        ]}
+                    >
+                        <ManageUser
+                            rowSelection={true}
+                            multiRowSelection={true}
+                            enableEdit={false}
+                            paginationMode="state"
+                            onChange={(users: Array<any>) => {
+                                if (!Array.isArray(users)) {
+                                    console.warn('Invalid values received from ManageUser component');
+                                    return;
+                                }
+                                formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
+                            }}
+                        />
+                    </AccessControlComponent>
+                )
+            },
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    users: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    console.log('Form Values', values);
+                    if (!operation) {
+                        console.warn('Operation is required');
+                        return;
+                    }
+                    if (!listingId) {
+                        console.warn('Listing ID is required');
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.listingFollow.replace(
+                                ':listingId',
+                                listingId.toString()
+                            ),
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: {
+                            user_ids: userIds,
+                        }
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add new listing</p>
+                            ),
+                        }, 'listing-add-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Listing added successfully</p>
+                        ),
+                    }, 'listing-add-success');
+                    dataTableContextState.refresh();
+                    // dataTableContextState.modal.close('add-users-modal');
+                    return false;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                const response = await formHelpers.submitForm();
+                if (!response) {
+                    return false;
+                }
+                return true;
+            },
+            fullscreen: true
+        }, 'add-users-modal');
     }
 
     function getRowSelectActions() {
@@ -355,8 +455,9 @@ function ManageListingFollow({
                 request={listingRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Title', key: 'title' },
-                    { label: 'Permalink', key: 'permalink' }
+                    { label: 'First namw', key: 'first_name' },
+                    { label: 'Last name', key: 'last_name' },
+                    { label: 'Email', key: 'email' },
                 ]}
             />
         </Suspense>

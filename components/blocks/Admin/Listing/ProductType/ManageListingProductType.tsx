@@ -80,6 +80,7 @@ function ManageListingProductType({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingProductType
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +106,7 @@ function ManageListingProductType({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingProductType
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -252,6 +254,7 @@ function ManageListingProductType({
             title: 'Add New Listing',
             component: (
                 <EditListingProductType
+                    listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}

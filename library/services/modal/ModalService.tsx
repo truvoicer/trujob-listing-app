@@ -111,13 +111,24 @@ export class ModalService extends MessageService {
     }
 
     renderModalContent(modal: ModalItem, index: number, formHelpers?: any) {
+
+        let component: any = null;
+        if (typeof modal?.component === 'function') {
+            component = modal.component({
+                formHelpers, 
+                index,
+                modal,
+            });
+        } else if (modal?.component) {
+            component = modal.component;
+        }
         return (
             <Modal show={modal.show} onHide={() => this.handleCancel(index, { formHelpers })}>
                 <Modal.Header closeButton>
                     <Modal.Title>{modal?.title || ''}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    {modal?.component || ''}
+                    {component || ''}
                 </Modal.Body>
                 {modal?.showFooter &&
                     <Modal.Footer>

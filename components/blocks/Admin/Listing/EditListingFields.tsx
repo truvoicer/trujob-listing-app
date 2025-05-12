@@ -47,7 +47,7 @@ function EditListingFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
+    
     function getListingComponentProps() {
         let componentProps: any = {
             operation: 'create',
@@ -58,7 +58,8 @@ function EditListingFields({
         }
         return componentProps;
     }
-    modalService.setUseStateHook(useState)
+
+    modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
             id: 'listingUser',
@@ -83,9 +84,20 @@ function EditListingFields({
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedUsers(
-                                users.filter((item) => item?.checked)
-                            );
+
+                            if (users.length === 0) {
+                                console.warn('No user selected');
+                                return true;
+                            }
+                            const selectedUser = users[0];
+
+                            if (values?.id) {
+                                setSelectedUsers(
+                                    users.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('user', selectedUser);
                         }}
                     />
                 </AccessControlComponent>
@@ -97,15 +109,17 @@ function EditListingFields({
             },
                 e?: React.MouseEvent | null
             ) => {
-                if (selectedUsers.length === 0) {
-                    console.warn('No user selected');
-                    return true;
-                }
-                const selectedUser = selectedUsers[0];
-                if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_user', selectedUser);
-                    return true;
-                }
+
+                // if (selectedUsers.length === 0) {
+                //     console.warn('No user selected');
+                //     return true;
+                // }
+                // const selectedUser = selectedUsers[0];
+                // if (['add', 'create'].includes(operation)) {
+                //     setFieldValue('user', selectedUser);
+                //     return true;
+                // }
+                return true;
             },
             onCancel: () => {
                 return true;
@@ -130,14 +144,18 @@ function EditListingFields({
                         multiRowSelection={false}
                         enableEdit={true}
                         paginationMode="state"
-                        onChange={(values: Array<any>) => {
-                            if (!Array.isArray(values)) {
+                        onChange={(reviews: Array<any>) => {
+                            if (!Array.isArray(reviews)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
-                            setSelectedReviews(
-                                values.filter((item) => item?.checked)
-                            );
+                            if (values?.id) {
+                                setSelectedReviews(
+                                    reviews.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('reviews', reviews);
                         }}
                     />
                 </AccessControlComponent>
@@ -147,7 +165,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_reviews', selectedReviews);
+                    setFieldValue('reviews', selectedReviews);
                     return true;
                 }
                 return true;
@@ -196,7 +214,6 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-
                     setFieldValue('features', selectedFeatures);
                     return true;
                 }
@@ -246,7 +263,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_follows', selectedFollows);
+                    setFieldValue('follows', selectedFollows);
                     return true;
                 }
                 return true;
@@ -295,7 +312,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_categories', selectedCategories);
+                    setFieldValue('categories', selectedCategories);
                     return true;
                 }
                 return true;
@@ -344,7 +361,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_brands', selectedBrands);
+                    setFieldValue('brands', selectedBrands);
                     return true;
                 }
                 return true;
@@ -393,7 +410,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_colors', selectedColors);
+                    setFieldValue('colors', selectedColors);
                     return true;
                 }
                 return true;
@@ -442,7 +459,7 @@ function EditListingFields({
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_product_types', selectedProductTypes);
+                    setFieldValue('product_types', selectedProductTypes);
                     return true;
                 }
                 return true;
@@ -493,7 +510,7 @@ function EditListingFields({
                 }
 
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('listing_media', selectedMedia);
+                    setFieldValue('media', selectedMedia);
                     return true;
                 }
                 return true;
@@ -504,7 +521,6 @@ function EditListingFields({
             }
         },
     ]);
-    console.log('modalService', values);
 
     return (
         <div className="row justify-content-center align-items-center">

@@ -26,8 +26,8 @@ function EditListingBrandFields({
 
                     <div className="col-12 col-lg-6">
                         <SelectBrand
-                            name="listing_type"
-                            value={values?.type}
+                            name="brand"
+                            value={values?.brand}
                         />
                     </div>
 

@@ -80,6 +80,7 @@ function ManageListingCategory({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingCategory
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +106,7 @@ function ManageListingCategory({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingCategory
+                                            listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -252,6 +254,7 @@ function ManageListingCategory({
             title: 'Add New Listing',
             component: (
                 <EditListingCategory
+                listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}

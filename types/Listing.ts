@@ -1,6 +1,7 @@
 import { Brand } from "./Brand";
 import { Category } from "./Category";
 import { Color } from "./Color";
+import { Feature } from "./Feature";
 import { Media } from "./Media";
 import { ProductType } from "./ProductType";
 import { User } from "./User";
@@ -42,8 +43,7 @@ export type ListingFollow = {
 export type ListingFeature = {
     id: number;
     listing: Listing;
-    label: string;
-    value: string;
+    feature: Feature;
 }
 export type ListingReview = {
     id: number;
@@ -74,3 +74,13 @@ export type ListingProductType = {
     listing: Listing;
     product_type: ProductType;
 }   
+
+export type ListingReviewRequest = {
+    rating: number;
+    review: string;
+}
+export interface CreateListingReview extends ListingReviewRequest {
+}
+export interface UpdateListingReview extends ListingReviewRequest {
+    id: number;
+}

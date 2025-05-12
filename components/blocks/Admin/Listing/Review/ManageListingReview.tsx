@@ -80,6 +80,7 @@ function ManageListingReview({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingReview
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -105,6 +106,7 @@ function ManageListingReview({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingReview
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -251,6 +253,7 @@ function ManageListingReview({
             title: 'Add New Listing',
             component: (
                 <EditListingReview
+                    listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}
