@@ -9,6 +9,7 @@ import EditListingProductTypeFields from "./EditListingProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/ProductType";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditListingProductTypeProps = {
     listingId?: number;
@@ -60,17 +61,17 @@ function EditListingProductType({
     }
     async function handleSubmit(values: ProductType) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
 
 
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         if (!values?.product_type?.id) {
-            console.warn('Product type ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Product type ID is required');
             return;
         }
 
@@ -108,7 +109,7 @@ function EditListingProductType({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
         }

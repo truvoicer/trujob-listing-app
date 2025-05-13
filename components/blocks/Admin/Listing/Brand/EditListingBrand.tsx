@@ -14,6 +14,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditListingBrandProps = {
     listingId: number;
@@ -69,16 +70,16 @@ function EditListingBrand({
     async function handleSubmit(values: Brand) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         if (!values?.brand?.id) {
-            console.warn('Brand ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
             return;
         }
 
@@ -88,7 +89,7 @@ function EditListingBrand({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
 
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
@@ -107,7 +108,7 @@ function EditListingBrand({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
@@ -120,7 +121,7 @@ function EditListingBrand({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
         

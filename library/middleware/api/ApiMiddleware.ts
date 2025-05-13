@@ -5,8 +5,8 @@ import {
     setShowLoginModalAction,
 } from "@/library/redux/actions/session-actions";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { AppManager } from "@/library/AppManager";
 import { SessionService } from "@/library/services/session/SessionService";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 export type ErrorItem = {
     code: string;
     message: string | null;
@@ -151,14 +151,16 @@ export class ApiMiddleware {
                 headers
             });
         } catch (error) {
-            console.error(error);
+            DebugHelpers.log(DebugHelpers.ERROR, error);
             return false;
         }
     }
 
     getProtectedSessionToken() {
         const sessionObject = SessionService.getSessionObject();
-        console.log('sessionObject', sessionObject);
+        DebugHelpers.log('debug', 'ApiMiddleware.getProtectedSessionToken', {
+            sessionObject,
+        });
         if (!sessionObject) {
             return false;
         }
@@ -275,9 +277,11 @@ export class ApiMiddleware {
                 throw new Error(`Method not supported ${method}`);
         }
 
-        if (AppManager.getInstance().isDebug()) {
-            console.log('ApiMiddleware.runRequest', { requestUrl, request });
-        }
+        DebugHelpers.log('debug', 'ApiMiddleware.runRequest', {
+            requestUrl,
+            request,
+        });
+
         return await this.handleResponse(
             requestUrl,
             await fetch(
@@ -296,7 +300,7 @@ export class ApiMiddleware {
     }
 
     handleUnauthorizedResponse(response: Response, data: any): void {
-        console.log('handleUnauthorizedResponse', { response, data });
+        DebugHelpers.log(DebugHelpers.DEBUG, 'handleUnauthorizedResponse', { response, data });
         SessionService.removeLocalSession();
         setAuthenticatedAction(false);
         setIsAuthenticatingAction(false)
@@ -317,7 +321,7 @@ export class ApiMiddleware {
             case 401:
                 this.handleUnauthorizedResponse(responsePromise, responseData);
             default:
-                console.log({responsePromise, responseData});
+                DebugHelpers.log(DebugHelpers.DEBUG, {responsePromise, responseData});
                 this.addError(
                     'api_error',
                     responseData?.message || 'API Error',

@@ -1,3 +1,4 @@
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { isSet } from "@/helpers/utils";
 import { setIsAuthenticatingAction, setSessionUserAction } from "@/library/redux/actions/session-actions";
 import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_STATE, SESSION_USER, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
@@ -38,13 +39,18 @@ export class SessionService {
 
     static async handleTokenResponse(token, tokenExpiry, user) {
         if (!token) {
-            console.error('Token not found');
-            console.log(response);
+            DebugHelpers.log(DebugHelpers.ERROR, 'Token not found');
+            DebugHelpers.log(DebugHelpers.DEBUG, {
+                message: 'Token not found',
+                token: token,
+                tokenExpiry: tokenExpiry,
+                user: user
+            });
             setIsAuthenticatingAction(false)
             return false;
         }
         if (!user) {
-            console.error('User not found');
+            DebugHelpers.log(DebugHelpers.ERROR, 'User not found');
             setIsAuthenticatingAction(false)
             return false;
         }
@@ -93,7 +99,7 @@ export class SessionService {
                 expires_at: expiry
             }
         } catch (error) {
-            console.error(error);
+            DebugHelpers.log(DebugHelpers.ERROR, error);
             SessionService.logout();
             return false;
         }

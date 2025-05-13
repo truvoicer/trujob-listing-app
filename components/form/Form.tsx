@@ -1,3 +1,4 @@
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ObjectDifference } from "@/helpers/ObjectDfference";
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
 import { Formik, FormikValues } from "formik";
@@ -75,11 +76,11 @@ function Form({
         for (let i = 0; i < requiredFields.length; i++) {
             const field = requiredFields[i];
             if (typeof rule[field] === 'undefined') {
-                console.warn(`Validation rule ${rule.type} requires a ${field} field`);
+                DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} requires a ${field} field`);
                 return false;
             }
             if (rule[field] === null || rule[field] === '') {
-                console.warn(`Validation rule ${rule.type} ${field} field cannot be null or empty`);
+                DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} ${field} field cannot be null or empty`);
                 return false;
             }
         }
@@ -100,7 +101,7 @@ function Form({
             }
             validation[key].forEach(rule => {
                 if (!VALIDATION_RULES.includes(rule.type)) {
-                    console.warn(`Validation rule ${rule.type} is not supported`);
+                    DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} is not supported`);
                     return;
                 }
                 switch (rule.type) {
@@ -202,13 +203,13 @@ function Form({
     }
     function handleSubmit(values: FormikValues, formikHelpers: any) {
         if (typeof operation !== 'string') {
-            console.warn(`Form operation is not a string`);
+            DebugHelpers.log(DebugHelpers.WARN, `Form operation is not a string`);
             return;
         }
         let requestData = { ...values };
         const errors = validationHandler(requestData);
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
-            console.warn(`Form has validation errors`, errors);
+            DebugHelpers.log(DebugHelpers.WARN, `Form has validation errors`, errors);
             return;
         }
 

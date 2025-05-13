@@ -4,6 +4,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectRole from "./SelectRole";
 import { Role } from "@/types/Role";
 import { FormikProps, FormikValues } from "formik";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type RoleFormProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -46,27 +47,27 @@ function RoleForm({
                 formHelpers: FormikProps<FormikValues>;
             }) => {
                 if (!formHelpers) {
-                    console.warn('No form helpers found');
+                    DebugHelpers.log(DebugHelpers.WARN, 'No form helpers found');
                     return false;
                 }
 
                 if (!formHelpers?.values?.role) {
-                    console.warn('No role found');
+                    DebugHelpers.log(DebugHelpers.WARN, 'No role found');
                     return false;
                 }
                 if (typeof onAdd !== 'function') {
-                    console.warn('No onAdd function found');
+                    DebugHelpers.log(DebugHelpers.WARN, 'No onAdd function found');
                     return false;
                 }
                 const response = await onAdd(
                     formHelpers?.values?.role
                 );
                 if (!response) {
-                    console.warn('No response from onAdd function');
+                    DebugHelpers.log(DebugHelpers.WARN, 'No response from onAdd function');
                     return false;
                 }
                 initRequest();
-                console.log('Successfully added role');
+                DebugHelpers.log(DebugHelpers.DEBUG, 'Successfully added role');
                 dataTableContext.modal.close('role-select');
                 return false;
             }
@@ -75,17 +76,17 @@ function RoleForm({
 
     async function handleDelete({ index, item, itemSchema, reorderData }: ReorderOnDelete) {
         if (!item) {
-            console.warn('No item found');
+            DebugHelpers.log(DebugHelpers.WARN, 'No item found');
             return false;
         }
         if (typeof onDelete !== 'function') {
-            console.warn('No onDelete function found');
+            DebugHelpers.log(DebugHelpers.WARN, 'No onDelete function found');
             return false;
         }
         const response = await onDelete(item);
-        console.log('delete response', response);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'delete response', response);
         if (!response) {
-            console.warn('No response from onDelete function');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from onDelete function');
             return false;
         }
         initRequest();
@@ -106,7 +107,7 @@ function RoleForm({
             setRoles(response);
             return;
         }
-        console.warn('No response from makeRequest');
+        DebugHelpers.log(DebugHelpers.WARN, 'No response from makeRequest');
     }
 
     useEffect(() => {
@@ -149,7 +150,7 @@ function RoleForm({
                             <SelectRole
                                 roleId={item?.id}
                                 onChange={(role: Role) => {
-                                    console.log('role', role);
+                                    DebugHelpers.log(DebugHelpers.DEBUG, 'role', role);
                                     // updateFieldValue(index, 'pagination_type', paginationType);
                                 }}
                             />

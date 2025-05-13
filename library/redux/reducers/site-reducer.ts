@@ -30,6 +30,7 @@ import {
     ERROR
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export const siteStateData = {
     [SITE_NAME]: null,
@@ -69,7 +70,7 @@ const defaultReducers = {
     },
     setError: (state, action) => {
         state.error = action.payload;
-        console.error(state.error)
+        DebugHelpers.log(DebugHelpers.ERROR, state.error)
     },
 };
 

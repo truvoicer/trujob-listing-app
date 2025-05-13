@@ -6,6 +6,7 @@ import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import type { Metadata, ResolvingMetadata } from 'next'
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type Props = {
   params: Promise<{ page: string }>
@@ -71,7 +72,7 @@ async function Home({ params }: Props ) {
       permalink: `/`,
     },
   });
-  console.log(site, settings, page);
+  DebugHelpers.log(DebugHelpers.DEBUG, site, settings, page);
   if (!settings?.data) {
     return;
   }

@@ -4,6 +4,7 @@ import { APP_STATE } from "@/library/redux/constants/app-constants";
 import { PAGE_STATE } from "@/library/redux/constants/page-constants";
 import MenuList from "./Menu/MenuList";
 import Branding from "@/components/Branding/Branding";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 const ListingHeader = ({ app, page }) => {
     const [isSticky, setSticky] = useState(false);
@@ -11,7 +12,7 @@ const ListingHeader = ({ app, page }) => {
     const ref = useRef(null);
 
     function toggleMobile() {
-        console.log('toggleMobile')
+        DebugHelpers.log(DebugHelpers.DEBUG, 'toggleMobile')
         setShowMobileMenu(!showMobileMenu);
     }
 
@@ -28,7 +29,7 @@ const ListingHeader = ({ app, page }) => {
             // setSticky(ref.current.getBoundingClientRect().top <= -50);
         }
     }
-    console.log(showMobileMenu)
+    DebugHelpers.log(DebugHelpers.DEBUG, showMobileMenu)
     return (
         <>
             <div className={`site-mobile-menu ${showMobileMenu ? 'show' : ''}`}>

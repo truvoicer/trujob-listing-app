@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { ListingColor } from "@/types/Listing";
@@ -26,7 +27,7 @@ function SelectColor({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching colors');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching colors');
             return;
         }
         setColors(response?.data || []);
@@ -50,11 +51,11 @@ function SelectColor({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedColor);
@@ -74,7 +75,7 @@ function SelectColor({
                     }
                     const findColor = colors.find((color: ListingColor) => color?.id === parseInt(e.target.value));
                     if (!findColor) {
-                        console.warn('Selected color not found');
+                        DebugHelpers.log(DebugHelpers.WARN, 'Selected color not found');
                         return;
                     }
                     setSelectedColor(findColor);

@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Menu } from "@/types/Menu";
@@ -32,7 +33,7 @@ function SelectMenu({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching menus');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching menus');
             return;
         }
         setMenus(response?.data || []);
@@ -60,7 +61,7 @@ function SelectMenu({
             setSelectedMenu(findMenu);
             return;
         }
-        console.warn('No menu found with the given ID or name');
+        DebugHelpers.log(DebugHelpers.WARN, 'No menu found with the given ID or name');
     }, [menuId, menus]);
 
     useEffect(() => {
@@ -74,11 +75,11 @@ function SelectMenu({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedMenu);
@@ -94,7 +95,7 @@ function SelectMenu({
                 onChange={e => {
                     const findSelectedMenu = menus.find(menu => menu?.id === parseInt(e.target.value));
                     if (!findSelectedMenu) {
-                        console.warn('No menu found with the given ID');
+                        DebugHelpers.log(DebugHelpers.WARN, 'No menu found with the given ID');
                         return;
                     }
                     setSelectedMenu(findSelectedMenu);

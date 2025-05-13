@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Block } from "@/types/Block";
@@ -25,7 +26,7 @@ function SelectBlock({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching blocks');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching blocks');
             return;
         }
         setBlocks(response?.data || []);
@@ -40,11 +41,11 @@ function SelectBlock({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedBlock);

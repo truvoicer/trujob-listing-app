@@ -15,6 +15,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ManageUserProps = {
     enableEdit?: boolean;
@@ -228,7 +229,7 @@ function ManageUser({
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        console.log('Add New User', dataTableContextState.modal);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New User', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New User',
             component: (
@@ -257,7 +258,7 @@ function ManageUser({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected users?',
                     onOk: async () => { 
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({      
                                 variant: 'danger',
@@ -312,7 +313,7 @@ function ManageUser({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-user-confirmation');
             }

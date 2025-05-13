@@ -9,6 +9,7 @@ import EditListingFeatureFields from "./EditListingFeatureFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateFeature, Feature, UpdateFeature } from "@/types/Feature";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditListingFeatureProps = {
     listingId?: number;
@@ -60,17 +61,17 @@ function EditListingFeature({
     }
     async function handleSubmit(values: Feature) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
 
 
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         if (!values?.feature?.id) {
-            console.warn('Brand ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
             return;
         }
 
@@ -108,7 +109,7 @@ function EditListingFeature({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
     }

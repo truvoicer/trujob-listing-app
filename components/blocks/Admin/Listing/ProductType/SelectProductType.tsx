@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { ProductType } from "@/types/ProductType";
@@ -26,7 +27,7 @@ function SelectProductType({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching productTypes');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching productTypes');
             return;
         }
         setProductTypes(response?.data || []);
@@ -50,11 +51,11 @@ function SelectProductType({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedProductType);
@@ -74,7 +75,7 @@ function SelectProductType({
                     }
                     const findProductType = productTypes.find((productType: ProductType) => productType?.id === parseInt(e.target.value));
                     if (!findProductType) {
-                        console.warn('Selected productType not found');
+                        DebugHelpers.log(DebugHelpers.WARN, 'Selected productType not found');
                         return;
                     }
                     setSelectedProductType(findProductType);

@@ -3,6 +3,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { CreateMenuItem, Menu, MenuItem, UpdateMenuItem } from "@/types/Menu";
 import { Role } from "@/types/Role";
 import { Page } from "@/types/Page";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditMenuItemMenuProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -47,7 +48,7 @@ function EditMenuItemMenu({
         <form
             onSubmit={e => {
                 e.preventDefault();
-                console.log('Selected Menu:', menuItem);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'Selected Menu:', menuItem);
                 handleSubmit(e);
             }}>
             

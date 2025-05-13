@@ -2,6 +2,7 @@ import { isNotEmpty } from "@/helpers/utils";
 import { useContext, useEffect, useState } from "react";
 import Pagination from "../listings/Pagination";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type DataTableColumn = {
     label?: string;
@@ -300,7 +301,7 @@ function DataTable({
                                     page: page,
                                 },
                             })
-                            console.log('Page Clicked', page);
+                            DebugHelpers.log(DebugHelpers.DEBUG, 'Page Clicked', page);
                         }} />
                 </div>
             </div>

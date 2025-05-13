@@ -14,6 +14,7 @@ import SelectMenuItemType from "./SelectMenuItemType";
 import SelectPage from "../../Page/SelectPage";
 import SelectLinkTarget from "../SelectLinkTarget";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type EditMenuItemFieldsProps = {
     menuId?: number;
@@ -194,7 +195,7 @@ function EditMenuItemFields({
                                     return values?.roles || [];
                                 }
                                 if (!menuId) {
-                                    console.warn('No menu item id found');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No menu item id found');
                                     return false;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance()
@@ -204,15 +205,15 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when getting roles');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
                                     return false;
                                 }
                                 if (!response?.data) {
-                                    console.warn('No data found');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No data found');
                                     return false;
                                 }
                                 if (!Array.isArray(response?.data)) {
-                                    console.warn('Response is not an array');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
                                     return false;
                                 }
                                 return response.data;
@@ -236,7 +237,7 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when adding role');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                     return false;
                                 }
                                 return true;
@@ -258,7 +259,7 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when adding role');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                     return false;
                                 }
                                 return true;
@@ -271,7 +272,7 @@ function EditMenuItemFields({
                                 Close
                             </Button>
                             <Button variant="primary" onClick={() => {
-                                // console.log('selected roles', selectedRoles);
+                                // DebugHelpers.log(DebugHelpers.DEBUG, 'selected roles', selectedRoles);
                                 // setFieldValue('roles', selectedRoles);
                                 ModalService.hideModal(setRolesModal)
                             }}>
@@ -298,7 +299,7 @@ function EditMenuItemFields({
                                     return values?.menus || [];
                                 }
                                 if (!menuId) {
-                                    console.warn('No menu item id found');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No menu item id found');
                                     return null;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance()
@@ -312,15 +313,15 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when getting roles');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
                                     return null;
                                 }
                                 if (!response?.data) {
-                                    console.warn('No data found');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No data found');
                                     return null;
                                 }
                                 if (!Array.isArray(response?.data)) {
-                                    console.warn('Response is not an array');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
                                     return null;
                                 }
                                 return response.data;
@@ -355,7 +356,7 @@ function EditMenuItemFields({
                                         }
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when adding role');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                     return false;
                                 }
                                 return true;
@@ -385,7 +386,7 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when adding role');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                     return false;
                                 }
                                 return true;
@@ -415,7 +416,7 @@ function EditMenuItemFields({
                                         protectedReq: true,
                                     })
                                 if (!response) {
-                                    console.warn('No response from API when adding role');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                     return false;
                                 }
                                 return true;

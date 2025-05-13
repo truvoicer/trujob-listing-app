@@ -16,6 +16,7 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Media } from "@/types/Media";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ManageMediaProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
@@ -233,7 +234,7 @@ function ManageMedia({
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        console.log('Add New Listing', dataTableContextState.modal);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New Listing',
             component: (
@@ -262,7 +263,7 @@ function ManageMedia({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -317,7 +318,7 @@ function ManageMedia({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

@@ -6,6 +6,7 @@ import { ListingsFetch } from '@/library/services/listings/ListingsFetch';
 import Pagination from '../Pagination';
 import InfiniteScroll from '../InfiniteScroll';
 import { BlockContext } from '@/contexts/BlockContext';
+import { DebugHelpers } from '@/helpers/DebugHelpers';
 
 function ListingsGrid(props) {
     const listingsContext = useContext(ListingsContext);
@@ -13,7 +14,7 @@ function ListingsGrid(props) {
     
     const core = Core.getInstance();
     const listingsService = core.getListingsService(listingsContext);
-    console.log(blockContext)
+    DebugHelpers.log(DebugHelpers.DEBUG, blockContext)
     function getContentClass() {
         let contentClass = 'col-12';
         if (blockContext?.has_sidebar) {

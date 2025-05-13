@@ -16,6 +16,7 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ManageListingCategoryProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
@@ -197,14 +198,14 @@ function ManageListingCategory({
         searchParams: any
     }) {
         if (!operation) {
-            console.warn('Operation is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
             return;
         }
         if (['add', 'create'].includes(operation)) {
             return;
         }
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -249,7 +250,7 @@ function ManageListingCategory({
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        console.log('Add New Listing', dataTableContextState.modal);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New Listing',
             component: (
@@ -279,7 +280,7 @@ function ManageListingCategory({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -334,7 +335,7 @@ function ManageListingCategory({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

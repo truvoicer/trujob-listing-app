@@ -10,6 +10,7 @@ import EditWidgetFields from "./EditWidgetFields";
 import { EDIT_SIDEBAR_MODAL_ID } from "./ManageWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditWidgetProps = {
     data?: Widget | null;
@@ -110,7 +111,7 @@ function EditWidget({
     }
     async function handleSubmit(values: Widget) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         let response = null;
@@ -119,7 +120,7 @@ function EditWidget({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
                     throw new Error('Widget ID is required');
@@ -134,7 +135,7 @@ function EditWidget({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/create`,
@@ -144,7 +145,7 @@ function EditWidget({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
         if (!response) {

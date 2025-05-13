@@ -13,6 +13,7 @@ import { PageBlock } from "@/types/PageBlock";
 import EditPageFields from "./EditPageFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditPageProps = {
     data?: Page;
@@ -68,7 +69,7 @@ function EditPage({
         let requestData = { ...values };
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         if (Array.isArray(values?.roles)) {
@@ -119,7 +120,7 @@ function EditPage({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
 

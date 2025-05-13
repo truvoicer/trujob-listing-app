@@ -37,6 +37,7 @@ import {
     PAGE_HAS_PERMISSION,
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
+import { DebugHelpers } from '@/helpers/DebugHelpers';
 
 export const pageStateData = {
     [ERROR]: null,
@@ -81,7 +82,7 @@ const defaultReducers = {
     },
     setPageError: (state, action) => {
         state[ERROR] = action.payload;
-        console.error(state.error)
+        DebugHelpers.log(DebugHelpers.ERROR, state.error)
     },
 };
 

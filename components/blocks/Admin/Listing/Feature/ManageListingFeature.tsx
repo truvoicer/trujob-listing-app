@@ -16,6 +16,7 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ManageListingFeatureProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
@@ -54,7 +55,7 @@ function ManageListingFeature({
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!operation) {
-                    console.warn('Operation is required');
+                    DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
                     return;
                 }
                 if (!formHelpers) {
@@ -211,14 +212,14 @@ function ManageListingFeature({
         searchParams: any
     }) {
         if (!operation) {
-            console.warn('Operation is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
             return;
         }
         if (['add', 'create'].includes(operation)) {
             return;
         }
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -262,7 +263,7 @@ function ManageListingFeature({
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        console.log('Add New Listing', dataTableContextState.modal);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New Listing',
             component: (
@@ -292,7 +293,7 @@ function ManageListingFeature({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -347,7 +348,7 @@ function ManageListingFeature({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

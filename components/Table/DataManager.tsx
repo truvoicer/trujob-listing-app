@@ -1,11 +1,11 @@
 import DataTable, { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { useEffect, useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
-import Pagination from "@/components/listings/Pagination";
 import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
     data: Array<any>;
@@ -206,7 +206,7 @@ function DataManager({
         });
         
     }, [data]);
-
+    DebugHelpers.log(DebugHelpers.INFO, 'DataManager', 'dataTableContextState', title, dataTableContextState?.modal);
     return (
         <DataTableContext.Provider value={dataTableContextState}>
             <div className="row">

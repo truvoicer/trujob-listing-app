@@ -1,5 +1,6 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { ModalState } from "@/library/services/modal/ModalService";
@@ -34,7 +35,7 @@ function SelectRole({
             protectedReq: true,
         });
         if (!response) {
-            console.warn('No response from API when fetching roles');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching roles');
             return;
         }
         setRoles(response?.data || []);

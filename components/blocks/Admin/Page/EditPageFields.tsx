@@ -16,6 +16,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type EditPageFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -78,7 +79,7 @@ function EditPageFields({
                             </p>
                         ),
                     }, 'sidebar-form-select-sidebar-error');
-                    console.warn('Sidebar not found', {
+                    DebugHelpers.log(DebugHelpers.WARN, 'Sidebar not found', {
                         values: formHelpers?.values,
                     });
                     return false;
@@ -93,7 +94,7 @@ function EditPageFields({
                             </p>
                         ),
                     }, 'sidebar-form-select-sidebar-id-error');
-                    console.warn('Sidebar id not found', selectedSidebar);
+                    DebugHelpers.log(DebugHelpers.WARN, 'Sidebar id not found', selectedSidebar);
                     return false;
                 }
 
@@ -125,7 +126,7 @@ function EditPageFields({
                             </p>
                         ),
                     }, 'sidebar-sidebar-add-error');
-                    console.warn('sidebar add failed', response);
+                    DebugHelpers.log(DebugHelpers.WARN, 'sidebar add failed', response);
                     return false;
                 }
                 notificationContext.show({
@@ -234,7 +235,7 @@ function EditPageFields({
                     </p>
                 ),
             }, 'sidebar-item-delete-error');
-            console.warn('Page block id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'Page block id not found', item);
             return false;
         }
 
@@ -292,7 +293,7 @@ function EditPageFields({
                     </p>
                 ),
             }, 'sidebar-sidebar-update-error');
-            console.warn('sidebar id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'sidebar id not found', item);
             return false;
         }
         if (['add', 'create'].includes(operation || '')) {
@@ -597,7 +598,7 @@ function EditPageFields({
                                 }}
                                 makeRequest={async () => {
                                     if (!operation) {
-                                        console.warn('No operation found');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No operation found');
                                         return [];
                                     }
                                     if (['edit', 'update'].includes(operation)) {
@@ -608,15 +609,15 @@ function EditPageFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when getting roles');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
                                             return false;
                                         }
                                         if (!response?.data) {
-                                            console.warn('No data found');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
                                             return false;
                                         }
                                         if (!Array.isArray(response?.data)) {
-                                            console.warn('Response is not an array');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
                                             return false;
                                         }
                                         return response.data;
@@ -627,12 +628,12 @@ function EditPageFields({
                                 }}
                                 onAdd={async (role: Role) => {
                                     if (!operation) {
-                                        console.warn('No operation found');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No operation found');
                                         return false;
                                     }
                                     if (['edit', 'update'].includes(operation)) {
                                         if (!values?.id) {
-                                            console.warn('Widget ID is required');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'Widget ID is required');
                                             return false;
                                         }
                                         if (!role) {
@@ -645,7 +646,7 @@ function EditPageFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when adding role');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                             return false;
                                         }
                                         return true;
@@ -654,12 +655,12 @@ function EditPageFields({
                                         setFieldValue('roles', [...roles, role]);
                                         return true;
                                     }
-                                    console.warn('Invalid operation');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                                     return false;
                                 }}
                                 onDelete={async (role: Role) => {
                                     if (!operation) {
-                                        console.warn('No operation found');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No operation found');
                                         return false;
                                     }
                                     if (!role) {
@@ -667,7 +668,7 @@ function EditPageFields({
                                     }
                                     if (['edit', 'update'].includes(operation)) {
                                         if (!values?.id) {
-                                            console.warn('Widget ID is required');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'Widget ID is required');
                                             return false;
                                         }
                                         const response = await TruJobApiMiddleware.getInstance()
@@ -677,7 +678,7 @@ function EditPageFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when adding role');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                             return false;
                                         }
                                         return true;
@@ -688,7 +689,7 @@ function EditPageFields({
                                         setFieldValue('roles', buildRoles);
                                         return true;
                                     }
-                                    console.warn('Invalid operation');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                                     return false;
                                 }}
                             />

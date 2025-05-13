@@ -5602,7 +5602,7 @@ function reduce (state, action, calendar) {
         var reducerFunc = _a[_i];
         nextState = reducerFunc(nextState, action, calendar);
     }
-    // console.log(action.type, nextState)
+    // DebugHelpers.log(DebugHelpers.DEBUG, action.type, nextState)
     return nextState;
 }
 function reduceViewType(currentViewType, action) {

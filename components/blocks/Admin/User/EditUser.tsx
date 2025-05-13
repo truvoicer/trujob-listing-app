@@ -12,6 +12,7 @@ import { Sidebar } from "@/types/Sidebar";
 import EditUserFields from "./EditUserFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditUserProps = {
     data?: User;
@@ -45,7 +46,7 @@ function EditUser({
         let requestData = { ...values };
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(requestData)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         if (Array.isArray(values?.roles)) {
@@ -96,7 +97,7 @@ function EditUser({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
 

@@ -24,6 +24,7 @@ import ManageListingProductType from "./ProductType/ManageListingProductType";
 import ManageMedia from "../Media/ManageMedia";
 import { stat } from "fs";
 import { objectMerge } from "@/helpers/utils";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type EditListingFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -81,12 +82,12 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(users: Array<any>) => {
                             if (!Array.isArray(users)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
 
                             if (users.length === 0) {
-                                console.warn('No user selected');
+                                DebugHelpers.log(DebugHelpers.WARN, 'No user selected');
                                 return true;
                             }
                             const selectedUser = users[0];
@@ -111,7 +112,7 @@ function EditListingFields({
             ) => {
 
                 // if (selectedUsers.length === 0) {
-                //     console.warn('No user selected');
+                //     DebugHelpers.log(DebugHelpers.WARN, 'No user selected');
                 //     return true;
                 // }
                 // const selectedUser = selectedUsers[0];
@@ -146,7 +147,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(reviews: Array<any>) => {
                             if (!Array.isArray(reviews)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -195,7 +196,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(features: Array<any>) => {
                             if (!Array.isArray(features)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -244,7 +245,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(follows: Array<any>) => {
                             if (!Array.isArray(follows)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -293,7 +294,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(categories: Array<any>) => {
                             if (!Array.isArray(categories)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -342,7 +343,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(brands: Array<any>) => {
                             if (!Array.isArray(brands)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -391,7 +392,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(colors: Array<any>) => {
                             if (!Array.isArray(colors)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -440,7 +441,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(productTypes: Array<any>) => {
                             if (!Array.isArray(productTypes)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -488,7 +489,7 @@ function EditListingFields({
                         paginationMode="state"
                         onChange={(media: Array<any>) => {
                             if (!Array.isArray(media)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                 return;
                             }
                             if (values?.id) {
@@ -503,9 +504,9 @@ function EditListingFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                console.log('ok');
+                DebugHelpers.log(DebugHelpers.DEBUG, 'ok');
                 if (selectedMedia.length === 0) {
-                    console.warn('No user selected');
+                    DebugHelpers.log(DebugHelpers.WARN, 'No user selected');
                     return true;
                 }
 
@@ -516,7 +517,7 @@ function EditListingFields({
                 return true;
             },
             onCancel: () => {
-                console.log('cancel');
+                DebugHelpers.log(DebugHelpers.DEBUG, 'cancel');
                 return true;
             }
         },

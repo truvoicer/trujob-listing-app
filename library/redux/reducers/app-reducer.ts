@@ -10,6 +10,7 @@ import {
     APP_STATE,
     ERROR
 } from "@/library/redux/constants/app-constants";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 const defaultState = {
     [APP_LOADED]: false,
@@ -45,7 +46,7 @@ const defaultReducers = {
     },
     setError: (state, action) => {
         state.error = action.payload;
-        console.error(state.error)
+        DebugHelpers.log(DebugHelpers.ERROR, state.error)
     },
 };
 

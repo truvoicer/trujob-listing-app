@@ -9,6 +9,7 @@ import { Role } from "@/types/Role";
 import EditSidebarWidgetFields from "./EditSidebarWidgetFields";
 import { EDIT_SIDEBAR_WIDGET_MODAL_ID } from "./ManageSidebarWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditSidebarWidgetProps = {
     data?: Widget | null;
@@ -38,11 +39,11 @@ function EditSidebarWidget({
 
     async function sidebarWidgetRequest() {
         if (!sidebarId) {
-            console.warn('Sidebar ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar ID is required');
             return;
         }
         if (!data?.id) {
-            console.warn('Sidebar widget ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget ID is required');
             return;
         }
         const response = await truJobApiMiddleware.resourceRequest({
@@ -54,7 +55,7 @@ function EditSidebarWidget({
             return;
         }
         if (!response?.data) {
-            console.warn('No data found');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
             return;
         }
         setInitialValues(response.data);
@@ -133,7 +134,7 @@ function EditSidebarWidget({
     }
     async function handleSubmit(values: Widget) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         let response = null;
@@ -142,7 +143,7 @@ function EditSidebarWidget({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
                     throw new Error('Widget ID is required');
@@ -157,7 +158,7 @@ function EditSidebarWidget({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.widget}/create`,
@@ -167,7 +168,7 @@ function EditSidebarWidget({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
         if (!response) {

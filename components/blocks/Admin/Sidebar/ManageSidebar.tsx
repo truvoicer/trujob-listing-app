@@ -11,6 +11,7 @@ import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants"
 import EditSidebar from "./EditSidebar";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-sidebar-modal';
 export type ManageSidebarProps = {
@@ -225,7 +226,7 @@ function ManageSidebar({
                     title: 'Bulk Delete Sidebars',
                     message: 'Are you sure you want to delete selected sidebars?',
                     onOk: async () => {
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -280,7 +281,7 @@ function ManageSidebar({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-page-confirmation');
             }

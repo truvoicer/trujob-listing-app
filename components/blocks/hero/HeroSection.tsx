@@ -1,8 +1,9 @@
+import { DebugHelpers } from '@/helpers/DebugHelpers';
 import { StyleBuilder } from '@/library/StyleBuilder';
 import React from 'react';
 
 function HeroSection(props) {
-    console.log('HeroSection', props);
+    DebugHelpers.log(DebugHelpers.DEBUG, 'HeroSection', props);
     return (
         <div className=""
             style={StyleBuilder.getInstance().addBackGround(props?.properties)}>

@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Category } from "@/types/Listing";
@@ -26,7 +27,7 @@ function SelectCategory({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching categories');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching categories');
             return;
         }
         setCategories(response?.data || []);
@@ -50,11 +51,11 @@ function SelectCategory({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedCategory);
@@ -74,7 +75,7 @@ function SelectCategory({
                     }
                     const findCategory = categories.find((category: Category) => category?.id === parseInt(e.target.value));
                     if (!findCategory) {
-                        console.warn('Selected category not found');
+                        DebugHelpers.log(DebugHelpers.WARN, 'Selected category not found');
                         return;
                     }
                     setSelectedCategory(findCategory);

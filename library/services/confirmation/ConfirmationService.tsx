@@ -2,6 +2,7 @@ import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
 import React from "react";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export interface ConfirmationState extends MessageState {
     items: Array<ConfirmationItem>;
@@ -48,7 +49,7 @@ export class ConfirmationService extends MessageService {
 
         const itemState = this.findStateData();
         if (!itemState) {
-            console.error("state not found");
+            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
             return null;
         }
         return (

@@ -2,6 +2,7 @@ import { ModalItem, ModalService, ModalState } from "@/library/services/modal/Mo
 import React, { useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { FormikProps, FormikValues } from "formik";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ReorderProps = {
     children: (props: any) => React.ReactNode;
@@ -184,11 +185,11 @@ function Reorder({
     }
     function showModal(index: number, item: any) {
         if (typeof modalState !== 'object') {
-            console.error("Modal state is not an object");
+            DebugHelpers.log(DebugHelpers.ERROR, "Modal state is not an object");
             return;
         }
         if (typeof modalState?.show !== 'function') {
-            console.error("Modal show function not found");
+            DebugHelpers.log(DebugHelpers.ERROR, "Modal show function not found");
             return;
         }
         modalState.show({

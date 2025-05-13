@@ -8,6 +8,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import EditMenuItem from "./EditMenuItem";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type ManageMenuItemsProps = {
     menuId?: number;
@@ -46,7 +47,7 @@ function ManageMenuItems({
                     </p>
                 ),
             }, 'page-block-form-validate-page-id-error');
-            console.warn('Page id not found', menuId);
+            DebugHelpers.log(DebugHelpers.WARN, 'Page id not found', menuId);
             return false;
         }
         return true;
@@ -89,7 +90,7 @@ function ManageMenuItems({
                             </p>
                         ),
                     }, 'menuItem-form-select-menuItem-error');
-                    console.warn('MenuItem not found', selectedMenuItem);
+                    DebugHelpers.log(DebugHelpers.WARN, 'MenuItem not found', selectedMenuItem);
                     return false;
                 }
 
@@ -98,7 +99,7 @@ function ManageMenuItems({
                     ...formHelpers.values
                 };
                 if (['add', 'create'].includes(operation || '')) {
-                    console.log('menuItem add', {
+                    DebugHelpers.log(DebugHelpers.DEBUG, 'menuItem add', {
                         ...menuItemSchema,
                         ...formHelpers.values
                     });
@@ -137,7 +138,7 @@ function ManageMenuItems({
                             </p>
                         ),
                     }, 'sidebar-menuItem-add-error');
-                    console.warn('menuItem add failed', response);
+                    DebugHelpers.log(DebugHelpers.WARN, 'menuItem add failed', response);
                     return false;
                 }
                 notificationContext.show({
@@ -234,7 +235,7 @@ function ManageMenuItems({
                     </p>
                 ),
             }, 'menu-item-delete-error');
-            console.warn('Menu item id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'Menu item id not found', item);
             return false;
         }
 
@@ -274,7 +275,7 @@ function ManageMenuItems({
         if (!formHelpers) {
             return;
         }
-        console.log('formHelpers', formHelpers.values);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'formHelpers', formHelpers.values);
         const item = { ...formHelpers.values };
         if (['add', 'create'].includes(operation || '')) {
             if (item.hasOwnProperty('index')) {
@@ -301,7 +302,7 @@ function ManageMenuItems({
                     </p>
                 ),
             }, 'sidebar-menuItem-update-error');
-            console.warn('menuItem id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'menuItem id not found', item);
             return false;
         }
         if (item.hasOwnProperty('page') && item.page && item.page?.id) {
@@ -354,7 +355,7 @@ function ManageMenuItems({
     }
 
     async function menuItemsRequest() {
-        console.log('menuItemsRequest', menuId);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'menuItemsRequest', menuId);
         if (!validateMenuId() || !menuId) {
             return;
         }
@@ -394,7 +395,7 @@ function ManageMenuItems({
             return;
         }
         if (!Array.isArray(data)) {
-            console.warn('menuItem data is not an array');
+            DebugHelpers.log(DebugHelpers.WARN, 'menuItem data is not an array');
             return;
         }
         setMenuItems(data);

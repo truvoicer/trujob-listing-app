@@ -6,6 +6,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { FormikValues, useFormikContext } from "formik";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type RolesModal = {
     show: boolean;
@@ -180,7 +181,7 @@ function EditSidebarWidgetFields({
                                 }}
                                 makeRequest={async () => {
                                     if (!operation) {
-                                        console.warn('No operation found');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No operation found');
                                         return false;
                                     }
                                     if (['edit', 'update'].includes(operation)) {
@@ -194,15 +195,15 @@ function EditSidebarWidgetFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when getting roles');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
                                             return false;
                                         }
                                         if (!response?.data) {
-                                            console.warn('No data found');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
                                             return false;
                                         }
                                         if (!Array.isArray(response?.data)) {
-                                            console.warn('Response is not an array');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
                                             return false;
                                         }
                                         setFieldValue('roles', response.data);
@@ -227,7 +228,7 @@ function EditSidebarWidgetFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when adding role');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                             return false;
                                         }
                                         return true;
@@ -253,14 +254,14 @@ function EditSidebarWidgetFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when adding role');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                             return false;
                                         }
                                         return true;
                                     } else if (['add', 'create'].includes(operation)) {
                                         return true;
                                     }
-                                    console.warn('Invalid operation');
+                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                                     return false;
                                 }}
                             />

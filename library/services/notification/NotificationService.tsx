@@ -1,6 +1,7 @@
 import { Toast, ToastContainer } from "react-bootstrap";
 import { MessageService, MessageState } from "../message/MessageService";
 import { NOTIFICATION_DEFAULT_POSITION, NOTIFICATION_DEFAULT_TYPE, NOTIFICATION_DEFAULT_VARIANT } from "@/contexts/AppNotificationContext";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 
 export interface NotificationState extends MessageState {
@@ -52,7 +53,7 @@ export class NotificationService extends MessageService {
     render() {
         const itemState = this.findStateData();
         if (!itemState) {
-            console.error("state not found");
+            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
             return null;
         }
         return (

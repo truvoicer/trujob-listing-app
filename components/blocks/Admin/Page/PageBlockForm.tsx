@@ -9,6 +9,7 @@ import { FormikProps, FormikValues } from "formik";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type PageBlockFormProps = {
     pageId?: number;
@@ -54,7 +55,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                     </p>
                 ),
             }, 'page-block-form-validate-page-id-error');
-            console.warn('Page id not found', pageId);
+            DebugHelpers.log(DebugHelpers.WARN, 'Page id not found', pageId);
             return false;
         }
         return true;
@@ -90,7 +91,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                             </p>
                         ),
                     }, 'pageBlock-form-select-pageBlock-error');
-                    console.warn('PageBlock not found', selectedPageBlock);
+                    DebugHelpers.log(DebugHelpers.WARN, 'PageBlock not found', selectedPageBlock);
                     return false;
                 }
                 if (!selectedPageBlock?.id) {
@@ -103,7 +104,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                             </p>
                         ),
                     }, 'pageBlock-form-select-pageBlock-id-error');
-                    console.warn('PageBlock id not found', selectedPageBlock);
+                    DebugHelpers.log(DebugHelpers.WARN, 'PageBlock id not found', selectedPageBlock);
                     return false;
                 }
 
@@ -135,7 +136,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                             </p>
                         ),
                     }, 'sidebar-pageBlock-add-error');
-                    console.warn('pageBlock add failed', response);
+                    DebugHelpers.log(DebugHelpers.WARN, 'pageBlock add failed', response);
                     return false;
                 }
                 notificationContext.show({
@@ -232,7 +233,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                     </p>
                 ),
             }, 'sidebar-item-delete-error');
-            console.warn('Page block id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'Page block id not found', item);
             return false;
         }
 
@@ -284,7 +285,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
                     </p>
                 ),
             }, 'sidebar-pageBlock-update-error');
-            console.warn('pageBlock id not found', item);
+            DebugHelpers.log(DebugHelpers.WARN, 'pageBlock id not found', item);
             return false;
         }
         if (['add', 'create'].includes(operation || '')) {
@@ -347,7 +348,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
     }
 
     async function pageBlocksRequest() {
-        console.log('pageBlocksRequest', pageId);
+        DebugHelpers.log(DebugHelpers.DEBUG, 'pageBlocksRequest', pageId);
         if (!validatePageId() || !pageId) {
             return;
         }
@@ -386,7 +387,7 @@ function PageBlockForm({ pageId, data, onChange, operation }: PageBlockFormProps
             return;
         }
         if (!Array.isArray(data)) {
-            console.warn('pageBlock data is not an array');
+            DebugHelpers.log(DebugHelpers.WARN, 'pageBlock data is not an array');
             return;
         }
         setPageBlocks(data);

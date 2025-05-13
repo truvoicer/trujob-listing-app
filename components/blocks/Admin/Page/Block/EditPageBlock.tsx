@@ -9,6 +9,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { Role } from "@/types/Role";
 import { Sidebar } from "@/types/Sidebar";
 import { isObjectEmpty } from "@/helpers/utils";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 type EditPageBlockProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -39,11 +40,11 @@ function EditPageBlock({
 
     async function pageBlockRequest() {
         if (!pageId) {
-            console.warn('PageBlock ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'PageBlock ID is required');
             return;
         }
         if (!data?.id) {
-            console.warn('Page block ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Page block ID is required');
             return;
         }
         const response = await truJobApiMiddleware.resourceRequest({
@@ -55,7 +56,7 @@ function EditPageBlock({
             return;
         }
         if (!response?.data) {
-            console.warn('No data found');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
             return;
         }
         setInitialValues(response.data);
@@ -176,11 +177,11 @@ function EditPageBlock({
     }
     async function handleSubmit(values: PageBlock) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         if (!pageId) {
-            console.warn('Page ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Page ID is required');
             return;
         }
         let response = null;
@@ -189,7 +190,7 @@ function EditPageBlock({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
                     throw new Error('PageBlock ID is required');
@@ -204,7 +205,7 @@ function EditPageBlock({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', requestData);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.pageBlock.replace('%s', pageId.toString())}/create`,
@@ -214,7 +215,7 @@ function EditPageBlock({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
         if (!response) {

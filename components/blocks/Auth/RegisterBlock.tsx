@@ -1,5 +1,6 @@
 import Form, { VALIDATION_ALPHA_NUMERIC_HYPHENS, VALIDATION_ALPHA_NUMERIC_SYMBOLS, VALIDATION_EMAIL, VALIDATION_MATCH, VALIDATION_REQUIRED } from "@/components/form/Form";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { FormikProps, FormikValues } from "formik";
@@ -18,7 +19,7 @@ function RegisterBlock() {
         if (!TruJobApiMiddleware.handleTokenResponse(response)) {
             return;
         }
-        console.log({ response, requestData });
+        DebugHelpers.log(DebugHelpers.DEBUG, { response, requestData });
     }
 
     return (

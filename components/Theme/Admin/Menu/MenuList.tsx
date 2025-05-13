@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import MenuListItem from "./MenuListItem";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 function MenuList({ name, className = '', session }) {
     const [data, setData] = useState([]);
@@ -20,7 +21,7 @@ function MenuList({ name, className = '', session }) {
             protectedReq: session[SESSION_AUTHENTICATED],
         })
         if (!Array.isArray(menuFetch?.data?.menu_items)) {
-            console.warn(`Menu data is not an array | name: ${name}`);
+            DebugHelpers.log(DebugHelpers.WARN, `Menu data is not an array | name: ${name}`);
             return;
         }
         setData(menuFetch.data);

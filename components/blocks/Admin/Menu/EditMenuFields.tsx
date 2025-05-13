@@ -9,6 +9,7 @@ import { Role } from "@/types/Role";
 import { MenuItem } from "@/types/Menu";
 import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditMenuFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -140,15 +141,15 @@ function EditMenuFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            console.warn('No response from API when getting roles');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
                                             return false;
                                         }
                                         if (!response?.data) {
-                                            console.warn('No data found');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
                                             return false;
                                         }
                                         if (!Array.isArray(response?.data)) {
-                                            console.warn('Response is not an array');
+                                            DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
                                             return false;
                                         }
                                         return response.data;
@@ -165,7 +166,7 @@ function EditMenuFields({
                                     return true;
                                 }
                                     if (!values?.id) {
-                                        console.warn('Menu ID is required');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'Menu ID is required');
                                         return false;
                                     }
                                     if (!role) {
@@ -178,7 +179,7 @@ function EditMenuFields({
                                             protectedReq: true,
                                         })
                                     if (!response) {
-                                        console.warn('No response from API when adding role');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                         return false;
                                     }
                                     return true;
@@ -188,7 +189,7 @@ function EditMenuFields({
                                         return true;
                                     }
                                     if (!values?.id) {
-                                        console.warn('Menu ID is required');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'Menu ID is required');
                                         return false;
                                     }
                                     if (!role) {
@@ -201,7 +202,7 @@ function EditMenuFields({
                                             protectedReq: true,
                                         })
                                     if (!response) {
-                                        console.warn('No response from API when adding role');
+                                        DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
                                         return false;
                                     }
                                     return true;

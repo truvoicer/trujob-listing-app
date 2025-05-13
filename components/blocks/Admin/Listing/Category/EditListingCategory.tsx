@@ -10,6 +10,7 @@ import EditListingCategoryFields from "./EditListingCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Category, CreateCategory, UpdateCategory } from "@/types/Category";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export type EditListingCategoryProps = {
     listingId?: number;
@@ -61,17 +62,17 @@ function EditListingCategory({
     }
     async function handleSubmit(values: Category) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
         
         
         if (!listingId) {
-            console.warn('Listing ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
         if (!values?.category?.id) {
-            console.warn('Brand ID is required');
+            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
             return;
         }
 
@@ -109,7 +110,7 @@ function EditListingCategory({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
 

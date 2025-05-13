@@ -1,4 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { User } from "@/types/User";
@@ -26,7 +27,7 @@ function SelectUser({
             protectedReq: true
         });
         if (!response) {
-            console.warn('No response from API when fetching users');
+            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching users');
             return;
         }
         setUsers(response?.data || []);
@@ -50,11 +51,11 @@ function SelectUser({
             return;
         }
         if (!formContext) {
-            console.warn('Form context not found');
+            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            console.warn('setFieldValue function not found in form context');
+            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedUser);
@@ -74,7 +75,7 @@ function SelectUser({
                     }
                     const findUser = users.find((user: User) => user?.id === parseInt(e.target.value));
                     if (!findUser) {
-                        console.warn('Selected user not found');
+                        DebugHelpers.log(DebugHelpers.WARN, 'Selected user not found');
                         return;
                     }
                     setSelectedUser(findUser);

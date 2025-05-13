@@ -17,6 +17,7 @@ import EditMenu from "./EditMenu";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 
 export const EDIT_MENU_MODAL_ID = 'edit-menu-modal';
 export type ManageMenuProps = {
@@ -232,7 +233,7 @@ function ManageMenu({
                     title: 'Bulk Delete Menus',
                     message: 'Are you sure you want to delete selected menus?',
                     onOk: async () => {
-                        console.log('Yes')
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -287,7 +288,7 @@ function ManageMenu({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        console.log('Cancel delete');
+                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
                     },
                 }, 'delete-bulk-page-confirmation');
             }

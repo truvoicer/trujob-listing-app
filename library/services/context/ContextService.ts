@@ -1,3 +1,4 @@
+import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { StateService } from "../state/StateService";
 
 export class ContextService {
@@ -27,7 +28,7 @@ export class ContextService {
         if (typeof this.context?.update === 'function') {
             this.context.update(data);
         } else {
-            console.warn('Context does not have an update method');
+            DebugHelpers.log(DebugHelpers.WARN, 'Context does not have an update method');
         }
     }
 
