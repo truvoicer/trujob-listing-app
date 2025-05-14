@@ -28,7 +28,7 @@ export class MessageService {
     config: Array<any> = [];
     useStateHook: (prevState: SetStateAction<LocalItem>) => {};
     
-    constructor(state?: any, setter?: any) {
+    constructor(state: any = null, setter: any = null) {
         this.state = state;
         this.setter = setter;
     }
@@ -380,7 +380,6 @@ export class MessageService {
                 item = cloneState.items[findItemIdex];
             }
         }
-        
         item = {
             ...item,
             ...this.buildItemData(data, id),
@@ -476,15 +475,16 @@ export class MessageService {
     }
     
     getState() {
-        const findKeyData = this.findStateData();
-        if (!findKeyData) {
-            return null;
-        }
+        // const findKeyData = this.findStateData();
+        // if (!findKeyData) {
+        //     return null;
+        // }
         const data = {
-            ...findKeyData,
+            // ...findKeyData,
             items: [],
             update: this.updateState.bind(this),
             show: (data: any, id: null | string = null) => {
+                console.log("show", data, id);
                 this.updateState(
                     {
                         ...data,

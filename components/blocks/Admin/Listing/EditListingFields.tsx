@@ -53,7 +53,7 @@ function EditListingFields({
         }
         return componentProps;
     }
-    DebugHelpers.log(DebugHelpers.DEBUG, 'EditListingFields', values);
+    // DebugHelpers.log(DebugHelpers.DEBUG, 'EditListingFields', values);
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
@@ -347,6 +347,7 @@ function EditListingFields({
                                 data: post,
                             })
                         }}
+                        addMode="selector"
                         data={values?.brands || []}
                         rowSelection={false}
                         multiRowSelection={false}

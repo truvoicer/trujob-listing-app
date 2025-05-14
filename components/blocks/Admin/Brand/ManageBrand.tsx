@@ -44,6 +44,8 @@ function ManageBrand({
     enablePagination = true,
     enableEdit = true
 }: ManageBrandProps) {
+    const [showModal, setShowModal] = useState(false);
+    
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -303,10 +305,6 @@ function ManageBrand({
         if (['add', 'create'].includes(operation)) {
             return;
         }
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-            return;
-        }
         let query = dataTableContextState?.query || {};
         let post = dataTableContextState?.post || {};
         const preparedQuery = await prepareSearch(searchParams);
@@ -378,8 +376,9 @@ function ManageBrand({
                             />
                         )}
                         {addMode === 'selector' && (
+                            <>
                             <ManageBrand
-                                addMode="selector"
+                                addMode="edit"
                                 rowSelection={true}
                                 multiRowSelection={true}
                                 enableEdit={false}
@@ -389,9 +388,10 @@ function ManageBrand({
                                         DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
                                         return;
                                     }
-                                    formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
+                                    // formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
                                 }}
                             />
+                            </>
                         )}
                     </>
                 )
