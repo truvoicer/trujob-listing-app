@@ -1,5 +1,5 @@
 import { findInObject } from "@/helpers/utils";
-import { ModalItem } from "../modal/ModalService";
+import { ModalItem, ModalState } from "../modal/ModalService";
 import { SetStateAction } from "react";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
@@ -423,6 +423,34 @@ export class MessageService {
         return findKeyData;
     }
 
+    static findMessageItemIndexInDataById(id: string, modalState: ModalState): number {
+        if (typeof id !== "string") {
+            return -1;
+        }
+        if (!modalState) {
+            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            return -1;
+        }
+        if (!Array.isArray(modalState?.items)) {
+            return -1;
+        }
+        return modalState.items.findIndex((item: any) => item?.id === id);
+    }
+
+    static findMessageItemInDataById(id: string, modalState: ModalState): ModalItem | undefined {
+        if (typeof id !== "string") {
+            return undefined;
+        }
+        if (!modalState) {
+            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            return undefined;
+        }
+        if (!Array.isArray(modalState?.items)) {
+            return undefined;
+        }
+        return modalState.items.find((item: any) => item?.id === id);
+    }
+
     findItemIndexById(id: string): number {
         if (typeof id !== "string") {
             return -1;
@@ -432,10 +460,19 @@ export class MessageService {
             DebugHelpers.log(DebugHelpers.ERROR, "state not found");
             return -1;
         }
-        if (!Array.isArray(modalState?.items)) {
-            return -1;
+        return MessageService.findMessageItemIndexInDataById(id, modalState);
+    }
+    
+    findItemById(id: string): ModalItem | undefined {
+        if (typeof id !== "string") {
+            return undefined;
         }
-        return modalState.items.findIndex((item: any) => item?.id === id);
+        const modalState = this.findStateData();
+        if (!modalState) {
+            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            return undefined;
+        }
+        return MessageService.findMessageItemInDataById(id, modalState);
     }
     
     getState() {

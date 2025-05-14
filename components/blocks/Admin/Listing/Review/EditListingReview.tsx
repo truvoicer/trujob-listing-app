@@ -10,6 +10,7 @@ import EditListingReviewFields from "./EditListingReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { FormikValues } from "formik";
 
 export type EditListingReviewProps = {
     listingId?: number;
@@ -61,7 +62,7 @@ function EditListingReview({
 
         return requestData;
     }
-    async function handleSubmit(values: ListingReview) {
+    async function handleSubmit(values: FormikValues) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
@@ -114,60 +115,56 @@ function EditListingReview({
                 DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
-        }
-
-
-        useEffect(() => {
-            if (!inModal) {
-                return;
-            }
-            if (!modalId) {
-                return;
-            }
-
-            dataTableContext.modal.update(
-                {
-                    formProps: {
-                        operation: operation,
-                        initialValues: initialValues,
-                        onSubmit: handleSubmit,
-                    }
-                },
-                modalId
-            );
-        }, [inModal, modalId]);
-
-
-        const dataTableContext = useContext(DataTableContext);
-        return (
-            <div className="row justify-content-center align-items-center">
-                <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                    {alert && (
-                        <div className={`alert alert-${alert.type}`} role="alert">
-                            {alert.message}
-                        </div>
-                    )}
-                    {inModal &&
-                        ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
-                        (
-                            <EditListingReviewFields operation={operation} />
-                        )
-                    }
-                    {!inModal && (
-                        <Form
-                            operation={operation}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditListingReviewFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
-                </div>
-            </div>
-        );
     }
-    export default EditListingReview;
+
+
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
+        }
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
+    }, [inModal, modalId]);
+
+
+    const dataTableContext = useContext(DataTableContext);
+    return (
+        <div className="row justify-content-center align-items-center">
+            <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
+                        <EditListingReviewFields operation={operation} />
+                    )
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditListingReviewFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
+            </div>
+        </div>
+    );
+}
+export default EditListingReview;

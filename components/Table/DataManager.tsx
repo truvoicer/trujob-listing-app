@@ -7,6 +7,24 @@ import { DataTableContext, dataTableContextData } from "@/contexts/DataTableCont
 import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
+export type DataManagerComponentProps = {
+    addMode?: 'selector' | 'edit';
+    data?: Array<any>;
+    operation?: 'edit' | 'update' | 'add' | 'create';
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
+    requestHandler?: ({
+        query,
+        post
+    }: {
+        query: any,
+        post: any
+    }) => Promise<Array<any>>;
+}
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
     data: Array<any>;
     dataTableContextState: any;
@@ -90,7 +108,7 @@ function DataManager({
             return;
         }
         setDataTableContextState(prevState => {
-            let newState: DataTableContextType = {...prevState};
+            let newState: DataTableContextType = { ...prevState };
             Object.keys(data).forEach(key => {
                 if (dataTableContextData.hasOwnProperty(key)) {
                     newState[key] = data[key];
@@ -189,7 +207,7 @@ function DataManager({
         }
         makeRequest();
     }, [dataTableContextState.query]);
-    
+
     useEffect(() => {
         if (!data) {
             return;
@@ -197,16 +215,16 @@ function DataManager({
         if (!Array.isArray(data)) {
             return;
         }
-        
+
         updateDataTableContextState({
             data,
             links: [],
             meta: {},
             requestStatus: 'idle',
         });
-        
+
     }, [data]);
-    DebugHelpers.log(DebugHelpers.INFO, 'DataManager', 'dataTableContextState', title, dataTableContextState?.modal);
+
     return (
         <DataTableContext.Provider value={dataTableContextState}>
             <div className="row">
@@ -223,6 +241,8 @@ function DataManager({
                                     <a href="#"
                                         className="btn btn-primary"
                                         onClick={(e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
                                             if (typeof renderAddNew === 'function') {
                                                 renderAddNew(e, {
                                                     dataTableContextState,

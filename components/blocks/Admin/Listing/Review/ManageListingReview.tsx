@@ -1,24 +1,26 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditListingReview from "./EditListingReview";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { Review } from "@/types/Review";
+import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageListingReviewProps = {
+    data: Array<Review>;
     operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
     enableEdit?: boolean;
@@ -31,6 +33,7 @@ export type ManageListingReviewProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingReview({
+    data,
     operation,
     listingId,
     rowSelection = true,
@@ -43,6 +46,96 @@ function ManageListingReview({
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
+
+    function getAddNewModalProps() {
+        return {
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    reviews: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    console.log('Form Values', values);
+                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    if (!operation) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        return;
+                    }
+                    if (['add', 'create'].includes(operation)) {
+                        if (!values) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            return;
+                        }
+                        let origData = data;
+                        if (!Array.isArray(origData)) {
+                            origData = [];
+                            return;
+                        }
+                        if (typeof onChange === 'function') {
+                            onChange([
+                                ...origData,
+                                values
+                            ]);
+                        }
+                        return;
+                    }
+                    if (!listingId) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.listingReview.replace(
+                                ':listingId',
+                                listingId.toString()
+                            ),
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: values
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add review</p>
+                            ),
+                        }, 'add-review-modal-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Added review</p>
+                        ),
+                    }, 'add-review-modal-success');
+                    dataTableContext.refresh();
+                    dataTableContext.modal.close('add-review-modal');
+                    return true;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                return await formHelpers.submitForm();
+            },
+            fullscreen: true
+        };
+    }
 
     function getListingFormModalProps() {
         return {
@@ -248,20 +341,29 @@ function ManageListingReview({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
-        dataTableContextState.modal.show({
-            title: 'Add New Listing',
-            component: (
-                <EditListingReview
-                    listingId={listingId}
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            ),
-            ...getListingFormModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        dataTableContext.modal.show({
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <EditListingReview
+                        listingId={listingId}
+                        operation={'add'}
+                        inModal={true}
+                        modalId={'add-review-modal'}
+                    />
+                )
+            },
+            ...getAddNewModalProps(),
+        }, 'add-review-modal');
+
     }
 
     function getRowSelectActions() {
@@ -345,6 +447,7 @@ function ManageListingReview({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

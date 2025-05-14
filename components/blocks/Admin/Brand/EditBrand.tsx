@@ -1,32 +1,35 @@
 import Form from "@/components/form/Form";
+import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
+import { EDIT_PAGE_MODAL_ID } from "./ManageBrand";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Listing } from "@/types/Listing";
-import EditListingColorFields from "./EditListingColorFields";
+import { Sidebar } from "@/types/Sidebar";
+import EditBrandFields from "./EditBrandFields";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { CreateColor, UpdateColor } from "@/types/Color";
-import { Color } from "react-bootstrap/esm/types";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
-export type EditListingColorProps = {
-    listingId?: number;
-    data?: Listing;
+export type EditBrandProps = {
+    listingId: number;
+    data?: Brand;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListingColor({
+function EditBrand({
     listingId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingColorProps) {
+}: EditBrandProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -35,85 +38,113 @@ function EditListingColor({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Color = {
+    const initialValues: Brand = {
         id: data?.id || 0,
-        name: data?.name || '',
         label: data?.label || '',
+        name: data?.name || '',
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
-    function buildCreateData(values: Color) {
 
-        let requestData: CreateColor = {
-            name: values?.name || '',
-            label: values?.label || '',
-        };
-        return requestData;
-    }
-    function buildUpdateData(values: Color) {
+    function buildCreateData(values: Brand) {
 
-        let requestData: UpdateColor = {
-            id: values?.id || 0,
+        let requestData: CreateBrand = {
             name: values?.name || '',
             label: values?.label || '',
         };
 
         return requestData;
     }
-    async function handleSubmit(values: Color) {
+
+    function buildUpdateData(values: Brand) {
+
+        let requestData: UpdateBrand = {
+            id: data?.id || 0,
+            name: values?.name || '',
+            label: values?.label || '',
+        };
+
+        return requestData;
+    }
+    async function handleSubmit(values: Brand) {
+
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
         }
-
-
+        
         if (!listingId) {
             DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
-        if (!values?.color?.id) {
+        if (!values?.brand?.id) {
             DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
             return;
         }
 
         let response = null;
-        let requestData: CreateColor | UpdateColor;
+        let requestData: CreateBrand | UpdateBrand;
         switch (operation) {
             case 'edit':
             case 'update':
+                requestData = buildUpdateData(values);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
+
+                if (!data?.id) {
+                    throw new Error('Listing ID is required');
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingColor.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.color?.id,
-                        'update',
+                        truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
+                        values.brand.id,
+                        'update'
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
+                    data: requestData,
                 })
                 break;
             case 'add':
             case 'create':
+                requestData = buildCreateData(values);
+                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingColor.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.color?.id,
-                        'create',
+                        truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
+                        values.brand.id,
+                        'create'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: requestData,
                 })
                 break;
             default:
                 DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
                 break;
         }
+        
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
+
     }
 
 
@@ -124,17 +155,13 @@ function EditListingColor({
         if (!modalId) {
             return;
         }
-
-        dataTableContext.modal.update(
-            {
-                formProps: {
-                    operation: operation,
-                    initialValues: initialValues,
-                    onSubmit: handleSubmit,
-                }
-            },
-            modalId
-        );
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
     }, [inModal, modalId]);
 
 
@@ -150,7 +177,7 @@ function EditListingColor({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditListingColorFields operation={operation} />
+                        <EditBrandFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -161,7 +188,7 @@ function EditListingColor({
                     >
                         {() => {
                             return (
-                                <EditListingColorFields operation={operation} />
+                                <EditBrandFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -170,4 +197,4 @@ function EditListingColor({
         </div>
     );
 }
-export default EditListingColor;
+export default EditBrand;

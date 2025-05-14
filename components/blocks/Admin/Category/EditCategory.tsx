@@ -3,29 +3,29 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_PAGE_MODAL_ID } from "./ManageListingCategory";
+import { EDIT_PAGE_MODAL_ID } from "./ManageCategory";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditListingCategoryFields from "./EditListingCategoryFields";
+import EditCategoryFields from "./EditCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Category, CreateCategory, UpdateCategory } from "@/types/Category";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
-export type EditListingCategoryProps = {
+export type EditCategoryProps = {
     listingId?: number;
     data?: Category;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListingCategory({
+function EditCategory({
     listingId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingCategoryProps) {
+}: EditCategoryProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -145,16 +145,13 @@ function EditListingCategory({
             return;
         }
 
-        dataTableContext.modal.update(
-            {
-                formProps: {
-                    operation: operation,
-                    initialValues: initialValues,
-                    onSubmit: handleSubmit,
-                }
-            },
-            modalId
-        );
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
     }, [inModal, modalId]);
 
 
@@ -170,7 +167,7 @@ function EditListingCategory({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditListingCategoryFields operation={operation} />
+                        <EditCategoryFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -181,7 +178,7 @@ function EditListingCategory({
                     >
                         {() => {
                             return (
-                                <EditListingCategoryFields operation={operation} />
+                                <EditCategoryFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -190,4 +187,4 @@ function EditListingCategory({
         </div>
     );
 }
-export default EditListingCategory;
+export default EditCategory;

@@ -20,8 +20,10 @@ import AccessControlComponent from "@/components/AccessControl/AccessControlComp
 import ManageUser from "../../User/ManageUser";
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { User } from "@/types/User";
 
 export type ManageListingFollowProps = {
+    data?: Array<User>;
     operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
     enableEdit?: boolean;
@@ -34,6 +36,7 @@ export type ManageListingFollowProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingFollow({
+    data,
     operation,
     listingId,
     rowSelection = true,
@@ -47,6 +50,100 @@ function ManageListingFollow({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalProps() {
+        return {
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    users: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    if (!operation) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        return;
+                    }
+                    if (['add', 'create'].includes(operation)) {
+                        if (!Array.isArray(values?.users)) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            return;
+                        }
+                        if (!values?.users?.length) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            return;
+                        }
+                        let origData = data;
+                        if (!Array.isArray(origData)) {
+                            origData = [];
+                            return;
+                        }
+                        if (typeof onChange === 'function') {
+                            onChange([
+                                ...origData,
+                                ...values?.users
+                            ]);
+                        }
+                        return;
+                    }
+                    if (!listingId) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.listingFollow.replace(
+                                ':listingId',
+                                listingId.toString()
+                            ),
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: {
+                            user_ids: userIds,
+                        }
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add followers</p>
+                            ),
+                        }, 'listing-add-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Added user/s as followers</p>
+                        ),
+                    }, 'listing-add-success');
+                    dataTableContext.refresh();
+                    dataTableContext.modal.close('add-users-modal');
+                    return true;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                return await formHelpers.submitForm();
+            },
+            fullscreen: true
+        };
+    }
     function getListingFormModalProps() {
         return {
             formProps: {},
@@ -253,7 +350,7 @@ function ManageListingFollow({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContextState.modal.show({
+        dataTableContext.modal.show({
             title: 'Select Users',
             component: ({
                 modal,
@@ -287,79 +384,7 @@ function ManageListingFollow({
                     </AccessControlComponent>
                 )
             },
-            formProps: {
-                operation: operation,
-                initialValues: {
-                    users: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
-                    if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-                        return;
-                    }
-                    if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add new listing</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Listing added successfully</p>
-                        ),
-                    }, 'listing-add-success');
-                    // dataTableContextState.refresh();
-                    // dataTableContextState.modal.close('add-users-modal');
-                    return false;
-                }
-            },
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                DebugHelpers.log(DebugHelpers.DEBUG, 'Response', response);
-                if (!response) {
-                    return false;
-                }
-                return false;
-            },
-            fullscreen: true
+            ...getAddNewModalProps(),
         }, 'add-users-modal');
     }
 
@@ -444,6 +469,7 @@ function ManageListingFollow({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

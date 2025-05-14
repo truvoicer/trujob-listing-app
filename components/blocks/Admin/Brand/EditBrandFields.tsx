@@ -5,12 +5,12 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectBrand from "./SelectBrand";
 
-type EditListingBrandFields = {
+type EditBrandFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingBrandFields({
+function EditBrandFields({
     operation
-}: EditListingBrandFields) {
+}: EditBrandFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -36,4 +36,4 @@ function EditListingBrandFields({
         </div>
     );
 }
-export default EditListingBrandFields;
+export default EditBrandFields;

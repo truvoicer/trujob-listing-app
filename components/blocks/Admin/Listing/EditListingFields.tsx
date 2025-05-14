@@ -1,30 +1,24 @@
 import { Dispatch, useContext, useState } from "react";
-import { FormikProps, FormikValues, useFormikContext } from "formik";
+import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
-import RoleForm from "../Role/RoleForm";
-import { Role } from "@/types/Role";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { title } from "process";
 import SelectListingType from "./SelectListingType";
-import SelectUser from "../User/SelectUser";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../User/ManageUser";
 import ManageListingReview from "./Review/ManageListingReview";
-import ManageListingFeature from "./Feature/ManageListingFeature";
+import ManageFeature from "../Feature/ManageFeature";
 import ManageListingFollow from "./Follow/ManageListingFollow";
-import ManageListingCategory from "./Category/ManageListingCategory";
-import ManageListingBrand from "./Brand/ManageListingBrand";
-import ManageListingColor from "./Color/ManageListingColor";
-import ManageListingProductType from "./ProductType/ManageListingProductType";
+import ManageCategory from "../Category/ManageCategory";
+import ManageBrand from "../Brand/ManageBrand";
+import ManageColor from "../Color/ManageColor";
+import ManageProductType from "../ProductType/ManageProductType";
 import ManageMedia from "../Media/ManageMedia";
-import { stat } from "fs";
-import { objectMerge } from "@/helpers/utils";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 type EditListingFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -48,7 +42,7 @@ function EditListingFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
+
     function getListingComponentProps() {
         let componentProps: any = {
             operation: 'create',
@@ -59,7 +53,7 @@ function EditListingFields({
         }
         return componentProps;
     }
-
+    DebugHelpers.log(DebugHelpers.DEBUG, 'EditListingFields', values);
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
@@ -187,7 +181,7 @@ function EditListingFields({
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageListingFeature
+                    <ManageFeature
                         {...getListingComponentProps()}
                         data={values?.features || []}
                         rowSelection={false}
@@ -263,10 +257,10 @@ function EditListingFields({
                 if (selectedFollows.length === 0) {
                     return true;
                 }
-                if (['add', 'create'].includes(operation)) {
-                    setFieldValue('follows', selectedFollows);
-                    return true;
-                }
+                // if (['add', 'create'].includes(operation)) {
+                //     setFieldValue('follows', selectedFollows);
+                //     return true;
+                // }
                 return true;
             },
             onCancel: () => {
@@ -285,7 +279,7 @@ function EditListingFields({
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageListingCategory
+                    <ManageCategory
                         {...getListingComponentProps()}
                         data={values?.categories || []}
                         rowSelection={false}
@@ -334,8 +328,25 @@ function EditListingFields({
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageListingBrand
+                    <ManageBrand
                         {...getListingComponentProps()}
+                        requestHandler={async ({
+                            query,
+                            post
+                        }: {
+                            query: any,
+                            post: any
+                        }) => {
+                            return await TruJobApiMiddleware.getInstance().resourceRequest({
+                                endpoint: UrlHelpers.urlFromArray([
+                                    truJobApiConfig.endpoints.listingBrand.replace(':listingId', values.id.toString()),
+                                ]),
+                                method: ApiMiddleware.METHOD.GET,
+                                protectedReq: true,
+                                query,
+                                data: post,
+                            })
+                        }}
                         data={values?.brands || []}
                         rowSelection={false}
                         multiRowSelection={false}
@@ -383,7 +394,7 @@ function EditListingFields({
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageListingColor
+                    <ManageColor
                         {...getListingComponentProps()}
                         data={values?.colors || []}
                         rowSelection={false}
@@ -432,7 +443,7 @@ function EditListingFields({
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageListingProductType
+                    <ManageProductType
                         {...getListingComponentProps()}
                         data={values?.product_types || []}
                         rowSelection={false}

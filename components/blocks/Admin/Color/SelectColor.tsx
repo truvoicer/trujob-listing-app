@@ -2,7 +2,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { ListingColor } from "@/types/Listing";
+import { Color } from "@/types/Listing";
 import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
@@ -14,8 +14,8 @@ function SelectColor({
     name = 'color',
     value,
 }: SelectColorProps) {
-    const [colors, setColors] = useState<Array<ListingColor>>([]);
-    const [selectedColor, setSelectedColor] = useState<ListingColor | null>(null);
+    const [colors, setColors] = useState<Array<Color>>([]);
+    const [selectedColor, setSelectedColor] = useState<Color | null>(null);
 
     const formContext = useFormikContext<FormikValues>() || {};
 
@@ -39,7 +39,7 @@ function SelectColor({
 
     useEffect(() => {
         if (value) {
-            const findColor = colors.find((color: ListingColor) => color?.id === value);
+            const findColor = colors.find((color: Color) => color?.id === value);
             
             if (findColor) {
                 setSelectedColor(findColor);
@@ -73,7 +73,7 @@ function SelectColor({
                         setSelectedColor(null);
                         return;
                     }
-                    const findColor = colors.find((color: ListingColor) => color?.id === parseInt(e.target.value));
+                    const findColor = colors.find((color: Color) => color?.id === parseInt(e.target.value));
                     if (!findColor) {
                         DebugHelpers.log(DebugHelpers.WARN, 'Selected color not found');
                         return;

@@ -3,14 +3,14 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import SelectColor from "./SelectColor";
+import SelectProductType from "./SelectProductType";
 
-type EditListingColorFields = {
+type EditProductTypeFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingColorFields({
+function EditProductTypeFields({
     operation
-}: EditListingColorFields) {
+}: EditProductTypeFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -18,7 +18,7 @@ function EditListingColorFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
+    
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -26,14 +26,14 @@ function EditListingColorFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <SelectColor
-                            name="listing_type"
+                        <SelectProductType
+                            name="product_type"
                         />
                     </div>
-                    
+
                 </div>
             </div>
         </div>
     );
 }
-export default EditListingColorFields;
+export default EditProductTypeFields;

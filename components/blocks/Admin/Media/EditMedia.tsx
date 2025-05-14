@@ -239,16 +239,13 @@ function EditMedia({
             return;
         }
 
-        dataTableContext.modal.update(
-            {
-                formProps: {
-                    operation: operation,
-                    initialValues: initialValues,
-                    onSubmit: handleSubmit,
-                }
-            },
-            modalId
-        );
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
     }, [inModal, modalId]);
 
 

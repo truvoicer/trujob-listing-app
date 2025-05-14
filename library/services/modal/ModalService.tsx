@@ -46,7 +46,40 @@ export class ModalService extends MessageService {
         onCancel: () => { return true; },
         onOk: () => { return true; },
     };
+    static initializeModalWithForm({
+        modalState,
+        id,
+        operation,
+        initialValues,
+        handleSubmit,
+    }: {
+        modalState: ModalState;
+        id: string;
+        operation: string;
+        initialValues: any;
+        handleSubmit: (values: FormikValues) => Promise<void>;
+    }) {
+        let modalItem = ModalService.findMessageItemInDataById(
+            id,
+            modalState
+        );
 
+        let modalFormProps: any = {
+            formProps: {
+                ...modalItem?.formProps,
+                operation: operation,
+                initialValues: initialValues,
+            }
+        };
+
+        if (typeof modalItem?.formProps?.onSubmit !== 'function') {
+            modalFormProps.formProps.onSubmit = handleSubmit;
+        }
+        modalState.update(
+            modalFormProps,
+            id
+        );
+    }
     buildItemData(data: any, id: null | string = null) {
         let item: ModalItem = ModalService.INIT_ITEM_DATA;
         Object.keys(ModalService.INIT_ITEM_DATA).forEach((key: string) => {

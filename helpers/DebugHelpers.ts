@@ -1,16 +1,23 @@
 
-export type DebugLevel = 'error' | 'warn' | 'info' | 'debug';
+export type DebugLevel = 'error' | 'warn' | 'info' | 'debug' | 'intense';
 
 export class DebugHelpers {
     static ERROR: DebugLevel = 'error';
     static WARN: DebugLevel = 'warn';
     static INFO: DebugLevel = 'info';
     static DEBUG: DebugLevel = 'debug';
+    static INTENSE: DebugLevel = 'intense';
 
-    static levels: Array<DebugLevel> = ['error', 'warn', 'info', 'debug'];
+    static levels: Array<DebugLevel> = [
+        DebugHelpers.ERROR,
+        DebugHelpers.WARN,
+        DebugHelpers.INFO,
+        DebugHelpers.DEBUG,
+        DebugHelpers.INTENSE,
+    ];
 
     static debug: boolean = false;
-    static debugLevel: DebugLevel = 'info';
+    static debugLevel: DebugLevel = DebugHelpers.INFO;
 
     static {
 
@@ -20,7 +27,7 @@ export class DebugHelpers {
         if (debugLevel && DebugHelpers.levels.includes(debugLevel as DebugLevel)) {
             DebugHelpers.debugLevel = debugLevel as DebugLevel;
         } else {
-            DebugHelpers.debugLevel = 'info';
+            DebugHelpers.debugLevel = DebugHelpers.INFO;
         }
     }
 

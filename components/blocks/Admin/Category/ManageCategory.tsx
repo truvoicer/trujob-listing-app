@@ -2,7 +2,7 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditListingCategory from "./EditListingCategory";
+import EditCategory from "./EditCategory";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -17,8 +17,9 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { ModalItem } from "@/library/services/modal/ModalService";
 
-export type ManageListingCategoryProps = {
+export type ManageCategoryProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
     listingId: number;
     enableEdit?: boolean;
@@ -30,7 +31,7 @@ export type ManageListingCategoryProps = {
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
-function ManageListingCategory({
+function ManageCategory({
     operation,
     listingId,
     rowSelection = true,
@@ -39,10 +40,105 @@ function ManageListingCategory({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageListingCategoryProps) {
+}: ManageCategoryProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
+
+    function getAddNewModalProps() {
+        return {
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    users: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    if (!operation) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        return;
+                    }
+                    if (['add', 'create'].includes(operation)) {
+                        if (!Array.isArray(values?.users)) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            return;
+                        }
+                        if (!values?.users?.length) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            return;
+                        }
+                        let origData = data;
+                        if (!Array.isArray(origData)) {
+                            origData = [];
+                            return;
+                        }
+                        if (typeof onChange === 'function') {
+                            onChange([
+                                ...origData,
+                                ...values?.users
+                            ]);
+                        }
+                        return;
+                    }
+                    if (!listingId) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.listingFollow.replace(
+                                ':listingId',
+                                listingId.toString()
+                            ),
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: {
+                            user_ids: userIds,
+                        }
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add followers</p>
+                            ),
+                        }, 'listing-add-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Added user/s as followers</p>
+                        ),
+                    }, 'listing-add-success');
+                    dataTableContext.refresh();
+                    dataTableContext.modal.close('add-users-modal');
+                    return true;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                return await formHelpers.submitForm();
+            },
+            fullscreen: true
+        };
+    }
 
     function getListingFormModalProps() {
         return {
@@ -80,7 +176,7 @@ function ManageListingCategory({
                         dataTableContextState.modal.show({
                             title: 'Edit Listing',
                             component: (
-                                <EditListingCategory
+                                <EditCategory
                                     listingId={listingId}
                                     data={item}
                                     operation={'edit'}
@@ -106,7 +202,7 @@ function ManageListingCategory({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Listing',
                                         component: (
-                                            <EditListingCategory
+                                            <EditCategory
                                             listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
@@ -249,19 +345,27 @@ function ManageListingCategory({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
-        dataTableContextState.modal.show({
-            title: 'Add New Listing',
-            component: (
-                <EditListingCategory
+                dataTableContext.modal.show({
+                    title: 'Select Users',
+                    component: ({
+                        modal,
+                        index,
+                        formHelpers
+                    }: {
+                        modal: ModalItem,
+                        index: number,
+                        formHelpers?: any
+                    }) => {
+                        return (
+                <EditCategory
                 listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}
                 />
-            ),
-            ...getListingFormModalProps(),
+            )
+        },
+        ...getAddNewModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
 
@@ -366,4 +470,4 @@ function ManageListingCategory({
         </Suspense>
     );
 }
-export default ManageListingCategory;
+export default ManageCategory;

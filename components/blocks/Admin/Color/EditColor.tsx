@@ -5,26 +5,28 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditListingFeatureFields from "./EditListingFeatureFields";
+import { Listing } from "@/types/Listing";
+import EditColorFields from "./EditColorFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { CreateFeature, Feature, UpdateFeature } from "@/types/Feature";
+import { CreateColor, UpdateColor } from "@/types/Color";
+import { Color } from "react-bootstrap/esm/types";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
-export type EditListingFeatureProps = {
+export type EditColorProps = {
     listingId?: number;
-    data?: Feature;
+    data?: Listing;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListingFeature({
+function EditColor({
     listingId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingFeatureProps) {
+}: EditColorProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -33,7 +35,7 @@ function EditListingFeature({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Feature = {
+    const initialValues: Color = {
         id: data?.id || 0,
         name: data?.name || '',
         label: data?.label || '',
@@ -41,17 +43,17 @@ function EditListingFeature({
         updated_at: data?.updated_at || '',
     };
 
-    function buildCreateData(values: Feature) {
+    function buildCreateData(values: Color) {
 
-        let requestData: CreateFeature = {
+        let requestData: CreateColor = {
             name: values?.name || '',
             label: values?.label || '',
         };
         return requestData;
     }
-    function buildUpdateData(values: Feature) {
+    function buildUpdateData(values: Color) {
 
-        let requestData: UpdateFeature = {
+        let requestData: UpdateColor = {
             id: values?.id || 0,
             name: values?.name || '',
             label: values?.label || '',
@@ -59,7 +61,7 @@ function EditListingFeature({
 
         return requestData;
     }
-    async function handleSubmit(values: Feature) {
+    async function handleSubmit(values: Color) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
             return;
@@ -70,23 +72,23 @@ function EditListingFeature({
             DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
             return;
         }
-        if (!values?.feature?.id) {
+        if (!values?.color?.id) {
             DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
             return;
         }
 
         let response = null;
-        let requestData: CreateFeature | UpdateFeature;
+        let requestData: CreateColor | UpdateColor;
         switch (operation) {
             case 'edit':
             case 'update':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingFeature.replace(
+                        truJobApiConfig.endpoints.listingColor.replace(
                             ':listingId',
                             listingId.toString()
                         ),
-                        values?.feature?.id,
+                        values?.color?.id,
                         'update',
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
@@ -97,11 +99,11 @@ function EditListingFeature({
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingFeature.replace(
+                        truJobApiConfig.endpoints.listingColor.replace(
                             ':listingId',
                             listingId.toString()
                         ),
-                        values?.feature?.id,
+                        values?.color?.id,
                         'create',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -115,57 +117,54 @@ function EditListingFeature({
     }
 
 
-        useEffect(() => {
-            if (!inModal) {
-                return;
-            }
-            if (!modalId) {
-                return;
-            }
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
+        }
 
-            dataTableContext.modal.update(
-                {
-                    formProps: {
-                        operation: operation,
-                        initialValues: initialValues,
-                        onSubmit: handleSubmit,
-                    }
-                },
-                modalId
-            );
-        }, [inModal, modalId]);
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
+    }, [inModal, modalId]);
 
 
-        const dataTableContext = useContext(DataTableContext);
-        return (
-            <div className="row justify-content-center align-items-center">
-                <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                    {alert && (
-                        <div className={`alert alert-${alert.type}`} role="alert">
-                            {alert.message}
-                        </div>
-                    )}
-                    {inModal &&
-                        ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
-                        (
-                            <EditListingFeatureFields operation={operation} />
-                        )
-                    }
-                    {!inModal && (
-                        <Form
-                            operation={operation}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditListingFeatureFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
-                </div>
+    const dataTableContext = useContext(DataTableContext);
+    return (
+        <div className="row justify-content-center align-items-center">
+            <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
+                        <EditColorFields operation={operation} />
+                    )
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditColorFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
-        );
-    }
-    export default EditListingFeature;
+        </div>
+    );
+}
+export default EditColor;

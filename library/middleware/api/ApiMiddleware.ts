@@ -158,7 +158,7 @@ export class ApiMiddleware {
 
     getProtectedSessionToken() {
         const sessionObject = SessionService.getSessionObject();
-        DebugHelpers.log('debug', 'ApiMiddleware.getProtectedSessionToken', {
+        DebugHelpers.log(DebugHelpers.INTENSE, 'ApiMiddleware.getProtectedSessionToken', {
             sessionObject,
         });
         if (!sessionObject) {
@@ -277,7 +277,7 @@ export class ApiMiddleware {
                 throw new Error(`Method not supported ${method}`);
         }
 
-        DebugHelpers.log('debug', 'ApiMiddleware.runRequest', {
+        DebugHelpers.log(DebugHelpers.INTENSE, 'ApiMiddleware.runRequest', {
             requestUrl,
             request,
         });

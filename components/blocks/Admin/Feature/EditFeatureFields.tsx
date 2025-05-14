@@ -3,22 +3,21 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import SelectProductType from "./SelectProductType";
+import SelectFeature from "./SelectFeature";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+import ManageUser from "../User/ManageUser";
 
-type EditListingProductTypeFields = {
+type EditFeatureFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingProductTypeFields({
+function EditFeatureFields({
     operation
-}: EditListingProductTypeFields) {
-    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
-
+}: EditFeatureFields) {
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -26,14 +25,17 @@ function EditListingProductTypeFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <SelectProductType
-                            name="product_type"
+                        <SelectFeature
+                            name="feature"
+                            value={values?.feature}
                         />
                     </div>
 
                 </div>
+
+                {modalService.renderLocalModals()}
             </div>
         </div>
     );
 }
-export default EditListingProductTypeFields;
+export default EditFeatureFields;

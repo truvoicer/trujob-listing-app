@@ -5,26 +5,26 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditListingProductTypeFields from "./EditListingProductTypeFields";
+import EditProductTypeFields from "./EditProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/ProductType";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 
-export type EditListingProductTypeProps = {
+export type EditProductTypeProps = {
     listingId?: number;
     data?: ProductType;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListingProductType({
+function EditProductType({
     listingId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingProductTypeProps) {
+}: EditProductTypeProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -123,16 +123,13 @@ function EditListingProductType({
                 return;
             }
 
-            dataTableContext.modal.update(
-                {
-                    formProps: {
-                        operation: operation,
-                        initialValues: initialValues,
-                        onSubmit: handleSubmit,
-                    }
-                },
-                modalId
-            );
+            ModalService.initializeModalWithForm({
+                modalState: dataTableContext?.modal,
+                id: modalId,
+                operation: operation,
+                initialValues: initialValues,
+                handleSubmit: handleSubmit,
+            });
         }, [inModal, modalId]);
 
 
@@ -148,7 +145,7 @@ function EditListingProductType({
                     {inModal &&
                         ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                         (
-                            <EditListingProductTypeFields operation={operation} />
+                            <EditProductTypeFields operation={operation} />
                         )
                     }
                     {!inModal && (
@@ -159,7 +156,7 @@ function EditListingProductType({
                         >
                             {() => {
                                 return (
-                                    <EditListingProductTypeFields operation={operation} />
+                                    <EditProductTypeFields operation={operation} />
                                 )
                             }}
                         </Form>
@@ -168,4 +165,4 @@ function EditListingProductType({
             </div>
         );
     }
-    export default EditListingProductType;
+    export default EditProductType;

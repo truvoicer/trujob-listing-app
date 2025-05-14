@@ -2,35 +2,39 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditListingBrand from "./EditListingBrand";
+import EditBrand from "./EditBrand";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManagerComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { ModalItem } from "@/library/services/modal/ModalService";
+import { Brand } from "@/types/Brand";
 
-export type ManageListingBrandProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageBrandProps extends DataManagerComponentProps {
+    data?: Array<Brand>;
+    requestHandler?: ({
+        query,
+        post
+    }: {
+        query: any,
+        post: any
+    }) => Promise<Array<Brand>>;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
-function ManageListingBrand({
+function ManageBrand({
+    addMode = 'edit',
+    requestHandler,
+    data,
     operation,
     listingId,
     rowSelection = true,
@@ -39,10 +43,105 @@ function ManageListingBrand({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageListingBrandProps) {
+}: ManageBrandProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
+
+    function getAddNewModalProps() {
+        return {
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    brands: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    if (!operation) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        return;
+                    }
+                    if (['add', 'create'].includes(operation)) {
+                        if (!Array.isArray(values?.brands)) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            return;
+                        }
+                        if (!values?.users?.length) {
+                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            return;
+                        }
+                        let origData = data;
+                        if (!Array.isArray(origData)) {
+                            origData = [];
+                            return;
+                        }
+                        if (typeof onChange === 'function') {
+                            onChange([
+                                ...origData,
+                                ...values?.brands
+                            ]);
+                        }
+                        return;
+                    }
+                    if (!listingId) {
+                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.listingFollow.replace(
+                                ':listingId',
+                                listingId.toString()
+                            ),
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: {
+                            user_ids: userIds,
+                        }
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add followers</p>
+                            ),
+                        }, 'listing-add-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Added user/s as followers</p>
+                        ),
+                    }, 'listing-add-success');
+                    dataTableContext.refresh();
+                    dataTableContext.modal.close('add-users-modal');
+                    return true;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                return await formHelpers.submitForm();
+            },
+            fullscreen: true
+        };
+    }
 
     function getListingFormModalProps() {
         return {
@@ -80,7 +179,7 @@ function ManageListingBrand({
                         dataTableContextState.modal.show({
                             title: 'Edit Listing',
                             component: (
-                                <EditListingBrand
+                                <EditBrand
                                     listingId={listingId}
                                     data={item}
                                     operation={'edit'}
@@ -106,7 +205,7 @@ function ManageListingBrand({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Listing',
                                         component: (
-                                            <EditListingBrand
+                                            <EditBrand
                                                 listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
@@ -209,21 +308,30 @@ function ManageListingBrand({
             return;
         }
         let query = dataTableContextState?.query || {};
+        let post = dataTableContextState?.post || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
             ...query,
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
-            ]),
-            method: ApiMiddleware.METHOD.GET,
-            protectedReq: true,
-            query: query,
-            post: dataTableContextState?.post || {},
-        })
+        let response;
+        if (typeof requestHandler === 'function') {
+            response = await requestHandler({
+                query,
+                post,
+            });
+        } else {
+            response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                endpoint: UrlHelpers.urlFromArray([
+                    truJobApiConfig.endpoints.brand,
+                ]),
+                method: ApiMiddleware.METHOD.GET,
+                protectedReq: true,
+                query,
+                data: post,
+            })
+        }
         if (!response) {
             setDataTableContextState(prevState => {
                 let newState = {
@@ -248,20 +356,48 @@ function ManageListingBrand({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
-        dataTableContextState.modal.show({
-            title: 'Add New Listing',
-            component: (
-                <EditListingBrand
-                    listingId={listingId}
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            ),
-            ...getListingFormModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        dataTableContext.modal.show({
+            title: 'Add Brand',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <>
+                        {addMode === 'edit' && (
+                            <EditBrand
+                                listingId={listingId}
+                                operation={'add'}
+                                inModal={true}
+                                modalId={'add-brand-modal'}
+                            />
+                        )}
+                        {addMode === 'selector' && (
+                            <ManageBrand
+                                addMode="selector"
+                                rowSelection={true}
+                                multiRowSelection={true}
+                                enableEdit={false}
+                                paginationMode="state"
+                                onChange={(users: Array<any>) => {
+                                    if (!Array.isArray(users)) {
+                                        DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                                        return;
+                                    }
+                                    formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
+                                }}
+                            />
+                        )}
+                    </>
+                )
+            },
+            ...getAddNewModalProps(),
+        }, 'add-brand-modal');
     }
 
     function getRowSelectActions() {
@@ -345,6 +481,7 @@ function ManageListingBrand({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}
@@ -365,4 +502,4 @@ function ManageListingBrand({
         </Suspense>
     );
 }
-export default ManageListingBrand;
+export default ManageBrand;

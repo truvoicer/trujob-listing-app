@@ -2,24 +2,24 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { ListingFeature } from "@/types/Listing";
+import { Feature } from "@/types/Listing";
 import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
-export type SelectListingFeatureProps = {
+export type SelectFeatureProps = {
     name?: string;
     value?: number | null;
 }
-function SelectListingFeature({
+function SelectFeature({
     name = 'feature',
     value,
-}: SelectListingFeatureProps) {
-    const [listingFeatures, setListingFeatures] = useState<Array<ListingFeature>>([]);
-    const [selectedListingFeature, setSelectedListingFeature] = useState<ListingFeature | null>(null);
+}: SelectFeatureProps) {
+    const [listingFeatures, setFeatures] = useState<Array<Feature>>([]);
+    const [selectedFeature, setSelectedFeature] = useState<Feature | null>(null);
 
     const formContext = useFormikContext<FormikValues>() || {};
 
-    async function fetchListingFeatures() {
+    async function fetchFeatures() {
         // Fetch listingFeatures from the API or any other source
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.feature}`,
@@ -29,24 +29,24 @@ function SelectListingFeature({
             DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching listingFeatures');
             return;
         }
-        setListingFeatures(response?.data || []);
+        setFeatures(response?.data || []);
     }
 
     useEffect(() => {
-        fetchListingFeatures();
+        fetchFeatures();
     }, []);
 
     useEffect(() => {
         if (value) {
-            const findListingFeature = listingFeatures.find((listingFeature: ListingFeature) => listingFeature?.id === value);
+            const findFeature = listingFeatures.find((listingFeature: Feature) => listingFeature?.id === value);
             
-            if (findListingFeature) {
-                setSelectedListingFeature(findListingFeature);
+            if (findFeature) {
+                setSelectedFeature(findFeature);
             }
         }
     }, [value, listingFeatures]);
     useEffect(() => {
-        if (!selectedListingFeature) {
+        if (!selectedFeature) {
             return;
         }
         if (!formContext) {
@@ -57,9 +57,9 @@ function SelectListingFeature({
             DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
             return;
         }
-        formContext.setFieldValue(name, selectedListingFeature);
+        formContext.setFieldValue(name, selectedFeature);
 
-    }, [selectedListingFeature]);
+    }, [selectedFeature]);
 
     return (
         <div className="floating-input form-group">
@@ -69,19 +69,19 @@ function SelectListingFeature({
                 className="form-control"
                 onChange={e => {
                     if (!e.target.value) {
-                        setSelectedListingFeature(null);
+                        setSelectedFeature(null);
                         return;
                     }
-                    const findListingFeature = listingFeatures.find((listingFeature: ListingFeature) => listingFeature?.id === parseInt(e.target.value));
-                    if (!findListingFeature) {
+                    const findFeature = listingFeatures.find((listingFeature: Feature) => listingFeature?.id === parseInt(e.target.value));
+                    if (!findFeature) {
                         DebugHelpers.log(DebugHelpers.WARN, 'Selected listingFeature not found');
                         return;
                     }
-                    setSelectedListingFeature(findListingFeature);
+                    setSelectedFeature(findFeature);
                 }}
-                value={selectedListingFeature?.id || ''}
+                value={selectedFeature?.id || ''}
             >
-                <option value="">Select ListingFeature</option>
+                <option value="">Select Feature</option>
                 {listingFeatures.map((listingFeature, index) => (
                     <option
                         key={index}
@@ -90,8 +90,8 @@ function SelectListingFeature({
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={name}>ListingFeature</label>
+            <label className="form-label" htmlFor={name}>Feature</label>
         </div>
     );
 }
-export default SelectListingFeature;
+export default SelectFeature;

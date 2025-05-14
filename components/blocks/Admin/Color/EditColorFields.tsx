@@ -3,21 +3,22 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import SelectListingFeature from "./SelectListingFeature";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageUser from "../../User/ManageUser";
+import SelectColor from "./SelectColor";
 
-type EditListingFeatureFields = {
+type EditColorFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditListingFeatureFields({
+function EditColorFields({
     operation
-}: EditListingFeatureFields) {
+}: EditColorFields) {
+    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
+
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -25,17 +26,14 @@ function EditListingFeatureFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <SelectListingFeature
-                            name="feature"
-                            value={values?.feature}
+                        <SelectColor
+                            name="listing_type"
                         />
                     </div>
-
+                    
                 </div>
-
-                {modalService.renderLocalModals()}
             </div>
         </div>
     );
 }
-export default EditListingFeatureFields;
+export default EditColorFields;
