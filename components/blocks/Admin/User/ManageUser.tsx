@@ -8,16 +8,16 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { User } from "@/types/User";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
 export type ManageUserProps = {
+    values?: Array<User>;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -25,9 +25,10 @@ export type ManageUserProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-user-modal';
+export const EDIT_USER_MODAL_ID = 'edit-user-modal';
 
-function ManageUser({ 
+function ManageUser({
+    values,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -79,11 +80,11 @@ function ManageUser({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_USER_MODAL_ID}
                                 />
                             ),
                             ...getUserFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_USER_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -104,11 +105,11 @@ function ManageUser({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_USER_MODAL_ID}
                                             />
                                         ),
                                         ...getUserFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_USER_MODAL_ID);
                                 }
                             }
                         },
@@ -156,7 +157,7 @@ function ManageUser({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_USER_MODAL_ID);
                                 }
                             }
                         }
@@ -197,30 +198,12 @@ function ManageUser({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.user}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
-            post: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
+            data: dataTableContextState?.post || {},
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
@@ -236,11 +219,11 @@ function ManageUser({
                 <EditUser
                     operation={'add'}
                     inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
+                    modalId={EDIT_USER_MODAL_ID}
                 />
             ),
             ...getUserFormModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        }, EDIT_USER_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -324,6 +307,7 @@ function ManageUser({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                values={values}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

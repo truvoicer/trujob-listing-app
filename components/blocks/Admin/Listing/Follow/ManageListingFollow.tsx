@@ -33,7 +33,9 @@ export type ManageListingFollowProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_LISTING_FOLLOW_MODAL_ID = 'edit-listing-follow-modal';
+export const CREATE_LISTING_FOLLOW_MODAL_ID = 'create-listing-follow-modal';
+export const DELETE_LISTING_FOLLOW_MODAL_ID = 'delete-listing-follow-modal';
 
 function ManageListingFollow({
     data,
@@ -186,11 +188,88 @@ function ManageListingFollow({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_LISTING_FOLLOW_MODAL_ID}
                                 />
                             ),
                             ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_LISTING_FOLLOW_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Listing Follow',
+                            component: (
+                                <p>Are you sure you want to delete this follow ({item?.email} | {item?.first_name} {item?.last_name})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_FOLLOW_MODAL_ID);
+                                    return;
+                                }
+                                if (!listingId) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing ID is required</p>
+                                        ),
+                                    }, 'listing-follow-delete-error');
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Follow ID is required</p>
+                                        ),
+                                    }, 'listing-follow-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingFollow.replace(':listingId', listingId.toString()),
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing follow</p>
+                                        ),
+                                    }, 'listing-follow-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_FOLLOW_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -212,11 +291,11 @@ function ManageListingFollow({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_LISTING_FOLLOW_MODAL_ID}
                                             />
                                         ),
                                         ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_FOLLOW_MODAL_ID);
                                 }
                             }
                         },
@@ -264,7 +343,7 @@ function ManageListingFollow({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_FOLLOW_MODAL_ID);
                                 }
                             }
                         }
@@ -316,33 +395,14 @@ function ManageListingFollow({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.listingFollow.replace(':listingId', listingId.toString()),
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
-            post: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
+            data: dataTableContextState?.post || {},
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {

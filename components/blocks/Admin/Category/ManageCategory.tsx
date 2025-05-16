@@ -301,7 +301,7 @@ function ManageCategory({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.category,
             ]),
@@ -309,25 +309,6 @@ function ManageCategory({
             protectedReq: true,
             query,
             data: post,
-        });
-
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {

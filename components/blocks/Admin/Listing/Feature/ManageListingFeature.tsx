@@ -20,7 +20,10 @@ import { ModalItem } from "@/library/services/modal/ModalService";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageFeature from "../../Feature/ManageFeature";
 
-const CREATE_FEATURES_MODAL_ID = 'create-features-modal';
+const CREATE_LISTING_FEATURE_MODAL_ID = 'create-features-modal';
+const DELETE_LISTING_FEATURE_MODAL_ID = 'delete-listing-feature-modal';
+const EDIT_LISTING_FEATURE_MODAL_ID = 'edit-listing-feature-modal';
+
 
 export type ManageListingFeatureProps = {
     data?: Array<Feature>;
@@ -182,6 +185,83 @@ function ManageListingFeature({
                 >
                     <i className="lar la-eye"></i>
                 </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Listing Feature',
+                            component: (
+                                <p>Are you sure you want to delete this feature ({item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_FEATURE_MODAL_ID);
+                                    return;
+                                }
+                                if (!listingId) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing ID is required</p>
+                                        ),
+                                    }, 'listing-feature-delete-error');
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Feature ID is required</p>
+                                        ),
+                                    }, 'listing-feature-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingFeature.replace(':listingId', listingId.toString()),
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing feature</p>
+                                        ),
+                                    }, 'listing-feature-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_FEATURE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
                 <BadgeDropDown
                     data={[
                         {
@@ -302,7 +382,7 @@ function ManageListingFeature({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.listingFeature.replace(':listingId', listingId.toString()),
             ]),
@@ -310,24 +390,6 @@ function ManageListingFeature({
             protectedReq: true,
             query: query,
             data: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
@@ -390,7 +452,7 @@ function ManageListingFeature({
                 )
             },
             ...getListingFormModalProps(),
-        }, CREATE_FEATURES_MODAL_ID);
+        }, CREATE_LISTING_FEATURE_MODAL_ID);
     }
 
     function getRowSelectActions() {

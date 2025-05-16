@@ -154,7 +154,7 @@ function ManageFeature({
                 if (typeof formHelpers?.submitForm !== 'function') {
                     return;
                 }
-                
+
                 if (['add', 'create'].includes(operation)) {
                     onChange([
                         ...data,
@@ -310,7 +310,7 @@ function ManageFeature({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.feature,
             ]),
@@ -318,24 +318,6 @@ function ManageFeature({
             protectedReq: true,
             query: query,
             data: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
@@ -343,26 +325,26 @@ function ManageFeature({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-                dataTableContext.modal.show({
-                    title: 'Select Users',
-                    component: ({
-                        modal,
-                        index,
-                        formHelpers
-                    }: {
-                        modal: ModalItem,
-                        index: number,
-                        formHelpers?: any
-                    }) => {
-                        return (
-                <EditFeature
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            )
-        },
-        ...getAddNewModalProps(),
+        dataTableContext.modal.show({
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <EditFeature
+                        operation={'add'}
+                        inModal={true}
+                        modalId={EDIT_PAGE_MODAL_ID}
+                    />
+                )
+            },
+            ...getAddNewModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
 

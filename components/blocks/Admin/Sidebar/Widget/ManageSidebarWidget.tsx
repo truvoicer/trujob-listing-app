@@ -167,30 +167,12 @@ function ManageSidebarWidget({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.widget}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
             data: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState((prevState: DataTableContextType) => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState((prevState: DataTableContextType) => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(

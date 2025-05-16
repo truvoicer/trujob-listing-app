@@ -12,6 +12,7 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+    values?: Array<any>;
     data?: Array<any>;
     onChange: (tableData: Array<any>) => void;
     paginationMode?: 'router' | 'state';
@@ -23,7 +24,11 @@ export type DataManagerProps = {
     rowSelection?: boolean;
     renderActionColumn?: null | ((item: any, index: number, dataTableContextState: any) => React.ReactNode | React.Component | null);
     renderAddNew?: (e: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.MouseEvent<HTMLAnchorElement, MouseEvent>, context: any) => void;
-    request?: (context: any) => void;
+    request?: (context: any) => Promise<{
+        data: Array<any>;
+        links: any;
+        meta: any;
+    }> | null | undefined | boolean;
     columns?: Array<any>;
 }
 
@@ -52,6 +57,7 @@ export type DatatableSearchParams = {
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
+    values = [],
     data,
     rowSelection = false,
     onChange,
@@ -121,10 +127,43 @@ function DataManager({
                     return newState;
                 });
             }
-            request({
+            const response = await request({
                 dataTableContextState,
                 setDataTableContextState,
                 searchParams
+            });
+            
+            if (typeof response === 'object' && response?.data && response?.links && response?.meta) {
+                const data = response?.data || [];
+                setDataTableContextState(prevState => {
+                    let newState = { ...prevState };
+                    newState.data = data.map((item: any, index: number) => {
+                        let cloneItem = { ...item };
+                        let isChecked = false;
+                        if (Array.isArray(values)) {
+                            isChecked = values.some((value: any) => {
+                                if (typeof value === 'object') {
+                                    return value.id === item.id;
+                                }
+                                return value === item.id;
+                            });
+                        }
+                        cloneItem.checked = isChecked;
+                        return cloneItem;
+                    });
+                    newState.links = response.links;
+                    newState.meta = response.meta;
+                    newState.requestStatus = 'idle';
+                    return newState;
+                });
+                return;
+            }
+            setDataTableContextState(prevState => {
+                let newState = {
+                    ...prevState,
+                    requestStatus: 'idle'
+                };
+                return newState;
             });
             return;
         }

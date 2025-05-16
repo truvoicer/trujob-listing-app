@@ -7,9 +7,7 @@ import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware
 import { EDIT_PAGE_MODAL_ID } from "./ManageListing";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
-import { Sidebar } from "@/types/Sidebar";
-import { ListingBlock } from "@/types/ListingBlock";
+import { CreateListing, Listing, ListingRequest, UpdateListing } from "@/types/Listing";
 import EditListingFields from "./EditListingFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
@@ -72,17 +70,11 @@ function EditListing({
 
 
     function buildRequestData(values: Listing) {
-        let requestData: Listing = {
+        let requestData: ListingRequest = {
+            active: values?.active || false,
+            name: values.name,
+            title: values.title,
         };
-        if (values.hasOwnProperty('active')) {
-            requestData.active = values.active;
-        }
-        if (values.hasOwnProperty('name')) {
-            requestData.name = values.name;
-        }
-        if (values.hasOwnProperty('title')) {
-            requestData.title = values.title;
-        }
         if (values.hasOwnProperty('description')) {
             requestData.description = values.description;
         }
@@ -98,8 +90,8 @@ function EditListing({
         if (values.hasOwnProperty('user')) {
             requestData.user = values.user.id;
         }
-        if (Array.isArray(values?.follow_users)) {
-            requestData.follows = RequestHelpers.extractIdsFromArray(values.follow_users);
+        if (Array.isArray(values?.follows)) {
+            requestData.follows = RequestHelpers.extractIdsFromArray(values.follows);
         }
         if (Array.isArray(values?.features)) {
             requestData.features = RequestHelpers.extractIdsFromArray(values.features);
@@ -127,7 +119,10 @@ function EditListing({
 
     function buildCreateData(values: Listing) {
 
-        let requestData: CreateMenuItem = {
+        let requestData: CreateListing = {
+            name: values.name,
+            title: values.title,
+            active: values?.active || false,
             type: values?.type || '',
         };
         requestData = {
@@ -140,7 +135,8 @@ function EditListing({
 
     function buildUpdateData(values: Listing) {
 
-        let requestData: CreateMenuItem = {
+        let requestData: UpdateListing = {
+            id: data?.id || 0,
             type: values?.type || '',
         };
         requestData = {
@@ -159,12 +155,12 @@ function EditListing({
         }
 
         let response = null;
-        let requestData: CreateMenu | UpdateMenu;
+        let requestData: CreateListing | UpdateListing;
         switch (operation) {
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.warn('edit requestData', requestData);
+                console.log('edit requestData', {requestData, values});
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
                 }
@@ -178,7 +174,7 @@ function EditListing({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.warn('create requestData', requestData);
+                console.log('create requestData', {requestData, values});
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.listing}/create`,
                     method: ApiMiddleware.METHOD.POST,

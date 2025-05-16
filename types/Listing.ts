@@ -4,6 +4,7 @@ import { Color } from "./Color";
 import { Feature } from "./Feature";
 import { Media } from "./Media";
 import { ProductType } from "./ProductType";
+import { Review } from "./Review";
 import { User } from "./User";
 
 export type Listing = {
@@ -82,5 +83,30 @@ export type ListingReviewRequest = {
 export interface CreateListingReview extends ListingReviewRequest {
 }
 export interface UpdateListingReview extends ListingReviewRequest {
+    id: number;
+}
+
+export type ListingRequest = {
+    name: string;
+    title: string;
+    description?: string;
+    active: boolean;
+    allow_offers?: boolean;
+    quantity?: number;
+    type?: number;
+    user?: number;
+    follow_users?: Array<number>;
+    features?: Array<number>;
+    reviews?: Array<Review>;
+    categories?: Array<number>;
+    brands?: Array<number>;
+    colors?: Array<number>;
+    product_types?: Array<number>;
+    media?: Array<Media>;
+}
+export interface CreateListing extends ListingRequest {
+
+}
+export interface UpdateListing extends ListingRequest {
     id: number;
 }

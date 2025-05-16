@@ -88,10 +88,14 @@ function DataTable({
         if (Array.isArray(data) && data.length > 0) {
             setTableData(
                 data.map((item: any, index: number) => {
+                    let checked = false;
+                    if (item.hasOwnProperty('checked')) {
+                        checked = item.checked;
+                    }
                     return {
                         ...item,
                         index,
-                        checked: false,
+                        checked,
                     };
                 })
             );

@@ -33,6 +33,8 @@ export type ManageListingProductTypeProps = {
     multiRowSelection?: boolean;
 }
 export const EDIT_LISTING_PRODUCT_TYPE_MODAL_ID = 'edit-listing-product-type-modal';
+export const DELETE_LISTING_PRODUCT_TYPE_MODAL_ID = 'delete-listing-product-type-modal';
+export const CREATE_LISTING_PRODUCT_TYPE_MODAL_ID = 'create-listing-product-type-modal';
 
 function ManageListingProductType({
     data,
@@ -174,6 +176,83 @@ function ManageListingProductType({
                 >
                     <i className="lar la-eye"></i>
                 </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Listing ProductType',
+                            component: (
+                                <p>Are you sure you want to delete this productType ({item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_PRODUCT_TYPE_MODAL_ID);
+                                    return;
+                                }
+                                if (!listingId) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing ID is required</p>
+                                        ),
+                                    }, 'listing-productType-delete-error');
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>ProductType ID is required</p>
+                                        ),
+                                    }, 'listing-productType-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingProductType.replace(':listingId', listingId.toString()),
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing productType</p>
+                                        ),
+                                    }, 'listing-productType-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_PRODUCT_TYPE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
                 <BadgeDropDown
                     data={[
                         {
@@ -294,7 +373,7 @@ function ManageListingProductType({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
 
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.listingProductType.replace(':listingId', listingId.toString()),
@@ -303,24 +382,6 @@ function ManageListingProductType({
             protectedReq: true,
             query: query,
             data: dataTableContextState?.post || {},
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {

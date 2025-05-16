@@ -66,6 +66,7 @@ function EditListingFields({
                 >
                     <ManageUser
                         {...getListingComponentProps()}
+                        values={values?.user? [values?.user] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}

@@ -33,8 +33,9 @@ export type ManageListingBrandProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_LISTING_BRAND_MODAL_ID = 'edit-listing-brand-modal';
 export const DELETE_LISTING_BRAND_MODAL_ID = 'delete-listing-brand-modal';
+export const CREATE_LISTING_BRAND_MODAL_ID = 'create-listing-brand-modal';
 
 function ManageListingBrand({
     data,
@@ -57,7 +58,7 @@ function ManageListingBrand({
             formProps: {
                 operation: operation,
                 initialValues: {
-                    users: [],
+                    brands: [],
                 },
                 onSubmit: async (values: FormikValues) => {
                     if (!operation) {
@@ -69,8 +70,8 @@ function ManageListingBrand({
                             console.warn('Invalid values');
                             return;
                         }
-                        if (!values?.users?.length) {
-                            console.warn('No users selected');
+                        if (!values?.brands?.length) {
+                            console.warn('No brands selected');
                             return;
                         }
                         let origData = data;
@@ -127,7 +128,7 @@ function ManageListingBrand({
                         ),
                     }, 'listing-add-success');
                     dataTableContext.refresh();
-                    dataTableContext.modal.close('create-listing-brand-modal');
+                    dataTableContext.modal.close(CREATE_LISTING_BRAND_MODAL_ID);
                     return true;
                 }
             },
@@ -168,11 +169,11 @@ function ManageListingBrand({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_LISTING_BRAND_MODAL_ID}
                                 />
                             ),
                             ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_LISTING_BRAND_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -255,11 +256,11 @@ function ManageListingBrand({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_LISTING_BRAND_MODAL_ID}
                                             />
                                         ),
                                         ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_BRAND_MODAL_ID);
                                 }
                             }
                         },
@@ -307,7 +308,7 @@ function ManageListingBrand({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_BRAND_MODAL_ID);
                                 }
                             }
                         }
@@ -360,7 +361,7 @@ function ManageListingBrand({
             ...preparedQuery
         }
 
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+        return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
             ]),
@@ -368,24 +369,6 @@ function ManageListingBrand({
             protectedReq: true,
             query,
             data: post,
-        })
-        if (!response) {
-            setDataTableContextState(prevState => {
-                let newState = {
-                    ...prevState,
-                    requestStatus: 'idle'
-                };
-                return newState;
-            });
-            return;
-        }
-        setDataTableContextState(prevState => {
-            let newState = { ...prevState };
-            newState.data = response.data;
-            newState.links = response.links;
-            newState.meta = response.meta;
-            newState.requestStatus = 'idle';
-            return newState;
         });
     }
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
@@ -449,7 +432,7 @@ function ManageListingBrand({
                 )
             },
             ...getListingFormModalProps(),
-        }, 'create-listing-brand-modal');
+        }, CREATE_LISTING_BRAND_MODAL_ID);
     }
 
     function getRowSelectActions() {
