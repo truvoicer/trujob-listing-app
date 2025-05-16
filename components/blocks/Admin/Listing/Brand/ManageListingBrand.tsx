@@ -34,6 +34,7 @@ export type ManageListingBrandProps = {
     multiRowSelection?: boolean;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const DELETE_LISTING_BRAND_MODAL_ID = 'delete-listing-brand-modal';
 
 function ManageListingBrand({
     data,
@@ -172,6 +173,68 @@ function ManageListingBrand({
                             ),
                             ...getListingFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="http://google.com"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Listing',
+                            component: (
+                                <p>Are you sure you want to delete this brand ({item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_BRAND_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing ID is required</p>
+                                        ),
+                                    }, 'listing-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing</p>
+                                        ),
+                                    }, 'listing-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_BRAND_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>

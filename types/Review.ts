@@ -1,7 +1,7 @@
 export type Review = {
     id: number;
-    name: string;
-    label: string;
+    review: string;
+    rating: string;
     created_at: string;
     updated_at: string;
 }

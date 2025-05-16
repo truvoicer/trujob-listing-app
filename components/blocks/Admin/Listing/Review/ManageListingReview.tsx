@@ -30,7 +30,9 @@ export type ManageListingReviewProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_LISTING_REVIEW_MODAL_ID = 'edit-listing-modal';
+export const ADD_LISTING_REVIEW_MODAL_ID = 'add-listing-modal';
+export const DELETE_LISTING_REVIEW_MODAL_ID = 'delete-listing-review-modal';
 
 function ManageListingReview({
     data,
@@ -160,7 +162,7 @@ function ManageListingReview({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Review, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -169,7 +171,7 @@ function ManageListingReview({
                     onClick={e => {
                         e.preventDefault();
                         e.stopPropagation();
-                        dataTableContextState.modal.show({
+                        dataTableContext.modal.show({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingReview
@@ -177,11 +179,72 @@ function ManageListingReview({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_LISTING_REVIEW_MODAL_ID}
                                 />
                             ),
                             ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_LISTING_REVIEW_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="http://google.com"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Listing',
+                            component: (
+                                <p>Are you sure you want to delete this listing ({item?.review})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_REVIEW_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing ID is required</p>
+                                        ),
+                                    }, 'listing-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing</p>
+                                        ),
+                                    }, 'listing-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_REVIEW_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -195,7 +258,7 @@ function ManageListingReview({
                                 onClick: e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    dataTableContextState.modal.show({
+                                    dataTableContext.modal.show({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingReview
@@ -203,11 +266,11 @@ function ManageListingReview({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_LISTING_REVIEW_MODAL_ID}
                                             />
                                         ),
                                         ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_REVIEW_MODAL_ID);
                                 }
                             }
                         },
@@ -218,7 +281,7 @@ function ManageListingReview({
                                 onClick: e => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    appModalContext.show({
+                                    dataTableContext.modal.show({
                                         title: 'Delete Listing',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
@@ -251,11 +314,11 @@ function ManageListingReview({
                                                 }, 'listing-delete-error');
                                                 return;
                                             }
-                                            dataTableContextState.refresh();
+                                            dataTableContext.refresh();
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, DELETE_LISTING_REVIEW_MODAL_ID);
                                 }
                             }
                         }
