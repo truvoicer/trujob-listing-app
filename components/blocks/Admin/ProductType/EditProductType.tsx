@@ -9,17 +9,15 @@ import EditProductTypeFields from "./EditProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/ProductType";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditProductTypeProps = {
-    listingId?: number;
     data?: ProductType;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditProductType({
-    listingId,
     data,
     operation,
     inModal = false,
@@ -61,17 +59,12 @@ function EditProductType({
     }
     async function handleSubmit(values: ProductType) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.log('No data to update');
             return;
         }
 
-
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-            return;
-        }
-        if (!values?.product_type?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Product type ID is required');
+        if (!values?.id) {
+            console.log('Product type ID is required');
             return;
         }
 
@@ -82,34 +75,29 @@ function EditProductType({
             case 'update':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingProductType.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.product_type?.id,
+                        truJobApiConfig.endpoints.productType,
+                        values?.id,
                         'update',
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingProductType.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.product_type?.id,
+                        truJobApiConfig.endpoints.productType,
                         'create',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: buildCreateData(values),
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
         }

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ListingsFetch } from "@/library/services/listings/ListingsFetch";
 import { SESSION_USER } from "@/library/redux/constants/session-constants";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type PaginationProps = {
     paginationMode?: 'router' | 'state';
@@ -112,7 +112,7 @@ const Pagination = ({
     }, [data?.[ListingsFetch.PAGINATION.PAGE], pageQueryVal]);
 
     let { left, right } = getpadding(pageNumber);
-    // DebugHelpers.log(DebugHelpers.DEBUG, {pageNumber, left, right, lastPageNumber});
+    // console.log({pageNumber, left, right, lastPageNumber});
     return (
         <>
             {children}

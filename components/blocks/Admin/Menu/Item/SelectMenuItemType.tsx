@@ -1,5 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { FormikValues, useFormikContext } from "formik";
@@ -30,7 +30,7 @@ function SelectMenuItemType({
             protectedReq: true
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching menuItemTypes');
+            console.log('No response from API when fetching menuItemTypes');
             return;
         }
         setMenuItemTypes(response?.data || []);
@@ -52,11 +52,11 @@ function SelectMenuItemType({
             return;
         }
         if (!formContext) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
+            console.log('Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
+            console.log('setFieldValue function not found in form context');
             return;
         }
         

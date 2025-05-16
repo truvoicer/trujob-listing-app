@@ -5,27 +5,6 @@ import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
-
-export type DataManagerComponentProps = {
-    addMode?: 'selector' | 'edit';
-    data?: Array<any>;
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
-    requestHandler?: ({
-        query,
-        post
-    }: {
-        query: any,
-        post: any
-    }) => Promise<Array<any>>;
-}
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
     data: Array<any>;
     dataTableContextState: any;
@@ -119,26 +98,17 @@ function DataManager({
         });
     }
 
-    const modalService = new ModalService();
-    const confirmationService = new ConfirmationService();
-
-    modalService.setKey('modal');
-    confirmationService.setKey('confirmation');
 
     const [dataTableContextState, setDataTableContextState] = useState<DataTableContextType>({
         ...dataTableContextData,
         refresh: makeRequest,
         update: updateDataTableContextState,
-        ...modalService.getState(),
-        ...confirmationService.getState()
     });
-    console.log('DataManager: dataTableContextState', dataTableContextState);
-    modalService.setState(dataTableContextState);
-    modalService.setSetter(updateDataTableContextState);
 
-    confirmationService.setState(dataTableContextState);
-    confirmationService.setSetter(updateDataTableContextState);
-
+    const modalService = new ModalService(dataTableContextState, setDataTableContextState);
+    const confirmationService = new ConfirmationService(dataTableContextState, setDataTableContextState);
+    modalService.setKey('modal');
+    confirmationService.setKey('confirmation');
 
     async function makeRequest() {
         if (typeof request === 'function') {
@@ -182,17 +152,16 @@ function DataManager({
         makeRequest();
     }, []);
 
-    // useEffect(() => {
-    //     console.log('DataManager: useEffect: dataTableContextState', Object.keys(dataTableContextState));
-    //     setDataTableContextState(prevState => {
-    //         let newState = {
-    //             ...prevState,
-    //             ...modalService.getState(),
-    //             ...confirmationService.getState(),
-    //         };
-    //         return newState;
-    //     });
-    // }, []);
+    useEffect(() => {
+        setDataTableContextState(prevState => {
+            let newState = {
+                ...prevState,
+                ...modalService.getState(),
+                ...confirmationService.getState(),
+            };
+            return newState;
+        });
+    }, []);
 
     useEffect(() => {
         if (dataTableContextState?.requestStatus !== 'idle') {

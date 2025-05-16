@@ -10,7 +10,7 @@ import EditWidget from "./EditWidget";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { FormikProps, FormikValues } from "formik";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type WidgetFormProps = {
     sidebarId?: number;
@@ -42,7 +42,7 @@ function WidgetForm({
                     </p>
                 ),
             }, 'widget-form-validate-sidebar-id-error');
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar id not found', sidebarId);
+            console.log('Sidebar id not found', sidebarId);
             return false;
         }
         return true;
@@ -85,7 +85,7 @@ function WidgetForm({
                             </p>
                         ),
                     }, 'widget-form-select-widget-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Widget not found', selectedWidget);
+                    console.log('Widget not found', selectedWidget);
                     return;
                 }
                 if (!selectedWidget?.id) {
@@ -98,7 +98,7 @@ function WidgetForm({
                             </p>
                         ),
                     }, 'widget-form-select-widget-id-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Widget id not found', selectedWidget);
+                    console.log('Widget id not found', selectedWidget);
                     return;
                 }
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -116,7 +116,7 @@ function WidgetForm({
                             </p>
                         ),
                     }, 'sidebar-widget-add-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget add failed', response);
+                    console.log('Sidebar widget add failed', response);
                     return;
                 }
                 notificationContext.show({
@@ -211,7 +211,7 @@ function WidgetForm({
                     </p>
                 ),
             }, 'sidebar-item-delete-error');
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar id not found', item);
+            console.log('Sidebar id not found', item);
             return false;
         }
 
@@ -306,7 +306,7 @@ function WidgetForm({
                                     </p>
                                 ),
                             }, 'sidebar-widget-update-error');
-                            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget id not found', item);
+                            console.log('Sidebar widget id not found', item);
                             return false;
                         }
                         if (Array.isArray(item?.roles)) {

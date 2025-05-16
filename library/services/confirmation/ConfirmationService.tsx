@@ -2,7 +2,7 @@ import { findInObject, isObject, isObjectEmpty } from "@/helpers/utils";
 import { MessageService, MessageState } from "../message/MessageService";
 import { Button, Modal } from "react-bootstrap";
 import React from "react";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export interface ConfirmationState extends MessageState {
     items: Array<ConfirmationItem>;
@@ -19,6 +19,7 @@ export type ConfirmationItem = {
 }
 export class ConfirmationService extends MessageService {
     static INIT_DATA: ConfirmationState = {
+        loaded: false,
         items: [],
         show: () => { },
         close: () => { },
@@ -49,7 +50,7 @@ export class ConfirmationService extends MessageService {
 
         const itemState = this.findStateData();
         if (!itemState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return null;
         }
         return (

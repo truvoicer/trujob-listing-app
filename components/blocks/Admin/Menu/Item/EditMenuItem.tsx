@@ -10,7 +10,7 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { isObjectEmpty } from "@/helpers/utils";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditMenuItemProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -41,11 +41,11 @@ function EditMenuItem({
 
     async function menuItemRequest() {
         if (!menuId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Menu Item ID is required');
+            console.warn('Menu Item ID is required');
             return;
         }
         if (!data?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Menu Item ID is required');
+            console.warn('Menu Item ID is required');
             return;
         }
         const response = await truJobApiMiddleware.resourceRequest({
@@ -57,7 +57,7 @@ function EditMenuItem({
             return;
         }
         if (!response?.data) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
+            console.warn('No data found');
             return;
         }
         setInitialValues(response.data);
@@ -168,11 +168,11 @@ function EditMenuItem({
     }
     async function handleSubmit(values: MenuItem) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
         if (!menuId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Menu ID is required');
+            console.warn('Menu ID is required');
             return;
         }
         let response = null;
@@ -181,7 +181,7 @@ function EditMenuItem({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', { values, requestData });
+                console.warn('edit requestData', { values, requestData });
                 // return;
                 if (!requestData?.id) {
                     throw new Error('MenuItem ID is required');
@@ -196,7 +196,7 @@ function EditMenuItem({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
+                console.log('create requestData', requestData);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.menuItem.replace('%s', menuId.toString())}/create`,
@@ -206,7 +206,7 @@ function EditMenuItem({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.warn('Invalid operation');
                 break;
         }
 

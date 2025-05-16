@@ -1,5 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Feature } from "@/types/Listing";
@@ -26,7 +26,7 @@ function SelectFeature({
             method: ApiMiddleware.METHOD.GET,
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching listingFeatures');
+            console.warn('No response from API when fetching listingFeatures');
             return;
         }
         setFeatures(response?.data || []);
@@ -50,11 +50,11 @@ function SelectFeature({
             return;
         }
         if (!formContext) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
+            console.warn('Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
+            console.warn('setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedFeature);
@@ -74,7 +74,7 @@ function SelectFeature({
                     }
                     const findFeature = listingFeatures.find((listingFeature: Feature) => listingFeature?.id === parseInt(e.target.value));
                     if (!findFeature) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Selected listingFeature not found');
+                        console.warn('Selected listingFeature not found');
                         return;
                     }
                     setSelectedFeature(findFeature);

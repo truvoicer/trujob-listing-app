@@ -12,7 +12,7 @@ import { Sidebar } from "@/types/Sidebar";
 import EditMediaFields from "./EditMediaFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditMediaProps = {
     data?: Listing;
@@ -151,7 +151,7 @@ function EditMedia({
     async function handleSubmit(values: Listing) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
         // if (Array.isArray(values?.roles)) {
@@ -183,7 +183,7 @@ function EditMedia({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
+                console.log('edit requestData', requestData);
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
                 }
@@ -204,7 +204,7 @@ function EditMedia({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.warn('Invalid operation');
                 break;
         }
 

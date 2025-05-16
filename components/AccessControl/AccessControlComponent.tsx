@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import Loader from "../Loader";
 import { Role } from "@/types/Role";
 import { useEffect, useState } from "react";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 type Props = {
     session: any;
@@ -106,7 +106,7 @@ function AccessControlComponent({
         }
         showComponent();
     }, [roles, session?.[SESSION_USER]?.[SESSION_USER_ROLES], session?.[SESSION_IS_AUTHENTICATING]]);
-    // DebugHelpers.log(DebugHelpers.DEBUG, {show, session, roles});
+    // console.log({show, session, roles});
     return (
         <>
             {session?.[SESSION_IS_AUTHENTICATING]

@@ -13,7 +13,7 @@ import { ListingBlock } from "@/types/ListingBlock";
 import EditListingFields from "./EditListingFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditListingProps = {
     data?: Listing;
@@ -154,7 +154,7 @@ function EditListing({
     async function handleSubmit(values: Listing) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
 
@@ -164,7 +164,7 @@ function EditListing({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
+                console.warn('edit requestData', requestData);
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
                 }
@@ -178,7 +178,7 @@ function EditListing({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
+                console.warn('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.listing}/create`,
                     method: ApiMiddleware.METHOD.POST,
@@ -187,7 +187,7 @@ function EditListing({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
 

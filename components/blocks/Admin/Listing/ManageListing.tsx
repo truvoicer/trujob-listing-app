@@ -15,7 +15,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type ManageListingProps = {
     enableEdit?: boolean;
@@ -229,7 +229,7 @@ function ManageListing({
     }) {
         e.preventDefault();
         // e.stopPropagation();
-        DebugHelpers.log(DebugHelpers.DEBUG, 'Add New Listing', dataTableContextState.modal);
+        // console.warn('Add New Listing', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New Listing',
             component: (
@@ -258,7 +258,7 @@ function ManageListing({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.warn('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -313,7 +313,7 @@ function ManageListing({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

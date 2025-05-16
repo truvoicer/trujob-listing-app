@@ -4,7 +4,7 @@ import { Button, Modal } from "react-bootstrap";
 import Form, { FormProps } from "@/components/form/Form";
 import React, { SetStateAction, Dispatch } from "react";
 import { FormikProps, FormikValues } from "formik";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export interface LocalModal extends LocalItem {
     
@@ -122,7 +122,7 @@ export class ModalService extends MessageService {
     render() {
         const itemState = this.findStateData();
         if (!itemState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return null;
         }
         return (
@@ -133,7 +133,7 @@ export class ModalService extends MessageService {
                     }
                     return (
                         <React.Fragment key={index}>
-                            {(isObject(modal?.formProps) && !isObjectEmpty(modal?.formProps))
+                            {(isObject(modal?.formProps))
                                 ? this.renderFormModal(modal, index)
                                 : this.renderModalContent(modal, index)
                             }
@@ -183,7 +183,7 @@ export class ModalService extends MessageService {
             <>
                 {this.config.map((configItem: any, index: number) => {
                     if (typeof configItem?.state !== 'object') {
-                        DebugHelpers.log(DebugHelpers.ERROR, 'Modal state not found');
+                        console.log('Modal state not found');
                         return null;
                     }
                     const [state, setState] = configItem.state;

@@ -5,7 +5,7 @@ import SelectMenu from "../../SelectMenu";
 import { Menu, MenuItemMenu } from "@/types/Menu";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { FormikProps, FormikValues } from "formik";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type MenuItemMenuFormProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -55,11 +55,11 @@ function MenuItemMenuForm({
         newIndex
     }: ReorderOnMove) {
         if (!item) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No item found');
+            console.log('No item found');
             return false;
         }
         if (typeof onMove !== 'function') {
-            DebugHelpers.log(DebugHelpers.WARN, 'No onMove function found');
+            console.log('No onMove function found');
             return false;
         }
         const response = await onMove({
@@ -72,7 +72,7 @@ function MenuItemMenuForm({
             newIndex
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from onMove function');
+            console.log('No response from onMove function');
             return false;
         }
         initRequest();
@@ -80,16 +80,16 @@ function MenuItemMenuForm({
     }
     async function handleOk({ index, item, itemSchema, reorderData }: ReorderOnOk) {
         if (!item) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No item found');
+            console.log('No item found');
             return false;
         }
         if (typeof onOk !== 'function') {
-            DebugHelpers.log(DebugHelpers.WARN, 'No onOk function found');
+            console.log('No onOk function found');
             return false;
         }
         const response = await onOk(reorderData);
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from onOk function');
+            console.log('No response from onOk function');
             return false;
         }
         initRequest();
@@ -112,27 +112,27 @@ function MenuItemMenuForm({
                 formHelpers: FormikProps<FormikValues>;
             }) => {
                 if (!formHelpers) {
-                    DebugHelpers.log(DebugHelpers.WARN, 'No form helpers found');
+                    console.log('No form helpers found');
                     return false;
                 }
 
                 if (!formHelpers?.values?.menu) {
-                    DebugHelpers.log(DebugHelpers.WARN, 'No menu found');
+                    console.log('No menu found');
                     return false;
                 }
                 if (typeof onAdd !== 'function') {
-                    DebugHelpers.log(DebugHelpers.WARN, 'No onAdd function found');
+                    console.log('No onAdd function found');
                     return false;
                 }
                 const response = await onAdd(
                     formHelpers?.values?.menu
                 );
                 if (!response) {
-                    DebugHelpers.log(DebugHelpers.WARN, 'No response from onAdd function');
+                    console.log('No response from onAdd function');
                     return false;
                 }
                 initRequest();
-                DebugHelpers.log(DebugHelpers.DEBUG, 'Successfully added menu');
+                console.log('Successfully added menu');
                 dataTableContext.modal.close('menu-select');
                 return false;
             }
@@ -141,16 +141,16 @@ function MenuItemMenuForm({
 
     async function handleDelete({ index, item, itemSchema, reorderData }: ReorderOnDelete) {
         if (!item) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No item found');
+            console.log('No item found');
             return false;
         }
         if (typeof onDelete !== 'function') {
-            DebugHelpers.log(DebugHelpers.WARN, 'No onDelete function found');
+            console.log('No onDelete function found');
             return false;
         }
         const response = await onDelete(item);
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from onDelete function');
+            console.log('No response from onDelete function');
             return false;
         }
         initRequest();
@@ -171,7 +171,7 @@ function MenuItemMenuForm({
             setMenus(response);
             return;
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'No response from makeRequest');
+        console.log('No response from makeRequest');
     }
 
     useEffect(() => {
@@ -198,7 +198,7 @@ function MenuItemMenuForm({
                     enableEdit={false}
                     itemSchema={menuSchema}
                     itemHeader={(item, index) => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'item', item);
+                        console.log('item', item);
                         if (['create', 'add'].includes(operation || '')) {
                             return `${item?.name}` || 'Item type error'
                         } else if (['edit', 'update'].includes(operation || '')) {

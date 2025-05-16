@@ -1,5 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Sidebar } from "@/types/Sidebar";
@@ -26,7 +26,7 @@ function SelectSidebar({
             protectedReq: true,
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching sidebars');
+            console.log('No response from API when fetching sidebars');
             return;
         }
         setSidebars(response?.data || []);
@@ -56,11 +56,11 @@ function SelectSidebar({
             return;
         }
         if (!formContext) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
+            console.log('Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
+            console.log('setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedSidebar);

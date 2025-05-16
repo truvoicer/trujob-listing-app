@@ -1,4 +1,4 @@
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ObjectDifference } from "@/helpers/ObjectDfference";
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
 import { Formik, FormikValues } from "formik";
@@ -76,11 +76,11 @@ function Form({
         for (let i = 0; i < requiredFields.length; i++) {
             const field = requiredFields[i];
             if (typeof rule[field] === 'undefined') {
-                DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} requires a ${field} field`);
+                console.log(`Validation rule ${rule.type} requires a ${field} field`);
                 return false;
             }
             if (rule[field] === null || rule[field] === '') {
-                DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} ${field} field cannot be null or empty`);
+                console.log(`Validation rule ${rule.type} ${field} field cannot be null or empty`);
                 return false;
             }
         }
@@ -101,7 +101,7 @@ function Form({
             }
             validation[key].forEach(rule => {
                 if (!VALIDATION_RULES.includes(rule.type)) {
-                    DebugHelpers.log(DebugHelpers.WARN, `Validation rule ${rule.type} is not supported`);
+                    console.log(`Validation rule ${rule.type} is not supported`);
                     return;
                 }
                 switch (rule.type) {
@@ -203,13 +203,13 @@ function Form({
     }
     function handleSubmit(values: FormikValues, formikHelpers: any) {
         if (typeof operation !== 'string') {
-            DebugHelpers.log(DebugHelpers.WARN, `Form operation is not a string`);
+            console.log(`Form operation is not a string`);
             return;
         }
         let requestData = { ...values };
         const errors = validationHandler(requestData);
         if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
-            DebugHelpers.log(DebugHelpers.WARN, `Form has validation errors`, errors);
+            console.log(`Form has validation errors`, errors);
             return;
         }
 

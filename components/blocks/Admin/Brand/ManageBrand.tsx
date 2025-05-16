@@ -6,7 +6,7 @@ import EditBrand from "./EditBrand";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataManagerComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
@@ -15,28 +15,21 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
-import { ModalItem } from "@/library/services/modal/ModalService";
-import { Brand } from "@/types/Brand";
 
-export interface ManageBrandProps extends DataManagerComponentProps {
-    data?: Array<Brand>;
-    requestHandler?: ({
-        query,
-        post
-    }: {
-        query: any,
-        post: any
-    }) => Promise<Array<Brand>>;
+
+export type ManageBrandProps = {
+    operation?: 'edit' | 'update' | 'add' | 'create';
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageBrand({
-    addMode = 'edit',
-    requestHandler,
-    data,
     operation,
-    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -44,106 +37,9 @@ function ManageBrand({
     enablePagination = true,
     enableEdit = true
 }: ManageBrandProps) {
-    const [showModal, setShowModal] = useState(false);
-    
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
-
-    function getAddNewModalProps() {
-        return {
-            formProps: {
-                operation: operation,
-                initialValues: {
-                    brands: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
-                    if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.brands)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.brands
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
-            },
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                return await formHelpers.submitForm();
-            },
-            fullscreen: true
-        };
-    }
 
     function getListingFormModalProps() {
         return {
@@ -299,10 +195,7 @@ function ManageBrand({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-            return;
-        }
-        if (['add', 'create'].includes(operation)) {
+            console.warn('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -313,23 +206,16 @@ function ManageBrand({
             ...preparedQuery
         }
 
-        let response;
-        if (typeof requestHandler === 'function') {
-            response = await requestHandler({
-                query,
-                post,
-            });
-        } else {
-            response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                endpoint: UrlHelpers.urlFromArray([
-                    truJobApiConfig.endpoints.brand,
-                ]),
-                method: ApiMiddleware.METHOD.GET,
-                protectedReq: true,
-                query,
-                data: post,
-            })
-        }
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.brand,
+            ]),
+            method: ApiMiddleware.METHOD.GET,
+            protectedReq: true,
+            query,
+            data: post,
+        });
+
         if (!response) {
             setDataTableContextState(prevState => {
                 let newState = {
@@ -349,54 +235,22 @@ function ManageBrand({
             return newState;
         });
     }
+    
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContext.modal.show({
-            title: 'Add Brand',
-            component: ({
-                modal,
-                index,
-                formHelpers
-            }: {
-                modal: ModalItem,
-                index: number,
-                formHelpers?: any
-            }) => {
-                return (
-                    <>
-                        {addMode === 'edit' && (
-                            <EditBrand
-                                listingId={listingId}
-                                operation={'add'}
-                                inModal={true}
-                                modalId={'add-brand-modal'}
-                            />
-                        )}
-                        {addMode === 'selector' && (
-                            <>
-                            <ManageBrand
-                                addMode="edit"
-                                rowSelection={true}
-                                multiRowSelection={true}
-                                enableEdit={false}
-                                paginationMode="state"
-                                onChange={(users: Array<any>) => {
-                                    if (!Array.isArray(users)) {
-                                        DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
-                                        return;
-                                    }
-                                    // formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
-                                }}
-                            />
-                            </>
-                        )}
-                    </>
-                )
-            },
-            ...getAddNewModalProps(),
+        dataTableContextState.modal.show({
+            title: 'Create Brand',
+            component: (
+                <EditBrand
+                    operation={'create'}
+                    inModal={true}
+                    modalId={'create-brand-modal'}
+                />
+            ),
+            ...getListingFormModalProps(),
         }, 'add-brand-modal');
     }
 
@@ -415,7 +269,7 @@ function ManageBrand({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -470,7 +324,7 @@ function ManageBrand({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }
@@ -478,10 +332,10 @@ function ManageBrand({
         return actions;
     }
 
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

@@ -9,7 +9,7 @@ import { CreateListingReview, ListingReview, UpdateListingReview } from "@/types
 import EditListingReviewFields from "./EditListingReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { FormikValues } from "formik";
 
 export type EditListingReviewProps = {
@@ -64,17 +64,17 @@ function EditListingReview({
     }
     async function handleSubmit(values: FormikValues) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
 
 
         if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Listing ID is required');
             return;
         }
         if (!values?.review?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Review ID is required');
+            console.warn('Review ID is required');
             return;
         }
 
@@ -112,7 +112,7 @@ function EditListingReview({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.warn('Invalid operation');
                 break;
         }
     }

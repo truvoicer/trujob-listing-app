@@ -9,7 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { isObjectEmpty } from "@/helpers/utils";
 import { FormikValues, useFormikContext } from "formik";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type RolesModal = {
     show: boolean;
@@ -169,7 +169,7 @@ function EditSidebarFields({
                                 makeRequest={async () => {
                                     if (['edit', 'update'].includes(operation)) {
                                         if (!values?.id) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar ID is required');
+                                            console.log('Sidebar ID is required');
                                             return false;
                                         }
                                         const response = await TruJobApiMiddleware.getInstance()
@@ -179,15 +179,15 @@ function EditSidebarFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when getting roles');
+                                            console.log('No response from API when getting roles');
                                             return false;
                                         }
                                         if (!response?.data) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'No data found');
+                                            console.log('No data found');
                                             return false;
                                         }
                                         if (!Array.isArray(response?.data)) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'Response is not an array');
+                                            console.log('Response is not an array');
                                             return false;
                                         }
                                         setFieldValue('roles', response.data);
@@ -204,7 +204,7 @@ function EditSidebarFields({
                                     }
                                     if (['edit', 'update'].includes(operation)) {
                                         if (!values?.id) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar ID is required');
+                                            console.log('Sidebar ID is required');
                                             return false;
                                         }
                                         const response = await TruJobApiMiddleware.getInstance()
@@ -214,7 +214,7 @@ function EditSidebarFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
+                                            console.log('No response from API when adding role');
                                             return false;
                                         }
                                         return true;
@@ -223,7 +223,7 @@ function EditSidebarFields({
                                         setFieldValue('roles', [...roles, role]);
                                         return true;
                                     }
-                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                                    console.log('Invalid operation');
                                     return false;
                                 }}
                                 onDelete={async (role: Role) => {
@@ -232,7 +232,7 @@ function EditSidebarFields({
                                     }
                                     if (['edit', 'update'].includes(operation)) {
                                         if (!values?.id) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar ID is required');
+                                            console.log('Sidebar ID is required');
                                             return false;
                                         }
                                         const response = await TruJobApiMiddleware.getInstance()
@@ -242,7 +242,7 @@ function EditSidebarFields({
                                                 protectedReq: true,
                                             })
                                         if (!response) {
-                                            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when adding role');
+                                            console.log('No response from API when adding role');
                                             return false;
                                         }
                                         return true;
@@ -253,7 +253,7 @@ function EditSidebarFields({
                                         setFieldValue('roles', buildRoles);
                                         return true;
                                     }
-                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                                    console.log('Invalid operation');
                                     return false;
                                 }}
                             />

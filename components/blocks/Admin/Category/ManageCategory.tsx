@@ -16,12 +16,11 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageCategoryProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -33,7 +32,6 @@ export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageCategory({
     operation,
-    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -53,18 +51,18 @@ function ManageCategory({
                     users: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.log('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
                         if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            console.warn('No users selected');
                             return;
                         }
                         let origData = data;
@@ -81,7 +79,7 @@ function ManageCategory({
                         return;
                     }
                     if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        console.warn('Listing ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -177,7 +175,6 @@ function ManageCategory({
                             title: 'Edit Listing',
                             component: (
                                 <EditCategory
-                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -203,7 +200,6 @@ function ManageCategory({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditCategory
-                                            listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -294,17 +290,11 @@ function ManageCategory({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-            return;
-        }
-        if (['add', 'create'].includes(operation)) {
-            return;
-        }
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
+        let post = dataTableContextState?.post || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
             ...query,
@@ -312,15 +302,15 @@ function ManageCategory({
         }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-           
-                       endpoint: UrlHelpers.urlFromArray([
-                           truJobApiConfig.endpoints.listingCategory.replace(':listingId', listingId.toString()),
-                       ]),
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.category,
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
-            query: query,
-            post: dataTableContextState?.post || {},
-        })
+            query,
+            data: post,
+        });
+
         if (!response) {
             setDataTableContextState(prevState => {
                 let newState = {
@@ -345,27 +335,26 @@ function ManageCategory({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-                dataTableContext.modal.show({
-                    title: 'Select Users',
-                    component: ({
-                        modal,
-                        index,
-                        formHelpers
-                    }: {
-                        modal: ModalItem,
-                        index: number,
-                        formHelpers?: any
-                    }) => {
-                        return (
-                <EditCategory
-                listingId={listingId}
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            )
-        },
-        ...getAddNewModalProps(),
+        dataTableContext.modal.show({
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <EditCategory
+                        operation={'add'}
+                        inModal={true}
+                        modalId={EDIT_PAGE_MODAL_ID}
+                    />
+                )
+            },
+            ...getAddNewModalProps(),
         }, EDIT_PAGE_MODAL_ID);
     }
 
@@ -384,7 +373,7 @@ function ManageCategory({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -439,7 +428,7 @@ function ManageCategory({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

@@ -14,7 +14,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { User } from "@/types/User";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditListingFollowProps = {
     listingId?: number;
@@ -46,17 +46,17 @@ function EditListingFollow({
     
         async function handleSubmit(values: User) {
             if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-                DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+                console.warn('No data to update');
                 return;
             }
             
             
             if (!listingId) {
-                DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                console.warn('Listing ID is required');
                 return;
             }
             if (!values?.id) {
-                DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
+                console.warn('Brand ID is required');
                 return;
             }
     
@@ -93,7 +93,7 @@ function EditListingFollow({
                     })
                     break;
                 default:
-                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                    console.warn('Invalid operation');
                     break;
             }
             }

@@ -1,7 +1,7 @@
 import { findInObject } from "@/helpers/utils";
 import { ModalItem, ModalState } from "../modal/ModalService";
 import { SetStateAction } from "react";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type LocalItem = {
     id: null | string;
@@ -28,7 +28,7 @@ export class MessageService {
     config: Array<any> = [];
     useStateHook: (prevState: SetStateAction<LocalItem>) => {};
     
-    constructor(state: any = null, setter: any = null) {
+    constructor(state?: any, setter?: any) {
         this.state = state;
         this.setter = setter;
     }
@@ -48,12 +48,12 @@ export class MessageService {
     }
     setConfig(config: Array<any>) {
         if (!Array.isArray(config)) {
-            DebugHelpers.log(DebugHelpers.ERROR, "config is not an array");
+            console.log("config is not an array");
             return this;
         }
         this.config = config.map((item: any) => {
             if (typeof item !== "object") {
-                DebugHelpers.log(DebugHelpers.ERROR, "config item is not an object", {
+                console.log("config item is not an object", {
                     item: item,
                     config: config
                 });
@@ -61,7 +61,7 @@ export class MessageService {
             }
             let newItem = { ...item };
             if (typeof newItem?.id !== "string" && !Array.isArray(newItem?.id)) {
-                DebugHelpers.log(DebugHelpers.ERROR, "config item id is not a string", {
+                console.log("config item id is not a string", {
                     item: item,
                     config: config
                 });
@@ -88,14 +88,14 @@ export class MessageService {
     
     updateMessageConfigItem(id: string, data: any) {
         if (typeof data !== "object") {
-            DebugHelpers.log(DebugHelpers.ERROR, "data is not an object", {
+            console.log("data is not an object", {
                 data: data,
                 config: this.config
             });
             return null;
         }
         if (typeof id !== "string") {
-            DebugHelpers.log(DebugHelpers.ERROR, "id is not a string", {
+            console.log("id is not a string", {
                 id: id,
                 config: this.config
             });
@@ -103,7 +103,7 @@ export class MessageService {
         }
         const findLocalMessageConfigIndex = this.findLocalMessageConfigIndexById(id);
         if (findLocalMessageConfigIndex === -1) {
-            DebugHelpers.log(DebugHelpers.ERROR, "local message config not found", {
+            console.log("local message config not found", {
                 id: id,
                 config: this.config
             });
@@ -121,7 +121,7 @@ export class MessageService {
         }
         return this.config.findIndex((item: any) => {
             if (typeof item !== "object") {
-                DebugHelpers.log(DebugHelpers.ERROR, "config item is not an object", {
+                console.log("config item is not an object", {
                     item: item,
                     config: this.config
                 });
@@ -132,7 +132,7 @@ export class MessageService {
             } else if (Array.isArray(item?.id)) {
                 return item.id.includes(id);
             }
-            DebugHelpers.log(DebugHelpers.ERROR, "config item id is not a string or array", {
+            console.log("config item id is not a string or array", {
                 item: item,
                 config: this.config
             });
@@ -145,7 +145,7 @@ export class MessageService {
         }
         return this.config.find((item: any) => {
             if (typeof item !== "object") {
-                DebugHelpers.log(DebugHelpers.ERROR, "config item is not an object", {
+                console.log("config item is not an object", {
                     item: item,
                     config: this.config
                 });
@@ -156,7 +156,7 @@ export class MessageService {
             } else if (Array.isArray(item?.id)) {
                 return item.id.includes(id);
             }
-            DebugHelpers.log(DebugHelpers.ERROR, "config item id is not a string or array", {
+            console.log("config item id is not a string or array", {
                 item: item,
                 config: this.config
             });
@@ -166,14 +166,14 @@ export class MessageService {
     findLocalMessageStateById(id: string) {
         const findLocalMessageConfig = this.findLocalMessageConfigById(id);
         if (!findLocalMessageConfig) {
-            DebugHelpers.log(DebugHelpers.ERROR, "local message config not found", {
+            console.log("local message config not found", {
                 id: id,
                 config: this.config
             });
             return null;
         }
         if (typeof findLocalMessageConfig?.state !== "object") {
-            DebugHelpers.log(DebugHelpers.ERROR, "local message config state is not an object", {
+            console.log("local message config state is not an object", {
                 id: id,
                 config: this.config
             });
@@ -183,7 +183,7 @@ export class MessageService {
     }
     onLocalModalCancel(item: any, e?: React.MouseEvent | null) {
         if (typeof item?.state !== 'object') {
-            DebugHelpers.log(DebugHelpers.ERROR, 'Modal state not found');
+            console.log('Modal state not found');
             return null;
         }
         const [state, setState] = item.state;
@@ -203,7 +203,7 @@ export class MessageService {
     }
     onLocalModalOk(item: any, e?: React.MouseEvent | null) {
         if (typeof item?.state !== 'object') {
-            DebugHelpers.log(DebugHelpers.ERROR, 'Modal state not found');
+            console.log('Modal state not found');
             return null;
         }
         const [state, setState] = item.state;
@@ -224,14 +224,14 @@ export class MessageService {
     renderLocalTriggerButton(id: string, label: string | null = null, props: any = {}) {
         const findLocalMessageConfig = this.findLocalMessageConfigById(id);
         if (!findLocalMessageConfig) {
-            DebugHelpers.log(DebugHelpers.ERROR, "local message config not found", {
+            console.log("local message config not found", {
                 id: id,
                 config: this.config
             });
             return null;
         }
         if (typeof findLocalMessageConfig?.state !== "object") {
-            DebugHelpers.log(DebugHelpers.ERROR, "local message config state is not an object", {
+            console.log("local message config state is not an object", {
                 id: id,
                 config: this.config
             });
@@ -270,7 +270,7 @@ export class MessageService {
 
     static updateLocalItemState(data: any, setter: any) {
         if (typeof data !== "object") {
-            DebugHelpers.log(DebugHelpers.ERROR, "data is not an object", {
+            console.log("data is not an object", {
                 data: data,
                 setter: setter
             });
@@ -300,7 +300,7 @@ export class MessageService {
         if (this.key) {
             itemState = findInObject(this.key, this.state);
             if (!itemState) {
-                DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+                console.log("state not found");
                 return false;
             }
         } else {
@@ -350,7 +350,7 @@ export class MessageService {
     closeBatch(id: string) {
         const itemState = this.findStateData();
         if (!itemState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return;
         }
         const findItemIdex = itemState.items.findIndex((item: ModalItem) => item?.id === id);
@@ -365,7 +365,7 @@ export class MessageService {
     updateState(data: any, id: null | string = null): void {
         const itemState = this.findStateData();
         if (!itemState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return;
         }
         let cloneState = { ...itemState };
@@ -380,6 +380,7 @@ export class MessageService {
                 item = cloneState.items[findItemIdex];
             }
         }
+        
         item = {
             ...item,
             ...this.buildItemData(data, id),
@@ -412,7 +413,7 @@ export class MessageService {
             return null;
         }
         if (typeof findKeyData !== "object") {
-            DebugHelpers.log(DebugHelpers.ERROR, "state is not an object", {
+            console.log("state is not an object", {
                 modalKey: this.key,
                 state: this.state,
                 findKeyData: findKeyData
@@ -427,7 +428,7 @@ export class MessageService {
             return -1;
         }
         if (!modalState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return -1;
         }
         if (!Array.isArray(modalState?.items)) {
@@ -441,7 +442,7 @@ export class MessageService {
             return undefined;
         }
         if (!modalState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return undefined;
         }
         if (!Array.isArray(modalState?.items)) {
@@ -456,7 +457,7 @@ export class MessageService {
         }
         const modalState = this.findStateData();
         if (!modalState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return -1;
         }
         return MessageService.findMessageItemIndexInDataById(id, modalState);
@@ -468,23 +469,22 @@ export class MessageService {
         }
         const modalState = this.findStateData();
         if (!modalState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return undefined;
         }
         return MessageService.findMessageItemInDataById(id, modalState);
     }
     
     getState() {
-        // const findKeyData = this.findStateData();
-        // if (!findKeyData) {
-        //     return null;
-        // }
+        const findKeyData = this.findStateData();
+        if (!findKeyData) {
+            return null;
+        }
         const data = {
-            // ...findKeyData,
+            ...findKeyData,
             items: [],
             update: this.updateState.bind(this),
             show: (data: any, id: null | string = null) => {
-                console.log("show", data, id);
                 this.updateState(
                     {
                         ...data,

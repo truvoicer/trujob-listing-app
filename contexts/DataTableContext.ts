@@ -13,11 +13,11 @@ export const dataTableContextData = {
     modal: {
         ...ModalService.INIT_DATA,
     },
-    // notification: {
-    //     ...NotificationService.INIT_DATA,
-    // },
+    notification: {
+        ...NotificationService.INIT_DATA,
+    },
     confirmation: {
-        // ...ConfirmationService.INIT_DATA,
+        ...ConfirmationService.INIT_DATA,
     },
     refresh: () => {},
     update: (data: any) => {},

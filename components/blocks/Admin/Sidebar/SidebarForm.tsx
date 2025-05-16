@@ -6,7 +6,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { Sidebar } from "@/types/Sidebar";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export const sidebarSchema = {
     'title': '',
@@ -123,7 +123,7 @@ function SidebarForm({
                 sidebarsRequest: sidebarsRequest
             });
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'onAdd is not a function');
+        console.log('onAdd is not a function');
         return false;
     }
 
@@ -150,7 +150,7 @@ function SidebarForm({
                 sidebarsRequest: sidebarsRequest
             });
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'onMove is not a function');
+        console.log('onMove is not a function');
         return false;
     }
 
@@ -165,7 +165,7 @@ function SidebarForm({
                 sidebarsRequest: sidebarsRequest
             });
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'onDelete is not a function');
+        console.log('onDelete is not a function');
         return false;
     }
 
@@ -180,7 +180,7 @@ function SidebarForm({
                 sidebarsRequest: sidebarsRequest
             });
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'onOk is not a function');
+        console.log('onOk is not a function');
         return false;
     }
 
@@ -191,13 +191,13 @@ function SidebarForm({
                 setSidebars
             });
             if (!Array.isArray(response)) {
-                DebugHelpers.log(DebugHelpers.WARN, 'sidebar data is not an array');
+                console.log('sidebar data is not an array');
                 return;
             }
             setSidebars(response);
             return;
         }
-        DebugHelpers.log(DebugHelpers.WARN, 'makeRequest is not a function');
+        console.log('makeRequest is not a function');
     }
 
     useEffect(() => {
@@ -212,7 +212,7 @@ function SidebarForm({
                 return;
             }
             if (!Array.isArray(data)) {
-                DebugHelpers.log(DebugHelpers.WARN, 'sidebar data is not an array');
+                console.log('sidebar data is not an array');
                 return;
             }
             setSidebars(data);
@@ -220,7 +220,7 @@ function SidebarForm({
             sidebarsRequest();
         }
     }, []);
-    DebugHelpers.log(DebugHelpers.DEBUG, 'sidebar form', operation, sidebars);
+    console.log('sidebar form', operation, sidebars);
     return (
         <div className="row">
             <div className="col-12">

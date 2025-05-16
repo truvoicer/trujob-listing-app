@@ -1,4 +1,4 @@
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { isNotEmpty } from "@/helpers/utils";
 import Link, { LinkProps } from "next/link";
 import React from "react";
@@ -75,15 +75,15 @@ function BadgeDropDown({
                 <Dropdown.Menu className="dropdown-menu">
                     {Array.isArray(data) && data.map((item, index) => {
                         if (!isNotEmpty(item?.text)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'BadgeDropDown: text is empty', {index, item});
+                            console.warn('BadgeDropDown: text is empty', {index, item});
                             return null;
                         }
                         if (!isNotEmpty(item?.linkProps)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'BadgeDropDown: linkProps is empty', {index, item});
+                            console.warn('BadgeDropDown: linkProps is empty', {index, item});
                             return null;
                         }
                         if (typeof item.linkProps !== 'object') {
-                            DebugHelpers.log(DebugHelpers.WARN, 'BadgeDropDown: linkProps is not an object', {index, item});
+                            console.warn('BadgeDropDown: linkProps is not an object', {index, item});
                             return null;
                         }
                         return (

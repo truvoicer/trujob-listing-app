@@ -1,4 +1,4 @@
-import { DebugHelpers } from "./DebugHelpers";
+
 
 export class UrlHelpers {
 
@@ -25,11 +25,11 @@ export class UrlHelpers {
         }
         query.forEach(({ name, value }) => {
             if (typeof value === 'object') {
-                DebugHelpers.log(DebugHelpers.WARN, 'Query value should not be an object', { name, value });
+                console.log('Query value should not be an object', { name, value });
                 return;
             }
             if (value === null || value === undefined) {
-                DebugHelpers.log(DebugHelpers.WARN, 'Query value should not be null or undefined', { name, value });
+                console.log('Query value should not be null or undefined', { name, value });
                 return;
             }
             if (typeof value === 'string') {
@@ -39,7 +39,7 @@ export class UrlHelpers {
             } else if (typeof value === 'boolean') {
                 params.set(name, value ? 'true' : 'false');
             } else {
-                DebugHelpers.log(DebugHelpers.WARN, 'Query value should be a string, number or boolean', { name, value });
+                console.log('Query value should be a string, number or boolean', { name, value });
                 return;
             }
         });
@@ -60,7 +60,7 @@ export class UrlHelpers {
             } else if (typeof item === 'number') {
                 return item.toString();
             } else {
-                DebugHelpers.log(DebugHelpers.WARN, 'Array item should be a string or number', { item });
+                console.log('Array item should be a string or number', { item });
                 return '';
             }
         }).join(separator);

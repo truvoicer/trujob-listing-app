@@ -16,7 +16,7 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageColorProps = {
@@ -53,18 +53,18 @@ function ManageColor({
                     users: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.warn('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
                         if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            console.warn('No users selected');
                             return;
                         }
                         let origData = data;
@@ -81,7 +81,7 @@ function ManageColor({
                         return;
                     }
                     if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        console.warn('Listing ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -294,14 +294,7 @@ function ManageColor({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-            return;
-        }
-        if (['add', 'create'].includes(operation)) {
-            return;
-        }
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -313,12 +306,12 @@ function ManageColor({
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.listingColor.replace(':listingId', listingId.toString()),
+                truJobApiConfig.endpoints.color,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
-            post: dataTableContextState?.post || {},
+            data: dataTableContextState?.post || {},
         })
         if (!response) {
             setDataTableContextState(prevState => {
@@ -383,7 +376,7 @@ function ManageColor({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -438,7 +431,7 @@ function ManageColor({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

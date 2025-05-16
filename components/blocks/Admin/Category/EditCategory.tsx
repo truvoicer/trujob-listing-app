@@ -10,17 +10,15 @@ import EditCategoryFields from "./EditCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Category, CreateCategory, UpdateCategory } from "@/types/Category";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditCategoryProps = {
-    listingId?: number;
     data?: Category;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditCategory({
-    listingId,
     data,
     operation,
     inModal = false,
@@ -62,17 +60,12 @@ function EditCategory({
     }
     async function handleSubmit(values: Category) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
         
-        
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-            return;
-        }
-        if (!values?.category?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
+        if (!values?.id) {
+            console.warn('Brand ID is required');
             return;
         }
 
@@ -83,34 +76,29 @@ function EditCategory({
             case 'update':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingCategory.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.category?.id,
+                        truJobApiConfig.endpoints.category,
+                        values?.id,
                         'update',
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingCategory.replace(
-                            ':listingId',
-                            listingId.toString()
-                        ),
-                        values?.category?.id,
+                        truJobApiConfig.endpoints.category,
                         'create',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: buildCreateData(values),
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
 

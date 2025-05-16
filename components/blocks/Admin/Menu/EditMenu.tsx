@@ -11,7 +11,7 @@ import EditMenuFields from "./EditMenuFields";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { FormikProps, FormikValues } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditMenuProps = {
     data?: Menu | null;
@@ -154,9 +154,9 @@ function EditMenu({
         return requiredFields;
     }
     async function handleSubmit(values: Menu) {
-        DebugHelpers.log(DebugHelpers.DEBUG, 'edit menu values', values);
+        console.log('edit menu values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
         let response = null;
@@ -165,7 +165,7 @@ function EditMenu({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
+                console.log('edit requestData', requestData);
                 // return;
                 if (!requestData?.id) {
                     throw new Error('Menu ID is required');
@@ -180,7 +180,7 @@ function EditMenu({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
+                console.log('create requestData', requestData);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.menu}/create`,
@@ -190,7 +190,7 @@ function EditMenu({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.warn('Invalid operation');
                 break;
         }
         if (!response) {

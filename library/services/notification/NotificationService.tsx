@@ -1,7 +1,6 @@
 import { Toast, ToastContainer } from "react-bootstrap";
 import { MessageService, MessageState } from "../message/MessageService";
-import { NOTIFICATION_DEFAULT_POSITION, NOTIFICATION_DEFAULT_TYPE, NOTIFICATION_DEFAULT_VARIANT } from "@/contexts/AppNotificationContext";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 
 export interface NotificationState extends MessageState {
@@ -21,6 +20,7 @@ export type NotificationItem = {
 }
 export class NotificationService extends MessageService {
     static INIT_DATA: NotificationState = {
+        loaded: false,
         items: [],
         show: () => { },
         close: () => { },
@@ -53,7 +53,7 @@ export class NotificationService extends MessageService {
     render() {
         const itemState = this.findStateData();
         if (!itemState) {
-            DebugHelpers.log(DebugHelpers.ERROR, "state not found");
+            console.log("state not found");
             return null;
         }
         return (
@@ -66,13 +66,13 @@ export class NotificationService extends MessageService {
                         <ToastContainer
                             key={index}
                             className="p-3"
-                            position={notification?.position || NOTIFICATION_DEFAULT_POSITION}
+                            position={notification?.position || 'top_center'}
                             style={{ zIndex: 9999 }}
                         >
                             <Toast
                                 onClose={() => this.handleCancel(index)}
                                 show={notification.show}
-                                bg={notification?.variant || NOTIFICATION_DEFAULT_VARIANT}
+                                bg={notification?.variant || 'toast'}
                                 animation={false}>
                                 <Toast.Header>
                                     {/* <img

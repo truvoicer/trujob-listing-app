@@ -10,7 +10,7 @@ import EditSidebarWidget from "./EditSidebarWidget";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { FormikProps, FormikValues } from "formik";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type SidebarWidgetFormProps = {
     sidebarId?: number;
@@ -48,7 +48,7 @@ function SidebarWidgetForm({
                     </p>
                 ),
             }, 'widget-form-validate-sidebar-id-error');
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar id not found', sidebarId);
+            console.log('Sidebar id not found', sidebarId);
             return false;
         }
         return true;
@@ -90,7 +90,7 @@ function SidebarWidgetForm({
                             </p>
                         ),
                     }, 'widget-form-select-widget-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Widget not found', selectedWidget);
+                    console.log('Widget not found', selectedWidget);
                     return;
                 }
                 if (!selectedWidget?.id) {
@@ -103,7 +103,7 @@ function SidebarWidgetForm({
                             </p>
                         ),
                     }, 'widget-form-select-widget-id-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Widget id not found', selectedWidget);
+                    console.log('Widget id not found', selectedWidget);
                     return;
                 }
 
@@ -135,7 +135,7 @@ function SidebarWidgetForm({
                             </p>
                         ),
                     }, 'sidebar-widget-add-error');
-                    DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget add failed', response);
+                    console.log('Sidebar widget add failed', response);
                     return;
                 }
                 notificationContext.show({
@@ -231,7 +231,7 @@ function SidebarWidgetForm({
                     </p>
                 ),
             }, 'sidebar-item-delete-error');
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar id not found', item);
+            console.log('Sidebar id not found', item);
             return false;
         }
 
@@ -270,7 +270,7 @@ function SidebarWidgetForm({
         if (!formHelpers) {
             return;
         }
-        DebugHelpers.log(DebugHelpers.DEBUG, 'formHelpers', formHelpers.values);
+        console.log('formHelpers', formHelpers.values);
         const item = {...formHelpers.values};
         if (!item?.id) {
             notificationContext.show({
@@ -282,7 +282,7 @@ function SidebarWidgetForm({
                     </p>
                 ),
             }, 'sidebar-widget-update-error');
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget id not found', item);
+            console.log('Sidebar widget id not found', item);
             return false;
         }
         if (['add', 'create'].includes(operation || '')) {
@@ -375,7 +375,7 @@ function SidebarWidgetForm({
             return;
         }
         if (!Array.isArray(data)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Sidebar widget data is not an array');
+            console.log('Sidebar widget data is not an array');
             return;
         }
         setWidgets(data);

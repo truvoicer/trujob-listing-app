@@ -11,7 +11,7 @@ import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants"
 import EditWidget from "./EditWidget";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-widget-modal';
 export type ManageWidgetProps = {
@@ -225,7 +225,7 @@ function ManageWidget({
                         title: 'Bulk Delete Widgets',
                         message: 'Are you sure you want to delete selected widgets?',
                         onOk: async () => {
-                            DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                            console.log('Yes')
                             if (!data?.length) {
                                 notificationContext.show({
                                     variant: 'danger',
@@ -280,7 +280,7 @@ function ManageWidget({
                             dataTableContextState.refresh();
                         },
                         onCancel: () => {
-                            DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                            console.log('Cancel delete');
                         },
                     }, 'delete-bulk-page-confirmation');
                 }

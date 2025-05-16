@@ -1,4 +1,4 @@
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import gridConfig from "./config/gridConfig";
 
 export class ListingsViewService {
@@ -15,11 +15,11 @@ export class ListingsViewService {
         const config = gridConfig;
         const findConfig = config.find((item) => item?.type === type);
         if (!findConfig) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No config found for type: ' + type);
+            console.log('No config found for type: ' + type);
             return null;
         }
         if (!findConfig?.component) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No component found for type: ' + type);
+            console.log('No component found for type: ' + type);
             return null;
         }
         const Component = findConfig.component;

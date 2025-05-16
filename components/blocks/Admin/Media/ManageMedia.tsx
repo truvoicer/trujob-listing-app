@@ -16,7 +16,7 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Media } from "@/types/Media";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageMediaProps = {
@@ -53,18 +53,18 @@ function ManageMedia({
                     users: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.log('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
                         if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            console.warn('No users selected');
                             return;
                         }
                         let origData = data;
@@ -81,7 +81,7 @@ function ManageMedia({
                         return;
                     }
                     if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        console.log('Listing ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -368,7 +368,7 @@ function ManageMedia({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -423,7 +423,7 @@ function ManageMedia({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

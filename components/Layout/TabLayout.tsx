@@ -1,4 +1,4 @@
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { PageBlock } from "@/types/PageBlock";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -62,11 +62,11 @@ function TabLayout({
             mountOnEnter: true,
             unmountOnExit: true,
             onSelect: (eventKey: string | null) => {
-                DebugHelpers.log(DebugHelpers.DEBUG, 'Selected Tab:', eventKey);
+                console.log('Selected Tab:', eventKey);
                 const findKey = config.find(item => item.key === eventKey);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'findKey', findKey);
+                console.log('findKey', findKey);
                 if (!findKey) {
-                    DebugHelpers.log(DebugHelpers.ERROR, 'Tab key not found', eventKey);
+                    console.log('Tab key not found', eventKey);
                     return;
                 }
                 const query = UrlHelpers.createQueryString(searchParams, [
@@ -93,7 +93,7 @@ function TabLayout({
 
         const findTab = findTabById(tabId);
         if (!findTab) {
-            DebugHelpers.log(DebugHelpers.ERROR, 'Tab not found', tabId);
+            console.log('Tab not found', tabId);
             return;
         }
         return findTab.key;
@@ -116,11 +116,11 @@ function TabLayout({
                             <Nav variant="pills" className="d-flex nav nav-pills mb-4 text-center event-tab">
                                 {config.map((item, index) => {
                                     if (!item?.key) {
-                                        DebugHelpers.log(DebugHelpers.WARN, 'Tab key is required', { index, item });
+                                        console.log('Tab key is required', { index, item });
                                         return null;
                                     }
                                     if (!item?.component) {
-                                        DebugHelpers.log(DebugHelpers.WARN, 'Tab component is required', { index, item });
+                                        console.log('Tab component is required', { index, item });
                                         return null;
                                     }
                                     return (
@@ -158,11 +158,11 @@ function TabLayout({
                         <Tab.Content>
                             {config.map((item: TabItem, index: number) => {
                                 if (!item?.key) {
-                                    DebugHelpers.log(DebugHelpers.WARN, 'Tab key is required', { index, item });
+                                    console.log('Tab key is required', { index, item });
                                     return null;
                                 }
                                 if (!item?.component) {
-                                    DebugHelpers.log(DebugHelpers.WARN, 'Tab component is required', { index, item });
+                                    console.log('Tab component is required', { index, item });
                                     return null;
                                 }
                                 // const Component = item.component;

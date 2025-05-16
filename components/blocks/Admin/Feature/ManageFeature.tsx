@@ -8,20 +8,18 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing, Feature } from "@/types/Listing";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { Feature } from "@/types/Feature";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageFeatureProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId?: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -35,7 +33,6 @@ export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 function ManageFeature({
     data = [],
     operation,
-    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -52,21 +49,21 @@ function ManageFeature({
             formProps: {
                 operation: operation,
                 initialValues: {
-                    users: [],
+                    features: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.log('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                        if (!Array.isArray(values?.features)) {
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
-                        if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                        if (!values?.features?.length) {
+                            console.warn('No features selected');
                             return;
                         }
                         let origData = data;
@@ -77,28 +74,25 @@ function ManageFeature({
                         if (typeof onChange === 'function') {
                             onChange([
                                 ...origData,
-                                ...values?.users
+                                ...values?.features.filter((item: any) => {
+                                    return !origData?.some((origItem: any) => {
+                                        return origItem?.id === item?.id;
+                                    });
+                                })
                             ]);
                         }
                         return;
                     }
-                    if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const featureIds = RequestHelpers.extractIdsFromArray(values?.features);
                     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                         endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
+                            truJobApiConfig.endpoints.feature,
                             'create',
                         ]),
                         method: ApiMiddleware.METHOD.POST,
                         protectedReq: true,
                         data: {
-                            user_ids: userIds,
+                            ids: featureIds,
                         }
                     });
                     if (!response) {
@@ -117,11 +111,11 @@ function ManageFeature({
                         type: 'toast',
                         title: 'Success',
                         component: (
-                            <p>Added user/s as followers</p>
+                            <p>Added feature/s as followers</p>
                         ),
                     }, 'listing-add-success');
                     dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
+                    dataTableContext.modal.close('add-features-modal');
                     return true;
                 }
             },
@@ -142,7 +136,7 @@ function ManageFeature({
         };
     }
 
-    function getListingFormModalProps() {
+    function getFeatureFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -151,7 +145,7 @@ function ManageFeature({
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!operation) {
-                    DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                    console.warn('Operation is required');
                     return;
                 }
                 if (!formHelpers) {
@@ -178,7 +172,7 @@ function ManageFeature({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Feature, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -188,17 +182,16 @@ function ManageFeature({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit Feature',
                             component: (
                                 <EditFeature
-                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PAGE_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getFeatureFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
                     }}
                 >
@@ -214,17 +207,16 @@ function ManageFeature({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
+                                        title: 'Edit Feature',
                                         component: (
                                             <EditFeature
-                                            listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PAGE_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getFeatureFormModalProps(),
                                     }, EDIT_PAGE_MODAL_ID);
                                 }
                             }
@@ -237,7 +229,7 @@ function ManageFeature({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Listing',
+                                        title: 'Delete Feature',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
@@ -248,7 +240,7 @@ function ManageFeature({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Listing ID is required</p>
+                                                        <p>Feature ID is required</p>
                                                     ),
                                                 }, 'listing-delete-error');
                                                 return;
@@ -308,14 +300,7 @@ function ManageFeature({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-            return;
-        }
-        if (['add', 'create'].includes(operation)) {
-            return;
-        }
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -327,12 +312,12 @@ function ManageFeature({
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.listingFeature.replace(':listingId', listingId.toString()),
+                truJobApiConfig.endpoints.feature,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
-            post: dataTableContextState?.post || {},
+            data: dataTableContextState?.post || {},
         })
         if (!response) {
             setDataTableContextState(prevState => {
@@ -371,7 +356,6 @@ function ManageFeature({
                     }) => {
                         return (
                 <EditFeature
-                listingId={listingId}
                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_PAGE_MODAL_ID}
@@ -397,7 +381,7 @@ function ManageFeature({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -416,7 +400,7 @@ function ManageFeature({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>Feature IDs are required</p>
                                 ),
                             }, 'listing-bulk-delete-error');
                             return;
@@ -446,13 +430,13 @@ function ManageFeature({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Features deleted successfully</p>
                             ),
                         }, 'listing-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }
@@ -463,14 +447,13 @@ function ManageFeature({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Features'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}

@@ -82,7 +82,7 @@ const defaultReducers = {
     },
     setPageError: (state, action) => {
         state[ERROR] = action.payload;
-        DebugHelpers.log(DebugHelpers.ERROR, state.error)
+        console.log(state.error)
     },
 };
 

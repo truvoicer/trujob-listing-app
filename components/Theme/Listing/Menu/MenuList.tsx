@@ -1,7 +1,7 @@
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import siteConfig from "@/config/site-config";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_AUTHENTICATED, SESSION_IS_AUTHENTICATING, SESSION_STATE } from "@/library/redux/constants/session-constants";
@@ -20,7 +20,7 @@ function MenuList({ name, className = '', session }) {
             protectedReq: session[SESSION_AUTHENTICATED],
         })
         if (!Array.isArray(menuFetch?.data?.menu_items)) {
-            DebugHelpers.log(DebugHelpers.WARN, `Menu data is not an array | name: ${name}`);
+            console.log(`Menu data is not an array | name: ${name}`);
             return;
         }
         setData(menuFetch.data);

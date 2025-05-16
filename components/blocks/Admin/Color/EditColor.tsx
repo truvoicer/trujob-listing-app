@@ -11,7 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateColor, UpdateColor } from "@/types/Color";
 import { Color } from "react-bootstrap/esm/types";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditColorProps = {
     listingId?: number;
@@ -63,17 +63,17 @@ function EditColor({
     }
     async function handleSubmit(values: Color) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.warn('No data to update');
             return;
         }
 
 
         if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Listing ID is required');
             return;
         }
         if (!values?.color?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
+            console.warn('Brand ID is required');
             return;
         }
 
@@ -111,7 +111,7 @@ function EditColor({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.warn('Invalid operation');
                 break;
         }
     }

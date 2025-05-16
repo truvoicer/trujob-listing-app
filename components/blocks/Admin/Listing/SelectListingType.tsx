@@ -1,5 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { ListingType } from "@/types/ListingType";
@@ -27,7 +27,7 @@ function SelectListingType({
             protectedReq: true
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching listingTypes');
+            console.warn('No response from API when fetching listingTypes');
             return;
         }
         setListingTypes(response?.data || []);
@@ -51,11 +51,11 @@ function SelectListingType({
             return;
         }
         if (!formContext) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
+            console.warn('Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
+            console.warn('setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedListingType);
@@ -75,7 +75,7 @@ function SelectListingType({
                     }
                     const findListingType = listingTypes.find((listingType: ListingType) => listingType?.id === parseInt(e.target.value));
                     if (!findListingType) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Selected listingType not found');
+                        console.warn('Selected listingType not found');
                         return;
                     }
                     setSelectedListingType(findListingType);

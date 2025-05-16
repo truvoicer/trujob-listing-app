@@ -19,7 +19,7 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../../User/ManageUser";
 import { ModalItem } from "@/library/services/modal/ModalService";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { User } from "@/types/User";
 
 export type ManageListingFollowProps = {
@@ -58,18 +58,18 @@ function ManageListingFollow({
                     users: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.log('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
                         if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            console.warn('No users selected');
                             return;
                         }
                         let origData = data;
@@ -86,7 +86,7 @@ function ManageListingFollow({
                         return;
                     }
                     if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        console.warn('Listing ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -152,7 +152,7 @@ function ManageListingFollow({
             onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
-                DebugHelpers.log(DebugHelpers.DEBUG, 'Form Helpers', formHelpers?.values);
+                console.log('Form Helpers', formHelpers?.values);
                 if (!formHelpers) {
                     return;
                 }
@@ -299,14 +299,14 @@ function ManageListingFollow({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+            console.warn('Operation is required');
             return;
         }
         if (['add', 'create'].includes(operation)) {
             return;
         }
         if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Listing ID is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -375,7 +375,7 @@ function ManageListingFollow({
                             paginationMode="state"
                             onChange={(users: Array<any>) => {
                                 if (!Array.isArray(users)) {
-                                    DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                                    console.warn('Invalid values received from ManageUser component');
                                     return;
                                 }
                                 formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
@@ -403,7 +403,7 @@ function ManageListingFollow({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -458,7 +458,7 @@ function ManageListingFollow({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }
@@ -476,14 +476,14 @@ function ManageListingFollow({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Listings Followers'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
                 request={listingRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'First namw', key: 'first_name' },
+                    { label: 'First name', key: 'first_name' },
                     { label: 'Last name', key: 'last_name' },
                     { label: 'Email', key: 'email' },
                 ]}

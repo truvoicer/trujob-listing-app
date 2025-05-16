@@ -14,17 +14,15 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditBrandProps = {
-    listingId: number;
     data?: Brand;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditBrand({
-    listingId,
     data,
     operation,
     inModal = false,
@@ -70,16 +68,16 @@ function EditBrand({
     async function handleSubmit(values: Brand) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.log('No data to update');
             return;
         }
         
         if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.log('Listing ID is required');
             return;
         }
         if (!values?.brand?.id) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Brand ID is required');
+            console.log('Brand ID is required');
             return;
         }
 
@@ -89,7 +87,7 @@ function EditBrand({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData);
+                console.log('edit requestData', requestData);
 
                 if (!data?.id) {
                     throw new Error('Listing ID is required');
@@ -108,7 +106,7 @@ function EditBrand({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData);
+                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
@@ -121,7 +119,7 @@ function EditBrand({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
         

@@ -7,6 +7,7 @@ import {
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { SessionService } from "@/library/services/session/SessionService";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 export type ErrorItem = {
     code: string;
     message: string | null;
@@ -151,7 +152,7 @@ export class ApiMiddleware {
                 headers
             });
         } catch (error) {
-            DebugHelpers.log(DebugHelpers.ERROR, error);
+            console.log(error);
             return false;
         }
     }
@@ -300,7 +301,7 @@ export class ApiMiddleware {
     }
 
     handleUnauthorizedResponse(response: Response, data: any): void {
-        DebugHelpers.log(DebugHelpers.DEBUG, 'handleUnauthorizedResponse', { response, data });
+        console.log('handleUnauthorizedResponse', { response, data });
         SessionService.removeLocalSession();
         setAuthenticatedAction(false);
         setIsAuthenticatingAction(false)
@@ -321,7 +322,7 @@ export class ApiMiddleware {
             case 401:
                 this.handleUnauthorizedResponse(responsePromise, responseData);
             default:
-                DebugHelpers.log(DebugHelpers.DEBUG, {responsePromise, responseData});
+                console.log({responsePromise, responseData});
                 this.addError(
                     'api_error',
                     responseData?.message || 'API Error',

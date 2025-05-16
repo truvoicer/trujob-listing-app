@@ -6,7 +6,7 @@ import {
     SETTINGS_TIMEZONE
 } from "@/library/redux/constants/settings-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export const settingsStateData = {
         [SETTINGS_TIMEZONE]: null,
@@ -22,7 +22,7 @@ const defaultReducers = {
     },
     setError: (state, action) => {
         state.error = action.payload;
-        DebugHelpers.log(DebugHelpers.ERROR, state.error)
+        console.log(state.error)
     },
 };
 

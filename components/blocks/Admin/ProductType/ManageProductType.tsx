@@ -16,12 +16,11 @@ import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 export type ManageProductTypeProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId?: number;
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
@@ -29,11 +28,10 @@ export type ManageProductTypeProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_PRODUCT_TYPE_MODAL_ID = 'edit-product-type-modal';
 
 function ManageProductType({
     operation,
-    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -53,18 +51,18 @@ function ManageProductType({
                     users: [],
                 },
                 onSubmit: async (values: FormikValues) => {
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
+                    console.log('Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.log('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!Array.isArray(values?.users)) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.log('Invalid values received from ManageUser component');
                             return;
                         }
                         if (!values?.users?.length) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'No users selected');
+                            console.log('No users selected');
                             return;
                         }
                         let origData = data;
@@ -80,17 +78,10 @@ function ManageProductType({
                         }
                         return;
                     }
-                    if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
-                        return;
-                    }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
                     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                         endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
+                            truJobApiConfig.endpoints.productType,
                             'create',
                         ]),
                         method: ApiMiddleware.METHOD.POST,
@@ -177,15 +168,14 @@ function ManageProductType({
                             title: 'Edit Listing',
                             component: (
                                 <EditProductType
-                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                 />
                             ),
                             ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_PRODUCT_TYPE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -203,15 +193,14 @@ function ManageProductType({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditProductType
-                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                             />
                                         ),
                                         ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
                                 }
                             }
                         },
@@ -259,7 +248,7 @@ function ManageProductType({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
                                 }
                             }
                         }
@@ -294,14 +283,7 @@ function ManageProductType({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
-            return;
-        }
-        if (['add', 'create'].includes(operation)) {
-            return;
-        }
-        if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.log('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -314,7 +296,7 @@ function ManageProductType({
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
 
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.listingProductType.replace(':listingId', listingId.toString()),
+                truJobApiConfig.endpoints.productType,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -345,28 +327,27 @@ function ManageProductType({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-                dataTableContext.modal.show({
-                    title: 'Select Users',
-                    component: ({
-                        modal,
-                        index,
-                        formHelpers
-                    }: {
-                        modal: ModalItem,
-                        index: number,
-                        formHelpers?: any
-                    }) => {
-                        return (
-                <EditProductType
-                    listingId={listingId}
-                    operation={'add'}
-                    inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
-                />
-            )
-        },
-        ...getAddNewModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        dataTableContext.modal.show({
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <EditProductType
+                        operation={'add'}
+                        inModal={true}
+                        modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                    />
+                )
+            },
+            ...getAddNewModalProps(),
+        }, EDIT_PRODUCT_TYPE_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -384,7 +365,7 @@ function ManageProductType({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -439,7 +420,7 @@ function ManageProductType({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

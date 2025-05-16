@@ -5,7 +5,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../../User/ManageUser";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 type EditListingFollowFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -42,7 +42,7 @@ function EditListingFollowFields({
                         paginationMode="state"
                         onChange={(users: Array<any>) => {
                             if (!Array.isArray(users)) {
-                                DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageUser component');
                                 return;
                             }
                             setSelectedTableRows(
@@ -54,21 +54,21 @@ function EditListingFollowFields({
                 </AccessControlComponent>
             ),
             onOk: () => {
-                DebugHelpers.log(DebugHelpers.DEBUG, 'ok');
+                console.log('ok');
                 if (selectedTableRows.length === 0) {
-                    DebugHelpers.log(DebugHelpers.WARN, 'No user selected');
+                    console.warn('No user selected');
                     return true;
                 }
                 setFieldValue('users', selectedTableRows);
                 return true;
             },
             onCancel: () => {
-                DebugHelpers.log(DebugHelpers.DEBUG, 'cancel');
+                console.log('cancel');
                 return true;
             }
         },
     ]);
-    DebugHelpers.log(DebugHelpers.DEBUG, 'values', values);
+    console.log('values', values);
 
     return (
         <div className="row justify-content-center align-items-center">

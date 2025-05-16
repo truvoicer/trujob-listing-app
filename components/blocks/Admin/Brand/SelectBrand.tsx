@@ -1,5 +1,5 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Brand } from "@/types/Brand";
@@ -26,7 +26,7 @@ function SelectBrand({
             method: ApiMiddleware.METHOD.GET,
         });
         if (!response) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No response from API when fetching brands');
+            console.warn('No response from API when fetching brands');
             return;
         }
         setBrands(response?.data || []);
@@ -50,11 +50,11 @@ function SelectBrand({
             return;
         }
         if (!formContext) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Form context not found');
+            console.warn('Form context not found');
             return;
         }
         if (!formContext.setFieldValue) {
-            DebugHelpers.log(DebugHelpers.WARN, 'setFieldValue function not found in form context');
+            console.warn('setFieldValue function not found in form context');
             return;
         }
         formContext.setFieldValue(name, selectedBrand);
@@ -74,7 +74,7 @@ function SelectBrand({
                     }
                     const findBrand = brands.find((brand: Brand) => brand?.id === parseInt(e.target.value));
                     if (!findBrand) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Selected brand not found');
+                        console.warn('Selected brand not found');
                         return;
                     }
                     setSelectedBrand(findBrand);

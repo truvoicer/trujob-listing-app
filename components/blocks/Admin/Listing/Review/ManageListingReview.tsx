@@ -15,7 +15,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 import { Review } from "@/types/Review";
 import { ModalItem } from "@/library/services/modal/ModalService";
 
@@ -56,14 +56,13 @@ function ManageListingReview({
                 },
                 onSubmit: async (values: FormikValues) => {
                     console.log('Form Values', values);
-                    DebugHelpers.log(DebugHelpers.DEBUG, 'Form Values', values);
                     if (!operation) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+                        console.warn('Operation is required');
                         return;
                     }
                     if (['add', 'create'].includes(operation)) {
                         if (!values) {
-                            DebugHelpers.log(DebugHelpers.WARN, 'Invalid values received from ManageUser component');
+                            console.warn('Invalid values received from ManageUser component');
                             return;
                         }
                         let origData = data;
@@ -80,7 +79,7 @@ function ManageListingReview({
                         return;
                     }
                     if (!listingId) {
-                        DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+                        console.warn('Listing ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -291,14 +290,14 @@ function ManageListingReview({
         searchParams: any
     }) {
         if (!operation) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Operation is required');
+            console.warn('Operation is required');
             return;
         }
         if (['add', 'create'].includes(operation)) {
             return;
         }
         if (!listingId) {
-            DebugHelpers.log(DebugHelpers.WARN, 'Listing ID is required');
+            console.warn('Listing ID is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -381,7 +380,7 @@ function ManageListingReview({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
@@ -436,7 +435,7 @@ function ManageListingReview({
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
-                        DebugHelpers.log(DebugHelpers.DEBUG, 'Cancel delete');
+                        console.log('Cancel delete');
                     },
                 }, 'delete-bulk-listing-confirmation');
             }

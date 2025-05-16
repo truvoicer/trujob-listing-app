@@ -11,7 +11,7 @@ import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
 import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
 import { CreateWidget, Widget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { DebugHelpers } from "@/helpers/DebugHelpers";
+
 
 export type EditSidebarProps = {
     data?: Sidebar | null;
@@ -124,9 +124,9 @@ function EditSidebar({
         return requiredFields;
     }
     async function handleSubmit(values: Sidebar) {
-        DebugHelpers.log(DebugHelpers.DEBUG, 'edit sidebar values', values);
+        console.log('edit sidebar values', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            DebugHelpers.log(DebugHelpers.WARN, 'No data to update');
+            console.log('No data to update');
             return false;
         }
         let response = null;
@@ -135,7 +135,7 @@ function EditSidebar({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'edit requestData', requestData, values);
+                console.log('edit requestData', requestData, values);
                 // return;
                 if (!requestData?.id) {
                     throw new Error('Sidebar ID is required');
@@ -150,7 +150,7 @@ function EditSidebar({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                DebugHelpers.log(DebugHelpers.DEBUG, 'create requestData', requestData, values);
+                console.log('create requestData', requestData, values);
                 // return;
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.sidebar}/create`,
@@ -160,10 +160,10 @@ function EditSidebar({
                 })
                 break;
             default:
-                DebugHelpers.log(DebugHelpers.WARN, 'Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
-        DebugHelpers.log(DebugHelpers.DEBUG, 'edit sidebar response', response);
+        console.log('edit sidebar response', response);
         if (!response) {
             setAlert({
                 show: true,
