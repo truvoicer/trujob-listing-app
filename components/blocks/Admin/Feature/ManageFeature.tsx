@@ -32,7 +32,7 @@ export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageFeature({
     data = [],
-    operation,
+    operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
     onChange,

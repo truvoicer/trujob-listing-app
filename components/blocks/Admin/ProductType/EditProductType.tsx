@@ -63,16 +63,16 @@ function EditProductType({
             return;
         }
 
-        if (!values?.id) {
-            console.log('Product type ID is required');
-            return;
-        }
 
         let response = null;
         let requestData: CreateProductType | UpdateProductType;
         switch (operation) {
             case 'edit':
             case 'update':
+                if (!values?.id) {
+                    console.log('Product type ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.productType,
@@ -100,57 +100,57 @@ function EditProductType({
                 console.log('Invalid operation');
                 break;
         }
+    }
+
+
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
         }
 
-
-        useEffect(() => {
-            if (!inModal) {
-                return;
-            }
-            if (!modalId) {
-                return;
-            }
-
-            ModalService.initializeModalWithForm({
-                modalState: dataTableContext?.modal,
-                id: modalId,
-                operation: operation,
-                initialValues: initialValues,
-                handleSubmit: handleSubmit,
-            });
-        }, [inModal, modalId]);
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
+    }, [inModal, modalId]);
 
 
-        const dataTableContext = useContext(DataTableContext);
-        return (
-            <div className="row justify-content-center align-items-center">
-                <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                    {alert && (
-                        <div className={`alert alert-${alert.type}`} role="alert">
-                            {alert.message}
-                        </div>
-                    )}
-                    {inModal &&
-                        ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
-                        (
-                            <EditProductTypeFields operation={operation} />
-                        )
-                    }
-                    {!inModal && (
-                        <Form
-                            operation={operation}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditProductTypeFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
-                </div>
+    const dataTableContext = useContext(DataTableContext);
+    return (
+        <div className="row justify-content-center align-items-center">
+            <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
+                        <EditProductTypeFields operation={operation} />
+                    )
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditProductTypeFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
-        );
-    }
-    export default EditProductType;
+        </div>
+    );
+}
+export default EditProductType;

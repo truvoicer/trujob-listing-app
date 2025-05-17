@@ -63,17 +63,16 @@ function EditCategory({
             console.warn('No data to update');
             return;
         }
-        
-        if (!values?.id) {
-            console.warn('Brand ID is required');
-            return;
-        }
 
         let response = null;
-        let requestData: CreateCategory | UpdateCategory;
+        
         switch (operation) {
             case 'edit':
             case 'update':
+                if (!values?.id) {
+                    console.warn('Category ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.category,

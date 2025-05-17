@@ -9,7 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { Color } from "@/types/Color";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
@@ -32,7 +32,7 @@ export type ManageColorProps = {
 export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageColor({
-    operation,
+    operation = 'create',
     listingId,
     rowSelection = true,
     multiRowSelection = true,
@@ -81,7 +81,7 @@ function ManageColor({
                         return;
                     }
                     if (!listingId) {
-                        console.warn('Listing ID is required');
+                        console.warn('Color ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -140,7 +140,7 @@ function ManageColor({
         };
     }
 
-    function getListingFormModalProps() {
+    function getColorFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -164,7 +164,7 @@ function ManageColor({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Color, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -174,7 +174,7 @@ function ManageColor({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit Color',
                             component: (
                                 <EditColor
                                     listingId={listingId}
@@ -184,7 +184,7 @@ function ManageColor({
                                     modalId={EDIT_PAGE_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getColorFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
                     }}
                 >
@@ -200,7 +200,7 @@ function ManageColor({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
+                                        title: 'Edit Color',
                                         component: (
                                             <EditColor
                                                 listingId={listingId}
@@ -210,7 +210,7 @@ function ManageColor({
                                                 modalId={EDIT_PAGE_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getColorFormModalProps(),
                                     }, EDIT_PAGE_MODAL_ID);
                                 }
                             }
@@ -223,7 +223,7 @@ function ManageColor({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Listing',
+                                        title: 'Delete Color',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
@@ -234,7 +234,7 @@ function ManageColor({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Listing ID is required</p>
+                                                        <p>Color ID is required</p>
                                                     ),
                                                 }, 'listing-delete-error');
                                                 return;
@@ -377,7 +377,7 @@ function ManageColor({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>Color IDs are required</p>
                                 ),
                             }, 'listing-bulk-delete-error');
                             return;
@@ -407,7 +407,7 @@ function ManageColor({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Colors deleted successfully</p>
                             ),
                         }, 'listing-bulk-delete-success');
                         dataTableContextState.refresh();
@@ -430,7 +430,7 @@ function ManageColor({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Colors'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}

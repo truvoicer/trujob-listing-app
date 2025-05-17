@@ -4,12 +4,12 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 
-type EditProductTypeFields = {
+type EditReviewFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditProductTypeFields({
+function EditReviewFields({
     operation
-}: EditProductTypeFields) {
+}: EditReviewFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -17,7 +17,6 @@ function EditProductTypeFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
 
     return (
         <div className="row justify-content-center align-items-center">
@@ -29,27 +28,26 @@ function EditProductTypeFields({
                             <input
                                 className="form-control"
                                 type="text"
-                                name="label"
-                                id="label"
+                                name="review"
+                                id="review"
                                 onChange={handleChange}
-                                value={values?.label || ""} />
-                            <label className="form-label" htmlFor="label">
-                                Label
+                                value={values?.review || ""} />
+                            <label className="form-label" htmlFor="title">
+                                Review
                             </label>
                         </div>
                     </div>
-
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <input
                                 className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
+                                type="tel"
+                                name="rating"
+                                id="rating"
                                 onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">
-                                Name
+                                value={values?.rating || ""} />
+                            <label className="form-label" htmlFor="rating">
+                                Rating
                             </label>
                         </div>
                     </div>
@@ -59,4 +57,4 @@ function EditProductTypeFields({
         </div>
     );
 }
-export default EditProductTypeFields;
+export default EditReviewFields;

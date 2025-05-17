@@ -118,12 +118,16 @@ function EditListing({
     }
 
     function buildCreateData(values: Listing) {
-
+        console.log('buildCreateData', {values});
+        if (!values?.type?.id) {
+            console.warn('Listing type is required');
+            return;
+        }
         let requestData: CreateListing = {
             name: values.name,
             title: values.title,
             active: values?.active || false,
-            type: values?.type || '',
+            type: values.type.id
         };
         requestData = {
             ...requestData,
@@ -137,7 +141,6 @@ function EditListing({
 
         let requestData: UpdateListing = {
             id: data?.id || 0,
-            type: values?.type || '',
         };
         requestData = {
             ...requestData,

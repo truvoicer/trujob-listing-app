@@ -9,7 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { Category } from "@/types/Category";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
@@ -28,10 +28,13 @@ export type ManageCategoryProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_CATEGORY_MODAL_ID = 'edit-category-modal';
+export const CREATE_CATEGORY_MODAL_ID = 'create-category-modal';
+export const DELETE_CATEGORY_MODAL_ID = 'delete-category-modal';
+
 
 function ManageCategory({
-    operation,
+    operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -79,7 +82,7 @@ function ManageCategory({
                         return;
                     }
                     if (!listingId) {
-                        console.warn('Listing ID is required');
+                        console.warn('Category ID is required');
                         return;
                     }
                     const userIds = RequestHelpers.extractIdsFromArray(values?.users);
@@ -138,7 +141,7 @@ function ManageCategory({
         };
     }
 
-    function getListingFormModalProps() {
+    function getCategoryFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -162,7 +165,7 @@ function ManageCategory({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Category, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -172,17 +175,17 @@ function ManageCategory({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit Category',
                             component: (
                                 <EditCategory
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_CATEGORY_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                            ...getCategoryFormModalProps(),
+                        }, EDIT_CATEGORY_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -197,17 +200,17 @@ function ManageCategory({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
+                                        title: 'Edit Category',
                                         component: (
                                             <EditCategory
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_CATEGORY_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                        ...getCategoryFormModalProps(),
+                                    }, EDIT_CATEGORY_MODAL_ID);
                                 }
                             }
                         },
@@ -219,7 +222,7 @@ function ManageCategory({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Listing',
+                                        title: 'Delete Category',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
@@ -230,7 +233,7 @@ function ManageCategory({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Listing ID is required</p>
+                                                        <p>Category ID is required</p>
                                                     ),
                                                 }, 'listing-delete-error');
                                                 return;
@@ -255,7 +258,7 @@ function ManageCategory({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_CATEGORY_MODAL_ID);
                                 }
                             }
                         }
@@ -331,12 +334,12 @@ function ManageCategory({
                     <EditCategory
                         operation={'add'}
                         inModal={true}
-                        modalId={EDIT_PAGE_MODAL_ID}
+                        modalId={CREATE_CATEGORY_MODAL_ID}
                     />
                 )
             },
             ...getAddNewModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        }, CREATE_CATEGORY_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -373,7 +376,7 @@ function ManageCategory({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>Category IDs are required</p>
                                 ),
                             }, 'listing-bulk-delete-error');
                             return;
@@ -403,7 +406,7 @@ function ManageCategory({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Categories deleted successfully</p>
                             ),
                         }, 'listing-bulk-delete-success');
                         dataTableContextState.refresh();
@@ -426,7 +429,7 @@ function ManageCategory({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Categories'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}

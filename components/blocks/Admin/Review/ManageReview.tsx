@@ -2,25 +2,22 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditBrand from "./EditBrand";
+import EditReview from "./EditReview";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Brand } from "@/types/Brand";
+import { Review } from "@/types/Review";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
-export const CREATE_BRAND_MODAL_ID = 'create-brand-modal';
-export const EDIT_BRAND_MODAL_ID = 'edit-brand-modal';
-export const DELETE_BRAND_MODAL_ID = 'delete-brand-modal';
 
-export type ManageBrandProps = {
+export type ManageReviewProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
@@ -29,8 +26,11 @@ export type ManageBrandProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
+export const EDIT_REVIEW_MODAL_ID = 'edit-review-modal';
+export const ADD_REVIEW_MODAL_ID = 'add-review-modal';
+export const DELETE_REVIEW_MODAL_ID = 'delete-review-modal';
 
-function ManageBrand({
+function ManageReview({
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -38,12 +38,12 @@ function ManageBrand({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageBrandProps) {
+}: ManageReviewProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getBrandFormModalProps() {
+    function getReviewFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -67,7 +67,7 @@ function ManageBrand({
         }
     }
 
-    function renderActionColumn(item: Brand, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: Review, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -77,17 +77,79 @@ function ManageBrand({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Brand',
+                            title: 'Edit Review',
                             component: (
-                                <EditBrand
+                                <EditReview
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_BRAND_MODAL_ID}
+                                    modalId={EDIT_REVIEW_MODAL_ID}
                                 />
                             ),
-                            ...getBrandFormModalProps(),
-                        }, EDIT_BRAND_MODAL_ID);
+                            ...getReviewFormModalProps(),
+                        }, EDIT_REVIEW_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="http://google.com"
+                    onClick={e => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        dataTableContext.modal.show({
+                            title: 'Delete Review',
+                            component: (
+                                <p>Are you sure you want to delete this brand ({item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (['add', 'create'].includes(operation)) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_REVIEW_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Review ID is required</p>
+                                        ),
+                                    }, 'review-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: `${truJobApiConfig.endpoints.review}/${item.id}/delete`,
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete review</p>
+                                        ),
+                                    }, 'review-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_REVIEW_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -102,17 +164,17 @@ function ManageBrand({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Brand',
+                                        title: 'Edit Review',
                                         component: (
-                                            <EditBrand
+                                            <EditReview
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_BRAND_MODAL_ID}
+                                                modalId={EDIT_REVIEW_MODAL_ID}
                                             />
                                         ),
-                                        ...getBrandFormModalProps(),
-                                    }, EDIT_BRAND_MODAL_ID);
+                                        ...getReviewFormModalProps(),
+                                    }, EDIT_REVIEW_MODAL_ID);
                                 }
                             }
                         },
@@ -124,9 +186,9 @@ function ManageBrand({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Brand',
+                                        title: 'Delete Review',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this review ({item?.review})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -135,13 +197,13 @@ function ManageBrand({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Brand ID is required</p>
+                                                        <p>Review ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'review-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.review}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -151,16 +213,16 @@ function ManageBrand({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete review</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'review-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_BRAND_MODAL_ID);
+                                    }, EDIT_REVIEW_MODAL_ID);
                                 }
                             }
                         }
@@ -181,15 +243,12 @@ function ManageBrand({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
-        // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.review)) {
+            query['review'] = searchParams.review;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function reviewRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -208,7 +267,7 @@ function ManageBrand({
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.brand,
+                truJobApiConfig.endpoints.review,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -216,23 +275,23 @@ function ManageBrand({
             data: post,
         });
     }
-
+    
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
         dataTableContextState.modal.show({
-            title: 'Create Brand',
+            title: 'Create Review',
             component: (
-                <EditBrand
+                <EditReview
                     operation={'create'}
                     inModal={true}
-                    modalId={CREATE_BRAND_MODAL_ID}
+                    modalId={'create-review-modal'}
                 />
             ),
-            ...getBrandFormModalProps(),
-        }, CREATE_BRAND_MODAL_ID);
+            ...getReviewFormModalProps(),
+        }, 'add-review-modal');
     }
 
     function getRowSelectActions() {
@@ -248,7 +307,7 @@ function ManageBrand({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected reviews?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -257,9 +316,9 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No reviews selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'review-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -269,13 +328,13 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Brand IDs are required</p>
+                                    <p>Review IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'review-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.review}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -288,9 +347,9 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete reviews</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'review-bulk-delete-error');
                             return;
                         }
 
@@ -299,15 +358,15 @@ function ManageBrand({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Brands deleted successfully</p>
+                                <p>Reviews deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'review-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-review-confirmation');
             }
         });
         return actions;
@@ -323,18 +382,18 @@ function ManageBrand({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Brands'}
+                title={'Manage Reviews'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={reviewRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Label', key: 'label' },
-                    { label: 'Name', key: 'name' }
+                    { label: 'Review', key: 'review' },
+                    { label: 'Rating', key: 'rating' }
                 ]}
             />
         </Suspense>
     );
 }
-export default ManageBrand;
+export default ManageReview;

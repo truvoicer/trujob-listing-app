@@ -87,14 +87,14 @@ export interface UpdateListingReview extends ListingReviewRequest {
 }
 
 export type ListingRequest = {
-    name: string;
-    title: string;
+    name?: string;
+    title?: string;
     description?: string;
-    active: boolean;
+    active?: boolean;
     allow_offers?: boolean;
     quantity?: number;
-    type?: number;
     user?: number;
+    type?: number;
     follow_users?: Array<number>;
     features?: Array<number>;
     reviews?: Array<Review>;
@@ -105,7 +105,10 @@ export type ListingRequest = {
     media?: Array<Media>;
 }
 export interface CreateListing extends ListingRequest {
-
+    type: number;
+    name: string;
+    title: string;
+    active: boolean;
 }
 export interface UpdateListing extends ListingRequest {
     id: number;

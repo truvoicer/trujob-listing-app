@@ -3,28 +3,27 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
+import { EDIT_REVIEW_MODAL_ID } from "./ManageReview";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
-import EditColorFields from "./EditColorFields";
+import EditReviewFields from "./EditReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { Review, CreateReview, UpdateReview } from "@/types/Review";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { CreateColor, UpdateColor, Color } from "@/types/Color";
 
 
-export type EditColorProps = {
-    listingId?: number;
-    data?: Color;
+export type EditReviewProps = {
+    data?: Review;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditColor({
+function EditReview({
     data,
-    operation,
+    operation = 'create',
     inModal = false,
     modalId,
-}: EditColorProps) {
+}: EditReviewProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -33,53 +32,64 @@ function EditColor({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Color = {
+    const initialValues: Review = {
         id: data?.id || 0,
-        name: data?.name || '',
-        label: data?.label || '',
+        review: data?.review || '',
+        rating: data?.rating || 1,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
-    function buildCreateData(values: Color) {
 
-        let requestData: CreateColor = {
-            name: values?.name || '',
-            label: values?.label || '',
-        };
-        return requestData;
-    }
-    function buildUpdateData(values: Color) {
+    function buildCreateData(values: Review) {
 
-        let requestData: UpdateColor = {
-            id: values?.id || 0,
-            name: values?.name || '',
-            label: values?.label || '',
+        let requestData: CreateReview = {
+            review: values?.review || '',
+            rating: values?.rating || 1,
         };
 
         return requestData;
     }
-    async function handleSubmit(values: Color) {
+
+    function buildUpdateData(values: Review) {
+
+        let requestData: UpdateReview = {
+            id: data?.id || 0,
+        };
+        if (values?.review) {
+            requestData.review = values?.review || '';
+        }
+        if (values.hasOwnProperty('rating')) {
+            requestData.rating = values?.rating || 1;
+        }
+
+        return requestData;
+    }
+    async function handleSubmit(values: Review) {
+
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            console.log('No data to update');
             return;
         }
 
-
+        if (!values?.id) {
+            console.log('Review ID is required');
+            return;
+        }
 
         let response = null;
+        let requestData: CreateReview | UpdateReview;
         switch (operation) {
             case 'edit':
             case 'update':
-                if (!values?.id) {
-                    console.warn('Color ID is required');
-                    return;
+                if (!data?.id) {
+                    throw new Error('Listing ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.color,
+                        truJobApiConfig.endpoints.review,
                         values.id,
-                        'update',
+                        'update'
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
@@ -90,8 +100,9 @@ function EditColor({
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.color,
-                        'create',
+                        truJobApiConfig.endpoints.review,
+                        values.id,
+                        'create'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -99,9 +110,30 @@ function EditColor({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
+        
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_REVIEW_MODAL_ID);
+
     }
 
 
@@ -112,7 +144,6 @@ function EditColor({
         if (!modalId) {
             return;
         }
-
         ModalService.initializeModalWithForm({
             modalState: dataTableContext?.modal,
             id: modalId,
@@ -135,7 +166,7 @@ function EditColor({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditColorFields operation={operation} />
+                        <EditReviewFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -146,7 +177,7 @@ function EditColor({
                     >
                         {() => {
                             return (
-                                <EditColorFields operation={operation} />
+                                <EditReviewFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -155,4 +186,4 @@ function EditColor({
         </div>
     );
 }
-export default EditColor;
+export default EditReview;

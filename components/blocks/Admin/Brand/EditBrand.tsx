@@ -1,17 +1,13 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_PAGE_MODAL_ID } from "./ManageBrand";
+import { CREATE_BRAND_MODAL_ID, EDIT_BRAND_MODAL_ID } from "./ManageBrand";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
-import { Sidebar } from "@/types/Sidebar";
 import EditBrandFields from "./EditBrandFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
@@ -71,15 +67,6 @@ function EditBrand({
             console.log('No data to update');
             return;
         }
-        
-        if (!listingId) {
-            console.log('Listing ID is required');
-            return;
-        }
-        if (!values?.brand?.id) {
-            console.log('Brand ID is required');
-            return;
-        }
 
         let response = null;
         let requestData: CreateBrand | UpdateBrand;
@@ -89,13 +76,13 @@ function EditBrand({
                 requestData = buildUpdateData(values);
                 console.log('edit requestData', requestData);
 
-                if (!data?.id) {
-                    throw new Error('Listing ID is required');
+                if (!values?.id) {
+                    throw new Error('Brand ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
-                        values.brand.id,
+                        truJobApiConfig.endpoints.brand,
+                        values.id,
                         'update'
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
@@ -109,8 +96,7 @@ function EditBrand({
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingBrand.replace(':listingId', listingId.toString()),
-                        values.brand.id,
+                        truJobApiConfig.endpoints.brand,
                         'create'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -141,8 +127,8 @@ function EditBrand({
             return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
-
+        dataTableContext.modal.close(CREATE_BRAND_MODAL_ID);
+        dataTableContext.modal.close(EDIT_BRAND_MODAL_ID);
     }
 
 

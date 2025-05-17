@@ -2,25 +2,23 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditBrand from "./EditBrand";
+import EditListingType from "./EditListingType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Brand } from "@/types/Brand";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
-export const CREATE_BRAND_MODAL_ID = 'create-brand-modal';
-export const EDIT_BRAND_MODAL_ID = 'edit-brand-modal';
-export const DELETE_BRAND_MODAL_ID = 'delete-brand-modal';
+import { ModalItem } from "@/library/services/modal/ModalService";
+import { ListingType } from "@/types/Listing";
 
-export type ManageBrandProps = {
+export type ManageListingTypeProps = {
     operation?: 'edit' | 'update' | 'add' | 'create';
     enableEdit?: boolean;
     paginationMode?: 'router' | 'state';
@@ -29,8 +27,9 @@ export type ManageBrandProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
 }
+export const EDIT_PRODUCT_TYPE_MODAL_ID = 'edit-product-type-modal';
 
-function ManageBrand({
+function ManageListingType({
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -38,12 +37,100 @@ function ManageBrand({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageBrandProps) {
+}: ManageListingTypeProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getBrandFormModalProps() {
+    function getAddNewModalProps() {
+        return {
+            formProps: {
+                operation: operation,
+                initialValues: {
+                    users: [],
+                },
+                onSubmit: async (values: FormikValues) => {
+                    console.log('Form Values', values);
+                    if (!operation) {
+                        console.log('Operation is required');
+                        return;
+                    }
+                    if (['add', 'create'].includes(operation)) {
+                        if (!Array.isArray(values?.users)) {
+                            console.log('Invalid values received from ManageUser component');
+                            return;
+                        }
+                        if (!values?.users?.length) {
+                            console.log('No users selected');
+                            return;
+                        }
+                        let origData = data;
+                        if (!Array.isArray(origData)) {
+                            origData = [];
+                            return;
+                        }
+                        if (typeof onChange === 'function') {
+                            onChange([
+                                ...origData,
+                                ...values?.users
+                            ]);
+                        }
+                        return;
+                    }
+                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
+                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                        endpoint: UrlHelpers.urlFromArray([
+                            truJobApiConfig.endpoints.productType,
+                            'create',
+                        ]),
+                        method: ApiMiddleware.METHOD.POST,
+                        protectedReq: true,
+                        data: {
+                            user_ids: userIds,
+                        }
+                    });
+                    if (!response) {
+                        notificationContext.show({
+                            variant: 'danger',
+                            type: 'toast',
+                            title: 'Error',
+                            component: (
+                                <p>Failed to add followers</p>
+                            ),
+                        }, 'listing-add-error');
+                        return false;
+                    }
+                    notificationContext.show({
+                        variant: 'success',
+                        type: 'toast',
+                        title: 'Success',
+                        component: (
+                            <p>Added user/s as followers</p>
+                        ),
+                    }, 'listing-add-success');
+                    dataTableContext.refresh();
+                    dataTableContext.modal.close('add-users-modal');
+                    return true;
+                }
+            },
+            show: true,
+            showFooter: true,
+            onOk: async ({ formHelpers }: {
+                formHelpers?: FormikProps<FormikValues>
+            }) => {
+                if (!formHelpers) {
+                    return;
+                }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    return;
+                }
+                return await formHelpers.submitForm();
+            },
+            fullscreen: true
+        };
+    }
+
+    function getListingTypeFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -67,7 +154,7 @@ function ManageBrand({
         }
     }
 
-    function renderActionColumn(item: Brand, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: ListingType, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -77,17 +164,17 @@ function ManageBrand({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Brand',
+                            title: 'Edit Listing Type',
                             component: (
-                                <EditBrand
+                                <EditListingType
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_BRAND_MODAL_ID}
+                                    modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                 />
                             ),
-                            ...getBrandFormModalProps(),
-                        }, EDIT_BRAND_MODAL_ID);
+                            ...getListingTypeFormModalProps(),
+                        }, EDIT_PRODUCT_TYPE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -102,17 +189,17 @@ function ManageBrand({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Brand',
+                                        title: 'Edit Listing Type',
                                         component: (
-                                            <EditBrand
+                                            <EditListingType
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_BRAND_MODAL_ID}
+                                                modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                             />
                                         ),
-                                        ...getBrandFormModalProps(),
-                                    }, EDIT_BRAND_MODAL_ID);
+                                        ...getListingTypeFormModalProps(),
+                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
                                 }
                             }
                         },
@@ -124,7 +211,7 @@ function ManageBrand({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Brand',
+                                        title: 'Delete Listing Type',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
@@ -135,13 +222,13 @@ function ManageBrand({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Brand ID is required</p>
+                                                        <p>ListingType ID is required</p>
                                                     ),
                                                 }, 'listing-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.listingType}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -160,7 +247,7 @@ function ManageBrand({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_BRAND_MODAL_ID);
+                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
                                 }
                             }
                         }
@@ -195,11 +282,10 @@ function ManageBrand({
         searchParams: any
     }) {
         if (!operation) {
-            console.warn('Operation is required');
+            console.log('Operation is required');
             return;
         }
         let query = dataTableContextState?.query || {};
-        let post = dataTableContextState?.post || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
             ...query,
@@ -208,31 +294,40 @@ function ManageBrand({
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.brand,
+                truJobApiConfig.endpoints.productType,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
-            query,
-            data: post,
+            query: query,
+            data: dataTableContextState?.post || {},
         });
     }
-
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContextState.modal.show({
-            title: 'Create Brand',
-            component: (
-                <EditBrand
-                    operation={'create'}
-                    inModal={true}
-                    modalId={CREATE_BRAND_MODAL_ID}
-                />
-            ),
-            ...getBrandFormModalProps(),
-        }, CREATE_BRAND_MODAL_ID);
+        dataTableContext.modal.show({
+            title: 'Select Users',
+            component: ({
+                modal,
+                index,
+                formHelpers
+            }: {
+                modal: ModalItem,
+                index: number,
+                formHelpers?: any
+            }) => {
+                return (
+                    <EditListingType
+                        operation={'add'}
+                        inModal={true}
+                        modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                    />
+                )
+            },
+            ...getAddNewModalProps(),
+        }, EDIT_PRODUCT_TYPE_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -269,13 +364,13 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Brand IDs are required</p>
+                                    <p>Listing Type IDs are required</p>
                                 ),
                             }, 'listing-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.listingType}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -299,7 +394,7 @@ function ManageBrand({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Brands deleted successfully</p>
+                                <p>Listing Types deleted successfully</p>
                             ),
                         }, 'listing-bulk-delete-success');
                         dataTableContextState.refresh();
@@ -313,7 +408,6 @@ function ManageBrand({
         return actions;
     }
 
-
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
@@ -323,7 +417,7 @@ function ManageBrand({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Brands'}
+                title={'Manage Listing Types'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
@@ -337,4 +431,4 @@ function ManageBrand({
         </Suspense>
     );
 }
-export default ManageBrand;
+export default ManageListingType;

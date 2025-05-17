@@ -521,7 +521,7 @@ function EditListingFields({
 
                     <div className="col-12 col-lg-6">
                         <SelectListingType
-                            name="listing_type"
+                            name="type"
                         />
                     </div>
 

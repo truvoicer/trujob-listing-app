@@ -63,17 +63,15 @@ function EditFeature({
             return;
         }
 
-
-        if (!values?.id) {
-            console.warn('Brand ID is required');
-            return;
-        }
-
         let response = null;
-        let requestData: CreateFeature | UpdateFeature;
+        
         switch (operation) {
             case 'edit':
             case 'update':
+                if (!values?.id) {
+                    console.warn('Feature ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.feature,
@@ -82,6 +80,7 @@ function EditFeature({
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
@@ -93,6 +92,7 @@ function EditFeature({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: buildCreateData(values),
                 })
                 break;
             default:
@@ -102,54 +102,54 @@ function EditFeature({
     }
 
 
-        useEffect(() => {
-            if (!inModal) {
-                return;
-            }
-            if (!modalId) {
-                return;
-            }
+    useEffect(() => {
+        if (!inModal) {
+            return;
+        }
+        if (!modalId) {
+            return;
+        }
 
-            ModalService.initializeModalWithForm({
-                modalState: dataTableContext?.modal,
-                id: modalId,
-                operation: operation,
-                initialValues: initialValues,
-                handleSubmit: handleSubmit,
-            });
-        }, [inModal, modalId]);
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            handleSubmit: handleSubmit,
+        });
+    }, [inModal, modalId]);
 
 
-        const dataTableContext = useContext(DataTableContext);
-        return (
-            <div className="row justify-content-center align-items-center">
-                <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                    {alert && (
-                        <div className={`alert alert-${alert.type}`} role="alert">
-                            {alert.message}
-                        </div>
-                    )}
-                    {inModal &&
-                        ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
-                        (
-                            <EditFeatureFields operation={operation} />
-                        )
-                    }
-                    {!inModal && (
-                        <Form
-                            operation={operation}
-                            initialValues={initialValues}
-                            onSubmit={handleSubmit}
-                        >
-                            {() => {
-                                return (
-                                    <EditFeatureFields operation={operation} />
-                                )
-                            }}
-                        </Form>
-                    )}
-                </div>
+    const dataTableContext = useContext(DataTableContext);
+    return (
+        <div className="row justify-content-center align-items-center">
+            <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                {alert && (
+                    <div className={`alert alert-${alert.type}`} role="alert">
+                        {alert.message}
+                    </div>
+                )}
+                {inModal &&
+                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
+                    (
+                        <EditFeatureFields operation={operation} />
+                    )
+                }
+                {!inModal && (
+                    <Form
+                        operation={operation}
+                        initialValues={initialValues}
+                        onSubmit={handleSubmit}
+                    >
+                        {() => {
+                            return (
+                                <EditFeatureFields operation={operation} />
+                            )
+                        }}
+                    </Form>
+                )}
             </div>
-        );
-    }
-    export default EditFeature;
+        </div>
+    );
+}
+export default EditFeature;

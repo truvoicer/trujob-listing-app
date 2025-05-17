@@ -11,6 +11,7 @@ export default {
         listingType: '/listing-type',
         color: '/color',
         productType: '/product-type',
+        review: '/review',
         feature: '/feature',
         listing: '/listing',
         listingFollow: '/listing/:listingId/follow',

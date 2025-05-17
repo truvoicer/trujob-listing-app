@@ -9,7 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { ProductType } from "@/types/ProductType";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { OnRowSelectActionClick } from "@/components/Table/DataTable";
@@ -31,7 +31,7 @@ export type ManageProductTypeProps = {
 export const EDIT_PRODUCT_TYPE_MODAL_ID = 'edit-product-type-modal';
 
 function ManageProductType({
-    operation,
+    operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -131,7 +131,7 @@ function ManageProductType({
         };
     }
 
-    function getListingFormModalProps() {
+    function getProductTypeFormModalProps() {
         return {
             formProps: {},
             show: true,
@@ -155,7 +155,7 @@ function ManageProductType({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: ProductType, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -165,7 +165,7 @@ function ManageProductType({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit Product Type',
                             component: (
                                 <EditProductType
                                     data={item}
@@ -174,7 +174,7 @@ function ManageProductType({
                                     modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getProductTypeFormModalProps(),
                         }, EDIT_PRODUCT_TYPE_MODAL_ID);
                     }}
                 >
@@ -190,7 +190,7 @@ function ManageProductType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
+                                        title: 'Edit Product Type',
                                         component: (
                                             <EditProductType
                                                 data={item}
@@ -199,7 +199,7 @@ function ManageProductType({
                                                 modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getProductTypeFormModalProps(),
                                     }, EDIT_PRODUCT_TYPE_MODAL_ID);
                                 }
                             }
@@ -212,7 +212,7 @@ function ManageProductType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete Listing',
+                                        title: 'Delete Product Type',
                                         component: (
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
@@ -223,7 +223,7 @@ function ManageProductType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Listing ID is required</p>
+                                                        <p>Product Type ID is required</p>
                                                     ),
                                                 }, 'listing-delete-error');
                                                 return;
@@ -365,7 +365,7 @@ function ManageProductType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>Product Type IDs are required</p>
                                 ),
                             }, 'listing-bulk-delete-error');
                             return;
@@ -395,7 +395,7 @@ function ManageProductType({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Product Types deleted successfully</p>
                             ),
                         }, 'listing-bulk-delete-success');
                         dataTableContextState.refresh();
@@ -418,7 +418,7 @@ function ManageProductType({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Product Types'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
