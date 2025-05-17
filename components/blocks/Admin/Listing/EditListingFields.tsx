@@ -343,6 +343,7 @@ function EditListingFields({
                                 );
                                 return;
                             }
+                             console.log('brands', brands);
                             setFieldValue('brands', brands);
                         }}
                     />

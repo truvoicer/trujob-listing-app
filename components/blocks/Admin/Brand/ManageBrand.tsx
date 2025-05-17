@@ -423,6 +423,7 @@ function ManageBrand({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+            data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

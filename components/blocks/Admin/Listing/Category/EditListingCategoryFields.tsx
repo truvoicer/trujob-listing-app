@@ -42,16 +42,7 @@ function EditListingCategoryFields({
                     }
                     const checkedCategories = categories.filter((item) => item?.checked);
 
-                    // setSelectedBrands(prevState => {
-                    //     let cloneState = [...prevState];
-                    //     return [
-                    //         ...cloneState,
-                    //         ...checkedBrands.filter((item) => {
-                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                    //         })
-                    //     ];
-                    // });
-                    const existingCategories = data || [];
+                    const existingCategories = formHelpers?.values?.categories || [];
                     formHelpers.setFieldValue('categories', [
                         ...existingCategories,
                         ...checkedCategories.filter((item) => {

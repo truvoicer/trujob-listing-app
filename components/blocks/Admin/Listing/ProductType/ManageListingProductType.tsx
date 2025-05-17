@@ -1,23 +1,20 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditListingProductType from "./EditListingProductType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageProductType from "../../ProductType/ManageProductType";
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { ProductType } from "@/types/ProductType";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
@@ -109,6 +106,7 @@ function ManageListingProductType({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingProductType
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -211,6 +209,7 @@ function ManageListingProductType({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingProductType
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -347,6 +346,7 @@ function ManageListingProductType({
             }) => {
                 return (
                     <EditListingProductType
+                        listingId={listingId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_LISTING_PRODUCT_TYPE_MODAL_ID}

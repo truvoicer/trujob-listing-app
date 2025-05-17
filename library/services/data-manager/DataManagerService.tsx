@@ -13,12 +13,13 @@ export class DataManagerService {
             onChange: (values: any) => void
         }
     ) {
+        console.warn('selectorModeCreateHandler', data, values);
         if (Array.isArray(data)) {
-            if (!Array.isArray(values?.features)) {
+            if (!Array.isArray(values)) {
                 console.warn('Invalid values received from ManageUser component');
                 return;
             }
-            if (!values?.features?.length) {
+            if (!values?.length) {
                 console.warn('No features selected');
                 return;
             }

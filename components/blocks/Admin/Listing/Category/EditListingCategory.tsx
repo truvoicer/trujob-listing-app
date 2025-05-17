@@ -16,12 +16,14 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Category } from "@/types/Category";
 
 export type EditListingCategoryProps = {
+    listingId?: number;
     data?: Listing;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditListingCategory({
+    listingId,
     data,
     operation,
     inModal = false,
@@ -35,100 +37,75 @@ function EditListingCategory({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Listing = {
-        id: data?.id || 0,
-        name: data?.name || '',
-        title: data?.title || '',
-        description: data?.description || '',
-        active: data?.active || false,
-        allow_offers: data?.allow_offers || false,
-        quantity: data?.quantity || 0,
-        listing_type: data?.listing_type || {
-            id: data?.listing_type?.id || 0,
-            name: data?.listing_type?.name || '',
-            label: data?.listing_type?.label || '',
-            description: data?.listing_type?.description || '',
-        },
-        listing_user: data?.listing_user || {
-            id: data?.listing_user?.id || 0,
-            first_name: data?.listing_user?.first_name || '',
-            last_name: data?.listing_user?.last_name || '',
-            username: data?.listing_user?.username || '',
-            email: data?.listing_user?.email || '',
-            created_at: data?.listing_user?.created_at || '',
-            updated_at: data?.listing_user?.updated_at || '',
-        },
-        listing_follow: data?.listing_follow || [],
-        listing_feature: data?.listing_feature || [],
-        listing_review: data?.listing_review || [],
-        listing_category: data?.listing_category || [],
-        listing_brand: data?.listing_brand || [],
-        listing_color: data?.listing_color || [],
-        listing_product_type: data?.listing_product_type || [],
-        media: data?.media || [],
-        created_at: data?.created_at || '',
-        updated_at: data?.updated_at || '',
+    const initialValues: {
+        categories: Array<Category>;
+    } = {
+        categories: data?.categories || [],
     };
 
-    async function handleSubmit(values: {categories: Array<Category>}) {
-            if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-                console.warn('No data to update');
-                return;
-            }
-            if (!data?.id) {
-                console.log('Listing type ID is required');
-                return;
-            }
-            if (!Array.isArray(values?.categories)) {
-                return;
-            }
-            let response = null;
-            let requestData = {
-                ids: RequestHelpers.extractIdsFromArray(values?.categories),
-            }
-            switch (operation) {
-                case 'add':
-                case 'create':
-                    console.log('create requestData', requestData);
-                    response = await truJobApiMiddleware.resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingCategory.replace(
-                                ':listingId',
-                                data.id.toString(),
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: requestData,
-                    })
-                    break;
-                default:
-                    console.warn('Invalid operation');
-                    break;
-            }
-    
-            if (!response) {
-                setAlert({
-                    show: true,
-                    message: (
-                        <div>
-                            <strong>Error:</strong>
-                            {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
-                                return (
-                                    <div key={index}>{error.message}</div>
-                                )
-                            })}
-                        </div>
-                    ),
-                    type: 'danger',
-                });
-                return;
-            }
-            dataTableContext.refresh();
-            dataTableContext.modal.close(EDIT_LISTING_CATEGORY_MODAL_ID);
-            dataTableContext.modal.close(CREATE_LISTING_CATEGORY_MODAL_ID);
-    
+    async function handleSubmit(values: { categories: Array<Category> }) {
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
+            console.warn('No data to update');
+            return;
+        }
+
+        if (!listingId) {
+            console.log('Listing ID is required');
+            return;
+        }
+        if (!Array.isArray(values?.categories)) {
+            console.warn('Invalid values received');
+            return;
+        }
+        let response = null;
+        let requestData = {
+            ids: RequestHelpers.extractIdsFromArray(values?.categories),
+        }
+        switch (operation) {
+            case 'add':
+            case 'create':
+                case 'edit':
+            case 'update':
+                console.log('create requestData', requestData);
+                response = await truJobApiMiddleware.resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.listingCategory.replace(
+                            ':listingId',
+                            listingId.toString(),
+                        ),
+                        'create',
+                    ]),
+                    method: ApiMiddleware.METHOD.POST,
+                    protectedReq: true,
+                    data: requestData,
+                })
+                break;
+            default:
+                console.warn('Invalid operation');
+                break;
+        }
+
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_LISTING_CATEGORY_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_CATEGORY_MODAL_ID);
+
     }
 
 

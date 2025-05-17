@@ -41,22 +41,13 @@ function EditListingColorFields({
                         console.log('Invalid values received from ManageUser component');
                         return;
                     }
-                    const checkedCategories = colors.filter((item) => item?.checked);
+                    const checked = colors.filter((item) => item?.checked);
 
-                    // setSelectedBrands(prevState => {
-                    //     let cloneState = [...prevState];
-                    //     return [
-                    //         ...cloneState,
-                    //         ...checkedBrands.filter((item) => {
-                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                    //         })
-                    //     ];
-                    // });
-                    const existingCategories = data || [];
+                    const existing = formHelpers?.values?.colors || [];
                     formHelpers.setFieldValue('colors', [
-                        ...existingCategories,
-                        ...checkedCategories.filter((item) => {
-                            return !existingCategories.find((checkedItem) => checkedItem?.id === item?.id);
+                        ...existing,
+                        ...checked.filter((item) => {
+                            return !existing.find((checkedItem) => checkedItem?.id === item?.id);
                         })
                     ]);
                 }}

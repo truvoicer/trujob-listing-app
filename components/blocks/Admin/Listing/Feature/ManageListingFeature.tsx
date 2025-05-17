@@ -17,8 +17,6 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Feature } from "@/types/Feature";
 import { ModalItem } from "@/library/services/modal/ModalService";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageFeature from "../../Feature/ManageFeature";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export const CREATE_LISTING_FEATURE_MODAL_ID = 'create-features-modal';
@@ -110,6 +108,7 @@ function ManageListingFeature({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingFeature
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -212,6 +211,7 @@ function ManageListingFeature({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingFeature
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -348,6 +348,7 @@ function ManageListingFeature({
             }) => {
                 return (
                     <EditListingFeature
+                        listingId={listingId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_LISTING_FEATURE_MODAL_ID}

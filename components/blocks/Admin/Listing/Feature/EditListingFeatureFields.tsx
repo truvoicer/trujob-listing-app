@@ -39,22 +39,13 @@ function EditListingFeatureFields({
                         console.log('Invalid values received from ManageUser component');
                         return;
                     }
-                    const checkedFeatures = features.filter((item) => item?.checked);
+                    const checked = features.filter((item) => item?.checked);
 
-                    // setSelectedBrands(prevState => {
-                    //     let cloneState = [...prevState];
-                    //     return [
-                    //         ...cloneState,
-                    //         ...checkedBrands.filter((item) => {
-                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                    //         })
-                    //     ];
-                    // });
-                    const existingFeatures = data || [];
+                    const existing = formHelpers?.values?.features || [];
                     formHelpers.setFieldValue('features', [
-                        ...existingFeatures,
-                        ...checkedFeatures.filter((item) => {
-                            return !existingFeatures.find((checkedItem) => checkedItem?.id === item?.id);
+                        ...existing,
+                        ...checked.filter((item) => {
+                            return !existing.find((checkedItem) => checkedItem?.id === item?.id);
                         })
                     ]);
                 }}

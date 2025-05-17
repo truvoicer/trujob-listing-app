@@ -1,23 +1,20 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditListingColor from "./EditListingColor";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import ManageColor from "../../Color/ManageColor";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { Color } from "react-bootstrap/esm/types";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
@@ -111,6 +108,7 @@ function ManageListingColor({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingColor
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -213,6 +211,7 @@ function ManageListingColor({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingColor
+                                    listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -348,6 +347,7 @@ function ManageListingColor({
             }) => {
                 return (
                     <EditListingColor
+                                    listingId={listingId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_LISTING_COLOR_MODAL_ID}

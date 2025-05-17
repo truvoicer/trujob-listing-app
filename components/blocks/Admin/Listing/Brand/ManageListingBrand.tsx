@@ -1,26 +1,22 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext, useState } from "react";
 import EditListingBrand from "./EditListingBrand";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import ManageBrand from "../../Brand/ManageBrand";
-
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { Brand } from "@/types/Brand";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export interface ManageListingBrandProps extends DataManageComponentProps {
@@ -72,6 +68,7 @@ function ManageListingBrand({
                     console.warn('submitForm is not a function');
                     return;
                 }
+                console.log('formHelpers', formHelpers);
                 switch (mode) {
                     case 'selector':
                         DataManagerService.selectorModeCreateHandler({
@@ -111,6 +108,7 @@ function ManageListingBrand({
                             title: 'Edit Listing',
                             component: (
                                 <EditListingBrand
+                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -198,6 +196,7 @@ function ManageListingBrand({
                                         title: 'Edit Listing',
                                         component: (
                                             <EditListingBrand
+                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -336,7 +335,8 @@ function ManageListingBrand({
             }) => {
                 return (
                     <EditListingBrand
-                        operation={operation}
+                        listingId={listingId}
+                        operation={'create'}
                         inModal={true}
                         modalId={CREATE_LISTING_BRAND_MODAL_ID}
                     />

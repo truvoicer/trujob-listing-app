@@ -16,12 +16,14 @@ import { Feature } from "@/types/Feature";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type EditListingFeatureProps = {
+    listingId?: number;
     data?: Listing;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditListingFeature({
+    listingId,
     data,
     operation,
     inModal = false,
@@ -35,68 +37,74 @@ function EditListingFeature({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: ListingFeature = {
-        
+    const initialValues: {
+        features: Array<Feature>;
+    } = {
+        features: data?.features || [],
     };
 
-    async function handleSubmit(values: {features: Array<Feature>}) {
-            if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-                console.warn('No data to update');
-                return;
-            }
-            if (!data?.id) {
-                console.log('Listing feature ID is required');
-                return;
-            }
-            if (!Array.isArray(values?.features)) {
-                return;
-            }
-            let response = null;
-            let requestData = {
-                ids: RequestHelpers.extractIdsFromArray(values?.features),
-            }
-            switch (operation) {
-                case 'add':
-                case 'create':
-                    console.log('create requestData', requestData);
-                    response = await truJobApiMiddleware.resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFeature.replace(
-                                ':listingId',
-                                data.id.toString(),
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: requestData,
-                    })
-                    break;
-                default:
-                    console.warn('Invalid operation');
-                    break;
-            }
-    
-            if (!response) {
-                setAlert({
-                    show: true,
-                    message: (
-                        <div>
-                            <strong>Error:</strong>
-                            {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
-                                return (
-                                    <div key={index}>{error.message}</div>
-                                )
-                            })}
-                        </div>
-                    ),
-                    type: 'danger',
-                });
-                return;
-            }
-            dataTableContext.refresh();
-            dataTableContext.modal.close(EDIT_LISTING_FEATURE_MODAL_ID);
-            dataTableContext.modal.close(CREATE_LISTING_FEATURE_MODAL_ID);
+    async function handleSubmit(values: { features: Array<Feature> }) {
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
+            console.warn('No data to update');
+            return;
+        }
+
+        if (!listingId) {
+            console.log('Listing ID is required');
+            return;
+        }
+        if (!Array.isArray(values?.features)) {
+            console.warn('Invalid values received');
+            return;
+        }
+        let response = null;
+        let requestData = {
+            ids: RequestHelpers.extractIdsFromArray(values?.features),
+        }
+        switch (operation) {
+            case 'add':
+            case 'create':
+            case 'edit':
+                case 'update':
+                console.log('create requestData', requestData);
+                response = await truJobApiMiddleware.resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.listingFeature.replace(
+                            ':listingId',
+                            listingId.toString(),
+                        ),
+                        'create',
+                    ]),
+                    method: ApiMiddleware.METHOD.POST,
+                    protectedReq: true,
+                    data: requestData,
+                })
+                break;
+            default:
+                console.warn('Invalid operation');
+                break;
+        }
+
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_LISTING_FEATURE_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_FEATURE_MODAL_ID);
     }
 
 

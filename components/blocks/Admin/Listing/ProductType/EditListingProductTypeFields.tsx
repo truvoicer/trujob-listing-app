@@ -44,16 +44,7 @@ function EditListingProductTypeFields({
                     }
                     const checkedProductTypes = productTypes.filter((item) => item?.checked);
 
-                    // setSelectedBrands(prevState => {
-                    //     let cloneState = [...prevState];
-                    //     return [
-                    //         ...cloneState,
-                    //         ...checkedBrands.filter((item) => {
-                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                    //         })
-                    //     ];
-                    // });
-                    const existingProductTypes = data || [];
+                    const existingProductTypes = formHelpers?.values?.productTypes || [];
                     formHelpers.setFieldValue('productTypes', [
                         ...existingProductTypes,
                         ...checkedProductTypes.filter((item) => {

@@ -41,17 +41,7 @@ function EditListingBrandFields({
                         return;
                     }
                     const checkedBrands = brands.filter((item) => item?.checked);
-
-                    // setSelectedBrands(prevState => {
-                    //     let cloneState = [...prevState];
-                    //     return [
-                    //         ...cloneState,
-                    //         ...checkedBrands.filter((item) => {
-                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                    //         })
-                    //     ];
-                    // });
-                    const existingBrands = data || [];
+                    const existingBrands = formContext?.values?.brands || [];
                     formContext.setFieldValue('brands', [
                         ...existingBrands,
                         ...checkedBrands.filter((item) => {

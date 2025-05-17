@@ -16,12 +16,14 @@ import { Brand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 export type EditListingBrandProps = {
+    listingId?: number;
     data?: Listing;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
 function EditListingBrand({
+    listingId,
     data,
     operation,
     inModal = false,
@@ -35,52 +37,25 @@ function EditListingBrand({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Listing = {
-        id: data?.id || 0,
-        name: data?.name || '',
-        title: data?.title || '',
-        description: data?.description || '',
-        active: data?.active || false,
-        allow_offers: data?.allow_offers || false,
-        quantity: data?.quantity || 0,
-        listing_type: data?.listing_type || {
-            id: data?.listing_type?.id || 0,
-            name: data?.listing_type?.name || '',
-            label: data?.listing_type?.label || '',
-            description: data?.listing_type?.description || '',
-        },
-        listing_user: data?.listing_user || {
-            id: data?.listing_user?.id || 0,
-            first_name: data?.listing_user?.first_name || '',
-            last_name: data?.listing_user?.last_name || '',
-            username: data?.listing_user?.username || '',
-            email: data?.listing_user?.email || '',
-            created_at: data?.listing_user?.created_at || '',
-            updated_at: data?.listing_user?.updated_at || '',
-        },
-        listing_follow: data?.listing_follow || [],
-        listing_feature: data?.listing_feature || [],
-        listing_review: data?.listing_review || [],
-        listing_category: data?.listing_category || [],
-        listing_brand: data?.listing_brand || [],
-        listing_color: data?.listing_color || [],
-        listing_product_type: data?.listing_product_type || [],
-        media: data?.media || [],
-        created_at: data?.created_at || '',
-        updated_at: data?.updated_at || '',
+    const initialValues: {
+        brands: Array<Brand>;
+    } = {
+        brands: data?.brands || [],
     };
 
-    async function handleSubmit(values: Array<Brand>) {
-
+    async function handleSubmit(values: {
+        brands: Array<Brand>;
+    }) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
-        if (!data?.id) {
-            console.log('Listing type ID is required');
+        if (!listingId) {
+            console.log('Listing ID is required');
             return;
         }
         if (!Array.isArray(values?.brands)) {
+            console.warn('Invalid values received');
             return;
         }
         let response = null;
@@ -90,12 +65,14 @@ function EditListingBrand({
         switch (operation) {
             case 'add':
             case 'create':
+            case 'edit':
+            case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingBrand.replace(
                             ':listingId',
-                            data.id.toString(),
+                            listingId.toString(),
                         ),
                         'create',
                     ]),

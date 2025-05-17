@@ -48,10 +48,11 @@ function EditListingFollow({
             return;
         }
         if (!listingId) {
-            console.log('Listing feature ID is required');
+            console.log('Listing ID is required');
             return;
         }
         if (!Array.isArray(values?.users)) {
+            console.warn('Invalid values received');
             return;
         }
         let response = null;
@@ -61,6 +62,8 @@ function EditListingFollow({
         switch (operation) {
             case 'add':
             case 'create':
+                case 'edit':
+                case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([

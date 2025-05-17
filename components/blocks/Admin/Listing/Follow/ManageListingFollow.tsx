@@ -1,25 +1,21 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditListingFollow from "./EditListingFollow";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageUser from "../../User/ManageUser";
 import { ModalItem } from "@/library/services/modal/ModalService";
-
 import { User } from "@/types/User";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
@@ -373,6 +369,7 @@ function ManageListingFollow({
             }) => {
                 return (
                     <EditListingFollow
+                        listingId={listingId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_LISTING_FOLLOW_MODAL_ID}
