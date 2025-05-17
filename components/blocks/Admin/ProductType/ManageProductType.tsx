@@ -6,31 +6,29 @@ import EditProductType from "./EditProductType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { ProductType } from "@/types/ProductType";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageProductTypeProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageProductTypeProps extends DataManageComponentProps {
+    data?: Array<ProductType>;
 }
 export const EDIT_PRODUCT_TYPE_MODAL_ID = 'edit-product-type-modal';
+export const DELETE_PRODUCT_TYPE_MODAL_ID = 'delete-product-type-modal';
+export const CREATE_PRODUCT_TYPE_MODAL_ID = 'create-product-type-modal';
 
 function ManageProductType({
+    mode = 'selector',
+    data,
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -43,76 +41,24 @@ function ManageProductType({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    productTypes: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getAddNewModalProps() {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    users: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.log('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            console.log('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            console.log('No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.users
-                            ]);
-                        }
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.productType,
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
+                initialValues: getAddNewModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -122,9 +68,34 @@ function ManageProductType({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.productTypes,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -176,6 +147,72 @@ function ManageProductType({
                             ),
                             ...getProductTypeFormModalProps(),
                         }, EDIT_PRODUCT_TYPE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Product type',
+                            component: (
+                                <p>Are you sure you want to delete this product type ({item?.name})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete product type', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_PRODUCT_TYPE_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Product type ID is required</p>
+                                        ),
+                                    }, 'product-type-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.productType,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete product type</p>
+                                        ),
+                                    }, 'product-type-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_PRODUCT_TYPE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -343,7 +380,7 @@ function ManageProductType({
             }: DMOnRowSelectActionClick) => {
 
                 dataTableContextState.confirmation.show({
-                    title: 'Edit Menu',
+                    title: 'Edit Product type',
                     message: 'Are you sure you want to delete selected listings?',
                     onOk: async () => {
                         console.log('Yes')

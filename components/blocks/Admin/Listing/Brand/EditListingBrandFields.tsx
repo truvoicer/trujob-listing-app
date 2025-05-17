@@ -4,6 +4,8 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectBrand from "./SelectBrand";
+import ManageBrand from "../../Brand/ManageBrand";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 
 type EditListingBrandFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -17,23 +19,48 @@ function EditListingBrandFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    const formContext = useFormikContext<FormikValues>() || {};
 
     return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
+        <AccessControlComponent
+            roles={[
+                { name: 'admin' },
+                { name: 'superuser' },
+                { name: 'user' },
+            ]}
+        >
+            <ManageBrand
+                operation={operation}
+                rowSelection={true}
+                multiRowSelection={true}
+                enableEdit={false}
+                paginationMode="state"
+                onChange={async (brands: Array<any>) => {
+                    if (!Array.isArray(brands)) {
+                        console.log('Invalid values received from ManageUser component');
+                        return;
+                    }
+                    const checkedBrands = brands.filter((item) => item?.checked);
 
-                    <div className="col-12 col-lg-6">
-                        <SelectBrand
-                            name="listing_type"
-                            value={values?.type}
-                        />
-                    </div>
-
-                </div>
-            </div>
-        </div>
+                    // setSelectedBrands(prevState => {
+                    //     let cloneState = [...prevState];
+                    //     return [
+                    //         ...cloneState,
+                    //         ...checkedBrands.filter((item) => {
+                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
+                    //         })
+                    //     ];
+                    // });
+                    const existingBrands = data || [];
+                    formContext.setFieldValue('brands', [
+                        ...existingBrands,
+                        ...checkedBrands.filter((item) => {
+                            return !existingBrands.find((checkedItem) => checkedItem?.id === item?.id);
+                        })
+                    ]);
+                }}
+            />
+        </AccessControlComponent>
     );
 }
 export default EditListingBrandFields;

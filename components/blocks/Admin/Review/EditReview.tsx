@@ -98,6 +98,9 @@ function EditReview({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.reviews)) {
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.review,

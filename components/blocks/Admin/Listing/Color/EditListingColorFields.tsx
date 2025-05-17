@@ -4,6 +4,8 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectColor from "./SelectColor";
+import ManageColor from "../../Color/ManageColor";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 
 type EditListingColorFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -17,23 +19,49 @@ function EditListingColorFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    const formHelpers = useFormikContext<FormikValues>() || {};
 
 
     return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
+        <AccessControlComponent
+            roles={[
+                { name: 'admin' },
+                { name: 'superuser' },
+                { name: 'user' },
+            ]}
+        >
+            <ManageColor
+                operation={operation}
+                rowSelection={true}
+                multiRowSelection={true}
+                enableEdit={false}
+                paginationMode="state"
+                onChange={async (colors: Array<any>) => {
+                    if (!Array.isArray(colors)) {
+                        console.log('Invalid values received from ManageUser component');
+                        return;
+                    }
+                    const checkedCategories = colors.filter((item) => item?.checked);
 
-                    <div className="col-12 col-lg-6">
-                        <SelectColor
-                            name="listing_type"
-                        />
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
+                    // setSelectedBrands(prevState => {
+                    //     let cloneState = [...prevState];
+                    //     return [
+                    //         ...cloneState,
+                    //         ...checkedBrands.filter((item) => {
+                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
+                    //         })
+                    //     ];
+                    // });
+                    const existingCategories = data || [];
+                    formHelpers.setFieldValue('colors', [
+                        ...existingCategories,
+                        ...checkedCategories.filter((item) => {
+                            return !existingCategories.find((checkedItem) => checkedItem?.id === item?.id);
+                        })
+                    ]);
+                }}
+            />
+        </AccessControlComponent>
     );
 }
 export default EditListingColorFields;

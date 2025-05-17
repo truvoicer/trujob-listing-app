@@ -5,24 +5,28 @@ import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditSidebar from "./EditSidebar";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Sidebar } from "@/types/Sidebar";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContext } from "@/contexts/DataTableContext";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-sidebar-modal';
-export type ManageSidebarProps = {
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export const CREATE_SIDEBAR_MODAL_ID = 'create-sidebar-modal';
+export const DELETE_SIDEBAR_MODAL_ID = 'delete-sidebar-modal';
+export interface ManageSidebarProps extends DataManageComponentProps {
+    data?: Array<Sidebar>;
 }
 function ManageSidebar({
+    operation = 'create',
+    data,
+    mode = 'selector',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -32,25 +36,65 @@ function ManageSidebar({
 }: ManageSidebarProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppModalContext);
+    const dataTableContext = useContext(DataTableContext);
+
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    sidebars: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getSidebarFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
-                    return false;
+                    return;
+                }
+                if (!operation) {
+                    console.warn('Operation is required');
+                    return;
                 }
                 if (typeof formHelpers?.submitForm !== 'function') {
-                    return false;
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.sidebars,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
                 }
-                return true;
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }

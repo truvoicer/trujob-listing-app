@@ -6,31 +6,28 @@ import EditBrand from "./EditBrand";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Brand } from "@/types/Brand";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export const CREATE_BRAND_MODAL_ID = 'create-brand-modal';
 export const EDIT_BRAND_MODAL_ID = 'edit-brand-modal';
 export const DELETE_BRAND_MODAL_ID = 'delete-brand-modal';
 
-export type ManageBrandProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageBrandProps extends DataManageComponentProps {
+    data?: Array<Brand>;
 }
 
 function ManageBrand({
+    mode = 'selector',
+    data,
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -43,9 +40,25 @@ function ManageBrand({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    brands: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getBrandFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -54,14 +67,35 @@ function ManageBrand({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.brands,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -88,6 +122,72 @@ function ManageBrand({
                             ),
                             ...getBrandFormModalProps(),
                         }, EDIT_BRAND_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Brand',
+                            component: (
+                                <p>Are you sure you want to delete this brand ({item?.name} | {item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete brand', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_BRAND_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Brand ID is required</p>
+                                        ),
+                                    }, 'brand-brand-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.brand,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete brand</p>
+                                        ),
+                                    }, 'brand-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_BRAND_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -126,7 +226,7 @@ function ManageBrand({
                                     appModalContext.show({
                                         title: 'Delete Brand',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this brand ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -137,11 +237,11 @@ function ManageBrand({
                                                     component: (
                                                         <p>Brand ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'brand-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.brand}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -151,9 +251,9 @@ function ManageBrand({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete brand</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'brand-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
@@ -181,15 +281,12 @@ function ManageBrand({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
-        // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.brand)) {
+            query['brand'] = searchParams.brand;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function brandRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -222,7 +319,16 @@ function ManageBrand({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContextState.modal.show({
+        let modalState;
+        if (mode === 'selector') {
+            modalState = dataTableContext.modal;
+        } else if (mode === 'edit') {
+            modalState = dataTableContextState.modal;
+        } else {
+            console.warn('Invalid mode');
+            return;
+        }
+        modalState.show({
             title: 'Create Brand',
             component: (
                 <EditBrand
@@ -248,7 +354,7 @@ function ManageBrand({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected brands?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -257,9 +363,9 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No brands selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'brand-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -271,11 +377,11 @@ function ManageBrand({
                                 component: (
                                     <p>Brand IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'brand-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.brand}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -288,9 +394,9 @@ function ManageBrand({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete brands</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'brand-bulk-delete-error');
                             return;
                         }
 
@@ -301,13 +407,13 @@ function ManageBrand({
                             component: (
                                 <p>Brands deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'brand-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-brand-confirmation');
             }
         });
         return actions;
@@ -327,7 +433,7 @@ function ManageBrand({
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={brandRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Label', key: 'label' },

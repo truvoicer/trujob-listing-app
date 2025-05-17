@@ -6,7 +6,7 @@ import EditFeature from "./EditFeature";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Feature } from "@/types/Feature";
@@ -17,20 +17,18 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageFeatureProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageFeatureProps extends DataManageComponentProps {
     data?: Array<Feature>;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+
+export const EDIT_FEATURE_MODAL_ID = 'edit-feature-modal';
+export const CREATE_FEATURE_MODAL_ID = 'create-feature-modal';
+export const DELETE_FEATURE_MODAL_ID = 'delete-feature-modal';
 
 function ManageFeature({
+    mode = 'selector',
     data = [],
     operation = 'create',
     rowSelection = true,
@@ -44,80 +42,25 @@ function ManageFeature({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getAddNewModalProps() {
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    features: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+    function getAddNewModalProps({ dataTableContextState }: {
+        dataTableContextState: DataTableContextType
+    }) {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    features: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.features)) {
-                            console.warn('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.features?.length) {
-                            console.warn('No features selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.features.filter((item: any) => {
-                                    return !origData?.some((origItem: any) => {
-                                        return origItem?.id === item?.id;
-                                    });
-                                })
-                            ]);
-                        }
-                        return;
-                    }
-                    const featureIds = RequestHelpers.extractIdsFromArray(values?.features);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.feature,
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            ids: featureIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added feature/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-features-modal');
-                    return true;
-                }
+                initialValues: getAddNewModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -127,9 +70,34 @@ function ManageFeature({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.features,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -188,11 +156,77 @@ function ManageFeature({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_FEATURE_MODAL_ID}
                                 />
                             ),
                             ...getFeatureFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_FEATURE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Feature',
+                            component: (
+                                <p>Are you sure you want to delete this feature ({item?.name} | {item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete feature', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_FEATURE_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Feature ID is required</p>
+                                        ),
+                                    }, 'feature-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.feature,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete feature</p>
+                                        ),
+                                    }, 'feature-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_FEATURE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -213,11 +247,11 @@ function ManageFeature({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_FEATURE_MODAL_ID}
                                             />
                                         ),
                                         ...getFeatureFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_FEATURE_MODAL_ID);
                                 }
                             }
                         },
@@ -265,7 +299,7 @@ function ManageFeature({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_FEATURE_MODAL_ID);
                                 }
                             }
                         }
@@ -320,12 +354,22 @@ function ManageFeature({
             data: dataTableContextState?.post || {},
         });
     }
-    function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
-        dataTableContextState: DataTableContextType,
-        setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
-    }) {
+    function renderAddNew(
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        { dataTableContextState }: {
+            dataTableContextState: DataTableContextType
+        }) {
         e.preventDefault();
-        dataTableContext.modal.show({
+        let modalState;
+        if (mode === 'selector') {
+            modalState = dataTableContext.modal;
+        } else if (mode === 'edit') {
+            modalState = dataTableContextState.modal;
+        } else {
+            console.warn('Invalid mode');
+            return;
+        }
+        modalState.show({
             title: 'Select Users',
             component: ({
                 modal,
@@ -340,12 +384,12 @@ function ManageFeature({
                     <EditFeature
                         operation={'add'}
                         inModal={true}
-                        modalId={EDIT_PAGE_MODAL_ID}
+                        modalId={CREATE_FEATURE_MODAL_ID}
                     />
                 )
             },
-            ...getAddNewModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+            ...getAddNewModalProps({ dataTableContextState }),
+        }, CREATE_FEATURE_MODAL_ID);
     }
 
     function getRowSelectActions() {

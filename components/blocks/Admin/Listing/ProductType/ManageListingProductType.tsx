@@ -6,7 +6,7 @@ import EditListingProductType from "./EditListingProductType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
@@ -20,23 +20,18 @@ import AccessControlComponent from "@/components/AccessControl/AccessControlComp
 import ManageProductType from "../../ProductType/ManageProductType";
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { ProductType } from "@/types/ProductType";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageListingProductTypeProps = {
+export interface ManageListingProductTypeProps extends DataManageComponentProps {
     data?: Array<ProductType>;
-    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
 }
 export const EDIT_LISTING_PRODUCT_TYPE_MODAL_ID = 'edit-listing-product-type-modal';
 export const DELETE_LISTING_PRODUCT_TYPE_MODAL_ID = 'delete-listing-product-type-modal';
 export const CREATE_LISTING_PRODUCT_TYPE_MODAL_ID = 'create-listing-product-type-modal';
 
 function ManageListingProductType({
+    mode = 'selector',
     data,
     operation,
     listingId,
@@ -58,77 +53,6 @@ function ManageListingProductType({
                 initialValues: {
                     productTypes: [],
                 },
-                onSubmit: async (values: FormikValues) => {
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.productTypes)) {
-                            console.warn('Invalid values');
-                            return;
-                        }
-                        if (!values?.productTypes?.length) {
-                            console.warn('No productTypes selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.productTypes.filter((item: any) => {
-                                    return !origData.some((checkedItem: any) => checkedItem?.id === item?.id);
-                                })
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Listing ID is required');
-                        return;
-                    }
-                    const ids = RequestHelpers.extractIdsFromArray(values?.productTypes);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingBrand.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            ids: ids,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added productType/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-productTypes-modal');
-                    return true;
-                }
             },
             show: true,
             showFooter: true,
@@ -138,14 +62,35 @@ function ManageListingProductType({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.productTypes,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -401,45 +346,11 @@ function ManageListingProductType({
                 formHelpers?: any
             }) => {
                 return (
-                    <AccessControlComponent
-                        roles={[
-                            { name: 'admin' },
-                            { name: 'superuser' },
-                            { name: 'user' },
-                        ]}
-                    >
-                        <ManageProductType
-                            operation={operation}
-                            rowSelection={true}
-                            multiRowSelection={true}
-                            enableEdit={false}
-                            paginationMode="state"
-                            onChange={async (productTypes: Array<any>) => {
-                                if (!Array.isArray(productTypes)) {
-                                    console.log('Invalid values received from ManageUser component');
-                                    return;
-                                }
-                                const checkedProductTypes = productTypes.filter((item) => item?.checked);
-
-                                // setSelectedBrands(prevState => {
-                                //     let cloneState = [...prevState];
-                                //     return [
-                                //         ...cloneState,
-                                //         ...checkedBrands.filter((item) => {
-                                //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                                //         })
-                                //     ];
-                                // });
-                                const existingProductTypes = data || [];
-                                formHelpers.setFieldValue('productTypes', [
-                                    ...existingProductTypes,
-                                    ...checkedProductTypes.filter((item) => {
-                                        return !existingProductTypes.find((checkedItem) => checkedItem?.id === item?.id);
-                                    })
-                                ]);
-                            }}
-                        />
-                    </AccessControlComponent>
+                    <EditListingProductType
+                        operation={operation}
+                        inModal={true}
+                        modalId={CREATE_LISTING_PRODUCT_TYPE_MODAL_ID}
+                    />
                 )
             },
             ...getListingFormModalProps(),

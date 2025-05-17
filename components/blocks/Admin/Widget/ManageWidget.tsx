@@ -5,24 +5,26 @@ import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditWidget from "./EditWidget";
 import { FormikProps, FormikValues } from "formik";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Widget } from "@/types/Widget";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContext } from "@/contexts/DataTableContext";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export const EDIT_SIDEBAR_MODAL_ID = 'edit-widget-modal';
-export type ManageWidgetProps = {
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageWidgetProps extends DataManageComponentProps {
+    data?: Array<Widget>;
 }
 function ManageWidget({
+    operation = 'create',
+    data,
+    mode = 'selector',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -32,9 +34,31 @@ function ManageWidget({
 }: ManageWidgetProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppModalContext);
+    const dataTableContext = useContext(DataTableContext);
+
+    const CREATE_WIDGET_MODAL_ID = 'create-widget-modal';
+    const EDIT_WIDGET_MODAL_ID = 'edit-widget-modal';
+    const DELETE_WIDGET_MODAL_ID = 'delete-widget-modal';
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    widgets: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getWidgetFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -43,14 +67,35 @@ function ManageWidget({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.widgets,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -192,83 +237,83 @@ function ManageWidget({
         }, EDIT_SIDEBAR_MODAL_ID);
     }
 
-        function getRowSelectActions() {
-            let actions = [];
-            actions.push({
-                label: 'Delete',
-                name: 'delete',
-                onClick: ({
-                    action,
-                    data,
-                    dataTableContextState,
-                }: DMOnRowSelectActionClick) => {
-    
-                    dataTableContextState.confirmation.show({
-                        title: 'Bulk Delete Widgets',
-                        message: 'Are you sure you want to delete selected widgets?',
-                        onOk: async () => {
-                            console.log('Yes')
-                            if (!data?.length) {
-                                notificationContext.show({
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>No widgets selected</p>
-                                    ),
-                                }, 'widget-bulk-delete-error');
-                                return;
-                            }
-                            const ids = RequestHelpers.extractIdsFromArray(data);
-                            if (!ids?.length) {
-                                notificationContext.show({
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>Widget IDs are required</p>
-                                    ),
-                                }, 'widget-bulk-delete-error');
-                                return;
-                            }
-                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                endpoint: `${truJobApiConfig.endpoints.widget}/bulk/delete`,
-                                method: ApiMiddleware.METHOD.DELETE,
-                                protectedReq: true,
-                                data: {
-                                    ids: ids
-                                }
-                            })
-                            if (!response) {
-                                notificationContext.show({
-                                    variant: 'danger',
-                                    type: 'toast',
-                                    title: 'Error',
-                                    component: (
-                                        <p>Failed to delete widgets</p>
-                                    ),
-                                }, 'widget-bulk-delete-error');
-                                return;
-                            }
-    
+    function getRowSelectActions() {
+        let actions = [];
+        actions.push({
+            label: 'Delete',
+            name: 'delete',
+            onClick: ({
+                action,
+                data,
+                dataTableContextState,
+            }: DMOnRowSelectActionClick) => {
+
+                dataTableContextState.confirmation.show({
+                    title: 'Bulk Delete Widgets',
+                    message: 'Are you sure you want to delete selected widgets?',
+                    onOk: async () => {
+                        console.log('Yes')
+                        if (!data?.length) {
                             notificationContext.show({
-                                variant: 'success',
+                                variant: 'danger',
                                 type: 'toast',
-                                title: 'Success',
+                                title: 'Error',
                                 component: (
-                                    <p>Widgets deleted successfully</p>
+                                    <p>No widgets selected</p>
                                 ),
-                            }, 'widget-bulk-delete-success');
-                            dataTableContextState.refresh();
-                        },
-                        onCancel: () => {
-                            console.log('Cancel delete');
-                        },
-                    }, 'delete-bulk-page-confirmation');
-                }
-            });
-            return actions;
-        }
+                            }, 'widget-bulk-delete-error');
+                            return;
+                        }
+                        const ids = RequestHelpers.extractIdsFromArray(data);
+                        if (!ids?.length) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Widget IDs are required</p>
+                                ),
+                            }, 'widget-bulk-delete-error');
+                            return;
+                        }
+                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                            endpoint: `${truJobApiConfig.endpoints.widget}/bulk/delete`,
+                            method: ApiMiddleware.METHOD.DELETE,
+                            protectedReq: true,
+                            data: {
+                                ids: ids
+                            }
+                        })
+                        if (!response) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Failed to delete widgets</p>
+                                ),
+                            }, 'widget-bulk-delete-error');
+                            return;
+                        }
+
+                        notificationContext.show({
+                            variant: 'success',
+                            type: 'toast',
+                            title: 'Success',
+                            component: (
+                                <p>Widgets deleted successfully</p>
+                            ),
+                        }, 'widget-bulk-delete-success');
+                        dataTableContextState.refresh();
+                    },
+                    onCancel: () => {
+                        console.log('Cancel delete');
+                    },
+                }, 'delete-bulk-page-confirmation');
+            }
+        });
+        return actions;
+    }
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager

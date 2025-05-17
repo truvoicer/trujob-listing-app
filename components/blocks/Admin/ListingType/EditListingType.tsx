@@ -9,6 +9,8 @@ import EditListingTypeFields from "./EditListingTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateListingType, ListingType, UpdateListingType } from "@/types/ListingType";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { CREATE_LISTING_TYPE_MODAL_ID, EDIT_LISTING_TYPE_MODAL_ID } from "./ManageListingType";
 
 
 export type EditListingTypeProps = {
@@ -86,6 +88,11 @@ function EditListingType({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.listingTypes)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingType,
@@ -93,13 +100,24 @@ function EditListingType({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: buildCreateData(values),
+                    data: requestData,
                 })
                 break;
             default:
                 console.log('Invalid operation');
                 break;
         }
+        if (!response) {
+            setAlert({
+                show: true,
+                message: 'Error occurred while processing the request',
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_LISTING_TYPE_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_TYPE_MODAL_ID);
     }
 
 

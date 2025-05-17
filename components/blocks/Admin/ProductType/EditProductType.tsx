@@ -86,6 +86,11 @@ function EditProductType({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.productTypes)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.productType,

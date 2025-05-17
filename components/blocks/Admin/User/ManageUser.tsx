@@ -6,7 +6,7 @@ import EditUser from "./EditUser";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { User } from "@/types/User";
@@ -14,20 +14,18 @@ import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
-export type ManageUserProps = {
-    values?: Array<User>;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageUserProps extends DataManageComponentProps {
+    data?: Array<User>;
 }
 export const EDIT_USER_MODAL_ID = 'edit-user-modal';
 
 function ManageUser({
+    operation = 'create',
+    mode = 'selector',
     values,
     rowSelection = true,
     multiRowSelection = true,
@@ -40,9 +38,25 @@ function ManageUser({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    users: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getUserFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -51,14 +65,35 @@ function ManageUser({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.users,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -127,7 +162,7 @@ function ManageUser({
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -143,7 +178,7 @@ function ManageUser({
                                                 protectedReq: true
                                             })
                                             if (!response) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -236,14 +271,14 @@ function ManageUser({
                 data,
                 dataTableContextState,
             }: DMOnRowSelectActionClick) => {
-                
+
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected users?',
-                    onOk: async () => { 
+                    onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
-                            notificationContext.show({      
+                            notificationContext.show({
                                 variant: 'danger',
                                 type: 'toast',
                                 title: 'Error',
@@ -284,7 +319,7 @@ function ManageUser({
                             }, 'user-bulk-delete-error');
                             return;
                         }
-                        
+
                         notificationContext.show({
                             variant: 'success',
                             type: 'toast',
@@ -300,10 +335,10 @@ function ManageUser({
                     },
                 }, 'delete-bulk-user-confirmation');
             }
-        }); 
+        });
         return actions;
     }
-    
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager

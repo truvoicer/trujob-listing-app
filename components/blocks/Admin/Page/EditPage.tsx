@@ -112,6 +112,9 @@ function EditPage({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.productTypes)) {
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.page}/create`,
                     method: ApiMiddleware.METHOD.POST,

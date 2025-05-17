@@ -4,6 +4,8 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectProductType from "./SelectProductType";
+import ManageProductType from "../../ProductType/ManageProductType";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 
 type EditListingProductTypeFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -17,23 +19,50 @@ function EditListingProductTypeFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
+    const formHelpers = useFormikContext<FormikValues>() || {};
+
 
     return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
 
-                    <div className="col-12 col-lg-6">
-                        <SelectProductType
-                            name="product_type"
-                        />
-                    </div>
+        <AccessControlComponent
+            roles={[
+                { name: 'admin' },
+                { name: 'superuser' },
+                { name: 'user' },
+            ]}
+        >
+            <ManageProductType
+                operation={operation}
+                rowSelection={true}
+                multiRowSelection={true}
+                enableEdit={false}
+                paginationMode="state"
+                onChange={async (productTypes: Array<any>) => {
+                    if (!Array.isArray(productTypes)) {
+                        console.log('Invalid values received from ManageUser component');
+                        return;
+                    }
+                    const checkedProductTypes = productTypes.filter((item) => item?.checked);
 
-                </div>
-            </div>
-        </div>
+                    // setSelectedBrands(prevState => {
+                    //     let cloneState = [...prevState];
+                    //     return [
+                    //         ...cloneState,
+                    //         ...checkedBrands.filter((item) => {
+                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
+                    //         })
+                    //     ];
+                    // });
+                    const existingProductTypes = data || [];
+                    formHelpers.setFieldValue('productTypes', [
+                        ...existingProductTypes,
+                        ...checkedProductTypes.filter((item) => {
+                            return !existingProductTypes.find((checkedItem) => checkedItem?.id === item?.id);
+                        })
+                    ]);
+                }}
+            />
+        </AccessControlComponent>
     );
 }
 export default EditListingProductTypeFields;

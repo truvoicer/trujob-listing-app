@@ -6,7 +6,7 @@ import EditListingFeature from "./EditListingFeature";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
@@ -19,26 +19,20 @@ import { Feature } from "@/types/Feature";
 import { ModalItem } from "@/library/services/modal/ModalService";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageFeature from "../../Feature/ManageFeature";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-const CREATE_LISTING_FEATURE_MODAL_ID = 'create-features-modal';
-const DELETE_LISTING_FEATURE_MODAL_ID = 'delete-listing-feature-modal';
-const EDIT_LISTING_FEATURE_MODAL_ID = 'edit-listing-feature-modal';
+export const CREATE_LISTING_FEATURE_MODAL_ID = 'create-features-modal';
+export const DELETE_LISTING_FEATURE_MODAL_ID = 'delete-listing-feature-modal';
+export const EDIT_LISTING_FEATURE_MODAL_ID = 'edit-listing-feature-modal';
 
 
-export type ManageListingFeatureProps = {
+export interface ManageListingFeatureProps extends DataManageComponentProps {
     data?: Array<Feature>;
-    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
 
 function ManageListingFeature({
+    mode = 'selector',
     data = [],
     operation,
     listingId,
@@ -60,101 +54,44 @@ function ManageListingFeature({
                 initialValues: {
                     features: [],
                 },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('onSubmit', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.features)) {
-                            console.warn('Invalid values');
-                            return;
-                        }
-                        if (!values?.features?.length) {
-                            console.warn('No features selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        console.log('Orig data', values);
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.features.filter((item: any) => {
-                                    return !origData.some((checkedItem: any) => checkedItem?.id === item?.id);
-                                })
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Listing ID is required');
-                        return;
-                    }
-                    const ids = RequestHelpers.extractIdsFromArray(values?.features);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingBrand.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            ids: ids,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added feature/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-features-modal');
-                    return true;
-                }
             },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
                 formHelpers?: FormikProps<FormikValues>
             }) => {
+                if (!formHelpers) {
+                    return;
+                }
                 if (!operation) {
                     console.warn('Operation is required');
                     return;
                 }
-                if (!formHelpers) {
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.features,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
                 }
 
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -176,11 +113,11 @@ function ManageListingFeature({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_LISTING_FEATURE_MODAL_ID}
                                 />
                             ),
                             ...getListingFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_LISTING_FEATURE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -278,11 +215,11 @@ function ManageListingFeature({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_LISTING_FEATURE_MODAL_ID}
                                             />
                                         ),
                                         ...getListingFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_FEATURE_MODAL_ID);
                                 }
                             }
                         },
@@ -330,7 +267,7 @@ function ManageListingFeature({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_LISTING_FEATURE_MODAL_ID);
                                 }
                             }
                         }
@@ -410,45 +347,11 @@ function ManageListingFeature({
                 formHelpers?: any
             }) => {
                 return (
-                    <AccessControlComponent
-                        roles={[
-                            { name: 'admin' },
-                            { name: 'superuser' },
-                            { name: 'user' },
-                        ]}
-                    >
-                        <ManageFeature
-                            operation={operation}
-                            rowSelection={true}
-                            multiRowSelection={true}
-                            enableEdit={false}
-                            paginationMode="state"
-                            onChange={async (features: Array<any>) => {
-                                if (!Array.isArray(features)) {
-                                    console.log('Invalid values received from ManageUser component');
-                                    return;
-                                }
-                                const checkedFeatures = features.filter((item) => item?.checked);
-
-                                // setSelectedBrands(prevState => {
-                                //     let cloneState = [...prevState];
-                                //     return [
-                                //         ...cloneState,
-                                //         ...checkedBrands.filter((item) => {
-                                //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
-                                //         })
-                                //     ];
-                                // });
-                                const existingFeatures = data || [];
-                                formHelpers.setFieldValue('features', [
-                                    ...existingFeatures,
-                                    ...checkedFeatures.filter((item) => {
-                                        return !existingFeatures.find((checkedItem) => checkedItem?.id === item?.id);
-                                    })
-                                ]);
-                            }}
-                        />
-                    </AccessControlComponent>
+                    <EditListingFeature
+                        operation={operation}
+                        inModal={true}
+                        modalId={CREATE_LISTING_FEATURE_MODAL_ID}
+                    />
                 )
             },
             ...getListingFormModalProps(),

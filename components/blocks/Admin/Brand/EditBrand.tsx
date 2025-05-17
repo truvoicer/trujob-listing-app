@@ -10,6 +10,7 @@ import EditBrandFields from "./EditBrandFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
 export type EditBrandProps = {
@@ -92,7 +93,11 @@ function EditBrand({
                 break;
             case 'add':
             case 'create':
-                requestData = buildCreateData(values);
+                if (Array.isArray(values?.brands)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -108,7 +113,7 @@ function EditBrand({
                 console.log('Invalid operation');
                 break;
         }
-        
+
         if (!response) {
             setAlert({
                 show: true,

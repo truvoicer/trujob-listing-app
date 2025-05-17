@@ -9,6 +9,9 @@ import EditFeatureFields from "./EditFeatureFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateFeature, Feature, UpdateFeature } from "@/types/Feature";
+import { request } from "http";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { CREATE_FEATURE_MODAL_ID, EDIT_FEATURE_MODAL_ID } from "./ManageFeature";
 
 
 export type EditFeatureProps = {
@@ -29,6 +32,8 @@ function EditFeature({
         message: string | React.ReactNode | React.Component;
         type: string;
     } | null>(null);
+
+    const dataTableContext = useContext(DataTableContext);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: Feature = {
@@ -57,14 +62,16 @@ function EditFeature({
 
         return requestData;
     }
-    async function handleSubmit(values: Feature) {
+    async function handleSubmit(
+        values: Feature | { features: Feature[] }
+    ) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
 
         let response = null;
-        
+        let requestData;
         switch (operation) {
             case 'edit':
             case 'update':
@@ -85,6 +92,11 @@ function EditFeature({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.features)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.feature,
@@ -92,13 +104,24 @@ function EditFeature({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: buildCreateData(values),
+                    data: requestData,
                 })
                 break;
             default:
                 console.warn('Invalid operation');
                 break;
         }
+        if (!response) {
+            setAlert({
+                show: true,
+                message: 'No response from server',
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_FEATURE_MODAL_ID);
+        dataTableContext.modal.close(CREATE_FEATURE_MODAL_ID);
     }
 
 
@@ -120,7 +143,6 @@ function EditFeature({
     }, [inModal, modalId]);
 
 
-    const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">

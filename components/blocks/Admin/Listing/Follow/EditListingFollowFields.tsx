@@ -20,73 +20,30 @@ function EditListingFollowFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
-    modalService.setUseStateHook(useState)
-    modalService.setConfig([
-        {
-            id: 'listingUser',
-            title: 'Select User',
-            size: 'lg',
-            fullscreen: true,
-            component: (
-                <AccessControlComponent
-                    roles={[
-                        { name: 'admin' },
-                        { name: 'superuser' },
-                    ]}
-                >
-                    <ManageUser
-                        rowSelection={true}
-                        multiRowSelection={true}
-                        enableEdit={false}
-                        paginationMode="state"
-                        onChange={(users: Array<any>) => {
-                            if (!Array.isArray(users)) {
-                                console.warn('Invalid values received from ManageUser component');
-                                return;
-                            }
-                            setSelectedTableRows(
-                                users.filter((item) => item?.checked)
-                            );
-                            setFieldValue('users', users.filter((item) => item?.checked));
-                        }}
-                    />
-                </AccessControlComponent>
-            ),
-            onOk: () => {
-                console.log('ok');
-                if (selectedTableRows.length === 0) {
-                    console.warn('No user selected');
-                    return true;
-                }
-                setFieldValue('users', selectedTableRows);
-                return true;
-            },
-            onCancel: () => {
-                console.log('cancel');
-                return true;
-            }
-        },
-    ]);
+    const formHelpers = useFormikContext<FormikValues>() || {};
     console.log('values', values);
 
     return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
-
-                    <div className="col-12 my-3">
-                        <h4>Select User</h4>
-                        {modalService.renderLocalTriggerButton(
-                            'listingUser',
-                            'Select User',
-                        )}
-                    </div>
-                </div>
-
-                {modalService.renderLocalModals()}
-            </div>
-        </div>
+        <AccessControlComponent
+            roles={[
+                { name: 'admin' },
+                { name: 'superuser' },
+            ]}
+        >
+            <ManageUser
+                rowSelection={true}
+                multiRowSelection={true}
+                enableEdit={false}
+                paginationMode="state"
+                onChange={(users: Array<any>) => {
+                    if (!Array.isArray(users)) {
+                        console.warn('Invalid values received from ManageUser component');
+                        return;
+                    }
+                    formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
+                }}
+            />
+        </AccessControlComponent>
     );
 }
 export default EditListingFollowFields;

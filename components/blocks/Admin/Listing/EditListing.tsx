@@ -4,7 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_PAGE_MODAL_ID } from "./ManageListing";
+import { CREATE_LISTING_MODAL_ID, EDIT_LISTING_MODAL_ID } from "./ManageListing";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { CreateListing, Listing, ListingRequest, UpdateListing } from "@/types/Listing";
@@ -208,7 +208,8 @@ function EditListing({
             return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);
+        dataTableContext.modal.close(EDIT_LISTING_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_MODAL_ID);
 
     }
 

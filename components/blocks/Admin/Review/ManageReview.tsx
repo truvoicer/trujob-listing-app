@@ -1,36 +1,33 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditReview from "./EditReview";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Review } from "@/types/Review";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
-export type ManageReviewProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageReviewProps extends DataManageComponentProps {
+    data?: Array<Review>;
 }
 export const EDIT_REVIEW_MODAL_ID = 'edit-review-modal';
 export const ADD_REVIEW_MODAL_ID = 'add-review-modal';
 export const DELETE_REVIEW_MODAL_ID = 'delete-review-modal';
 
 function ManageReview({
+    mode = 'selector',
+    data,
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -43,9 +40,24 @@ function ManageReview({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    reviews: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getReviewFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -54,14 +66,35 @@ function ManageReview({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.reviews,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -108,7 +141,7 @@ function ManageReview({
                                     console.warn('Operation is required');
                                     return;
                                 }
-                                if (['add', 'create'].includes(operation)) {
+                                if (Array.isArray(data) && data?.length) {
                                     let cloneData = [...data];
                                     cloneData.splice(index, 1);
                                     if (typeof onChange === 'function') {
@@ -275,7 +308,7 @@ function ManageReview({
             data: post,
         });
     }
-    
+
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,

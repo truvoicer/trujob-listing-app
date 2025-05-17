@@ -5,23 +5,26 @@ import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditSidebarWidget from "./EditSidebarWidget";
-import { SidebarWidget } from "@/types/Widget";
+import { SidebarWidget, Widget } from "@/types/Widget";
 import { FormikProps, FormikValues } from "formik";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContext } from "@/contexts/DataTableContext";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export const EDIT_SIDEBAR_WIDGET_MODAL_ID = 'edit-sidebar-widget-modal';
-export type ManageSidebarWidgetProps = {
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export const CREATE_SIDEBAR_WIDGET_MODAL_ID = 'create-sidebar-widget-modal';
+export const DELETE_SIDEBAR_WIDGET_MODAL_ID = 'delete-sidebar-widget-modal';
+export interface ManageSidebarWidgetProps extends DataManageComponentProps {
+    data?: Array<Widget>;
 }
 function ManageSidebarWidget({
+    operation = 'create',
+    data,
+    mode = 'selector',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -30,9 +33,27 @@ function ManageSidebarWidget({
     enableEdit = true
 }: ManageSidebarWidgetProps) {
     const appModalContext = useContext(AppModalContext);
+    const dataTableContext = useContext(DataTableContext);
+    const notificationContext = useContext(AppModalContext);
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    sidebarWidgets: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getSidebarWidgetFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -41,14 +62,35 @@ function ManageSidebarWidget({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.sidebarWidgets,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }

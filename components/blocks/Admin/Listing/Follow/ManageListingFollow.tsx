@@ -6,7 +6,7 @@ import EditListingFollow from "./EditListingFollow";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Listing } from "@/types/Listing";
@@ -21,17 +21,11 @@ import ManageUser from "../../User/ManageUser";
 import { ModalItem } from "@/library/services/modal/ModalService";
 
 import { User } from "@/types/User";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageListingFollowProps = {
+export interface ManageListingFollowProps extends DataManageComponentProps {
     data?: Array<User>;
-    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
 }
 export const EDIT_LISTING_FOLLOW_MODAL_ID = 'edit-listing-follow-modal';
 export const CREATE_LISTING_FOLLOW_MODAL_ID = 'create-listing-follow-modal';
@@ -39,6 +33,7 @@ export const DELETE_LISTING_FOLLOW_MODAL_ID = 'delete-listing-follow-modal';
 
 function ManageListingFollow({
     data,
+    mode = 'selector',
     operation,
     listingId,
     rowSelection = true,
@@ -59,76 +54,6 @@ function ManageListingFollow({
                 initialValues: {
                     users: [],
                 },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            console.warn('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            console.warn('No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.users
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Listing ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
             },
             show: true,
             showFooter: true,
@@ -138,9 +63,34 @@ function ManageListingFollow({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.users,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -422,30 +372,15 @@ function ManageListingFollow({
                 formHelpers?: any
             }) => {
                 return (
-                    <AccessControlComponent
-                        roles={[
-                            { name: 'admin' },
-                            { name: 'superuser' },
-                        ]}
-                    >
-                        <ManageUser
-                            rowSelection={true}
-                            multiRowSelection={true}
-                            enableEdit={false}
-                            paginationMode="state"
-                            onChange={(users: Array<any>) => {
-                                if (!Array.isArray(users)) {
-                                    console.warn('Invalid values received from ManageUser component');
-                                    return;
-                                }
-                                formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
-                            }}
-                        />
-                    </AccessControlComponent>
+                    <EditListingFollow
+                        operation={operation}
+                        inModal={true}
+                        modalId={CREATE_LISTING_FOLLOW_MODAL_ID}
+                    />
                 )
             },
             ...getAddNewModalProps(),
-        }, 'add-users-modal');
+        }, CREATE_LISTING_FOLLOW_MODAL_ID);
     }
 
     function getRowSelectActions() {

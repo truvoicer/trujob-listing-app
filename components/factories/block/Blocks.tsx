@@ -17,6 +17,7 @@ import ManageProductType from "@/components/blocks/Admin/ProductType/ManageProdu
 import ManageFeature from "@/components/blocks/Admin/Feature/ManageFeature";
 import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
 import ManageListingType from "@/components/blocks/Admin/ListingType/ManageListingType";
+import { ComponentHelpers } from "@/helpers/ComponentHelpers";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -40,6 +41,42 @@ export class Blocks {
     static MANAGE_LISTING_TYPES_BLOCK = 'manage-listing-types-block';
 
     static getBlocks() {
+        // ManageFeature.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageReview.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageListingType.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManagePage.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageSidebar.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageMenu.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageWidget.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageUser.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageBrand.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageCategory.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageColor.defaultProps = {
+        //     mode: 'edit',
+        // }
+        // ManageProductType.defaultProps = {
+        //     mode: 'edit',
+        // }   
         return {
             [Blocks.HERO_BLOCK]: {
                 title: 'Hero Block',
@@ -81,79 +118,144 @@ export class Blocks {
                 title: 'Manage Pages Block',
                 description: 'This is the manage pages block',
                 icon: 'manage-pages-block-icon',
-                component: ManagePage,
+                component: ComponentHelpers.buildComponent(
+                    ManagePage,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_SIDEBARS_BLOCK]: {
                 title: 'Manage Sidebars',
                 description: 'This is the manage sidebars',
                 icon: 'manage-listings-block-icon',
-                component: ManageSidebar,
+                component: ComponentHelpers.buildComponent(
+                    ManageSidebar,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_WIDGETS_BLOCK]: {
                 title: 'Manage Widgets',
                 description: 'This is the manage widgets',
                 icon: 'manage-listings-block-icon',
-                component: ManageWidget,
+                component: ComponentHelpers.buildComponent(
+                    ManageWidget,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_MENUS_BLOCK]: {
                 title: 'Manage Menus',
                 description: 'This is the manage menus',
                 icon: 'manage-listings-block-icon',
-                component: ManageMenu,
+                component: ComponentHelpers.buildComponent(
+                    ManageMenu,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_USERS_BLOCK]: {
                 title: 'Manage Users',
                 description: 'This is the manage users',
                 icon: 'manage-users-block-icon',
-                component: ManageUser,
+                component: ComponentHelpers.buildComponent(
+                    ManageUser,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_LISTINGS_BLOCK]: {
                 title: 'Manage Listings Block',
                 description: 'This is the manage listings block',
                 icon: 'manage-listings-block-icon',
-                component: ManageListing,
+                component: ComponentHelpers.buildComponent(
+                    ManageListing,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_BRANDS_BLOCK]: {
                 title: 'Manage Brands Block',
                 description: 'This is the manage brands block',
                 icon: 'manage-brands-block-icon',
-                component: ManageBrand,
+                component: ComponentHelpers.buildComponent(
+                    ManageBrand,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_CATEGORIES_BLOCK]: {
                 title: 'Manage Categories Block',
                 description: 'This is the manage categories block',
                 icon: 'manage-categories-block-icon',
-                component: ManageCategory
+                component: ComponentHelpers.buildComponent(
+                    ManageCategory,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_COLORS_BLOCK]: {
                 title: 'Manage Colors Block',
                 description: 'This is the manage colors block',
                 icon: 'manage-colors-block-icon',
-                component: ManageColor
+                component: ComponentHelpers.buildComponent(
+                    ManageColor,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_PRODUCT_TYPES_BLOCK]: {
                 title: 'Manage Product Types Block',
                 description: 'This is the manage product types block',
                 icon: 'manage-product-types-block-icon',
-                component: ManageProductType
+                component: ComponentHelpers.buildComponent(
+                    ManageProductType,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_FEATURES_BLOCK]: {
                 title: 'Manage Features Block',
                 description: 'This is the manage features block',
                 icon: 'manage-features-block-icon',
-                component: ManageFeature
+                component: ComponentHelpers.buildComponent(
+                    ManageFeature,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_REVIEWS_BLOCK]: {
                 title: 'Manage Reviews Block',
                 description: 'This is the manage reviews block',
                 icon: 'manage-reviews-block-icon',
-                component: ManageReview,
+                component: ComponentHelpers.buildComponent(
+                    ManageReview,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
             [Blocks.MANAGE_LISTING_TYPES_BLOCK]: {
                 title: 'Manage Listing Types Block',
                 description: 'This is the manage listing types block',
                 icon: 'manage-listing-types-block-icon',
-                component: ManageListingType,
+                component: ComponentHelpers.buildComponent(
+                    ManageListingType,
+                    {
+                        mode: 'edit',
+                    }
+                ),
             },
         };
     }

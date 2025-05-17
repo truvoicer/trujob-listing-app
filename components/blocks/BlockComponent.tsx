@@ -2,13 +2,19 @@ import { BlockContext, blockContextData } from "@/contexts/BlockContext";
 import { useEffect, useRef, useState } from "react";
 import AccessControlComponent from "../AccessControl/AccessControlComponent";
 
-function BlockComponent(props) {
+function BlockComponent(props: any) {
     const { component, className = '', roles, has_permission, ...otherProps } = props;
     if (!component) {
         return null;
     }
     const Component = component;
-    const blockProps = props || {};
+    let blockProps = props || {};
+    if (typeof component?.defaultProps === 'object') {
+        blockProps = {
+            ...blockProps,
+            ...component?.defaultProps,
+        }
+    }
 
     const [blockContextState, setBlockContextState] = useState({
         ...blockContextData,

@@ -1,19 +1,16 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_PAGE_MODAL_ID } from "./ManageListingFollow";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
-import { Sidebar } from "@/types/Sidebar";
 import EditListingFollowFields from "./EditListingFollowFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { User } from "@/types/User";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { CREATE_LISTING_FOLLOW_MODAL_ID, EDIT_LISTING_FOLLOW_MODAL_ID } from "./ManageListingFollow";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
 export type EditListingFollowProps = {
@@ -38,65 +35,72 @@ function EditListingFollow({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-        const initialValues: {
-            users: Array<User>;
-        } = {
-            users: data || [],
-        };
-    
-        async function handleSubmit(values: User) {
-            if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-                console.warn('No data to update');
-                return;
-            }
-            
-            
-            if (!listingId) {
-                console.warn('Listing ID is required');
-                return;
-            }
-            if (!values?.id) {
-                console.warn('Brand ID is required');
-                return;
-            }
-    
-            let response = null;
-            switch (operation) {
-                case 'edit':
-                case 'update':
-                    response = await truJobApiMiddleware.resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            values?.id,
-                            'update',
-                        ]),
-                        method: ApiMiddleware.METHOD.PATCH,
-                        protectedReq: true,
-                    })
-                    break;
-                case 'add':
-                case 'create':
-                    response = await truJobApiMiddleware.resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            values?.id,
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                    })
-                    break;
-                default:
-                    console.warn('Invalid operation');
-                    break;
-            }
-            }
+    const initialValues: {
+        users: Array<User>;
+    } = {
+        users: data || [],
+    };
+
+
+    async function handleSubmit(values: { users: Array<User> }) {
+        if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
+            console.warn('No data to update');
+            return;
+        }
+        if (!listingId) {
+            console.log('Listing feature ID is required');
+            return;
+        }
+        if (!Array.isArray(values?.users)) {
+            return;
+        }
+        let response = null;
+        let requestData = {
+            ids: RequestHelpers.extractIdsFromArray(values?.users),
+        }
+        switch (operation) {
+            case 'add':
+            case 'create':
+                console.log('create requestData', requestData);
+                response = await truJobApiMiddleware.resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.listingFollow.replace(
+                            ':listingId',
+                            listingId.toString(),
+                        ),
+                        'create',
+                    ]),
+                    method: ApiMiddleware.METHOD.POST,
+                    protectedReq: true,
+                    data: requestData,
+                })
+                break;
+            default:
+                console.warn('Invalid operation');
+                break;
+        }
+
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Error:</strong>
+                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
+                            return (
+                                <div key={index}>{error.message}</div>
+                            )
+                        })}
+                    </div>
+                ),
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_LISTING_FOLLOW_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_FOLLOW_MODAL_ID);
+    }
 
 
     useEffect(() => {

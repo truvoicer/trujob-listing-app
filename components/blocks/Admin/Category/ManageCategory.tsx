@@ -6,7 +6,7 @@ import EditCategory from "./EditCategory";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Category } from "@/types/Category";
@@ -18,15 +18,10 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageCategoryProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageCategoryProps extends DataManageComponentProps {
+    data?: Array<Category>;
 }
 export const EDIT_CATEGORY_MODAL_ID = 'edit-category-modal';
 export const CREATE_CATEGORY_MODAL_ID = 'create-category-modal';
@@ -34,6 +29,8 @@ export const DELETE_CATEGORY_MODAL_ID = 'delete-category-modal';
 
 
 function ManageCategory({
+    mode = 'selector',
+    data,
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -46,84 +43,27 @@ function ManageCategory({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    categories: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getAddNewModalProps() {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    users: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            console.warn('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            console.warn('No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.users
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Category ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
+                initialValues: getAddNewModalInitialValues(),
             },
+
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -132,9 +72,34 @@ function ManageCategory({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.categories,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -186,6 +151,72 @@ function ManageCategory({
                             ),
                             ...getCategoryFormModalProps(),
                         }, EDIT_CATEGORY_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Category',
+                            component: (
+                                <p>Are you sure you want to delete this category ({item?.name} | {item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete category', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_CATEGORY_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Category ID is required</p>
+                                        ),
+                                    }, 'category-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.category,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete category</p>
+                                        ),
+                                    }, 'category-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_CATEGORY_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -319,7 +350,7 @@ function ManageCategory({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContext.modal.show({
+        dataTableContextState.modal.show({
             title: 'Select Users',
             component: ({
                 modal,

@@ -1,33 +1,35 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditPage from "./EditPage";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Page } from "@/types/Page";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
-export type ManagePageProps = {
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManagePageProps extends DataManageComponentProps {
+    data?: Array<Page>;
 }
 export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
+export const CREATE_PAGE_MODAL_ID = 'create-page-modal';
+export const DELETE_PAGE_MODAL_ID = 'delete-page-modal';
+
 
 function ManagePage({
+    mode = 'selector',
+    operation = 'edit',
+    data,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -39,9 +41,25 @@ function ManagePage({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    pages: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
     function getPageFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -50,14 +68,35 @@ function ManagePage({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.pages,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -84,6 +123,72 @@ function ManagePage({
                             ),
                             ...getPageFormModalProps(),
                         }, EDIT_PAGE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Page',
+                            component: (
+                                <p>Are you sure you want to delete this page ({item?.name})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete page', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_PAGE_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Page ID is required</p>
+                                        ),
+                                    }, 'page-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.page,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete page</p>
+                                        ),
+                                    }, 'page-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_PAGE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -126,7 +231,7 @@ function ManagePage({
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -142,7 +247,7 @@ function ManagePage({
                                                 protectedReq: true
                                             })
                                             if (!response) {
-                                                notificationContext.show({      
+                                                notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
@@ -210,19 +315,17 @@ function ManagePage({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        console.log('Add New Page', dataTableContextState.modal);
         dataTableContextState.modal.show({
             title: 'Add New Page',
             component: (
                 <EditPage
                     operation={'add'}
                     inModal={true}
-                    modalId={EDIT_PAGE_MODAL_ID}
+                    modalId={CREATE_PAGE_MODAL_ID}
                 />
             ),
             ...getPageFormModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        }, CREATE_PAGE_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -235,14 +338,14 @@ function ManagePage({
                 data,
                 dataTableContextState,
             }: DMOnRowSelectActionClick) => {
-                
+
                 dataTableContextState.confirmation.show({
-                    title: 'Edit Menu',
+                    title: 'Edit Page',
                     message: 'Are you sure you want to delete selected pages?',
-                    onOk: async () => { 
+                    onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
-                            notificationContext.show({      
+                            notificationContext.show({
                                 variant: 'danger',
                                 type: 'toast',
                                 title: 'Error',
@@ -283,7 +386,7 @@ function ManagePage({
                             }, 'page-bulk-delete-error');
                             return;
                         }
-                        
+
                         notificationContext.show({
                             variant: 'success',
                             type: 'toast',
@@ -299,10 +402,10 @@ function ManagePage({
                     },
                 }, 'delete-bulk-page-confirmation');
             }
-        }); 
+        });
         return actions;
     }
-    
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager

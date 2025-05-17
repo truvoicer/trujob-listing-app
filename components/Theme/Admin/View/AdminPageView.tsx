@@ -54,11 +54,18 @@ function AdminPageView({ data, page, session }: Props) {
                     if (!item) {
                         return null;
                     }
+                    let itemProps = item?.props || {};
+                    if (typeof item?.component?.defaultProps === 'object') {
+                        itemProps = {
+                            ...itemProps,
+                            ...item?.component?.defaultProps,
+                        }
+                    }
                     return <BlockComponent key={index}
                         firstBlock={index === 0}
                         lastBlock={index === blockData.length - 1}
                         component={item.component}
-                        {...item.props} />;
+                        {...itemProps} />;
                 })}
             </>
         )

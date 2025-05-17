@@ -14,6 +14,7 @@ export default {
         review: '/review',
         feature: '/feature',
         listing: '/listing',
+        media: '/media',
         listingFollow: '/listing/:listingId/follow',
         listingFeature: '/listing/:listingId/feature',
         listingReview: '/listing/:listingId/review',

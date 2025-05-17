@@ -6,6 +6,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectListingFeature from "./SelectListingFeature";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../../User/ManageUser";
+import ManageFeature from "../../Feature/ManageFeature";
 
 type EditListingFeatureFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -17,25 +18,48 @@ function EditListingFeatureFields({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
+    const formHelpers = useFormikContext<FormikValues>() || {};
 
     return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
+        <AccessControlComponent
+            roles={[
+                { name: 'admin' },
+                { name: 'superuser' },
+                { name: 'user' },
+            ]}
+        >
+            <ManageFeature
+                operation={operation}
+                rowSelection={true}
+                multiRowSelection={true}
+                enableEdit={false}
+                paginationMode="state"
+                onChange={async (features: Array<any>) => {
+                    if (!Array.isArray(features)) {
+                        console.log('Invalid values received from ManageUser component');
+                        return;
+                    }
+                    const checkedFeatures = features.filter((item) => item?.checked);
 
-                    <div className="col-12 col-lg-6">
-                        <SelectListingFeature
-                            name="feature"
-                            value={values?.feature}
-                        />
-                    </div>
-
-                </div>
-
-                {modalService.renderLocalModals()}
-            </div>
-        </div>
+                    // setSelectedBrands(prevState => {
+                    //     let cloneState = [...prevState];
+                    //     return [
+                    //         ...cloneState,
+                    //         ...checkedBrands.filter((item) => {
+                    //             return !cloneState.find((checkedItem) => checkedItem?.id === item?.id);
+                    //         })
+                    //     ];
+                    // });
+                    const existingFeatures = data || [];
+                    formHelpers.setFieldValue('features', [
+                        ...existingFeatures,
+                        ...checkedFeatures.filter((item) => {
+                            return !existingFeatures.find((checkedItem) => checkedItem?.id === item?.id);
+                        })
+                    ]);
+                }}
+            />
+        </AccessControlComponent>
     );
 }
 export default EditListingFeatureFields;

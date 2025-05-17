@@ -6,10 +6,9 @@ import EditListingReview from "./EditListingReview";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -18,23 +17,18 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { Review } from "@/types/Review";
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageListingReviewProps = {
+export interface ManageListingReviewProps extends DataManageComponentProps {
     data: Array<Review>;
-    operation?: 'edit' | 'update' | 'add' | 'create';
     listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
 }
 export const EDIT_LISTING_REVIEW_MODAL_ID = 'edit-listing-modal';
 export const ADD_LISTING_REVIEW_MODAL_ID = 'add-listing-modal';
 export const DELETE_LISTING_REVIEW_MODAL_ID = 'delete-listing-review-modal';
 
 function ManageListingReview({
+    mode = 'selector',
     data,
     operation,
     listingId,
@@ -56,70 +50,6 @@ function ManageListingReview({
                 initialValues: {
                     reviews: [],
                 },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!values) {
-                            console.warn('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                values
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Listing ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingReview.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: values
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add review</p>
-                            ),
-                        }, 'add-review-modal-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added review</p>
-                        ),
-                    }, 'add-review-modal-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-review-modal');
-                    return true;
-                }
             },
             show: true,
             showFooter: true,
@@ -129,9 +59,34 @@ function ManageListingReview({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.reviews,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -401,12 +356,12 @@ function ManageListingReview({
                         listingId={listingId}
                         operation={'add'}
                         inModal={true}
-                        modalId={'add-review-modal'}
+                        modalId={ADD_LISTING_REVIEW_MODAL_ID}
                     />
                 )
             },
             ...getAddNewModalProps(),
-        }, 'add-review-modal');
+        }, ADD_LISTING_REVIEW_MODAL_ID);
 
     }
 

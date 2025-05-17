@@ -1,34 +1,34 @@
-import DataTable from "@/components/Table/DataTable";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
-import { Button, Modal } from "react-bootstrap";
-import { ModalService } from "@/library/services/modal/ModalService";
-import Pagination from "@/components/listings/Pagination";
-import DataManager, { DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import EditMenu from "./EditMenu";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { Menu } from "@/types/Menu";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContext } from "@/contexts/DataTableContext";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export const EDIT_MENU_MODAL_ID = 'edit-menu-modal';
-export type ManageMenuProps = {
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export const CREATE_MENU_MODAL_ID = 'create-menu-modal';
+export const DELETE_MENU_MODAL_ID = 'delete-menu-modal';
+
+export interface ManageMenuProps extends DataManageComponentProps {
+    data?: Array<Menu>;
 }
 function ManageMenu({
+    mode = 'selector',
+    data,
+    operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -38,9 +38,26 @@ function ManageMenu({
 }: ManageMenuProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
+    const dataTableContext = useContext(DataTableContext);
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    menus: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getMenuFormModalProps() {
         return {
-            formProps: {},
+            formProps: {
+                operation: operation,
+                initialValues: getAddNewModalInitialValues(),
+            },
             show: true,
             showFooter: true,
             onOk: async ({ formHelpers }: {
@@ -49,14 +66,35 @@ function ManageMenu({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
                 }
-                return true;
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.menus,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
+                return await formHelpers.submitForm();
             },
             fullscreen: true
         }
@@ -82,6 +120,72 @@ function ManageMenu({
                             ),
                             ...getMenuFormModalProps(),
                         }, EDIT_MENU_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Menu',
+                            component: (
+                                <p>Are you sure you want to delete this menu ({item?.name})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete menu', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_MENU_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Menu ID is required</p>
+                                        ),
+                                    }, 'menu-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.menu,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete menu</p>
+                                        ),
+                                    }, 'menu-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_MENU_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>

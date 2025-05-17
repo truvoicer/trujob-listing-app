@@ -1,39 +1,35 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditColor from "./EditColor";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { Color } from "@/types/Color";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageColorProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    listingId?: number;
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageColorProps extends DataManageComponentProps {
+    data?: Array<Color>;
 }
-export const EDIT_PAGE_MODAL_ID = 'edit-listing-modal';
+export const EDIT_COLOR_MODAL_ID = 'edit-color-modal';
+export const CREATE_COLOR_MODAL_ID = 'create-color-modal';
+export const DELETE_COLOR_MODAL_ID = 'delete-color-modal';
 
 function ManageColor({
+    mode = 'selector',
+    data,
     operation = 'create',
-    listingId,
     rowSelection = true,
     multiRowSelection = true,
     onChange,
@@ -45,83 +41,24 @@ function ManageColor({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    colors: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getAddNewModalProps() {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    users: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    console.warn('Form Values', values);
-                    if (!operation) {
-                        console.warn('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            console.warn('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            console.warn('No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.users
-                            ]);
-                        }
-                        return;
-                    }
-                    if (!listingId) {
-                        console.warn('Color ID is required');
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.listingFollow.replace(
-                                ':listingId',
-                                listingId.toString()
-                            ),
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
+                initialValues: getAddNewModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -131,9 +68,34 @@ function ManageColor({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.colors,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -177,15 +139,80 @@ function ManageColor({
                             title: 'Edit Color',
                             component: (
                                 <EditColor
-                                    listingId={listingId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PAGE_MODAL_ID}
+                                    modalId={EDIT_COLOR_MODAL_ID}
                                 />
                             ),
                             ...getColorFormModalProps(),
-                        }, EDIT_PAGE_MODAL_ID);
+                        }, EDIT_COLOR_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Color',
+                            component: (
+                                <p>Are you sure you want to delete this color ({item?.name} | {item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete color', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_COLOR_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Color ID is required</p>
+                                        ),
+                                    }, 'color-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.color,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete color</p>
+                                        ),
+                                    }, 'color-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_COLOR_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -203,15 +230,14 @@ function ManageColor({
                                         title: 'Edit Color',
                                         component: (
                                             <EditColor
-                                                listingId={listingId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PAGE_MODAL_ID}
+                                                modalId={EDIT_COLOR_MODAL_ID}
                                             />
                                         ),
                                         ...getColorFormModalProps(),
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_COLOR_MODAL_ID);
                                 }
                             }
                         },
@@ -225,7 +251,7 @@ function ManageColor({
                                     appModalContext.show({
                                         title: 'Delete Color',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this color ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -236,11 +262,11 @@ function ManageColor({
                                                     component: (
                                                         <p>Color ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'color-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.color}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -250,16 +276,16 @@ function ManageColor({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete color</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'color-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PAGE_MODAL_ID);
+                                    }, EDIT_COLOR_MODAL_ID);
                                 }
                             }
                         }
@@ -279,16 +305,12 @@ function ManageColor({
         if (isNotEmpty(searchParams?.sort_order)) {
             query[SORT_ORDER] = searchParams?.sort_order;
         }
-
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
-        // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.color)) {
+            query['color'] = searchParams.color;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function colorRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -319,8 +341,8 @@ function ManageColor({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        dataTableContext.modal.show({
-            title: 'Select Users',
+        dataTableContextState.modal.show({
+            title: 'Add New Color',
             component: ({
                 modal,
                 index,
@@ -332,15 +354,14 @@ function ManageColor({
             }) => {
                 return (
                     <EditColor
-                        listingId={listingId}
                         operation={'add'}
                         inModal={true}
-                        modalId={EDIT_PAGE_MODAL_ID}
+                        modalId={CREATE_COLOR_MODAL_ID}
                     />
                 )
             },
             ...getAddNewModalProps(),
-        }, EDIT_PAGE_MODAL_ID);
+        }, CREATE_COLOR_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -356,7 +377,7 @@ function ManageColor({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected colors?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -365,9 +386,9 @@ function ManageColor({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No colors selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'color-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -379,11 +400,11 @@ function ManageColor({
                                 component: (
                                     <p>Color IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'color-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.color}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -396,9 +417,9 @@ function ManageColor({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete colors</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'color-bulk-delete-error');
                             return;
                         }
 
@@ -409,13 +430,13 @@ function ManageColor({
                             component: (
                                 <p>Colors deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'color-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-color-confirmation');
             }
         });
         return actions;
@@ -434,7 +455,7 @@ function ManageColor({
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={colorRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Label', key: 'label' },

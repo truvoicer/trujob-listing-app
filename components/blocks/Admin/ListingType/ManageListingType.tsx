@@ -1,14 +1,14 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditListingType from "./EditListingType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { PAGINATION_PAGE_NUMBER, SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -17,19 +17,18 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
 import { ListingType } from "@/types/Listing";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type ManageListingTypeProps = {
-    operation?: 'edit' | 'update' | 'add' | 'create';
-    enableEdit?: boolean;
-    paginationMode?: 'router' | 'state';
-    enablePagination?: boolean;
-    onChange: (tableData: Array<any>) => void;
-    rowSelection?: boolean;
-    multiRowSelection?: boolean;
+export interface ManageListingTypeProps extends DataManageComponentProps {
+    data?: Array<ListingType>;
 }
-export const EDIT_PRODUCT_TYPE_MODAL_ID = 'edit-product-type-modal';
+export const EDIT_LISTING_TYPE_MODAL_ID = 'edit-listing-type-modal';
+export const DELETE_LISTING_TYPE_MODAL_ID = 'delete-listing-type-modal';
+export const CREATE_LISTING_TYPE_MODAL_ID = 'create-listing-type-modal';
 
 function ManageListingType({
+    mode = 'selector',
+    data,
     operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
@@ -42,76 +41,23 @@ function ManageListingType({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    listingTypes: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getAddNewModalProps() {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    users: [],
-                },
-                onSubmit: async (values: FormikValues) => {
-                    console.log('Form Values', values);
-                    if (!operation) {
-                        console.log('Operation is required');
-                        return;
-                    }
-                    if (['add', 'create'].includes(operation)) {
-                        if (!Array.isArray(values?.users)) {
-                            console.log('Invalid values received from ManageUser component');
-                            return;
-                        }
-                        if (!values?.users?.length) {
-                            console.log('No users selected');
-                            return;
-                        }
-                        let origData = data;
-                        if (!Array.isArray(origData)) {
-                            origData = [];
-                            return;
-                        }
-                        if (typeof onChange === 'function') {
-                            onChange([
-                                ...origData,
-                                ...values?.users
-                            ]);
-                        }
-                        return;
-                    }
-                    const userIds = RequestHelpers.extractIdsFromArray(values?.users);
-                    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                        endpoint: UrlHelpers.urlFromArray([
-                            truJobApiConfig.endpoints.productType,
-                            'create',
-                        ]),
-                        method: ApiMiddleware.METHOD.POST,
-                        protectedReq: true,
-                        data: {
-                            user_ids: userIds,
-                        }
-                    });
-                    if (!response) {
-                        notificationContext.show({
-                            variant: 'danger',
-                            type: 'toast',
-                            title: 'Error',
-                            component: (
-                                <p>Failed to add followers</p>
-                            ),
-                        }, 'listing-add-error');
-                        return false;
-                    }
-                    notificationContext.show({
-                        variant: 'success',
-                        type: 'toast',
-                        title: 'Success',
-                        component: (
-                            <p>Added user/s as followers</p>
-                        ),
-                    }, 'listing-add-success');
-                    dataTableContext.refresh();
-                    dataTableContext.modal.close('add-users-modal');
-                    return true;
-                }
+                initialValues: getAddNewModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -121,9 +67,34 @@ function ManageListingType({
                 if (!formHelpers) {
                     return;
                 }
-                if (typeof formHelpers?.submitForm !== 'function') {
+                if (!operation) {
+                    console.warn('Operation is required');
                     return;
                 }
+                if (typeof formHelpers?.submitForm !== 'function') {
+                    console.warn('submitForm is not a function');
+                    return;
+                }
+                switch (mode) {
+                    case 'selector':
+                        DataManagerService.selectorModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values?.listingTypes,
+                        });
+                        break;
+                    case 'edit':
+                        DataManagerService.editModeCreateHandler({
+                            onChange,
+                            data,
+                            values: formHelpers?.values,
+                        });
+                        break;
+                    default:
+                        console.warn('Invalid mode');
+                        return;
+                }
+
                 return await formHelpers.submitForm();
             },
             fullscreen: true
@@ -170,11 +141,77 @@ function ManageListingType({
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                                    modalId={EDIT_LISTING_TYPE_MODAL_ID}
                                 />
                             ),
                             ...getListingTypeFormModalProps(),
-                        }, EDIT_PRODUCT_TYPE_MODAL_ID);
+                        }, EDIT_LISTING_TYPE_MODAL_ID);
+                    }}
+                >
+                    <i className="lar la-eye"></i>
+                </Link>
+                <Link className="badge bg-danger-light mr-2"
+                    target="_blank"
+                    href="#"
+                    onClick={e => {
+                        e.preventDefault();
+                        dataTableContextState.modal.show({
+                            title: 'Delete Listing type',
+                            component: (
+                                <p>Are you sure you want to delete this listing type ({item?.name} | {item?.label})?</p>
+                            ),
+                            onOk: async () => {
+                                console.log('Delete listing type', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
+                                if (Array.isArray(data) && data.length) {
+                                    let cloneData = [...data];
+                                    cloneData.splice(index, 1);
+                                    if (typeof onChange === 'function') {
+                                        onChange(cloneData);
+                                    }
+                                    dataTableContext.modal.close(DELETE_LISTING_TYPE_MODAL_ID);
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing type ID is required</p>
+                                        ),
+                                    }, 'listing-type-delete-error');
+                                    return;
+                                }
+                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingType,
+                                        item.id,
+                                        'delete'
+                                    ]),
+                                    method: ApiMiddleware.METHOD.DELETE,
+                                    protectedReq: true
+                                })
+                                if (!response) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Failed to delete listing type</p>
+                                        ),
+                                    }, 'listingType-delete-error');
+                                    return;
+                                }
+                                dataTableContextState.refresh();
+
+                            },
+                            show: true,
+                            showFooter: true
+                        }, DELETE_LISTING_TYPE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -195,11 +232,11 @@ function ManageListingType({
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                                                modalId={EDIT_LISTING_TYPE_MODAL_ID}
                                             />
                                         ),
                                         ...getListingTypeFormModalProps(),
-                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
+                                    }, EDIT_LISTING_TYPE_MODAL_ID);
                                 }
                             }
                         },
@@ -247,7 +284,7 @@ function ManageListingType({
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PRODUCT_TYPE_MODAL_ID);
+                                    }, EDIT_LISTING_TYPE_MODAL_ID);
                                 }
                             }
                         }
@@ -322,12 +359,12 @@ function ManageListingType({
                     <EditListingType
                         operation={'add'}
                         inModal={true}
-                        modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                        modalId={CREATE_LISTING_TYPE_MODAL_ID}
                     />
                 )
             },
             ...getAddNewModalProps(),
-        }, EDIT_PRODUCT_TYPE_MODAL_ID);
+        }, CREATE_LISTING_TYPE_MODAL_ID);
     }
 
     function getRowSelectActions() {

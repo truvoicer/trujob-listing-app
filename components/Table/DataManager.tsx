@@ -5,6 +5,18 @@ import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
+
+export type DataManageComponentProps = {
+    mode?: 'selector' | 'edit';
+    operation?: 'edit' | 'update' | 'add' | 'create';
+    enableEdit?: boolean;
+    paginationMode?: 'router' | 'state';
+    enablePagination?: boolean;
+    onChange: (tableData: Array<any>) => void;
+    rowSelection?: boolean;
+    multiRowSelection?: boolean;
+    data?: Array<any>;
+}
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
     data: Array<any>;
     dataTableContextState: any;
@@ -53,8 +65,6 @@ export type DatatableSearchParams = {
     query?: string | null;
     page_size?: string | null;
 }
-
-export const EDIT_PAGE_MODAL_ID = 'edit-page-modal';
 
 function DataManager({
     values = [],
@@ -132,7 +142,7 @@ function DataManager({
                 setDataTableContextState,
                 searchParams
             });
-            
+
             if (typeof response === 'object' && response?.data && response?.links && response?.meta) {
                 const data = response?.data || [];
                 setDataTableContextState(prevState => {

@@ -62,7 +62,7 @@ function EditListingReview({
 
         return requestData;
     }
-    async function handleSubmit(values: FormikValues) {
+    async function handleSubmit(values: ListingReview) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
@@ -73,27 +73,28 @@ function EditListingReview({
             console.warn('Listing ID is required');
             return;
         }
-        if (!values?.review?.id) {
-            console.warn('Review ID is required');
-            return;
-        }
 
         let response = null;
-        let requestData: CreateListingReview | UpdateListingReview;
+        
         switch (operation) {
             case 'edit':
             case 'update':
+                if (!values?.id) {
+                    console.warn('Listing review ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingReview.replace(
                             ':listingId',
                             listingId.toString()
                         ),
-                        values?.review?.id,
+                        values?.id,
                         'update',
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
@@ -109,6 +110,7 @@ function EditListingReview({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
+                    data: buildCreateData(values),
                 })
                 break;
             default:

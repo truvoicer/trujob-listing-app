@@ -2,18 +2,18 @@ import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
 import EditColorFields from "./EditColorFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateColor, UpdateColor, Color } from "@/types/Color";
+import { CREATE_COLOR_MODAL_ID, EDIT_COLOR_MODAL_ID } from "./ManageColor";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
 export type EditColorProps = {
-    listingId?: number;
     data?: Color;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
@@ -68,6 +68,7 @@ function EditColor({
 
 
         let response = null;
+        let requestData: CreateColor | UpdateColor;
         switch (operation) {
             case 'edit':
             case 'update':
@@ -88,6 +89,11 @@ function EditColor({
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.colors)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.color,
@@ -102,6 +108,16 @@ function EditColor({
                 console.warn('Invalid operation');
                 break;
         }
+        if (!response) {
+            setAlert({
+                show: true,
+                message: 'No response received',
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.modal.close(EDIT_COLOR_MODAL_ID);
+        dataTableContext.modal.close(CREATE_COLOR_MODAL_ID);
     }
 
 
