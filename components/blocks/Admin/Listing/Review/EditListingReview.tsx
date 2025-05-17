@@ -105,7 +105,7 @@ function EditListingReview({
                             ':listingId',
                             listingId.toString()
                         ),
-                        values?.review?.id,
+                        values?.id,
                         'create',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
