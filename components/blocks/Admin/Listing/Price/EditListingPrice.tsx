@@ -4,31 +4,31 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_LISTING_BRAND_MODAL_ID, EDIT_LISTING_BRAND_MODAL_ID } from "./ManageListingBrand";
+import { CREATE_LISTING_PRICE_MODAL_ID, EDIT_LISTING_PRICE_MODAL_ID } from "./ManageListingPrice";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Listing } from "@/types/Listing";
 import { Sidebar } from "@/types/Sidebar";
-import EditListingBrandFields from "./EditListingBrandFields";
+import EditListingPriceFields from "./EditListingPriceFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { Brand } from "@/types/Brand";
+import { Price } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
-export type EditListingBrandProps = {
+export type EditListingPriceProps = {
     listingId?: number;
     data?: Listing;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditListingBrand({
+function EditListingPrice({
     listingId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditListingBrandProps) {
+}: EditListingPriceProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -38,13 +38,13 @@ function EditListingBrand({
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: {
-        brands: Array<Brand>;
+        prices: Array<Price>;
     } = {
-        brands: data?.brands || [],
+        prices: data?.prices || [],
     };
 
     async function handleSubmit(values: {
-        brands: Array<Brand>;
+        prices: Array<Price>;
     }) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
@@ -54,13 +54,13 @@ function EditListingBrand({
             console.log('Listing ID is required');
             return;
         }
-        if (!Array.isArray(values?.brands)) {
+        if (!Array.isArray(values?.prices)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.brands),
+            ids: RequestHelpers.extractIdsFromArray(values?.prices),
         }
         switch (operation) {
             case 'add':
@@ -70,7 +70,7 @@ function EditListingBrand({
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.listingBrand.replace(
+                        truJobApiConfig.endpoints.listingPrice.replace(
                             ':listingId',
                             listingId.toString(),
                         ),
@@ -104,8 +104,8 @@ function EditListingBrand({
             return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_LISTING_BRAND_MODAL_ID);
-        dataTableContext.modal.close(CREATE_LISTING_BRAND_MODAL_ID);
+        dataTableContext.modal.close(EDIT_LISTING_PRICE_MODAL_ID);
+        dataTableContext.modal.close(CREATE_LISTING_PRICE_MODAL_ID);
 
     }
 
@@ -153,7 +153,7 @@ function EditListingBrand({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditListingBrandFields operation={operation} />
+                        <EditListingPriceFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -164,7 +164,7 @@ function EditListingBrand({
                     >
                         {() => {
                             return (
-                                <EditListingBrandFields operation={operation} />
+                                <EditListingPriceFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -173,4 +173,4 @@ function EditListingBrand({
         </div>
     );
 }
-export default EditListingBrand;
+export default EditListingPrice;

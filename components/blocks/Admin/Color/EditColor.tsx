@@ -53,9 +53,13 @@ function EditColor({
 
         let requestData: UpdateColor = {
             id: values?.id || 0,
-            name: values?.name || '',
-            label: values?.label || '',
         };
+        if (values?.name) {
+            requestData.name = values?.name || '';
+        }
+        if (values?.label) {
+            requestData.label = values?.label || '';
+        }
 
         return requestData;
     }
@@ -72,6 +76,7 @@ function EditColor({
         switch (operation) {
             case 'edit':
             case 'update':
+                
                 if (!values?.id) {
                     console.warn('Color ID is required');
                     return;
@@ -120,6 +125,15 @@ function EditColor({
         dataTableContext.modal.close(CREATE_COLOR_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -134,6 +148,7 @@ function EditColor({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

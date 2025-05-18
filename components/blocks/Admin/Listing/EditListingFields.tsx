@@ -15,6 +15,8 @@ import ManageListingCategory from "./Category/ManageListingCategory";
 import ManageListingFeature from "./Feature/ManageListingFeature";
 import ManageListingColor from "./Color/ManageListingColor";
 import ManageListingProductType from "./ProductType/ManageListingProductType";
+import { Price } from "@/types/Price";
+import ManageListingPrice from "./Price/ManageListingPrice";
 
 type EditListingFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -105,16 +107,6 @@ function EditListingFields({
             },
                 e?: React.MouseEvent | null
             ) => {
-
-                // if (selectedUsers.length === 0) {
-                //     console.warn('No user selected');
-                //     return true;
-                // }
-                // const selectedUser = selectedUsers[0];
-                // if (['add', 'create'].includes(operation)) {
-                //     setFieldValue('user', selectedUser);
-                //     return true;
-                // }
                 return true;
             },
             onCancel: () => {
@@ -131,6 +123,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingReview
@@ -181,6 +174,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingFeature
@@ -230,6 +224,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingFollow
@@ -279,6 +274,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingCategory
@@ -328,6 +324,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingBrand
@@ -378,6 +375,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingColor
@@ -427,6 +425,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageListingProductType
@@ -476,6 +475,7 @@ function EditListingFields({
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
+                        { name: 'user' },
                     ]}
                 >
                     <ManageMedia
@@ -496,6 +496,56 @@ function EditListingFields({
                                 return;
                             }
                             setFieldValue('media', media);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                console.log('ok');
+                if (selectedMedia.length === 0) {
+                    console.warn('No user selected');
+                    return true;
+                }
+
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('media', selectedMedia);
+                    return true;
+                }
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
+        },
+        {
+            id: 'listingPrice',
+            title: 'Manage Price',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                        { name: 'user' },
+                    ]}
+                >
+                    <ManageListingPrice
+                        data={values?.prices || []}
+                        rowSelection={false}
+                        multiRowSelection={false}
+                        enableEdit={true}
+                        paginationMode="state"
+                        onChange={(prices: Array<Price>) => {
+                            if (!Array.isArray(prices)) {
+                                console.warn('Invalid values received from component');
+                                return;
+                            }
+                            if (values?.id) {
+                                return;
+                            }
+                            setFieldValue('prices', prices);
                         }}
                     />
                 </AccessControlComponent>
@@ -667,6 +717,13 @@ function EditListingFields({
                         {modalService.renderLocalTriggerButton(
                             'listingProductType',
                             'Manage Product Type',
+                        )}
+                    </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Price</h4>
+                        {modalService.renderLocalTriggerButton(
+                            'listingPrice',
+                            'Manage Price',
                         )}
                     </div>
                     <div className="col-12 my-3">

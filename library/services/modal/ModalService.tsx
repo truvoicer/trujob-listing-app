@@ -47,12 +47,14 @@ export class ModalService extends MessageService {
         onOk: () => { return true; },
     };
     static initializeModalWithForm({
+        requiredFields,
         modalState,
         id,
         operation,
         initialValues,
         handleSubmit,
     }: {
+        requiredFields?: Record<string, any>;
         modalState: ModalState;
         id: string;
         operation: string;
@@ -69,6 +71,7 @@ export class ModalService extends MessageService {
                 ...modalItem?.formProps,
                 operation: operation,
                 initialValues: initialValues,
+                requiredFields
             }
         };
 

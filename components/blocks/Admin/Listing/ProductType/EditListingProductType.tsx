@@ -107,6 +107,15 @@ function EditListingProductType({
         dataTableContext.modal.close(CREATE_LISTING_PRODUCT_TYPE_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -121,6 +130,7 @@ function EditListingProductType({
                 formProps: {
                     operation: operation,
                     initialValues: initialValues,
+                    requiredFields: getRequiredFields(),
                     onSubmit: handleSubmit,
                 }
             },

@@ -55,11 +55,14 @@ function EditBrand({
     function buildUpdateData(values: Brand) {
 
         let requestData: UpdateBrand = {
-            id: data?.id || 0,
-            name: values?.name || '',
-            label: values?.label || '',
+            id: values?.id || 0,
         };
-
+        if (values?.name) {
+            requestData.name = values?.name || '';
+        }
+        if (values?.label) {
+            requestData.label = values?.label || '';
+        }
         return requestData;
     }
     async function handleSubmit(values: Brand) {
@@ -136,7 +139,15 @@ function EditBrand({
         dataTableContext.modal.close(EDIT_BRAND_MODAL_ID);
     }
 
-
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
     useEffect(() => {
         if (!inModal) {
             return;
@@ -149,6 +160,7 @@ function EditBrand({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

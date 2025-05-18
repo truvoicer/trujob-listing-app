@@ -119,6 +119,15 @@ function EditListingReview({
         }
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -129,6 +138,7 @@ function EditListingReview({
         }
         ModalService.initializeModalWithForm({
             modalState: dataTableContext?.modal,
+            requiredFields: getRequiredFields(),
             id: modalId,
             operation: operation,
             initialValues: initialValues,

@@ -6,6 +6,8 @@ import { features } from "process";
 export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
+        currency: '/locale/currency',
+        country: '/locale/country',
         category: '/category',
         brand: '/brand',
         listingType: '/listing-type',

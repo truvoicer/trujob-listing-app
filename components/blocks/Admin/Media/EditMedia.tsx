@@ -230,6 +230,15 @@ function EditMedia({
 
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -244,6 +253,7 @@ function EditMedia({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

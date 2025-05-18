@@ -120,6 +120,15 @@ function EditListingType({
         dataTableContext.modal.close(CREATE_LISTING_TYPE_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -134,6 +143,7 @@ function EditListingType({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

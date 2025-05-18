@@ -107,6 +107,15 @@ function EditListingFeature({
         dataTableContext.modal.close(CREATE_LISTING_FEATURE_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -121,6 +130,7 @@ function EditListingFeature({
                 formProps: {
                     operation: operation,
                     initialValues: initialValues,
+                    requiredFields: getRequiredFields(),
                     onSubmit: handleSubmit,
                 }
             },

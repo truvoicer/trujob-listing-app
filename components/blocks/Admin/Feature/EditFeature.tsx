@@ -56,9 +56,13 @@ function EditFeature({
 
         let requestData: UpdateFeature = {
             id: values?.id || 0,
-            name: values?.name || '',
-            label: values?.label || '',
         };
+        if (values?.name) {
+            requestData.name = values?.name || '';
+        }
+        if (values?.label) {
+            requestData.label = values?.label || '';
+        }
 
         return requestData;
     }
@@ -124,6 +128,15 @@ function EditFeature({
         dataTableContext.modal.close(CREATE_FEATURE_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -138,6 +151,7 @@ function EditFeature({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

@@ -108,6 +108,15 @@ function EditListingCategory({
 
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -121,6 +130,7 @@ function EditListingCategory({
             {
                 formProps: {
                     operation: operation,
+                    requiredFields: getRequiredFields(),
                     initialValues: initialValues,
                     onSubmit: handleSubmit,
                 }

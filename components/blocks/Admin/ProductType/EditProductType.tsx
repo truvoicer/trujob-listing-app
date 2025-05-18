@@ -51,9 +51,13 @@ function EditProductType({
 
         let requestData: UpdateProductType = {
             id: values?.id || 0,
-            name: values?.name || '',
-            label: values?.label || '',
         };
+        if (values?.name) {
+            requestData.name = values?.name || '';
+        }
+        if (values?.label) {
+            requestData.label = values?.label || '';
+        }
 
         return requestData;
     }

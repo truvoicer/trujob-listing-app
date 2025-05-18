@@ -108,6 +108,16 @@ function EditListingColor({
     }
 
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
+
     useEffect(() => {
         if (!inModal) {
             return;
@@ -121,6 +131,7 @@ function EditListingColor({
                 formProps: {
                     operation: operation,
                     initialValues: initialValues,
+                    requiredFields: getRequiredFields(),
                     onSubmit: handleSubmit,
                 }
             },
