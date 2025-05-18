@@ -42,13 +42,24 @@ function ManageListingReview({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getAddNewModalProps() {
+    function getModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    reviews: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
+
+    function getListingFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    reviews: [],
-                },
+                initialValues: getModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -68,10 +79,12 @@ function ManageListingReview({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
-                            values: formHelpers?.values?.reviews,
+                            values: formHelpers?.values,
+                            'format': 'object',
+                            index
                         });
                         break;
                     case 'edit':
@@ -87,30 +100,6 @@ function ManageListingReview({
                 }
 
                 return await formHelpers.submitForm();
-            },
-            fullscreen: true
-        };
-    }
-
-    function getListingFormModalProps() {
-        return {
-            formProps: {},
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
             },
             fullscreen: true
         }
@@ -136,7 +125,7 @@ function ManageListingReview({
                                     modalId={EDIT_LISTING_REVIEW_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getListingFormModalProps(index),
                         }, EDIT_LISTING_REVIEW_MODAL_ID);
                     }}
                 >
@@ -167,7 +156,7 @@ function ManageListingReview({
                                     dataTableContext.modal.close(DELETE_LISTING_REVIEW_MODAL_ID);
                                     return;
                                 }
-                                if (!item?.id) {
+                                if (!listingId) {
                                     notificationContext.show({
                                         variant: 'danger',
                                         type: 'toast',
@@ -175,11 +164,29 @@ function ManageListingReview({
                                         component: (
                                             <p>Listing ID is required</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'listing-review-delete-error');
+                                    return;
+                                }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing review ID is required</p>
+                                        ),
+                                    }, 'listing-review-delete-error');
                                     return;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingReview.replace(
+                                            ':listingId', 
+                                            listingId.toString()
+                                        ),
+                                        item.id,
+                                        'delete'
+                                    ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
                                 })
@@ -189,9 +196,9 @@ function ManageListingReview({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete listing</p>
+                                            <p>Failed to delete review</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'listing-review-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -249,7 +256,7 @@ function ManageListingReview({
                                                     component: (
                                                         <p>Listing ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-review-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -265,7 +272,7 @@ function ManageListingReview({
                                                     component: (
                                                         <p>Failed to delete listing</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-review-delete-error');
                                                 return;
                                             }
                                             dataTableContext.refresh();
@@ -359,7 +366,7 @@ function ManageListingReview({
                     />
                 )
             },
-            ...getAddNewModalProps(),
+            ...getListingFormModalProps(),
         }, ADD_LISTING_REVIEW_MODAL_ID);
 
     }

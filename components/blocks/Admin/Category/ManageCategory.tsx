@@ -57,7 +57,7 @@ function ManageCategory({
         }
     }
 
-    function getAddNewModalProps() {
+    function getCategoryFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -82,10 +82,11 @@ function ManageCategory({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.categories,
+                            index
                         });
                         break;
                     case 'edit':
@@ -104,30 +105,6 @@ function ManageCategory({
             },
             fullscreen: true
         };
-    }
-
-    function getCategoryFormModalProps() {
-        return {
-            formProps: {},
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
-            },
-            fullscreen: true
-        }
     }
 
     function renderActionColumn(item: Category, index: number, dataTableContextState: DataTableContextType) {
@@ -149,7 +126,7 @@ function ManageCategory({
                                     modalId={EDIT_CATEGORY_MODAL_ID}
                                 />
                             ),
-                            ...getCategoryFormModalProps(),
+                            ...getCategoryFormModalProps(index),
                         }, EDIT_CATEGORY_MODAL_ID);
                     }}
                 >
@@ -240,7 +217,7 @@ function ManageCategory({
                                                 modalId={EDIT_CATEGORY_MODAL_ID}
                                             />
                                         ),
-                                        ...getCategoryFormModalProps(),
+                                        ...getCategoryFormModalProps(index),
                                     }, EDIT_CATEGORY_MODAL_ID);
                                 }
                             }
@@ -369,7 +346,7 @@ function ManageCategory({
                     />
                 )
             },
-            ...getAddNewModalProps(),
+            ...getCategoryFormModalProps(),
         }, CREATE_CATEGORY_MODAL_ID);
     }
 

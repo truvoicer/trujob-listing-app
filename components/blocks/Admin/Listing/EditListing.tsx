@@ -68,7 +68,6 @@ function EditListing({
         updated_at: data?.updated_at || '',
     };
 
-
     function buildRequestData(values: Listing) {
         let requestData: ListingRequest = {
             active: values?.active || false,
@@ -154,7 +153,7 @@ function EditListing({
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
-            return;
+            return false;
         }
 
         let response = null;
@@ -189,7 +188,7 @@ function EditListing({
                 console.log('Invalid operation');
                 break;
         }
-
+        console.log('response', {response});
         if (!response) {
             setAlert({
                 show: true,
@@ -205,7 +204,7 @@ function EditListing({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_LISTING_MODAL_ID);

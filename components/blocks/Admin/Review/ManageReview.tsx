@@ -76,7 +76,7 @@ function ManageReview({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.reviews,
@@ -134,7 +134,7 @@ function ManageReview({
                         dataTableContext.modal.show({
                             title: 'Delete Review',
                             component: (
-                                <p>Are you sure you want to delete this brand ({item?.label})?</p>
+                                <p>Are you sure you want to delete this review ({item?.label})?</p>
                             ),
                             onOk: async () => {
                                 if (!operation) {

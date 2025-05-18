@@ -53,7 +53,7 @@ function ManageBrand({
         }
     }
 
-    function getBrandFormModalProps() {
+    function getBrandFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -77,10 +77,11 @@ function ManageBrand({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.brands,
+                            index
                         });
                         break;
                     case 'edit':
@@ -120,7 +121,7 @@ function ManageBrand({
                                     modalId={EDIT_BRAND_MODAL_ID}
                                 />
                             ),
-                            ...getBrandFormModalProps(),
+                            ...getBrandFormModalProps(index),
                         }, EDIT_BRAND_MODAL_ID);
                     }}
                 >
@@ -211,7 +212,7 @@ function ManageBrand({
                                                 modalId={EDIT_BRAND_MODAL_ID}
                                             />
                                         ),
-                                        ...getBrandFormModalProps(),
+                                        ...getBrandFormModalProps(index),
                                     }, EDIT_BRAND_MODAL_ID);
                                 }
                             }

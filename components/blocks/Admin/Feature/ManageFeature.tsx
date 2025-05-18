@@ -54,9 +54,7 @@ function ManageFeature({
                 return {};
         }
     }
-    function getAddNewModalProps({ dataTableContextState }: {
-        dataTableContextState: DataTableContextType
-    }) {
+    function getFeatureFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -80,10 +78,11 @@ function ManageFeature({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.features,
+                            index
                         });
                         break;
                     case 'edit':
@@ -102,42 +101,6 @@ function ManageFeature({
             },
             fullscreen: true
         };
-    }
-
-    function getFeatureFormModalProps() {
-        return {
-            formProps: {},
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!operation) {
-                    console.warn('Operation is required');
-                    return;
-                }
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-
-                if (['add', 'create'].includes(operation)) {
-                    onChange([
-                        ...data,
-                        formHelpers.values.feature
-                    ]);
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
-            },
-            fullscreen: true
-        }
     }
 
     function renderActionColumn(item: Feature, index: number, dataTableContextState: DataTableContextType) {
@@ -159,7 +122,7 @@ function ManageFeature({
                                     modalId={EDIT_FEATURE_MODAL_ID}
                                 />
                             ),
-                            ...getFeatureFormModalProps(),
+                            ...getFeatureFormModalProps(index),
                         }, EDIT_FEATURE_MODAL_ID);
                     }}
                 >
@@ -250,7 +213,7 @@ function ManageFeature({
                                                 modalId={EDIT_FEATURE_MODAL_ID}
                                             />
                                         ),
-                                        ...getFeatureFormModalProps(),
+                                        ...getFeatureFormModalProps(index),
                                     }, EDIT_FEATURE_MODAL_ID);
                                 }
                             }
@@ -388,7 +351,7 @@ function ManageFeature({
                     />
                 )
             },
-            ...getAddNewModalProps({ dataTableContextState }),
+            ...getFeatureFormModalProps(),
         }, CREATE_FEATURE_MODAL_ID);
     }
 

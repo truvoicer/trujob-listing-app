@@ -305,7 +305,6 @@ function DataTable({
                                     page: page,
                                 },
                             })
-                            console.log('Page Clicked', page);
                         }} />
                 </div>
             </div>

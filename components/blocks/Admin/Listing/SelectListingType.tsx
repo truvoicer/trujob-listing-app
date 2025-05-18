@@ -11,7 +11,7 @@ export type SelectListingTypeProps = {
     value?: number | null;
 }
 function SelectListingType({
-    name = 'listingType',
+    name = 'type',
     value,
 }: SelectListingTypeProps) {
     const [listingTypes, setListingTypes] = useState<Array<ListingType>>([]);
@@ -87,7 +87,7 @@ function SelectListingType({
                     <option
                         key={index}
                         value={listingType.id}>
-                        {`${listingType.label} | name: ${listingType.name} | id: (${listingType.id})`}
+                        {`${listingType.name} | id: (${listingType.id})`}
                     </option>
                 ))}
             </select>

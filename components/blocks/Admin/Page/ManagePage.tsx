@@ -78,7 +78,7 @@ function ManagePage({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.pages,

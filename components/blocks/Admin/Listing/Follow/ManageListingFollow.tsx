@@ -43,7 +43,7 @@ function ManageListingFollow({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getAddNewModalProps() {
+    function getListingFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -69,10 +69,11 @@ function ManageListingFollow({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.users,
+                            index
                         });
                         break;
                     case 'edit':
@@ -91,30 +92,6 @@ function ManageListingFollow({
             },
             fullscreen: true
         };
-    }
-    function getListingFormModalProps() {
-        return {
-            formProps: {},
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                console.log('Form Helpers', formHelpers?.values);
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
-            },
-            fullscreen: true
-        }
     }
 
     function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
@@ -137,7 +114,7 @@ function ManageListingFollow({
                                     modalId={EDIT_LISTING_FOLLOW_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getListingFormModalProps(index),
                         }, EDIT_LISTING_FOLLOW_MODAL_ID);
                     }}
                 >
@@ -240,7 +217,7 @@ function ManageListingFollow({
                                                 modalId={EDIT_LISTING_FOLLOW_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getListingFormModalProps(index),
                                     }, EDIT_LISTING_FOLLOW_MODAL_ID);
                                 }
                             }
@@ -258,7 +235,7 @@ function ManageListingFollow({
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
-                                            if (!item?.id) {
+                                            if (!listingId) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
@@ -266,23 +243,42 @@ function ManageListingFollow({
                                                     component: (
                                                         <p>Listing ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-follow-delete-error');
                                                 return;
                                             }
+                                            if (!item?.id) {
+                                                notificationContext.show({
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Listing follow ID is required</p>
+                                                    ),
+                                                }, 'listing-follow-delete-error');
+                                                return;
+                                            }
+
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: UrlHelpers.urlFromArray([
+                                                    truJobApiConfig.endpoints.listingFollow.replace(
+                                                        ':listingId',
+                                                        listingId.toString()
+                                                    ),
+                                                    item.id,
+                                                    'delete'
+                                                ]),
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
-                                            })
+                                            });
                                             if (!response) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete listing follow</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-follow-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
@@ -376,7 +372,7 @@ function ManageListingFollow({
                     />
                 )
             },
-            ...getAddNewModalProps(),
+            ...getListingFormModalProps(),
         }, CREATE_LISTING_FOLLOW_MODAL_ID);
     }
 

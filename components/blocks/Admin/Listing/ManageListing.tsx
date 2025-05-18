@@ -67,17 +67,13 @@ function ManageListing({
                 if (!formHelpers) {
                     return;
                 }
-                if (!operation) {
-                    console.warn('Operation is required');
-                    return;
-                }
                 if (typeof formHelpers?.submitForm !== 'function') {
                     console.warn('submitForm is not a function');
                     return;
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.features,
@@ -137,11 +133,6 @@ function ManageListing({
                                 <p>Are you sure you want to delete this listing ({item?.name} | {item?.title})?</p>
                             ),
                             onOk: async () => {
-                                console.log('Delete listing', { operation, item });
-                                if (!operation) {
-                                    console.warn('Operation is required');
-                                    return;
-                                }
                                 if (Array.isArray(data) && data.length) {
                                     let cloneData = [...data];
                                     cloneData.splice(index, 1);

@@ -91,10 +91,12 @@ const Pagination = ({
     }
 
     function getPageLinkProps(page: number) {
+        const searchParamsObj = Object.fromEntries(searchParams.entries());
         return {
             scroll: false,
             href: {
                 query: {
+                    ...searchParamsObj,
                     page: page
                 }
             },

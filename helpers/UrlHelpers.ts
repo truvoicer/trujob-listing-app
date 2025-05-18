@@ -1,7 +1,24 @@
 
 
 export class UrlHelpers {
-
+    static getSearchParams(searchParams: URLSearchParams, keys?: Array<string>): Record<string, string>
+     {
+        if (!Array.isArray(keys)) {
+            return Object.fromEntries(searchParams.entries())
+        }
+        const filteredKeys = keys.filter((key) => searchParams.has(key));
+        if (filteredKeys.length === 0) {
+            return {};
+        }
+        const filteredParams: Record<string, string> = {};
+        filteredKeys.forEach((key) => {
+            const value = searchParams.get(key);
+            if (value) {
+                filteredParams[key] = value;
+            }
+        });
+        return filteredParams;
+    }
     static getRedirectUrl(
         searchParams: URLSearchParams,
         fallback: string

@@ -44,7 +44,7 @@ function ManageListingBrand({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getListingFormModalProps() {
+    function getListingFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -71,10 +71,11 @@ function ManageListingBrand({
                 console.log('formHelpers', formHelpers);
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.brands,
+                            index
                         });
                         break;
                     case 'edit':
@@ -115,7 +116,7 @@ function ManageListingBrand({
                                     modalId={EDIT_LISTING_BRAND_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getListingFormModalProps(index),
                         }, EDIT_LISTING_BRAND_MODAL_ID);
                     }}
                 >
@@ -146,7 +147,7 @@ function ManageListingBrand({
                                     dataTableContext.modal.close(DELETE_LISTING_BRAND_MODAL_ID);
                                     return;
                                 }
-                                if (!item?.id) {
+                                if (!listingId) {
                                     notificationContext.show({
                                         variant: 'danger',
                                         type: 'toast',
@@ -154,23 +155,43 @@ function ManageListingBrand({
                                         component: (
                                             <p>Listing ID is required</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'listing-brand-delete-error');
                                     return;
                                 }
+                                if (!item?.id) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Listing brand ID is required</p>
+                                        ),
+                                    }, 'listing-brand-delete-error');
+                                    return;
+                                }
+
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                    endpoint: UrlHelpers.urlFromArray([
+                                        truJobApiConfig.endpoints.listingBrand.replace(
+                                            ':listingId',
+                                            listingId.toString()
+                                        ),
+                                        item.id,
+                                        'delete'
+                                    ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
-                                })
+                                });
+
                                 if (!response) {
                                     notificationContext.show({
                                         variant: 'danger',
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete listing</p>
+                                            <p>Failed to delete listing brand</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'listing-brand-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -203,7 +224,7 @@ function ManageListingBrand({
                                                 modalId={EDIT_LISTING_BRAND_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getListingFormModalProps(index),
                                     }, EDIT_LISTING_BRAND_MODAL_ID);
                                 }
                             }
@@ -229,7 +250,7 @@ function ManageListingBrand({
                                                     component: (
                                                         <p>Listing ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-brand-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -245,7 +266,7 @@ function ManageListingBrand({
                                                     component: (
                                                         <p>Failed to delete listing</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-brand-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();

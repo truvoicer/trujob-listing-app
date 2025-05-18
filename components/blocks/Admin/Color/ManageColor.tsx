@@ -54,7 +54,7 @@ function ManageColor({
                 return {};
         }
     }
-    function getAddNewModalProps() {
+    function getColorFormModalProps(index: number) {
         return {
             formProps: {
                 operation: operation,
@@ -78,10 +78,11 @@ function ManageColor({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.colors,
+                            index
                         });
                         break;
                     case 'edit':
@@ -100,30 +101,6 @@ function ManageColor({
             },
             fullscreen: true
         };
-    }
-
-    function getColorFormModalProps() {
-        return {
-            formProps: {},
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    return;
-                }
-                const response = await formHelpers.submitForm();
-                if (!response) {
-                    return false;
-                }
-                return true;
-            },
-            fullscreen: true
-        }
     }
 
     function renderActionColumn(item: Color, index: number, dataTableContextState: DataTableContextType) {
@@ -145,7 +122,7 @@ function ManageColor({
                                     modalId={EDIT_COLOR_MODAL_ID}
                                 />
                             ),
-                            ...getColorFormModalProps(),
+                            ...getColorFormModalProps(index),
                         }, EDIT_COLOR_MODAL_ID);
                     }}
                 >
@@ -236,7 +213,7 @@ function ManageColor({
                                                 modalId={EDIT_COLOR_MODAL_ID}
                                             />
                                         ),
-                                        ...getColorFormModalProps(),
+                                        ...getColorFormModalProps(index),
                                     }, EDIT_COLOR_MODAL_ID);
                                 }
                             }
@@ -360,7 +337,7 @@ function ManageColor({
                     />
                 )
             },
-            ...getAddNewModalProps(),
+            ...getColorFormModalProps(),
         }, CREATE_COLOR_MODAL_ID);
     }
 

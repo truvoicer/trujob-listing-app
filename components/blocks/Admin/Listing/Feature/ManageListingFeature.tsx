@@ -45,7 +45,7 @@ function ManageListingFeature({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
-    function getListingFormModalProps() {
+    function getListingFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -71,10 +71,11 @@ function ManageListingFeature({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.features,
+                            index
                         });
                         break;
                     case 'edit':
@@ -115,7 +116,7 @@ function ManageListingFeature({
                                     modalId={EDIT_LISTING_FEATURE_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
+                            ...getListingFormModalProps(index),
                         }, EDIT_LISTING_FEATURE_MODAL_ID);
                     }}
                 >
@@ -218,7 +219,7 @@ function ManageListingFeature({
                                                 modalId={EDIT_LISTING_FEATURE_MODAL_ID}
                                             />
                                         ),
-                                        ...getListingFormModalProps(),
+                                        ...getListingFormModalProps(index),
                                     }, EDIT_LISTING_FEATURE_MODAL_ID);
                                 }
                             }
@@ -236,7 +237,7 @@ function ManageListingFeature({
                                             <p>Are you sure you want to delete this listing ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
-                                            if (!item?.id) {
+                                            if (!listingId) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
@@ -244,23 +245,42 @@ function ManageListingFeature({
                                                     component: (
                                                         <p>Listing ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-feature-delete-error');
                                                 return;
                                             }
+                                            if (!item?.id) {
+                                                notificationContext.show({
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Listing feature ID is required</p>
+                                                    ),
+                                                }, 'listing-feature-delete-error');
+                                                return;
+                                            }
+
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: UrlHelpers.urlFromArray([
+                                                    truJobApiConfig.endpoints.listingFeature.replace(
+                                                        ':listingId',
+                                                        listingId.toString()
+                                                    ),
+                                                    item.id,
+                                                    'delete'
+                                                ]),
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
-                                            })
+                                            });
                                             if (!response) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete listing feature</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-feature-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();

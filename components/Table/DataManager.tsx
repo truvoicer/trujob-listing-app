@@ -1,10 +1,12 @@
 import DataTable, { OnRowSelectActionClick } from "@/components/Table/DataTable";
-import { useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { useSearchParams } from "next/navigation";
 import { isObject, isObjectEmpty } from "@/helpers/utils";
 import { DataTableContext, dataTableContextData } from "@/contexts/DataTableContext";
 import { ConfirmationService } from "@/library/services/confirmation/ConfirmationService";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { PaginationHelpers } from "@/helpers/PaginationHelpers";
 
 export type DataManageComponentProps = {
     mode?: 'selector' | 'edit';
@@ -198,6 +200,7 @@ function DataManager({
         if (someSet) {
             return;
         }
+        console.log('DataManager useEffect init', dataTableContextState.query);
         makeRequest();
     }, []);
 
@@ -213,10 +216,27 @@ function DataManager({
     }, []);
 
     useEffect(() => {
+        if (paginationMode === 'state') {
+            makeRequest();
+            return;
+        }
         if (dataTableContextState?.requestStatus !== 'idle') {
             return;
         }
-        makeRequest();
+        const params = UrlHelpers.getSearchParams(searchParamsUse, PaginationHelpers.DEFAULT_PARAMS);
+        if (Object.keys(params).length === 0) {
+            return;
+        }
+            setDataTableContextState((prevState: SetStateAction<DataTableContextType>) => {
+                let newState: DataTableContextType = {
+                    ...prevState
+                };
+                newState.query = {
+                    ...prevState.query,
+                    ...params
+                };
+                return newState;
+            });
     }, [
         searchParamPage,
         searchParamSortOrder,

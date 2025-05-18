@@ -38,10 +38,11 @@ function EditListingFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
+    
     function getListingComponentProps() {
         let componentProps: any = {
             operation: 'create',
+            mode: 'selector'
         };
         if (values?.id) {
             componentProps.listingId = values.id;
@@ -78,15 +79,18 @@ function EditListingFields({
                             }
 
                             if (users.length === 0) {
+                                console.warn('Users is empty');
+                                return true;
+                            }
+                            const checked = users.filter((item) => item?.checked);
+                            if (checked.length === 0) {
                                 console.warn('No user selected');
                                 return true;
                             }
-                            const selectedUser = users[0];
+                            const selectedUser = checked[0];
 
                             if (values?.id) {
-                                setSelectedUsers(
-                                    users.filter((item) => item?.checked)
-                                );
+                                setSelectedUsers(checked);
                                 return;
                             }
                             setFieldValue('user', selectedUser);
@@ -137,6 +141,7 @@ function EditListingFields({
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(reviews: Array<any>) => {
+                            console.log('reviews', reviews);
                             if (!Array.isArray(reviews)) {
                                 console.warn('Invalid values received from ManageUser component');
                                 return;

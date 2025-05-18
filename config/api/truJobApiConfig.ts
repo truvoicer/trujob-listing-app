@@ -22,6 +22,7 @@ export default {
         listingBrand: '/listing/:listingId/brand',
         listingColor: '/listing/:listingId/color',
         listingProductType: '/listing/:listingId/product-type',
+        listingListingType: '/listing/:listingId/listing-type',
         settings: '/settings',
         menu: '/menu',
         menuItem: '/menu/%s/item',

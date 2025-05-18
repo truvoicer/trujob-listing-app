@@ -77,7 +77,7 @@ function ManageListingType({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.listingTypes,
@@ -259,25 +259,30 @@ function ManageListingType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>ListingType ID is required</p>
+                                                        <p>Listing type ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-type-delete-error');
                                                 return;
                                             }
+
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listingType}/${item.id}/delete`,
+                                                endpoint: UrlHelpers.urlFromArray([
+                                                    truJobApiConfig.endpoints.listingType,
+                                                    item.id,
+                                                    'delete'
+                                                ]),
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
-                                            })
+                                            });
                                             if (!response) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete listing type</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'listing-type-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();

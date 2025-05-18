@@ -75,7 +75,7 @@ function ManageUser({
                 }
                 switch (mode) {
                     case 'selector':
-                        DataManagerService.selectorModeCreateHandler({
+                        DataManagerService.selectorModeHandler({
                             onChange,
                             data,
                             values: formHelpers?.values?.users,
@@ -158,7 +158,7 @@ function ManageUser({
                                     appModalContext.show({
                                         title: 'Delete User',
                                         component: (
-                                            <p>Are you sure you want to delete this user ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this user: ({item?.email} | {item?.first_name} {item?.last_name})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -338,7 +338,7 @@ function ManageUser({
         });
         return actions;
     }
-
+    
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
