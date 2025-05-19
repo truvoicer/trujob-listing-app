@@ -112,7 +112,7 @@ function ManagePriceType({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit PriceType',
+                            title: 'Edit Price type',
                             component: (
                                 <EditPriceType
                                     data={item}
@@ -133,12 +133,12 @@ function ManagePriceType({
                     onClick={e => {
                         e.preventDefault();
                         dataTableContextState.modal.show({
-                            title: 'Delete PriceType',
+                            title: 'Delete price type',
                             component: (
-                                <p>Are you sure you want to delete this priceType ({item?.name} | {item?.label})?</p>
+                                <p>Are you sure you want to delete this price type ({item?.name} | {item?.label})?</p>
                             ),
                             onOk: async () => {
-                                console.log('Delete priceType', { operation, item });
+                                console.log('Delete price type', { operation, item });
                                 if (!operation) {
                                     console.warn('Operation is required');
                                     return;
@@ -158,9 +158,9 @@ function ManagePriceType({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>PriceType ID is required</p>
+                                            <p>Price type ID is required</p>
                                         ),
-                                    }, 'priceType-priceType-delete-error');
+                                    }, 'priceType-delete-error');
                                     return;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -178,7 +178,7 @@ function ManagePriceType({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete priceType</p>
+                                            <p>Failed to delete price type</p>
                                         ),
                                     }, 'priceType-delete-error');
                                     return;
@@ -203,7 +203,7 @@ function ManagePriceType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit PriceType',
+                                        title: 'Edit price type',
                                         component: (
                                             <EditPriceType
                                                 data={item}
@@ -225,9 +225,9 @@ function ManagePriceType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete PriceType',
+                                        title: 'Delete price type',
                                         component: (
-                                            <p>Are you sure you want to delete this priceType ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this price type ({item?.label} | {item?.name})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -236,7 +236,7 @@ function ManagePriceType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>PriceType ID is required</p>
+                                                        <p>Price type ID is required</p>
                                                     ),
                                                 }, 'priceType-delete-error');
                                                 return;
@@ -252,7 +252,7 @@ function ManagePriceType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete priceType</p>
+                                                        <p>Failed to delete price type</p>
                                                     ),
                                                 }, 'priceType-delete-error');
                                                 return;
@@ -330,7 +330,7 @@ function ManagePriceType({
             return;
         }
         modalState.show({
-            title: 'Create PriceType',
+            title: 'Create price type',
             component: (
                 <EditPriceType
                     operation={'create'}
@@ -355,7 +355,7 @@ function ManagePriceType({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected priceTypes?',
+                    message: 'Are you sure you want to delete selected price types?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -364,7 +364,7 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No priceTypes selected</p>
+                                    <p>No price types selected</p>
                                 ),
                             }, 'priceType-bulk-delete-error');
                             return;
@@ -376,7 +376,7 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>PriceType IDs are required</p>
+                                    <p>Price type IDs are required</p>
                                 ),
                             }, 'priceType-bulk-delete-error');
                             return;
@@ -395,7 +395,7 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete priceTypes</p>
+                                    <p>Failed to delete price types</p>
                                 ),
                             }, 'priceType-bulk-delete-error');
                             return;
@@ -406,7 +406,7 @@ function ManagePriceType({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>PriceTypes deleted successfully</p>
+                                <p>Price types deleted successfully</p>
                             ),
                         }, 'priceType-bulk-delete-success');
                         dataTableContextState.refresh();
@@ -431,7 +431,7 @@ function ManagePriceType({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage PriceTypes'}
+                title={'Manage price types'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}

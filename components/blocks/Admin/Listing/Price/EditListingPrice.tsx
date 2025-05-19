@@ -8,7 +8,6 @@ import { CREATE_LISTING_PRICE_MODAL_ID, EDIT_LISTING_PRICE_MODAL_ID } from "./Ma
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Listing } from "@/types/Listing";
-import { Sidebar } from "@/types/Sidebar";
 import EditListingPriceFields from "./EditListingPriceFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";

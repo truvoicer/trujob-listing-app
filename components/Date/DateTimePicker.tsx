@@ -63,7 +63,7 @@ function DateTimePicker({
             value={rangeEndDate}
             onChange={handleRangeEndChange}
           />
-          <button onClick={handleRangeSelect}>Select Range</button>
+          {/* <button onClick={handleRangeSelect}>Select Range</button> */}
         </div>
       ) : (
         <div>
@@ -72,7 +72,7 @@ function DateTimePicker({
             value={singleDate}
             onChange={handleSingleChange}
           />
-          <button onClick={handleSingleSelect}>Select Date</button>
+          {/* <button onClick={handleSingleSelect}>Select Date</button> */}
         </div>
       )}
     </div>

@@ -1,10 +1,13 @@
-import { useContext, useState } from "react";
+import { Dispatch, useContext, useState } from "react";
 import { FormikValues, useFormikContext } from "formik";
-import { ModalService } from "@/library/services/modal/ModalService";
+import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
 import CurrencyPriceInput from "@/components/blocks/Locale/Currency/CurrencyPriceInput";
+import ManagePriceType from "../../PriceType/ManagePriceType";
+import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
+import DateTimePicker from "@/components/Date/DateTimePicker";
 
 type EditListingPriceFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -20,43 +23,166 @@ function EditListingPriceFields({
 
     const { values, handleChange, setFieldValue } = useFormikContext<FormikValues>() || {};
 
-            // 'valid_from' => $this->valid_from,
-            // 'valid_to' => $this->valid_to,
-            // 'is_default' => $this->is_default,
-            // 'is_active' => $this->is_active,
-            // 'created_at' => $this->created_at,
-            // 'updated_at' => $this->updated_at,
+    function getListingComponentProps() {
+        let componentProps: any = {
+            operation: 'create',
+            mode: 'selector'
+        };
+        if (values?.id) {
+            componentProps.listingId = values.id;
+            componentProps.operation = 'edit';
+        }
+        return componentProps;
+    }
+
+    modalService.setUseStateHook(useState);
+    modalService.setConfig([
+        {
+            id: 'Type',
+            title: 'Select Type',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManagePriceType
+                        {...getListingComponentProps()}
+                        values={values?.user ? [values?.user] : []}
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(priceTypes: Array<any>) => {
+                            if (!Array.isArray(priceTypes)) {
+                                console.warn('Invalid values received from ManagePriceType component');
+                                return;
+                            }
+
+                            if (priceTypes.length === 0) {
+                                console.warn('Price types is empty');
+                                return true;
+                            }
+                            const checked = priceTypes.filter((item) => item?.checked);
+                            if (checked.length === 0) {
+                                console.warn('No price types selected');
+                                return true;
+                            }
+
+                            const selectedUser = checked[0];
+
+                            if (values?.id) {
+                                return;
+                            }
+                            setFieldValue('user', selectedUser);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: ({ state }: {
+                state: LocalModal,
+                setState: Dispatch<React.SetStateAction<LocalModal>>,
+                configItem: any,
+            },
+                e?: React.MouseEvent | null
+            ) => {
+                return true;
+            },
+            onCancel: () => {
+                return true;
+            }
+        },
+    ]);
+
+
     return (
 
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
 
+                    <div className="col-12 col-lg-6">
+                        <h4>Manage type</h4>
+                        {modalService.renderLocalTriggerButton(
+                            'Type',
+                            'Select Type',
+                        )}
+                    </div>
 
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="type"
-                                id="type"
-                                onChange={handleChange}
-                                value={values?.type || ""} />
-                            <label className="form-label" htmlFor="type">
-                                Type
-                            </label>
+                            <DateTimePicker
+                                onChange={(value) => {
+                                    console.log('value', value);
+                                    // setFieldValue("valid_from", value);
+                                }}
+                                onSelect={(value => {
+                                    console.log('value', value);
+                                    // setFieldValue("valid_from", value);
+                                })}
+                            />
                         </div>
                     </div>
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
+                            <DateTimePicker
+                                onChange={(value) => {
+                                    console.log('value', value);
+                                    // setFieldValue("valid_from", value);
+                                }}
+                                onSelect={(value => {
+                                    console.log('value', value);
+                                    // setFieldValue("valid_from", value);
+                                })}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="col-12 col-lg-6">
+                        <div className="custom-control custom-checkbox mb-3 text-left">
+                            <input
+                                onChange={handleChange}
+                                type="checkbox"
+                                className="custom-control-input"
+                                id="is_default"
+                                name="is_default"
+                                checked={values?.is_default || false} />
+                            <label className="custom-control-label" htmlFor="is_default">
+                                Is Default
+                            </label>
+                        </div>
+                    </div>
+
+                    <div className="col-12 col-lg-6">
+                        <div className="custom-control custom-checkbox mb-3 text-left">
+                            <input
+                                onChange={handleChange}
+                                type="checkbox"
+                                className="custom-control-input"
+                                id="is_active"
+                                name="is_active"
+                                checked={values?.is_active || false} />
+                            <label className="custom-control-label" htmlFor="is_active">
+                                Is Active
+                            </label>
+                        </div>
+                    </div>
+
+
+
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input form-group">
                             <CurrencyPriceInput
-                            onAmountChange={(value) => {
-                                setFieldValue("amount", value);
-                            }
-                            }
-                            onCurrencyChange={(value) => {
-                                setFieldValue("currency", value);
-                            }}
+                                onAmountChange={(value) => {
+                                    setFieldValue("amount", value);
+                                }
+                                }
+                                onCurrencyChange={(value) => {
+                                    setFieldValue("currency", value);
+                                }}
                             />
                         </div>
                     </div>
@@ -78,6 +204,7 @@ function EditListingPriceFields({
                     </div>
 
                 </div>
+                {modalService.renderLocalModals()}
             </div>
         </div>
     );
