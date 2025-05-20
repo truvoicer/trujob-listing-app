@@ -44,13 +44,23 @@ function ManageListingPrice({
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
+    function getAddNewModalInitialValues() {
+        switch (mode) {
+            case 'selector':
+                return {
+                    prices: [],
+                };
+            case 'edit':
+                return {};
+            default:
+                return {};
+        }
+    }
     function getListingFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
-                initialValues: {
-                    prices: [],
-                },
+                initialValues: getAddNewModalInitialValues(),
             },
             show: true,
             showFooter: true,
@@ -58,10 +68,6 @@ function ManageListingPrice({
                 formHelpers?: FormikProps<FormikValues>
             }) => {
                 if (!formHelpers) {
-                    return;
-                }
-                if (!operation) {
-                    console.warn('Operation is required');
                     return;
                 }
                 if (typeof formHelpers?.submitForm !== 'function') {
@@ -463,8 +469,15 @@ function ManageListingPrice({
                 request={listingRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
-                    { label: 'Label', key: 'label' },
-                    { label: 'Name', key: 'name' }
+                    { label: 'Amount', key: 'amount' },
+                    { label: 'Currency', key: 'currency.name' },
+                    { label: 'Country', key: 'country.name' },
+                    { label: 'Valid From', key: 'valid_from' },
+                    { label: 'Valid To', key: 'valid_to' },
+                    { label: 'Is Active', key: 'is_active' },
+                    { label: 'Is Default', key: 'is_default' },
+                    { label: 'Created At', key: 'created_at' },
+                    { label: 'Updated At', key: 'updated_at' },
                 ]}
             />
         </Suspense>

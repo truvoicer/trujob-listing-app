@@ -21,7 +21,7 @@ export type UpdatePriceType = {
 }
 
 export type Price = {
-    id: string;
+    id: number;
     user: User;
     country: Country;
     currency: Currency;
@@ -31,4 +31,22 @@ export type Price = {
     is_default: boolean;
     is_active: boolean;
     amount: number;
+}
+
+export type PriceRequest = {
+    country_id?: number;
+    currency_id?: number;
+    type_id?: number;
+    valid_from?: string;
+    valid_to?: string;
+    is_default?: boolean;
+    is_active?: boolean;
+    amount?: number;
+}
+
+export type CreatePrice = {
+}
+export type UpdatePrice = {
+    id: number;
+    user_id?: number;
 }

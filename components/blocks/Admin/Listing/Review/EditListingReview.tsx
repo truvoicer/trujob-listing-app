@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { FormikValues } from "formik";
+import { ADD_LISTING_REVIEW_MODAL_ID, EDIT_LISTING_REVIEW_MODAL_ID } from "./ManageListingReview";
 
 export type EditListingReviewProps = {
     listingId?: number;
@@ -117,6 +118,21 @@ function EditListingReview({
                 console.warn('Invalid operation');
                 break;
         }
+
+        if (!response) {
+            setAlert({
+                show: true,
+                message: (
+                    <div>
+                        <strong>Success!</strong> Listing review has been updated.
+                    </div>
+                ),
+                type: 'success',
+            });
+        } 
+        dataTableContext?.modal?.close(ADD_LISTING_REVIEW_MODAL_ID);
+        dataTableContext?.modal?.close(EDIT_LISTING_REVIEW_MODAL_ID);
+        dataTableContext?.refresh();
     }
 
     function getRequiredFields() {

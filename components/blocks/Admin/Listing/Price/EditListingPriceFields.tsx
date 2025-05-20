@@ -51,7 +51,7 @@ function EditListingPriceFields({
                 >
                     <ManagePriceType
                         {...getListingComponentProps()}
-                        values={values?.user ? [values?.user] : []}
+                        values={values?.type ? [values?.type] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -63,21 +63,21 @@ function EditListingPriceFields({
                             }
 
                             if (priceTypes.length === 0) {
-                                console.warn('Price types is empty');
+                                console.warn('Price type is empty');
                                 return true;
                             }
                             const checked = priceTypes.filter((item) => item?.checked);
                             if (checked.length === 0) {
-                                console.warn('No price types selected');
+                                console.warn('No price type selected');
                                 return true;
                             }
 
-                            const selectedUser = checked[0];
+                            const selected = checked[0];
 
                             if (values?.id) {
                                 return;
                             }
-                            setFieldValue('user', selectedUser);
+                            setFieldValue('type', selected);
                         }}
                     />
                 </AccessControlComponent>
@@ -115,13 +115,14 @@ function EditListingPriceFields({
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <DateTimePicker
+                                value={values?.valid_from}
                                 onChange={(value) => {
-                                    console.log('value', value);
-                                    // setFieldValue("valid_from", value);
+                                    console.log('valid_from', value);
+                                    setFieldValue("valid_from", value);
                                 }}
                                 onSelect={(value => {
-                                    console.log('value', value);
-                                    // setFieldValue("valid_from", value);
+                                    console.log('valid_from', value);
+                                    setFieldValue("valid_from", value);
                                 })}
                             />
                         </div>
@@ -129,13 +130,14 @@ function EditListingPriceFields({
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <DateTimePicker
+                                value={values?.valid_to}
                                 onChange={(value) => {
-                                    console.log('value', value);
-                                    // setFieldValue("valid_from", value);
+                                    console.log('valid_to', value);
+                                    setFieldValue("valid_to", value);
                                 }}
                                 onSelect={(value => {
-                                    console.log('value', value);
-                                    // setFieldValue("valid_from", value);
+                                    console.log('valid_to', value);
+                                    setFieldValue("valid_to", value);
                                 })}
                             />
                         </div>
@@ -176,11 +178,15 @@ function EditListingPriceFields({
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <CurrencyPriceInput
+                                amountValue={values?.amount || ''}
+                                currencyValue={values?.currency?.id || null}
                                 onAmountChange={(value) => {
+                                    console.log('currency amount value', value);
                                     setFieldValue("amount", value);
                                 }
                                 }
                                 onCurrencyChange={(value) => {
+                                    console.log('currency value', value);
                                     setFieldValue("currency", value);
                                 }}
                             />
@@ -189,12 +195,16 @@ function EditListingPriceFields({
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <CountrySelect
+                                value={values?.country?.id}
                                 isMulti={false}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {
-                                    //set field value to first item in array
+                                    let country;
                                     if (Array.isArray(value) && value.length > 0) {
-                                        setFieldValue("country", value);
+                                        country = value[0];
+                                    }
+                                    if (country) {
+                                        setFieldValue("country", country);
                                     }
                                 }}
                                 loadingMore={true}

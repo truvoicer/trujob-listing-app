@@ -91,25 +91,39 @@ function CurrencySelect({
         if (!response) {
           throw new Error("Failed to fetch currencies");
         }
-        response.data = response.data.map((currency: Currency) => ({
-          value: currency.id,
-          label: `${currency.name} (${currency.symbol})`,
-        }));
-        return response
+        return response;
       }}
       addNewOptionPosition={addNewOptionPosition}
       loadingMore={loadingMore}
       loadingMessage={loadingMessage}
       showLoadingSpinner={showLoadingSpinner}
-      options={currencies.map((currency) => ({
-        value: currency.id,
-        label: `${currency.name} (${currency.symbol})`,
-      }))}
-      onChange={(value: Option | Option[]) => {
+      options={currencies}
+      parseOptions={
+        (data: Record<string, any>) => {
+          return {
+            value: data.id,
+            label: `${data.name} (${data.symbol})`,
+          };
+        }
+      }
+
+      onChange={(value: Option | Option[], options: Record<string, any>[]) => {
+        if (!Array.isArray(options)) {
+          return;
+        }
         if (Array.isArray(value)) {
-          setSelectedCurrencies(value as Option[]);
+          const filteredOptions = value.map((option) => {
+            const findInOptions = options.find((o) => o?.value === option?.id);
+            return findInOptions;
+          })
+            .filter((option) => typeof option !== 'undefined');
+          setSelectedCurrencies(filteredOptions);
         } else {
-          setSelectedCurrencies([value as Option]);
+          const findInOptions = options.find((option) => option?.id === value?.value);
+          if (!findInOptions) {
+            return;
+          }
+          setSelectedCurrencies([findInOptions]);
         }
       }}
     />

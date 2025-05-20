@@ -1,6 +1,7 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import React, { useState, useEffect, useRef } from "react";
+import { has } from "underscore";
 
 export interface Currency {
   code: string;
@@ -25,9 +26,13 @@ export interface CurrencyPriceInputProps {
   dropdownButtonClass?: string;
   dropdownMenuClass?: string;
   dropdownItemClass?: string;
+  currencyValue?: number;
+  amountValue?: number;
 }
 
 export default function CurrencyPriceInput({
+  currencyValue,
+  amountValue,
   currencies = [],
   onLoadMore,
   defaultCurrency = { code: "USD", symbol: "$" },
@@ -41,6 +46,7 @@ export default function CurrencyPriceInput({
   dropdownMenuClass = "dropdown-menu show",
   dropdownItemClass = "dropdown-item"
 }: CurrencyPriceInputProps) {
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [currency, setCurrency] = useState<Currency>(currencies[0] || defaultCurrency);
   const [amount, setAmount] = useState<string>("");
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
@@ -50,7 +56,29 @@ export default function CurrencyPriceInput({
   const [loading, setLoading] = useState<boolean>(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedCurrencies, setSelectedCurrencies] = React.useState<Option[]>([]);
+
+  useEffect(() => {
+    if (!Array.isArray(currencyList) || currencyList.length === 0) {
+      return;
+    }
+    if (!currencyValue) {
+      return;
+    }
+    const selectedCurrency = currencyList.find((cur) => cur?.id === currencyValue);
+    if (selectedCurrency) {
+      setCurrency(selectedCurrency);
+    }
+  }, [currencyValue, currencyList]);
+
+  useEffect(() => {
+    if (typeof amountValue === "undefined") {
+      return;
+    }
+    if (amountValue === null) {
+      return;
+    }
+    setAmount(amountValue?.toString() || "");
+  }, [amountValue]);
 
   // Fetch currencies from API
   const fetchCurrencies = async (query: Record<string, string | number | boolean> = {
@@ -105,9 +133,16 @@ export default function CurrencyPriceInput({
     if (!dropdownRef.current) return;
     const handleScroll = async () => {
       const { scrollTop, scrollHeight, clientHeight } = dropdownRef.current!;
-      if (scrollTop + clientHeight >= scrollHeight - 5 && onLoadMore && hasMore && !loading) {
+      if (scrollTop + clientHeight >= scrollHeight - 5 && hasMore && !loading) {
         setLoading(true);
-        const response = await onLoadMore(page);
+        let response;
+        if (typeof onLoadMore === "function") {
+          response = await onLoadMore(page);
+        } else {
+          response = await fetchCurrencies(
+            { page }
+          );
+        }
         if (response?.data?.length) {
           setCurrencyList((prev) => [...prev, ...response.data]);
           setPage((prevPage) => prevPage + 1);
@@ -121,7 +156,7 @@ export default function CurrencyPriceInput({
     const currentDropdown = dropdownRef.current;
     currentDropdown.addEventListener("scroll", handleScroll);
     return () => currentDropdown.removeEventListener("scroll", handleScroll);
-  }, [onLoadMore, page, hasMore, loading]);
+  }, [page, hasMore, loading, dropdownOpen]);
 
   const toggleDropdown = () => setDropdownOpen(!dropdownOpen);
   const selectCurrency = (cur: Currency) => {
@@ -149,18 +184,34 @@ export default function CurrencyPriceInput({
         {dropdownOpen && (
           <div
             className={dropdownMenuClass}
-            style={{ position: 'absolute', zIndex: 1000, maxHeight: '200px', overflowY: 'auto' }}
+            style={{ position: 'absolute', zIndex: 1000, maxHeight: '200px', overflowY: 'auto', width: '250px' }}
             ref={dropdownRef}
           >
-            {currencyList.map((cur, index) => (
-              <button
-                key={index}
-                className={dropdownItemClass}
-                onClick={() => selectCurrency(cur)}
-              >
-                {cur.symbol} {cur.code}
-              </button>
-            ))}
+            <input
+              type="text"
+              className="form-control m-2"
+              placeholder="Search currency"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            {currencyList
+              .filter(cur =>
+                cur.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                cur.symbol.toLowerCase().includes(searchTerm.toLowerCase())
+              )
+              .map((cur, index) => (
+                <button
+                  key={index}
+                  className={dropdownItemClass}
+                  onClick={() => {
+                    selectCurrency(cur);
+                    setSearchTerm(""); // Clear search on select
+                  }}
+                >
+                  {cur.symbol} {cur.code}
+                </button>
+              ))
+            }
             {loading && (
               <div className={`${dropdownItemClass} text-center text-muted`}>
                 {loadingMessage}

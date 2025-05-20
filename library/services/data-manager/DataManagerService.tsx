@@ -121,7 +121,7 @@ export class DataManagerService {
             return;
         }
         if (typeof onChange === 'function') {
-            console.warn('selectorModeCreateHandler', data, values, [
+            console.log('selectorModeCreateHandler', data, values, [
                 ...data,
                 values
             ]);

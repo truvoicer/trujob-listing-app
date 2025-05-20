@@ -1,7 +1,7 @@
 import { Country } from "./Country";
 
 export type Currency = {
-    id: string;
+    id: number;
     country: Country
     name: string;
     name_plural: string;

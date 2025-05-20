@@ -1,4 +1,4 @@
-import { isNotEmpty } from "@/helpers/utils";
+import { findInObject, isNotEmpty } from "@/helpers/utils";
 import { useContext, useEffect, useState } from "react";
 import Pagination from "../listings/Pagination";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -59,8 +59,21 @@ function DataTable({
         if (!isNotEmpty(column?.key)) {
             return '';
         }
+        let value;
+        if (column?.key.includes('.')) {
+            value = findInObject(column.key, item);
+        }
         if (item.hasOwnProperty(column.key)) {
-            return item[column.key];
+            value = item[column.key];
+        }
+        if (typeof value === 'string' || typeof value === 'number') {
+            return value;
+        }
+        if (typeof value === 'boolean') {
+            return value ? 'Yes' : 'No';
+        }
+        if (typeof value === 'object') {
+            return JSON.stringify(value);
         }
         return '';
     }

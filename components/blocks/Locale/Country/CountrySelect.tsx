@@ -2,8 +2,23 @@ import SelectDropdown, { Option } from "@/components/Select/SelectDropdown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Country } from "@/types/Country";
+import { count } from "console";
 import React, { useEffect } from "react";
 
+export type CountrySelect = {
+  onChange?: (selected: Country | Country[]) => void;
+  isMulti?: boolean;
+  placeholder?: string;
+  enableSearch?: boolean;
+  allowNewOptions?: boolean;
+  loadMoreLimit?: number;
+  onLoadMore?: () => void;
+  addNewOptionPosition?: "top" | "bottom" | "both";
+  loadingMore?: boolean;
+  loadingMessage?: string;
+  showLoadingSpinner?: boolean;
+  value?: Option | Option[];
+}
 function CountrySelect({
   onChange,
   isMulti = false,
@@ -16,20 +31,9 @@ function CountrySelect({
   loadingMore = false,
   loadingMessage = "Loading more...",
   showLoadingSpinner = true,
-}: {
-  onChange?: (selected: Option | Option[]) => void;
-  isMulti?: boolean;
-  placeholder?: string;
-  enableSearch?: boolean;
-  allowNewOptions?: boolean;
-  loadMoreLimit?: number;
-  onLoadMore?: () => void;
-  addNewOptionPosition?: "top" | "bottom" | "both";
-  loadingMore?: boolean;
-  loadingMessage?: string;
-  showLoadingSpinner?: boolean;
-}) {
-  const [selectedCountries, setSelectedCountries] = React.useState<Option[]>([]);
+  value,
+}: CountrySelect) {
+  const [selectedCountries, setSelectedCountries] = React.useState<Country[]>([]);
   const [countries, setCountries] = React.useState<Country[]>([]);
 
   // Fetch countries from API
@@ -76,42 +80,56 @@ function CountrySelect({
     if (onChange) {
       onChange(selectedCountries);
     }
-  }, [selectedCountries, onChange]);
+  }, [selectedCountries]);
 
   return (
     <SelectDropdown
-          isMulti={isMulti}
-          placeholder={placeholder}
-          enableSearch={enableSearch}
-          allowNewOptions={allowNewOptions}
-          loadMoreLimit={loadMoreLimit}
-          onLoadMore={async (page: number) => {
-            console.log("Load more countries");
-            let response = await fetchCountries({ page });
-            if (!response) {
-              throw new Error("Failed to fetch countries");
-            }
-            response.data = response.data.map((country: Country) => ({
-              value: country.id,
-              label: `${country.name}`,
-            }));
-            return response
-          }}
-          addNewOptionPosition={addNewOptionPosition}
-          loadingMore={loadingMore}
-          loadingMessage={loadingMessage}
-          showLoadingSpinner={showLoadingSpinner}
-          options={countries.map((country) => ({
-            value: country.id,
-            label: `${country.name})`,
-          }))}
-          onChange={(value: Option | Option[]) => {
-            if (Array.isArray(value)) {
-              setSelectedCountries(value as Option[]);
-            } else {
-              setSelectedCountries([value as Option]);
-            }
-          }}
+      value={value}
+      isMulti={isMulti}
+      placeholder={placeholder}
+      enableSearch={enableSearch}
+      allowNewOptions={allowNewOptions}
+      loadMoreLimit={loadMoreLimit}
+      onLoadMore={async (page: number) => {
+        console.log("Load more countries");
+        let response = await fetchCountries({ page });
+        if (!response) {
+          throw new Error("Failed to fetch countries");
+        }
+        return response
+      }}
+      addNewOptionPosition={addNewOptionPosition}
+      loadingMore={loadingMore}
+      loadingMessage={loadingMessage}
+      showLoadingSpinner={showLoadingSpinner}
+      options={countries}
+      parseOptions={
+        (data: Record<string, any>) => {
+          return {
+            value: data.id,
+            label: `${data.name}`,
+          };
+        }
+      }
+      onChange={(value: Option | Option[], options: Record<string, any>[]) => {
+        if (!Array.isArray(options)) {
+          return;
+        }
+        if (Array.isArray(value)) {
+          const filteredOptions = value.map((option) => {
+            const findInOptions = options.find((o) => o?.value === option?.id);
+            return findInOptions;
+          })
+            .filter((option) => typeof option !== 'undefined');
+          setSelectedCountries(filteredOptions);
+        } else {
+          const findInOptions = options.find((option) => option?.id === value?.value);
+          if (!findInOptions) {
+            return;
+          }
+          setSelectedCountries([findInOptions]);
+        }
+      }}
     />
   );
 }

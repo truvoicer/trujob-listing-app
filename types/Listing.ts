@@ -3,6 +3,7 @@ import { Category } from "./Category";
 import { Color } from "./Color";
 import { Feature } from "./Feature";
 import { Media } from "./Media";
+import { Price } from "./Price";
 import { ProductType } from "./ProductType";
 import { Review } from "./Review";
 import { User } from "./User";
@@ -24,6 +25,7 @@ export type Listing = {
     brands: Array<ListingBrand>;
     colors: Array<ListingColor>;
     product_types: Array<ListingProductType>;
+    prices: Array<Price>;
     media: Array<Media>;
     created_at: string;
     updated_at: string;
@@ -103,6 +105,7 @@ export type ListingRequest = {
     colors?: Array<number>;
     product_types?: Array<number>;
     media?: Array<Media>;
+    prices?: Array<Price>;
 }
 export interface CreateListing extends ListingRequest {
     type: number;

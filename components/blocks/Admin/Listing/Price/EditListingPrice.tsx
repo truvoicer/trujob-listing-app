@@ -11,8 +11,9 @@ import { Listing } from "@/types/Listing";
 import EditListingPriceFields from "./EditListingPriceFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { Price } from "@/types/Price";
+import { CreatePrice, Price, PriceRequest, UpdatePrice } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { has } from "underscore";
 
 export type EditListingPriceProps = {
     listingId?: number;
@@ -36,55 +37,134 @@ function EditListingPrice({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: {
-        prices: Array<Price>;
-    } = {
-        prices: data?.prices || [],
+    const initialValues: Price = {
+        id: data?.id || 0,
+        user: data?.user || null,
+        country: data?.country || null,
+        currency: data?.currency || null,
+        type: data?.type || null,
+        valid_from: data?.valid_from || '',
+        valid_to: data?.valid_to || '',
+        is_default: data?.is_default || false,
+        is_active: data?.is_active || false,
+        amount: data?.amount || 0,
+        created_at: data?.created_at || '',
+        updated_at: data?.updated_at || '',
     };
 
-    async function handleSubmit(values: {
-        prices: Array<Price>;
-    }) {
+    function buildRequestData(values: Price) {
+        let requestData: PriceRequest = {};
+        
+        if (values?.country) {
+            requestData.country_id = values?.country?.id;
+        }
+        if (values?.currency) {
+            requestData.currency_id = values?.currency?.id;
+        }
+        if (values?.type) {
+            requestData.type_id = values?.type?.id;
+        }
+        if (values?.valid_from) {
+            requestData.valid_from = values?.valid_from;
+        }
+        if (values?.valid_to) {
+            requestData.valid_to = values?.valid_to;
+        }
+        if (values.hasOwnProperty('is_default')) {
+            requestData.is_default = values?.is_default;
+        }
+        if (values.hasOwnProperty('is_active')) {
+            requestData.is_active = values?.is_active;
+        }
+        if (values.hasOwnProperty('amount')) {
+            requestData.amount = values?.amount;
+        }
+        return requestData;
+    }
+
+    function buildCreateData(values: Price) {
+
+        let requestData: CreatePrice = {
+            
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+        return requestData;
+    }
+    function buildUpdateData(values: Price) {
+
+        let requestData: UpdatePrice = {
+            id: values?.id || 0,
+        };
+
+        if (values?.user) {
+            requestData.user_id = values?.user?.id;
+        }
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+        return requestData;
+    }
+
+    async function handleSubmit(values: Price) {
+        console.log('handleSubmit', {values});
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
         }
+
+
         if (!listingId) {
-            console.log('Listing ID is required');
+            console.warn('Listing ID is required');
             return;
         }
-        if (!Array.isArray(values?.prices)) {
-            console.warn('Invalid values received');
-            return;
-        }
+
         let response = null;
-        let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.prices),
-        }
+
+
         switch (operation) {
-            case 'add':
-            case 'create':
             case 'edit':
             case 'update':
-                console.log('create requestData', requestData);
+                if (!values?.id) {
+                    console.warn('Listing review ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingPrice.replace(
                             ':listingId',
-                            listingId.toString(),
+                            listingId.toString()
+                        ),
+                        values?.id,
+                        'update',
+                    ]),
+                    method: ApiMiddleware.METHOD.PATCH,
+                    protectedReq: true,
+                    data: buildUpdateData(values),
+                })
+                break;
+            case 'add':
+            case 'create':
+                response = await truJobApiMiddleware.resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.listingPrice.replace(
+                            ':listingId',
+                            listingId.toString()
                         ),
                         'create',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: requestData,
+                    data: buildCreateData(values),
                 })
                 break;
             default:
                 console.warn('Invalid operation');
                 break;
         }
-
         if (!response) {
             setAlert({
                 show: true,

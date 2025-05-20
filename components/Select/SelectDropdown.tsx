@@ -14,8 +14,9 @@ export interface LaravelPaginatedResponse {
 }
 
 export interface SelectDropdownProps {
-  options: Option[];
-  onChange: (selected: Option | Option[]) => void;
+  options: Record<string, any>[];
+  parseOptions: (option: Record<string, any>) => Option;
+  onChange: (selected: Option | Option[], options: Option[], rawOptions: Array<any>) => void;
   enableSearch?: boolean;
   allowNewOptions?: boolean;
   placeholder?: string;
@@ -26,9 +27,12 @@ export interface SelectDropdownProps {
   loadingMore?: boolean;
   loadingMessage?: string;
   showLoadingSpinner?: boolean;
+  value?: Option | Option[];
 }
 
 function SelectDropdown({
+  parseOptions,
+  value,
   options,
   onChange,
   enableSearch = false,
@@ -54,16 +58,45 @@ function SelectDropdown({
   const [initialLoad, setInitialLoad] = useState<boolean>(true);
   const listRef = useRef<HTMLUListElement>(null);
 
+  function parseDataToOptions(data: Record<string, any>[]) {
+  
+    return data.map(item => parseDataItemToOptions(item));
+  }
+  function parseDataItemToOptions(data: Record<string, any>) {
+    if (typeof parseOptions !== 'function') {
+      throw new Error('parseOptions function is required');
+    }
+    return parseOptions(data);
+  }
+  useEffect(() => {
+    if (value) {
+      if (isMulti && Array.isArray(value)) {
+        const selected = value.map(val => {
+          const foundOption = options.find(option => option?.value === val?.value);
+          return foundOption;
+        })
+          .filter(Boolean) as Option[];
+        setSelectedOptions(selected);
+      } else if (!isMulti && !Array.isArray(value)) {
+        const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
+        if(!findInOptions) {
+          return;
+        }
+        setSelectedOption(findInOptions);
+      }
+    }
+  }, [value, isMulti]);
+
   useEffect(() => {
     setInternalOptions(options);
-    setFilteredOptions(options);
+    setFilteredOptions(parseDataToOptions(options));
   }, [options]);
 
   useEffect(() => {
     if (enableSearch) {
       const lowerSearch = searchTerm.toLowerCase();
       const filtered = internalOptions.filter(option =>
-        option.label.toLowerCase().includes(lowerSearch)
+        parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
       );
       setFilteredOptions(filtered);
     } else {
@@ -81,10 +114,10 @@ function SelectDropdown({
         newSelection = [...selectedOptions, option];
       }
       setSelectedOptions(newSelection);
-      onChange(newSelection);
+      onChange(newSelection, internalOptions);
     } else {
       setSelectedOption(option);
-      onChange(option);
+      onChange(option, internalOptions);
       setIsOpen(false);
     }
     setSearchTerm('');
@@ -107,10 +140,10 @@ function SelectDropdown({
   const getDisplayText = () => {
     if (isMulti) {
       return selectedOptions.length > 0
-        ? selectedOptions.map(opt => opt.label).join(', ')
+        ? parseDataToOptions(selectedOptions).map(opt => opt.label).join(', ')
         : placeholder;
     } else {
-      return selectedOption ? selectedOption.label : placeholder;
+      return selectedOption ? selectedOption?.label || 'Error in display text' : placeholder;
     }
   };
 
@@ -122,7 +155,7 @@ function SelectDropdown({
       initialLoad ||
       (currentPage < lastPage)
     )) {
-      
+
       setIsLoadingMore(true);
       try {
         const response = await onLoadMore(currentPage + 1);
@@ -140,7 +173,7 @@ function SelectDropdown({
 
   const renderAddNewOption = () => (
     allowNewOptions && searchTerm &&
-    !filteredOptions.find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase()) && (
+    !parseDataToOptions(filteredOptions).find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase()) && (
       <li
         className="dropdown-item text-primary"
         onClick={handleAddNew}
@@ -178,7 +211,7 @@ function SelectDropdown({
             ref={listRef}
           >
             {addNewOptionPosition === 'top' || addNewOptionPosition === 'both' ? renderAddNewOption() : null}
-            {filteredOptions.map((option, index) => (
+            {parseDataToOptions(filteredOptions).map((option, index) => (
               <li
                 key={index}
                 className={`dropdown-item ${isOptionSelected(option) ? 'active' : ''}`}

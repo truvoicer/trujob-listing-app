@@ -33,7 +33,7 @@ function EditListingFields({
     const [selectedReviews, setSelectedReviews] = useState<Array<any>>([]);
     const [selectedFeatures, setSelectedFeatures] = useState<Array<any>>([]);
     const [selectedFollows, setSelectedFollows] = useState<Array<any>>([]);
-    const [selectedListingTypes, setSelectedListingTypes] = useState<Array<any>>([]);
+    const [selectedPrices, setSelectedPrices] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
@@ -52,7 +52,7 @@ function EditListingFields({
         }
         return componentProps;
     }
-    // console.log('EditListingFields', values);
+    console.log('EditListingFields', values);
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
@@ -532,6 +532,7 @@ function EditListingFields({
                     ]}
                 >
                     <ManageListingPrice
+                        {...getListingComponentProps()}
                         data={values?.prices || []}
                         rowSelection={false}
                         multiRowSelection={false}
@@ -543,6 +544,9 @@ function EditListingFields({
                                 return;
                             }
                             if (values?.id) {
+                                setSelectedPrices(
+                                    prices.filter((item) => item?.checked)
+                                );
                                 return;
                             }
                             setFieldValue('prices', prices);
@@ -552,13 +556,13 @@ function EditListingFields({
             ),
             onOk: () => {
                 console.log('ok');
-                if (selectedMedia.length === 0) {
-                    console.warn('No user selected');
+                if (selectedPrices.length === 0) {
+                    console.warn('No prices selected');
                     return true;
                 }
 
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('media', selectedMedia);
+                    setFieldValue('prices', selectedPrices);
                     return true;
                 }
                 return true;

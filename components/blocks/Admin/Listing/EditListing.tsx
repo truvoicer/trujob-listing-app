@@ -63,6 +63,7 @@ function EditListing({
         brands: data?.brands || [],
         colors: data?.colors || [],
         product_types: data?.product_types || [],
+        prices: data?.prices || [],
         media: data?.media || [],
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
