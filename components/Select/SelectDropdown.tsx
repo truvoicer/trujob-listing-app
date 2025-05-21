@@ -80,6 +80,7 @@ function SelectDropdown({
           .filter(Boolean) as Option[];
         setSelectedOptions(selected);
       } else if (!isMulti && !Array.isArray(value)) {
+        console.log('value', value, (typeof value === 'string' || typeof value === 'number'), typeof value);
         if (typeof value === 'string' || typeof value === 'number') {
           const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
           if (!findInOptions) {

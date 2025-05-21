@@ -101,12 +101,12 @@ function ManageSiteSettings({
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
                                                     onChange={(value) => {
-                                                        console.log('country value', value);
                                                         let selectedCountry;
                                                         if (Array.isArray(value) && value.length > 0) {
                                                             selectedCountry = value[0];
                                                         }
                                                         if (selectedCountry) {
+                                                        console.log('country value', value);
                                                             setFieldValue('country_id', selectedCountry?.id);
                                                         }
                                                     }}
@@ -125,12 +125,12 @@ function ManageSiteSettings({
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
                                                     onChange={(value) => {
-                                                        console.log('currency value', value);
                                                         let selectedCurrency;
                                                         if (Array.isArray(value) && value.length > 0) {
                                                             selectedCurrency = value[0];
                                                         }
                                                         if (selectedCurrency) {
+                                                        console.log('currency value', value);
                                                             setFieldValue('currency_id', selectedCurrency?.id);
                                                         }
                                                     }}
