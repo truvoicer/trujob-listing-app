@@ -18,6 +18,7 @@ import ManageFeature from "@/components/blocks/Admin/Feature/ManageFeature";
 import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
 import ManageListingType from "@/components/blocks/Admin/ListingType/ManageListingType";
 import { ComponentHelpers } from "@/helpers/ComponentHelpers";
+import ManageSiteSettings from "@/components/blocks/Admin/Settings/ManageSiteSettings";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -39,44 +40,9 @@ export class Blocks {
     static MANAGE_FEATURES_BLOCK = 'manage-features-block';
     static MANAGE_REVIEWS_BLOCK = 'manage-reviews-block';
     static MANAGE_LISTING_TYPES_BLOCK = 'manage-listing-types-block';
+    static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
 
     static getBlocks() {
-        // ManageFeature.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageReview.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageListingType.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManagePage.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageSidebar.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageMenu.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageWidget.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageUser.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageBrand.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageCategory.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageColor.defaultProps = {
-        //     mode: 'edit',
-        // }
-        // ManageProductType.defaultProps = {
-        //     mode: 'edit',
-        // }   
         return {
             [Blocks.HERO_BLOCK]: {
                 title: 'Hero Block',
@@ -246,16 +212,11 @@ export class Blocks {
                     }
                 ),
             },
-            [Blocks.MANAGE_LISTING_TYPES_BLOCK]: {
-                title: 'Manage Listing Types Block',
-                description: 'This is the manage listing types block',
-                icon: 'manage-listing-types-block-icon',
-                component: ComponentHelpers.buildComponent(
-                    ManageListingType,
-                    {
-                        mode: 'edit',
-                    }
-                ),
+            [Blocks.MANAGE_SITE_SETTINGS_BLOCK]: {
+                title: 'Manage Site Settings Block',
+                description: 'This is the manage site settings block',
+                icon: 'manage-site-settings-block-icon',
+                component: ManageSiteSettings,
             },
         };
     }

@@ -17,7 +17,7 @@ export type CountrySelect = {
   loadingMore?: boolean;
   loadingMessage?: string;
   showLoadingSpinner?: boolean;
-  value?: Option | Option[];
+  value?: number | string | Option | Option[];
 }
 function CountrySelect({
   onChange,
@@ -91,7 +91,6 @@ function CountrySelect({
       allowNewOptions={allowNewOptions}
       loadMoreLimit={loadMoreLimit}
       onLoadMore={async (page: number) => {
-        console.log("Load more countries");
         let response = await fetchCountries({ page });
         if (!response) {
           throw new Error("Failed to fetch countries");
@@ -103,6 +102,17 @@ function CountrySelect({
       loadingMessage={loadingMessage}
       showLoadingSpinner={showLoadingSpinner}
       options={countries}
+      handleSearch={async (searchTerm: string) => {
+        let response = await fetchCountries({ 
+          query: searchTerm,
+          page: 1,
+          page_size: loadMoreLimit
+         });
+        if (!response) {
+          throw new Error("Failed to fetch countries");
+        }
+        return response.data;
+      }}
       parseOptions={
         (data: Record<string, any>) => {
           return {

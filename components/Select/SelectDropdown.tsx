@@ -27,10 +27,12 @@ export interface SelectDropdownProps {
   loadingMore?: boolean;
   loadingMessage?: string;
   showLoadingSpinner?: boolean;
-  value?: Option | Option[];
+  value?: number | string | Option | Option[];
+  handleSearch?: (searchTerm: string) => Promise<Record<string, any>[]>;
 }
 
 function SelectDropdown({
+  handleSearch,
   parseOptions,
   value,
   options,
@@ -59,7 +61,7 @@ function SelectDropdown({
   const listRef = useRef<HTMLUListElement>(null);
 
   function parseDataToOptions(data: Record<string, any>[]) {
-  
+
     return data.map(item => parseDataItemToOptions(item));
   }
   function parseDataItemToOptions(data: Record<string, any>) {
@@ -78,14 +80,38 @@ function SelectDropdown({
           .filter(Boolean) as Option[];
         setSelectedOptions(selected);
       } else if (!isMulti && !Array.isArray(value)) {
-        const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
-        if(!findInOptions) {
+        if (typeof value === 'string' || typeof value === 'number') {
+          const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
+          if (!findInOptions) {
+            return;
+          }
+          setSelectedOption(findInOptions);
           return;
         }
-        setSelectedOption(findInOptions);
+
+        if (typeof value === 'object' && value.hasOwnProperty('value') && value.hasOwnProperty('label')) {
+          setSelectedOption(value);
+        }
       }
     }
-  }, [value, isMulti]);
+  }, [value, isMulti, options]);
+
+  async function onSearch() {
+    if (!enableSearch) {
+      setFilteredOptions(internalOptions);
+      return;
+    }
+    let filtered;
+    if (typeof handleSearch === 'function') {
+      filtered = await handleSearch(searchTerm);
+    } else {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = internalOptions.filter(option =>
+        parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
+      );
+    }
+    setFilteredOptions(filtered);
+  }
 
   useEffect(() => {
     setInternalOptions(options);
@@ -93,15 +119,7 @@ function SelectDropdown({
   }, [options]);
 
   useEffect(() => {
-    if (enableSearch) {
-      const lowerSearch = searchTerm.toLowerCase();
-      const filtered = internalOptions.filter(option =>
-        parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
-      );
-      setFilteredOptions(filtered);
-    } else {
-      setFilteredOptions(internalOptions);
-    }
+    onSearch();
   }, [searchTerm, internalOptions, enableSearch]);
 
   const handleSelect = (option: Option) => {
@@ -114,10 +132,10 @@ function SelectDropdown({
         newSelection = [...selectedOptions, option];
       }
       setSelectedOptions(newSelection);
-      onChange(newSelection, internalOptions);
+      onChange(newSelection, filteredOptions);
     } else {
       setSelectedOption(option);
-      onChange(option, internalOptions);
+      onChange(option, filteredOptions);
       setIsOpen(false);
     }
     setSearchTerm('');
@@ -143,6 +161,7 @@ function SelectDropdown({
         ? parseDataToOptions(selectedOptions).map(opt => opt.label).join(', ')
         : placeholder;
     } else {
+      console.log('selectedOption', selectedOption);
       return selectedOption ? selectedOption?.label || 'Error in display text' : placeholder;
     }
   };

@@ -1,7 +1,7 @@
 // AUTH STATE
 import { createSlice } from "@reduxjs/toolkit";
 import {
-    SITE_MEDIA, 
+    SITE_MEDIA,
     SITE_STATE,
     SITE_NAME,
     SITE_TITLE,
@@ -27,12 +27,15 @@ import {
     SITE_PINTEREST_FOLLOW_URL,
     SITE_X_FOLLOW_URL,
     SITE_TIMEZONE,
-    ERROR
+    ERROR,
+    SITE_SETTINGS,
+    SITE_ID
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
 
 export const siteStateData = {
+    [SITE_ID]: null,
     [SITE_NAME]: null,
     [SITE_TITLE]: null,
     [SITE_DESCRIPTION]: null,
@@ -58,6 +61,34 @@ export const siteStateData = {
     [SITE_X_FOLLOW_URL]: null,
     [SITE_TIMEZONE]: null,
     [SITE_MEDIA]: [],
+    [SITE_SETTINGS]: {
+        'country': {
+            id: null,
+            name: null,
+            iso2: null,
+            iso3: null,
+            phone_code: null,
+            created_at: null,
+            updated_at: null,
+        },
+        'currency': {
+            id: null,
+            name: null,
+            name_plural: null,
+            code: null,
+            symbol: null,
+            created_at: null,
+            updated_at: null,
+            country: {
+                id: null,
+                name: null,
+                code: null,
+                symbol: null,
+                created_at: null,
+                updated_at: null,
+            },
+        },
+    },
     [ERROR]: {
         show: false,
         message: "",

@@ -4,6 +4,20 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { Currency } from "@/types/Currency";
 import React, { useEffect } from "react";
 
+export type CurrencySelect = {
+  onChange?: (selected: Currency | Currency[]) => void;
+  isMulti?: boolean;
+  placeholder?: string;
+  enableSearch?: boolean;
+  allowNewOptions?: boolean;
+  loadMoreLimit?: number;
+  onLoadMore?: () => void;
+  addNewOptionPosition?: "top" | "bottom" | "both";
+  loadingMore?: boolean;
+  loadingMessage?: string;
+  showLoadingSpinner?: boolean;
+  value?: number | string | Option | Option[] | null;
+}
 function CurrencySelect({
   onChange,
   isMulti = false,
@@ -16,19 +30,8 @@ function CurrencySelect({
   loadingMore = false,
   loadingMessage = "Loading more...",
   showLoadingSpinner = true,
-}: {
-  onChange?: (selected: Option | Option[]) => void;
-  isMulti?: boolean;
-  placeholder?: string;
-  enableSearch?: boolean;
-  allowNewOptions?: boolean;
-  loadMoreLimit?: number;
-  onLoadMore?: () => void;
-  addNewOptionPosition?: "top" | "bottom" | "both";
-  loadingMore?: boolean;
-  loadingMessage?: string;
-  showLoadingSpinner?: boolean;
-}) {
+  value
+}: CurrencySelect) {
   const [selectedCurrencies, setSelectedCurrencies] = React.useState<Option[]>([]);
   const [currencies, setCurrencies] = React.useState<Currency[]>([]);
 
@@ -76,10 +79,11 @@ function CurrencySelect({
     if (onChange) {
       onChange(selectedCurrencies);
     }
-  }, [selectedCurrencies, onChange]);
+  }, [selectedCurrencies]);
 
   return (
     <SelectDropdown
+      value={value}
       isMulti={isMulti}
       placeholder={placeholder}
       enableSearch={enableSearch}
@@ -107,6 +111,17 @@ function CurrencySelect({
         }
       }
 
+      handleSearch={async (searchTerm: string) => {
+        let response = await fetchCurrencies({ 
+          query: searchTerm,
+          page: 1,
+          page_size: loadMoreLimit
+         });
+        if (!response) {
+          throw new Error("Failed to fetch currencies");
+        }
+        return response.data;
+      }}
       onChange={(value: Option | Option[], options: Record<string, any>[]) => {
         if (!Array.isArray(options)) {
           return;

@@ -13,7 +13,8 @@ export type NotificationItem = {
     position: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' |  'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
     id?: string | null;
     title: string | null;
-    component: any;
+    component?: any;
+    message?: string | null;
     show: boolean;
     onOk: () => void;
     onCancel: () => void;
@@ -33,6 +34,7 @@ export class NotificationService extends MessageService {
         position: 'top-center',
         title: null,
         component: null,
+        message: null,
         show: false,
         id: null,
         onOk: () => { },
@@ -84,7 +86,8 @@ export class NotificationService extends MessageService {
                                     {/* <small>11 mins ago</small> */}
                                 </Toast.Header>
                                 <Toast.Body>
-                                    {notification?.component || ''}
+                                    {notification?.component && notification.component}
+                                    {(notification?.message) && notification.message}
                                 </Toast.Body>
                             </Toast>
                         </ToastContainer>

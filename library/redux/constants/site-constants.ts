@@ -1,5 +1,6 @@
 export const SITE_STATE = "site";
 export const ERROR = "error";
+export const SITE_ID = "id";
 export const SITE_NAME = "name";
 export const SITE_TITLE = "title";
 export const SITE_DESCRIPTION = "description";
@@ -25,3 +26,4 @@ export const SITE_PINTEREST_FOLLOW_URL = "pinterest_follow_url";
 export const SITE_X_FOLLOW_URL = "x_follow_url";
 export const SITE_TIMEZONE = "timezone";
 export const SITE_MEDIA = "media";
+export const SITE_SETTINGS = "settings";
