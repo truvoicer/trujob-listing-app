@@ -7,7 +7,7 @@ import { FormikProps, FormikValues } from "formik";
 
 
 export interface LocalModal extends LocalItem {
-    
+
 };
 export interface ModalState extends MessageState {
     items: Array<ModalItem>;
@@ -16,7 +16,7 @@ export type ModalItem = {
     [key: string]: string | number | boolean | null | Function | undefined | FormProps | any;
     id?: string | null;
     title: string | null;
-    size: "sm" | "md" | "lg" | "xl";
+    size: "sm" | "lg" | "xl";
     fullscreen: string | true | undefined;
     component: any;
     show: boolean;
@@ -26,7 +26,7 @@ export type ModalItem = {
     onCancel: () => boolean;
 }
 export class ModalService extends MessageService {
-    
+
     static INIT_DATA: ModalState = {
         items: [],
         show: () => { },
@@ -152,15 +152,21 @@ export class ModalService extends MessageService {
         let component: any = null;
         if (typeof modal?.component === 'function') {
             component = modal.component({
-                formHelpers, 
+                formHelpers,
                 index,
                 modal,
             });
         } else if (modal?.component) {
             component = modal.component;
         }
+        console.log('Modal state', modal);
         return (
-            <Modal show={modal.show} onHide={() => this.handleCancel(index, { formHelpers })}>
+            <Modal
+                show={modal.show}
+
+                size={modal?.size || 'lg'}
+                fullscreen={modal?.fullscreen || undefined}
+                onHide={() => this.handleCancel(index, { formHelpers })}>
                 <Modal.Header closeButton>
                     <Modal.Title>{modal?.title || ''}</Modal.Title>
                 </Modal.Header>
@@ -193,7 +199,7 @@ export class ModalService extends MessageService {
                     let component: any = null;
                     if (typeof configItem?.component === 'function') {
                         component = configItem.component({
-                            state, 
+                            state,
                             setState,
                             configItem,
                         });

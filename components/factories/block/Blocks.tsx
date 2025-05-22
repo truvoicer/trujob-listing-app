@@ -16,10 +16,9 @@ import ManageColor from "@/components/blocks/Admin/Color/ManageColor";
 import ManageProductType from "@/components/blocks/Admin/ProductType/ManageProductType";
 import ManageFeature from "@/components/blocks/Admin/Feature/ManageFeature";
 import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
-import ManageListingType from "@/components/blocks/Admin/ListingType/ManageListingType";
 import { ComponentHelpers } from "@/helpers/ComponentHelpers";
 import ManageSiteSettings from "@/components/blocks/Admin/Settings/ManageSiteSettings";
-import ManagePaymentMethod from "@/components/blocks/Admin/PaymentMethod/ManagePaymentMethod";
+import ManagePaymentGateway from "@/components/blocks/Admin/PaymentGateway/ManagePaymentGateway";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -42,6 +41,7 @@ export class Blocks {
     static MANAGE_REVIEWS_BLOCK = 'manage-reviews-block';
     static MANAGE_LISTING_TYPES_BLOCK = 'manage-listing-types-block';
     static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
+    static MANAGE_PAYMENT_GATEWAYS_BLOCK = 'manage-payment-gateways-block';
     static MANAGE_PAYMENT_METHODS_BLOCK = 'manage-payment-methods-block';
 
     static getBlocks() {
@@ -220,12 +220,23 @@ export class Blocks {
                 icon: 'manage-site-settings-block-icon',
                 component: ManageSiteSettings,
             },
+            [Blocks.MANAGE_PAYMENT_GATEWAYS_BLOCK]: {
+                title: 'Manage Payment Gateways Block',
+                description: 'This is the manage payment gateways block',
+                icon: 'manage-payment-gateways-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManagePaymentGateway,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
             [Blocks.MANAGE_PAYMENT_METHODS_BLOCK]: {
                 title: 'Manage Payment Methods Block',
                 description: 'This is the manage payment methods block',
                 icon: 'manage-payment-methods-block-icon',
                 component: ComponentHelpers.buildComponent(
-                    ManagePaymentMethod,
+                    ManagePaymentGateway,
                     {
                         mode: 'edit',
                     }

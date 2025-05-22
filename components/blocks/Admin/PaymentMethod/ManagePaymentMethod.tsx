@@ -437,8 +437,6 @@ function ManagePaymentMethod({
                 renderActionColumn={renderActionColumn}
                 request={paymentMethodRequest}
                 columns={[
-                    { label: 'ID', key: 'id' },
-                    { label: 'Label', key: 'label' },
                     { label: 'Name', key: 'name' }
                 ]}
             />

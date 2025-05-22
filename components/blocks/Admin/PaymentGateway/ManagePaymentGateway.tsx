@@ -2,43 +2,40 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditListing from "./EditListing";
+import EditPaymentGateway from "./EditPaymentGateway";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { Listing } from "@/types/Listing";
+import { PaymentGateway } from "@/types/PaymentGateway";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
-import ListingTestCheckout from "./Checkout/ListingTestCheckout";
-import { size } from "underscore";
 
+export const CREATE_PAYMENT_METHOD_MODAL_ID = 'create-payment-gateway-modal';
+export const EDIT_PAYMENT_METHOD_MODAL_ID = 'edit-payment-gateway-modal';
+export const DELETE_PAYMENT_METHOD_MODAL_ID = 'delete-payment-gateway-modal';
 
-export interface ManageListingProps extends DataManageComponentProps {
-    data?: Array<Listing>;
+export interface ManagePaymentGatewayProps extends DataManageComponentProps {
+    data?: Array<PaymentGateway>;
 }
-export const TEST_TRANSACTION_MODAL_ID = 'test-transaction-modal';
-export const EDIT_LISTING_MODAL_ID = 'edit-listing-modal';
-export const CREATE_LISTING_MODAL_ID = 'create-listing-modal';
-export const DELETE_LISTING_MODAL_ID = 'delete-listing-modal';
 
-function ManageListing({
+function ManagePaymentGateway({
     mode = 'selector',
-    operation,
     data,
+    operation = 'create',
     rowSelection = true,
     multiRowSelection = true,
     onChange,
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageListingProps) {
+}: ManagePaymentGatewayProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -47,7 +44,7 @@ function ManageListing({
         switch (mode) {
             case 'selector':
                 return {
-                    listings: [],
+                    paymentGateways: [],
                 };
             case 'edit':
                 return {};
@@ -56,7 +53,7 @@ function ManageListing({
         }
     }
 
-    function getListingFormModalProps() {
+    function getPaymentGatewayFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -70,6 +67,10 @@ function ManageListing({
                 if (!formHelpers) {
                     return;
                 }
+                if (!operation) {
+                    console.warn('Operation is required');
+                    return;
+                }
                 if (typeof formHelpers?.submitForm !== 'function') {
                     console.warn('submitForm is not a function');
                     return;
@@ -79,7 +80,8 @@ function ManageListing({
                         DataManagerService.selectorModeHandler({
                             onChange,
                             data,
-                            values: formHelpers?.values?.features,
+                            values: formHelpers?.values?.paymentGateways,
+                            index
                         });
                         break;
                     case 'edit':
@@ -100,7 +102,7 @@ function ManageListing({
         }
     }
 
-    function renderActionColumn(item: Listing, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: PaymentGateway, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -110,17 +112,17 @@ function ManageListing({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Listing',
+                            title: 'Edit payment gateway',
                             component: (
-                                <EditListing
+                                <EditPaymentGateway
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_LISTING_MODAL_ID}
+                                    modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
                                 />
                             ),
-                            ...getListingFormModalProps(),
-                        }, EDIT_LISTING_MODAL_ID);
+                            ...getPaymentGatewayFormModalProps(index),
+                        }, EDIT_PAYMENT_METHOD_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -131,18 +133,23 @@ function ManageListing({
                     onClick={e => {
                         e.preventDefault();
                         dataTableContextState.modal.show({
-                            title: 'Delete Listing',
+                            title: 'Delete payment gateway',
                             component: (
-                                <p>Are you sure you want to delete this listing ({item?.name} | {item?.title})?</p>
+                                <p>Are you sure you want to delete this payment gateway ({item?.name} | {item?.label})?</p>
                             ),
                             onOk: async () => {
+                                console.log('Delete payment gateway', { operation, item });
+                                if (!operation) {
+                                    console.warn('Operation is required');
+                                    return;
+                                }
                                 if (Array.isArray(data) && data.length) {
                                     let cloneData = [...data];
                                     cloneData.splice(index, 1);
                                     if (typeof onChange === 'function') {
                                         onChange(cloneData);
                                     }
-                                    dataTableContext.modal.close(DELETE_LISTING_MODAL_ID);
+                                    dataTableContext.modal.close(DELETE_PAYMENT_METHOD_MODAL_ID);
                                     return;
                                 }
                                 if (!item?.id) {
@@ -151,14 +158,14 @@ function ManageListing({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Listing ID is required</p>
+                                            <p>Payment gateway ID is required</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'payment-gateway-delete-error');
                                     return;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: UrlHelpers.urlFromArray([
-                                        truJobApiConfig.endpoints.listing,
+                                        truJobApiConfig.endpoints.paymentGateway,
                                         item.id,
                                         'delete'
                                     ]),
@@ -171,9 +178,9 @@ function ManageListing({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete listing</p>
+                                            <p>Failed to delete payment gateway</p>
                                         ),
-                                    }, 'listing-delete-error');
+                                    }, 'payment-gateway-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -181,7 +188,7 @@ function ManageListing({
                             },
                             show: true,
                             showFooter: true
-                        }, DELETE_LISTING_MODAL_ID);
+                        }, DELETE_PAYMENT_METHOD_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -189,31 +196,75 @@ function ManageListing({
                 <BadgeDropDown
                     data={[
                         {
-                            text: 'Test Transaction',
+                            text: 'Edit',
                             linkProps: {
                                 href: '#',
                                 onClick: e => {
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Listing',
-                                        fullscreen: true,
-                                        size: 'xl',
-                                        formProps: {
-                                            operation: operation,
-                                            initialValues: {}
-                                        },
-                                        showFooter: false,
+                                        title: 'Edit Payment gateway',
                                         component: (
-                                            <ListingTestCheckout
-                                                listingId={item?.id}
-                                                modalId={TEST_TRANSACTION_MODAL_ID}
+                                            <EditPaymentGateway
+                                                data={item}
+                                                operation={'edit'}
+                                                inModal={true}
+                                                modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
                                             />
                                         ),
-                                    }, TEST_TRANSACTION_MODAL_ID);
+                                        ...getPaymentGatewayFormModalProps(index),
+                                    }, EDIT_PAYMENT_METHOD_MODAL_ID);
                                 }
                             }
                         },
+                        {
+                            text: 'Delete',
+                            linkProps: {
+                                href: '#',
+                                onClick: e => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    appModalContext.show({
+                                        title: 'Delete payment gateway',
+                                        component: (
+                                            <p>Are you sure you want to delete this paymentGateway ({item?.title})?</p>
+                                        ),
+                                        onOk: async () => {
+                                            if (!item?.id) {
+                                                notificationContext.show({
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Payment gateway ID is required</p>
+                                                    ),
+                                                }, 'payment-gateway-delete-error');
+                                                return;
+                                            }
+                                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                                                endpoint: `${truJobApiConfig.endpoints.paymentGateway}/${item.id}/delete`,
+                                                method: ApiMiddleware.METHOD.DELETE,
+                                                protectedReq: true
+                                            })
+                                            if (!response) {
+                                                notificationContext.show({
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
+                                                        <p>Failed to delete paymentGateway</p>
+                                                    ),
+                                                }, 'payment-gateway-delete-error');
+                                                return;
+                                            }
+                                            dataTableContextState.refresh();
+                                        },
+                                        show: true,
+                                        showFooter: true
+                                    }, EDIT_PAYMENT_METHOD_MODAL_ID);
+                                }
+                            }
+                        }
                     ]}
                 />
             </div>
@@ -231,20 +282,22 @@ function ManageListing({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
-        // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.paymentGateway)) {
+            query['paymentGateway'] = searchParams.paymentGateway;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function paymentGatewayRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
+        if (!operation) {
+            console.warn('Operation is required');
+            return;
+        }
         let query = dataTableContextState?.query || {};
+        let post = dataTableContextState?.post || {};
         const preparedQuery = await prepareSearch(searchParams);
         query = {
             ...query,
@@ -252,31 +305,41 @@ function ManageListing({
         }
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.listing}`,
+            endpoint: UrlHelpers.urlFromArray([
+                truJobApiConfig.endpoints.paymentGateway,
+            ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
-            query: query,
-            data: dataTableContextState?.post || {},
+            query,
+            data: post,
         });
     }
+
     function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        // console.warn('Add New Listing', dataTableContextState.modal);
-        dataTableContextState.modal.show({
-            title: 'Add New Listing',
+        let modalState;
+        if (mode === 'selector') {
+            modalState = dataTableContext.modal;
+        } else if (mode === 'edit') {
+            modalState = dataTableContextState.modal;
+        } else {
+            console.warn('Invalid mode');
+            return;
+        }
+        modalState.show({
+            title: 'Create payment gateway',
             component: (
-                <EditListing
-                    operation={'add'}
+                <EditPaymentGateway
+                    operation={'create'}
                     inModal={true}
-                    modalId={CREATE_LISTING_MODAL_ID}
+                    modalId={CREATE_PAYMENT_METHOD_MODAL_ID}
                 />
             ),
-            ...getListingFormModalProps(),
-        }, CREATE_LISTING_MODAL_ID);
+            ...getPaymentGatewayFormModalProps(),
+        }, CREATE_PAYMENT_METHOD_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -292,18 +355,18 @@ function ManageListing({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected paymentGateways?',
                     onOk: async () => {
-                        console.warn('Yes')
+                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No paymentGateways selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'payment-gateway-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -313,13 +376,13 @@ function ManageListing({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Listing IDs are required</p>
+                                    <p>Payment gateway IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'payment-gateway-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.paymentGateway}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -332,9 +395,9 @@ function ManageListing({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete paymentGateways</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'payment-gateway-bulk-delete-error');
                             return;
                         }
 
@@ -343,41 +406,47 @@ function ManageListing({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Listings deleted successfully</p>
+                                <p>Payment gateways deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'payment-gateway-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-payment-gateway-confirmation');
             }
         });
         return actions;
     }
 
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+            data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Listings'}
+                title={'Manage Payment gateways'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={paymentGatewayRequest}
                 columns={[
-                    { label: 'ID', key: 'id' },
-                    { label: 'Title', key: 'title' },
-                    { label: 'Permalink', key: 'permalink' }
+                    { label: 'Name', key: 'name' },
+                    { label: 'Description', key: 'description' },
+                    { label: 'Icon', key: 'icon' },
+                    { label: 'Is Active', key: 'is_active' },
+                    { label: 'Is Default', key: 'is_default' },
+                    { label: 'Created At', key: 'created_at' },
+                    { label: 'Updated At', key: 'updated_at' },
                 ]}
             />
         </Suspense>
     );
 }
-export default ManageListing;
+export default ManagePaymentGateway;
