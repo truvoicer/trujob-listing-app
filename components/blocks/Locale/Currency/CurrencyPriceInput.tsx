@@ -26,7 +26,7 @@ export interface CurrencyPriceInputProps {
   dropdownButtonClass?: string;
   dropdownMenuClass?: string;
   dropdownItemClass?: string;
-  currencyValue?: number;
+  currencyValue?: number | Currency;
   amountValue?: number;
 }
 
@@ -44,7 +44,7 @@ export default function CurrencyPriceInput({
   inputClassName = "form-control w-auto",
   dropdownButtonClass = "btn btn-outline-secondary dropdown-toggle",
   dropdownMenuClass = "dropdown-menu show",
-  dropdownItemClass = "dropdown-item"
+  dropdownItemClass = "dropdown-item",
 }: CurrencyPriceInputProps) {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currency, setCurrency] = useState<Currency>(currencies[0] || defaultCurrency);
@@ -62,11 +62,27 @@ export default function CurrencyPriceInput({
       return;
     }
     if (!currencyValue) {
+      setCurrency(currencyList[0]);
+
+      if (onCurrencyChange) onCurrencyChange(currencyList[0]);
       return;
     }
-    const selectedCurrency = currencyList.find((cur) => cur?.id === currencyValue);
-    if (selectedCurrency) {
-      setCurrency(selectedCurrency);
+    if (typeof currencyValue === 'string' || typeof currencyValue === 'number') {
+
+      const selectedCurrency = currencyList.find((cur) => cur?.id === currencyValue);
+      if (selectedCurrency) {
+        setCurrency(selectedCurrency);
+        if (onCurrencyChange) onCurrencyChange(selectedCurrency);
+      }
+      return;
+    }
+
+    if (
+      typeof currencyValue === 'object' &&
+      currencyValue.hasOwnProperty('symbol')
+    ) {
+      setCurrency(currencyValue);
+      if (onCurrencyChange) onCurrencyChange(currencyValue);
     }
   }, [currencyValue, currencyList]);
 

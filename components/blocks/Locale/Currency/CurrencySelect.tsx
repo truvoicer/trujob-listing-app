@@ -90,7 +90,6 @@ function CurrencySelect({
       allowNewOptions={allowNewOptions}
       loadMoreLimit={loadMoreLimit}
       onLoadMore={async (page: number) => {
-        console.log("Load more currencies");
         let response = await fetchCurrencies({ page });
         if (!response) {
           throw new Error("Failed to fetch currencies");

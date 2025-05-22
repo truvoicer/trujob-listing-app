@@ -27,3 +27,5 @@ export const SITE_X_FOLLOW_URL = "x_follow_url";
 export const SITE_TIMEZONE = "timezone";
 export const SITE_MEDIA = "media";
 export const SITE_SETTINGS = "settings";
+export const SITE_SETTINGS_CURRENCY = "currency";
+export const SITE_SETTINGS_COUNTRY = "country";

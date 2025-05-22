@@ -2,14 +2,14 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditPriceType from "./EditPriceType";
+import EditPaymentMethod from "./EditPaymentMethod";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { PriceType } from "@/types/Price";
+import { PaymentMethod } from "@/types/PaymentMethod";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -17,17 +17,15 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export const CREATE_PRICE_TYPE_MODAL_ID = 'create-priceType-modal';
-export const EDIT_PRICE_TYPE_MODAL_ID = 'edit-priceType-modal';
-export const DELETE_PRICE_TYPE_MODAL_ID = 'delete-priceType-modal';
+export const CREATE_PAYMENT_METHOD_MODAL_ID = 'create-payment-method-modal';
+export const EDIT_PAYMENT_METHOD_MODAL_ID = 'edit-payment-method-modal';
+export const DELETE_PAYMENT_METHOD_MODAL_ID = 'delete-payment-method-modal';
 
-export interface ManagePriceTypeProps extends DataManageComponentProps {
-    data?: Array<PriceType>;
-    values?: Array<PriceType>;
+export interface ManagePaymentMethodProps extends DataManageComponentProps {
+    data?: Array<PaymentMethod>;
 }
 
-function ManagePriceType({
-    values,
+function ManagePaymentMethod({
     mode = 'selector',
     data,
     operation = 'create',
@@ -37,7 +35,7 @@ function ManagePriceType({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManagePriceTypeProps) {
+}: ManagePaymentMethodProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -46,7 +44,7 @@ function ManagePriceType({
         switch (mode) {
             case 'selector':
                 return {
-                    priceTypes: [],
+                    paymentMethods: [],
                 };
             case 'edit':
                 return {};
@@ -55,7 +53,7 @@ function ManagePriceType({
         }
     }
 
-    function getPriceTypeFormModalProps(index?: number) {
+    function getPaymentMethodFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -82,7 +80,7 @@ function ManagePriceType({
                         DataManagerService.selectorModeHandler({
                             onChange,
                             data,
-                            values: formHelpers?.values?.priceTypes,
+                            values: formHelpers?.values?.paymentMethods,
                             index
                         });
                         break;
@@ -104,7 +102,7 @@ function ManagePriceType({
         }
     }
 
-    function renderActionColumn(item: PriceType, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: PaymentMethod, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -114,17 +112,17 @@ function ManagePriceType({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit Price type',
+                            title: 'Edit payment method',
                             component: (
-                                <EditPriceType
+                                <EditPaymentMethod
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_PRICE_TYPE_MODAL_ID}
+                                    modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
                                 />
                             ),
-                            ...getPriceTypeFormModalProps(index),
-                        }, EDIT_PRICE_TYPE_MODAL_ID);
+                            ...getPaymentMethodFormModalProps(index),
+                        }, EDIT_PAYMENT_METHOD_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -135,12 +133,12 @@ function ManagePriceType({
                     onClick={e => {
                         e.preventDefault();
                         dataTableContextState.modal.show({
-                            title: 'Delete price type',
+                            title: 'Delete payment method',
                             component: (
-                                <p>Are you sure you want to delete this price type ({item?.name} | {item?.label})?</p>
+                                <p>Are you sure you want to delete this payment method ({item?.name} | {item?.label})?</p>
                             ),
                             onOk: async () => {
-                                console.log('Delete price type', { operation, item });
+                                console.log('Delete payment method', { operation, item });
                                 if (!operation) {
                                     console.warn('Operation is required');
                                     return;
@@ -151,7 +149,7 @@ function ManagePriceType({
                                     if (typeof onChange === 'function') {
                                         onChange(cloneData);
                                     }
-                                    dataTableContext.modal.close(DELETE_PRICE_TYPE_MODAL_ID);
+                                    dataTableContext.modal.close(DELETE_PAYMENT_METHOD_MODAL_ID);
                                     return;
                                 }
                                 if (!item?.id) {
@@ -160,14 +158,14 @@ function ManagePriceType({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Price type ID is required</p>
+                                            <p>Payment method ID is required</p>
                                         ),
-                                    }, 'priceType-delete-error');
+                                    }, 'payment-method-delete-error');
                                     return;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: UrlHelpers.urlFromArray([
-                                        truJobApiConfig.endpoints.priceType,
+                                        truJobApiConfig.endpoints.paymentMethod,
                                         item.id,
                                         'delete'
                                     ]),
@@ -180,9 +178,9 @@ function ManagePriceType({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete price type</p>
+                                            <p>Failed to delete payment method</p>
                                         ),
-                                    }, 'priceType-delete-error');
+                                    }, 'payment-method-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -190,7 +188,7 @@ function ManagePriceType({
                             },
                             show: true,
                             showFooter: true
-                        }, DELETE_PRICE_TYPE_MODAL_ID);
+                        }, DELETE_PAYMENT_METHOD_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -205,17 +203,17 @@ function ManagePriceType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit price type',
+                                        title: 'Edit Payment method',
                                         component: (
-                                            <EditPriceType
+                                            <EditPaymentMethod
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_PRICE_TYPE_MODAL_ID}
+                                                modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
                                             />
                                         ),
-                                        ...getPriceTypeFormModalProps(index),
-                                    }, EDIT_PRICE_TYPE_MODAL_ID);
+                                        ...getPaymentMethodFormModalProps(index),
+                                    }, EDIT_PAYMENT_METHOD_MODAL_ID);
                                 }
                             }
                         },
@@ -227,9 +225,9 @@ function ManagePriceType({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete price type',
+                                        title: 'Delete payment method',
                                         component: (
-                                            <p>Are you sure you want to delete this price type ({item?.label} | {item?.name})?</p>
+                                            <p>Are you sure you want to delete this paymentMethod ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -238,13 +236,13 @@ function ManagePriceType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Price type ID is required</p>
+                                                        <p>Payment method ID is required</p>
                                                     ),
-                                                }, 'priceType-delete-error');
+                                                }, 'payment-method-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.priceType}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.paymentMethod}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -254,16 +252,16 @@ function ManagePriceType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete price type</p>
+                                                        <p>Failed to delete paymentMethod</p>
                                                     ),
-                                                }, 'priceType-delete-error');
+                                                }, 'payment-method-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_PRICE_TYPE_MODAL_ID);
+                                    }, EDIT_PAYMENT_METHOD_MODAL_ID);
                                 }
                             }
                         }
@@ -284,12 +282,12 @@ function ManagePriceType({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        if (isNotEmpty(searchParams?.priceType)) {
-            query['priceType'] = searchParams.priceType;
+        if (isNotEmpty(searchParams?.paymentMethod)) {
+            query['paymentMethod'] = searchParams.paymentMethod;
         }
         return query;
     }
-    async function priceTypeRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function paymentMethodRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -308,7 +306,7 @@ function ManagePriceType({
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.priceType,
+                truJobApiConfig.endpoints.paymentMethod,
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -332,16 +330,16 @@ function ManagePriceType({
             return;
         }
         modalState.show({
-            title: 'Create price type',
+            title: 'Create payment method',
             component: (
-                <EditPriceType
+                <EditPaymentMethod
                     operation={'create'}
                     inModal={true}
-                    modalId={CREATE_PRICE_TYPE_MODAL_ID}
+                    modalId={CREATE_PAYMENT_METHOD_MODAL_ID}
                 />
             ),
-            ...getPriceTypeFormModalProps(),
-        }, CREATE_PRICE_TYPE_MODAL_ID);
+            ...getPaymentMethodFormModalProps(),
+        }, CREATE_PAYMENT_METHOD_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -357,7 +355,7 @@ function ManagePriceType({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected price types?',
+                    message: 'Are you sure you want to delete selected paymentMethods?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -366,9 +364,9 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No price types selected</p>
+                                    <p>No paymentMethods selected</p>
                                 ),
-                            }, 'priceType-bulk-delete-error');
+                            }, 'payment-method-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -378,13 +376,13 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Price type IDs are required</p>
+                                    <p>Payment method IDs are required</p>
                                 ),
-                            }, 'priceType-bulk-delete-error');
+                            }, 'payment-method-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.paymentMethod}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -397,9 +395,9 @@ function ManagePriceType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete price types</p>
+                                    <p>Failed to delete paymentMethods</p>
                                 ),
-                            }, 'priceType-bulk-delete-error');
+                            }, 'payment-method-bulk-delete-error');
                             return;
                         }
 
@@ -408,15 +406,15 @@ function ManagePriceType({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Price types deleted successfully</p>
+                                <p>Payment methods deleted successfully</p>
                             ),
-                        }, 'priceType-bulk-delete-success');
+                        }, 'payment-method-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-priceType-confirmation');
+                }, 'delete-bulk-payment-method-confirmation');
             }
         });
         return actions;
@@ -426,19 +424,18 @@ function ManagePriceType({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-                values={values}
-                data={data}
+            data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage price types'}
+                title={'Manage Payment methods'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={priceTypeRequest}
+                request={paymentMethodRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Label', key: 'label' },
@@ -448,4 +445,4 @@ function ManagePriceType({
         </Suspense>
     );
 }
-export default ManagePriceType;
+export default ManagePaymentMethod;

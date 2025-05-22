@@ -12,6 +12,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { refreshSiteAction } from "@/library/redux/actions/site-actions";
 
 export const SITE_SETTINGS_SUCCESS_NOTIFICATION = 'SITE_SETTINGS_SUCCESS_NOTIFICATION';
 export const SITE_SETTINGS_ERROR_NOTIFICATION = 'SITE_SETTINGS_ERROR_NOTIFICATION';
@@ -31,8 +32,16 @@ function ManageSiteSettings({
     }
 
     async function submitHandler(values: FormikValues) {
-        console.log('values', values);
-        const requestData = { ...values };
+        let requestData = { ...values };
+
+        if (values?.country) {
+            requestData.country_id = values?.country?.id;
+            delete requestData.country;
+        }
+        if (values?.currency) {
+            requestData.currency_id = values?.currency?.id;
+            delete requestData.currency;
+        }
 
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
@@ -50,6 +59,7 @@ function ManageSiteSettings({
                 variant: 'success',
                 component: 'Settings updated successfully',
             }, SITE_SETTINGS_SUCCESS_NOTIFICATION);
+            refreshSiteAction();
         } else {
             notificationContext.show({
                 variant: 'error',
@@ -57,16 +67,16 @@ function ManageSiteSettings({
             }, SITE_SETTINGS_ERROR_NOTIFICATION);
         }
     }
+    
     useEffect(() => {
         siteSettingsRequest();
     }, []);
-
+    
     return (
         <div className="container">
             <div className="row">
                 <div className="col-lg-12 mb-4">
                     <div className="py-4 border-bottom">
-                        <div className="float-left"><a href="index.html?activeTab=view-workflow" className="badge bg-white back-arrow"><i className="las la-angle-left"></i></a></div>
                         <div className="form-title text-center">
                             <h3>Edit Settings</h3>
                         </div>
@@ -78,13 +88,12 @@ function ManageSiteSettings({
                             <Form
                                 operation="edit"
                                 initialValues={{
-                                    country_id: site?.settings?.country?.id,
-                                    currency_id: site?.settings?.currency?.id,
+                                    country: site?.settings?.country,
+                                    currency: site?.settings?.currency,
                                 }}
                                 onSubmit={submitHandler}
                             >
                                 {({ handleChange, handleSubmit, setFieldValue, values }: FormikProps<FormikValues>) => {
-                                    console.log('values', values);
                                     return (
                                         <div className="d-flex flex-wrap align-items-ceter">
                                             <div className="col-lg-6 mb-4">
@@ -93,10 +102,10 @@ function ManageSiteSettings({
                                                     Select Country
                                                 </label>
                                                 <CountrySelect
-                                                    value={site?.settings?.country ? 
+                                                    value={values?.country ? 
                                                         {
-                                                        value: site?.settings?.country?.id,
-                                                        label: site?.settings?.country?.name,
+                                                        value: values?.country?.id,
+                                                        label: values?.country?.name,
                                                     } : null}
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
@@ -107,7 +116,7 @@ function ManageSiteSettings({
                                                         }
                                                         if (selectedCountry) {
                                                         console.log('country value', value);
-                                                            setFieldValue('country_id', selectedCountry?.id);
+                                                            setFieldValue('country', selectedCountry);
                                                         }
                                                     }}
                                                     loadingMore={true}
@@ -117,10 +126,10 @@ function ManageSiteSettings({
                                             <div className="col-lg-6 mb-4">
                                                 <label className="title">Select Currency</label>
                                                 <CurrencySelect
-                                                    value={site?.settings?.currency ? 
+                                                    value={values?.currency ? 
                                                         {
-                                                        value: site?.settings?.currency?.id,
-                                                        label: site?.settings?.currency?.name,
+                                                        value: values?.currency?.id,
+                                                        label: values?.currency?.name,
                                                     } : null}
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
@@ -131,7 +140,7 @@ function ManageSiteSettings({
                                                         }
                                                         if (selectedCurrency) {
                                                         console.log('currency value', value);
-                                                            setFieldValue('currency_id', selectedCurrency?.id);
+                                                            setFieldValue('currency', selectedCurrency);
                                                         }
                                                     }}
                                                     loadingMore={true}

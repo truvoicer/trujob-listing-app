@@ -8,12 +8,21 @@ import CurrencyPriceInput from "@/components/blocks/Locale/Currency/CurrencyPric
 import ManagePriceType from "../../PriceType/ManagePriceType";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import DateTimePicker from "@/components/Date/DateTimePicker";
+import { SITE_STATE } from "@/library/redux/constants/site-constants";
+import { connect } from "react-redux";
+import { getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
+import moment from "moment";
+import ManageUser from "../../User/ManageUser";
+import { PriceType } from "@/types/Price";
+import { User } from "@/types/User";
 
-type EditListingPriceFields = {
+export type EditListingPriceFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
+    site: any;
 }
 function EditListingPriceFields({
-    operation
+    operation,
+    site,
 }: EditListingPriceFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
@@ -38,6 +47,60 @@ function EditListingPriceFields({
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
+            id: 'user',
+            title: 'Select User',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageUser
+                        {...getListingComponentProps()}
+                        values={values?.user ? [values?.user] : []}
+                        rowSelection={true}
+                        multiRowSelection={false}
+                        enableEdit={false}
+                        paginationMode="state"
+                        onChange={(users: Array<any>) => {
+                            if (!Array.isArray(users)) {
+                                console.warn('Invalid values received from ManageUser component');
+                                return;
+                            }
+
+                            if (users.length === 0) {
+                                console.warn('Users is empty');
+                                return true;
+                            }
+                            const checked = users.filter((item) => item?.checked);
+                            if (checked.length === 0) {
+                                console.warn('No user selected');
+                                return true;
+                            }
+                            const selectedUser = checked[0];
+
+                            setFieldValue('user', selectedUser);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: ({ state }: {
+                state: LocalModal,
+                setState: Dispatch<React.SetStateAction<LocalModal>>,
+                configItem: any,
+            },
+                e?: React.MouseEvent | null
+            ) => {
+                return true;
+            },
+            onCancel: () => {
+                return true;
+            }
+        },
+        {
             id: 'Type',
             title: 'Select Type',
             size: 'lg',
@@ -51,7 +114,7 @@ function EditListingPriceFields({
                 >
                     <ManagePriceType
                         {...getListingComponentProps()}
-                        values={values?.type ? [values?.type] : []}
+                        values={values?.priceType ? [values?.priceType] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -77,7 +140,7 @@ function EditListingPriceFields({
                             if (values?.id) {
                                 return;
                             }
-                            setFieldValue('type', selected);
+                            setFieldValue('priceType', selected);
                         }}
                     />
                 </AccessControlComponent>
@@ -97,6 +160,7 @@ function EditListingPriceFields({
         },
     ]);
 
+    // console.log('EditListingPriceFields', values);
 
     return (
 
@@ -105,17 +169,59 @@ function EditListingPriceFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <h4>Manage type</h4>
-                        {modalService.renderLocalTriggerButton(
-                            'Type',
-                            'Select Type',
-                        )}
+                        <div className="floating-input">
+                            <label className="d-block fw-bold">
+                                Price Type
+                            </label>
+                            {values?.priceType && (
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    Selected:
+                                    <div className="d-flex flex-wrap">
+                                        <div className="badge bg-primary-light mr-2 mb-2">
+                                            {values?.priceType?.label}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {modalService.renderLocalTriggerButton(
+                                'Type',
+                                'Select Type',
+                            )}
+                        </div>
                     </div>
 
-                    <div className="col-12 col-lg-6">
+                    <div className="col-12 col-lg-6 mt-3">
+                        <div className="floating-input">
+                            <label className="d-block fw-bold">
+                                User
+                            </label>
+                            {values?.user && (
+                                <div className="d-flex justify-content-between align-items-center mb-3">
+                                    Selected:
+                                    <div className="d-flex flex-wrap">
+                                        <div className="badge bg-primary-light mr-2 mb-2">
+                                            {values?.user?.first_name} {values?.user?.last_name} ({values?.user?.email})
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                            {modalService.renderLocalTriggerButton(
+                                'user',
+                                'Select User',
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="col-12 col-lg-6 mt-3">
                         <div className="floating-input form-group">
                             <DateTimePicker
-                                value={values?.valid_from}
+                                label="Valid From"
+                                value={
+                                    moment(values?.valid_from).isValid()
+                                        ? moment(values?.valid_from).toDate()
+                                        : ''
+                                }
                                 onChange={(value) => {
                                     console.log('valid_from', value);
                                     setFieldValue("valid_from", value);
@@ -130,7 +236,12 @@ function EditListingPriceFields({
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <DateTimePicker
-                                value={values?.valid_to}
+                                label="Valid To"
+                                value={
+                                    moment(values?.valid_to).isValid()
+                                        ? moment(values?.valid_to).toDate()
+                                        : ''
+                                }
                                 onChange={(value) => {
                                     console.log('valid_to', value);
                                     setFieldValue("valid_to", value);
@@ -176,24 +287,31 @@ function EditListingPriceFields({
 
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
+                        <div className="floating-input">
+                            <label className="fw-bold" htmlFor="amount">
+                                Amount
+                            </label>
                             <CurrencyPriceInput
                                 amountValue={values?.amount || ''}
-                                currencyValue={values?.currency?.id || null}
+                                currencyValue={
+                                    values?.currency
+                                        ? values?.currency
+                                        : getSiteCurrencyAction()
+                                }
                                 onAmountChange={(value) => {
-                                    console.log('currency amount value', value);
                                     setFieldValue("amount", value);
-                                }
-                                }
+                                }}
                                 onCurrencyChange={(value) => {
-                                    console.log('currency value', value);
                                     setFieldValue("currency", value);
                                 }}
                             />
                         </div>
                     </div>
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
+                    <div className="col-12 col-lg-6 mt-2">
+                        <div className="floating-input">
+                            <label className="fw-bold" htmlFor="country">
+                                Country
+                            </label>
                             <CountrySelect
                                 value={values?.country?.id}
                                 isMulti={false}
@@ -219,4 +337,8 @@ function EditListingPriceFields({
         </div>
     );
 }
-export default EditListingPriceFields;
+export default connect(
+    (state: any) => ({
+        site: state[SITE_STATE],
+    }),
+)(EditListingPriceFields);

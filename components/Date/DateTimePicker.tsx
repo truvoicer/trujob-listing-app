@@ -1,12 +1,17 @@
-import React, { useState } from 'react';
+import moment from 'moment';
+import React, { useEffect, useState } from 'react';
 
 interface DateTimePickerProps {
+  label?: string;
+  value?: Date;
   enableRange?: boolean;
   onChange?: (dates: Date | [Date | null, Date | null]) => void;
   onSelect?: (dates: Date | [Date | null, Date | null]) => void;
 }
 
 function DateTimePicker({
+  label,
+  value,
   enableRange = false,
   onChange,
   onSelect,
@@ -49,25 +54,51 @@ function DateTimePicker({
     onSelect?.([start, end]);
   };
 
+  useEffect(() => {
+    if (value) {
+      if (Array.isArray(value)) {
+        const [start, end] = value;
+        setRangeStartDate(moment(start).format('YYYY-MM-DDTHH:mm'));
+        setRangeEndDate(moment(end).format('YYYY-MM-DDTHH:mm'));
+      } else {
+        setSingleDate(moment(value).format('YYYY-MM-DDTHH:mm'));
+      }
+    }
+  }, [value]);
+
+
   return (
     <div>
       {enableRange ? (
         <div>
-          <input
-            type="datetime-local"
-            value={rangeStartDate}
-            onChange={handleRangeStartChange}
-          />
-          <input
-            type="datetime-local"
-            value={rangeEndDate}
-            onChange={handleRangeEndChange}
-          />
-          {/* <button onClick={handleRangeSelect}>Select Range</button> */}
+          <div className='floating-input'>
+            <label htmlFor='start-date'>Start Date</label>
+            <input
+              className="form-control"
+              id='start-date'
+              type="datetime-local"
+              value={rangeStartDate}
+              onChange={handleRangeStartChange}
+            />
+          </div>
+          <div className='floating-input'>
+            <label htmlFor='end-date' >End Date</label>
+            <input
+              className="form-control"
+              id='end-date'
+              type="datetime-local"
+              value={rangeEndDate}
+              onChange={handleRangeEndChange}
+            />
+            {/* <button onClick={handleRangeSelect}>Select Range</button> */}
+          </div>
         </div>
       ) : (
-        <div>
+        <div className='floating-input'>
+          {label && <label htmlFor='date' className='fw-bold'>{label}</label>}
           <input
+            id='date'
+            className="form-control"
             type="datetime-local"
             value={singleDate}
             onChange={handleSingleChange}

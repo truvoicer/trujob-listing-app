@@ -17,7 +17,7 @@ import { has } from "underscore";
 
 export type EditListingPriceProps = {
     listingId?: number;
-    data?: Listing;
+    data?: Price;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
@@ -36,22 +36,26 @@ function EditListingPrice({
         type: string;
     } | null>(null);
 
+    const dataTableContext = useContext(DataTableContext);
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
     const initialValues: Price = {
         id: data?.id || 0,
         user: data?.user || null,
         country: data?.country || null,
         currency: data?.currency || null,
-        type: data?.type || null,
+        priceType: data?.priceType,
         valid_from: data?.valid_from || '',
         valid_to: data?.valid_to || '',
+        valid_from_timestamp: data?.valid_from_timestamp || 0,
+        valid_to_timestamp: data?.valid_to_timestamp || 0,
         is_default: data?.is_default || false,
         is_active: data?.is_active || false,
         amount: data?.amount || 0,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
-
+    
     function buildRequestData(values: Price) {
         let requestData: PriceRequest = {};
         
@@ -61,8 +65,11 @@ function EditListingPrice({
         if (values?.currency) {
             requestData.currency_id = values?.currency?.id;
         }
-        if (values?.type) {
-            requestData.type_id = values?.type?.id;
+        if (values?.priceType) {
+            requestData.price_type_id = values?.priceType?.id;
+        }
+        if (values?.user) {
+            requestData.user_id = values?.user?.id;
         }
         if (values?.valid_from) {
             requestData.valid_from = values?.valid_from;
@@ -185,7 +192,6 @@ function EditListingPrice({
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_LISTING_PRICE_MODAL_ID);
         dataTableContext.modal.close(CREATE_LISTING_PRICE_MODAL_ID);
-
     }
 
     function getRequiredFields() {
@@ -219,8 +225,6 @@ function EditListingPrice({
         );
     }, [inModal, modalId]);
 
-
-    const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">

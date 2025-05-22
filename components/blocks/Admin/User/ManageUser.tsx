@@ -14,12 +14,12 @@ import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export interface ManageUserProps extends DataManageComponentProps {
     data?: Array<User>;
+    values?: Array<User>;
 }
 export const EDIT_USER_MODAL_ID = 'edit-user-modal';
 
@@ -338,9 +338,24 @@ function ManageUser({
         });
         return actions;
     }
-    
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
+            {mode === 'selector' && (
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    Selected:
+                    <div className="d-flex flex-wrap">
+                        {values?.map((item: User, index: number) => {
+                            return (
+                                <div key={index} className="badge bg-primary-light mr-2 mb-2">
+                                    {item?.first_name} {item?.last_name}
+                                </div>
+                            )
+                        })}
+                    </div>
+                </div>
+            )}
+
             <DataManager
                 values={values}
                 rowSelection={rowSelection}

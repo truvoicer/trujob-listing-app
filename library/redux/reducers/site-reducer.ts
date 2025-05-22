@@ -29,7 +29,9 @@ import {
     SITE_TIMEZONE,
     ERROR,
     SITE_SETTINGS,
-    SITE_ID
+    SITE_ID,
+    SITE_SETTINGS_CURRENCY,
+    SITE_SETTINGS_COUNTRY
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
@@ -62,7 +64,7 @@ export const siteStateData = {
     [SITE_TIMEZONE]: null,
     [SITE_MEDIA]: [],
     [SITE_SETTINGS]: {
-        'country': {
+        [SITE_SETTINGS_COUNTRY]: {
             id: null,
             name: null,
             iso2: null,
@@ -71,7 +73,7 @@ export const siteStateData = {
             created_at: null,
             updated_at: null,
         },
-        'currency': {
+        [SITE_SETTINGS_CURRENCY]: {
             id: null,
             name: null,
             name_plural: null,
