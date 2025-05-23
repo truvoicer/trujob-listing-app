@@ -8,6 +8,7 @@ import Link from "next/link";
 import DropDownMenuList from "./Menu/DropDownMenuList";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { SessionService } from "@/library/services/session/SessionService";
+import Branding from "./Branding/Branding";
 
 function AdminNavBar({ app, session }) {
     
@@ -60,21 +61,12 @@ function AdminNavBar({ app, session }) {
                                     setAppSidebarOpenAction(!app[APP_SIDEBAR_OPEN]);
                                 }}
                             ></i>
-                            <a href="index.html" className="header-logo" >
-                                <img src="/images/logo.png"
-                                    className={`img-fluid rounded-normal light-logo ${app[APP_MODE] === 'dark' ? 'd-none' : ''}`}
-                                    alt="logo" />
-                                <img src="/images/logo-white.png"
-                                    className={`img-fluid rounded-normal darkmode-logo ${app[APP_MODE] === 'light' ? 'd-none' : ''}`}
-                                    alt="logo" />
-                            </a>
+                            <Branding />
                         </div>
                         <div className="iq-menu-horizontal">
                             <nav className="iq-sidebar-menu">
                                 <div className="iq-sidebar-logo d-flex align-items-center justify-content-between">
-                                    <a href="index.html" className="header-logo">
-                                        <img src="/images/logo.png" className="img-fluid rounded-normal" alt="logo" />
-                                    </a>
+                                    <Branding />
                                     <div className="iq-menu-bt-sidebar">
                                         <i
                                             className={`ri-menu-line wrapper-menu ${app[APP_SIDEBAR_OPEN] ? '' : 'd-none'}`}

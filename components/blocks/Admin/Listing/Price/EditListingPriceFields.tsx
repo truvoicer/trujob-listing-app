@@ -10,7 +10,7 @@ import AccessControlComponent from "@/components/AccessControl/AccessControlComp
 import DateTimePicker from "@/components/Date/DateTimePicker";
 import { SITE_STATE } from "@/library/redux/constants/site-constants";
 import { connect } from "react-redux";
-import { getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
+import { getSiteCountryAction, getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
 import moment from "moment";
 import ManageUser from "../../User/ManageUser";
 import { PriceType } from "@/types/Price";
@@ -160,6 +160,7 @@ function EditListingPriceFields({
         },
     ]);
 
+    const country  = getSiteCountryAction();
     // console.log('EditListingPriceFields', values);
 
     return (
@@ -313,7 +314,14 @@ function EditListingPriceFields({
                                 Country
                             </label>
                             <CountrySelect
-                                value={values?.country?.id}
+                                value={values?.country ?
+                                    {
+                                        value: values?.country?.id,
+                                        label: values?.country?.name,
+                                    } : {
+                                        value: country?.id,
+                                        label: country?.name,
+                                    }}
                                 isMulti={false}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {

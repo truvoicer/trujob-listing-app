@@ -1,4 +1,5 @@
 import Checkout from "@/components/blocks/Payment/Checkout/Checkout";
+import { useEffect } from "react";
 
 export type ListingTestCheckoutProps = {
   listingId: number;
@@ -8,6 +9,10 @@ function ListingTestCheckout({
   listingId,
   modalId,
 }: ListingTestCheckoutProps) {
+
+  useEffect(() => {
+
+  }, [listingId]);
   return (
     <Checkout
 

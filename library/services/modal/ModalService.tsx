@@ -78,6 +78,7 @@ export class ModalService extends MessageService {
         if (typeof modalItem?.formProps?.onSubmit !== 'function') {
             modalFormProps.formProps.onSubmit = handleSubmit;
         }
+        
         modalState.update(
             modalFormProps,
             id
@@ -159,7 +160,7 @@ export class ModalService extends MessageService {
         } else if (modal?.component) {
             component = modal.component;
         }
-        console.log('Modal state', modal);
+        
         return (
             <Modal
                 show={modal.show}

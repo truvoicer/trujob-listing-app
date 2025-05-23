@@ -19,6 +19,7 @@ import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
 import { ComponentHelpers } from "@/helpers/ComponentHelpers";
 import ManageSiteSettings from "@/components/blocks/Admin/Settings/ManageSiteSettings";
 import ManagePaymentGateway from "@/components/blocks/Admin/PaymentGateway/ManagePaymentGateway";
+import ManageAddress from "@/components/blocks/Admin/User/Address/ManageAddress";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -43,6 +44,7 @@ export class Blocks {
     static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
     static MANAGE_PAYMENT_GATEWAYS_BLOCK = 'manage-payment-gateways-block';
     static MANAGE_PAYMENT_METHODS_BLOCK = 'manage-payment-methods-block';
+    static MANAGE_ADDRESSES_BLOCK = 'manage-addresses-block';
 
     static getBlocks() {
         return {
@@ -237,6 +239,17 @@ export class Blocks {
                 icon: 'manage-payment-methods-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManagePaymentGateway,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_ADDRESSES_BLOCK]: {
+                title: 'Manage Addresses Block',
+                description: 'This is the manage addresses block',
+                icon: 'manage-addresses-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageAddress,
                     {
                         mode: 'edit',
                     }
