@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { CheckoutContext, CheckoutContextType, checkoutData } from "./context/CheckoutContext";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
 
 export type CheckoutProviderProps = {
     children: React.ReactNode;
@@ -32,51 +34,43 @@ function CheckoutProvider({
                 break;
         }
     }
-    function addOrderItem(data: Record<string, any>) {
-        setCheckoutState((prevState: CheckoutContextType) => {
-            let newState = { ...prevState };
-            if (!newState.order || !newState.order.items) {
-                newState.order = { ...newState.order, items: [] };
-            }
-            // Add the new order item to the order items array
-            newState.order.items.push(data);
-            return newState;
+    async function addOrderItem(data: Record<string, any>) {
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: truJobApiConfig.endpoints.orderItem,
+            method: TruJobApiMiddleware.METHOD.POST,
+            protectedReq: true,
+            data: data,
         });
+        if (!response || !response.data) {
+            console.error("Failed to add order item. No response or data received.");
+            return;
+        }
+        refreshEntity('order');
     }
     function removeOrderItem(id: number) {
-        setCheckoutState((prevState: CheckoutContextType) => {
-            let newState = { ...prevState };
-            if (!newState.order || !newState.order.items) {
-                return newState;
-            }
-            const findOrderItemIndex = newState.order.items.findIndex(item => item.id === id);
-            if (findOrderItemIndex === -1) {
-                console.warn(`Order item with id ${id} not found.`);
-                return newState;
-            }
-            // Remove the specific order item
-            newState.order.items.splice(findOrderItemIndex, 1);
-            return newState;
+        const response = TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.orderItem}/${id}`,
+            method: TruJobApiMiddleware.METHOD.DELETE,
+            protectedReq: true,
         });
+        if (!response) {
+            console.error(`Failed to remove order item with id ${id}. No response received.`);
+            return;
+        }
+        refreshEntity('order');
     }
     function updateOrderItem(id: number, data: Record<string, any>) {
-        setCheckoutState((prevState: CheckoutContextType) => {
-            let newState = { ...prevState };
-            if (!newState.order || !newState.order.items) {
-                return newState;
-            }
-            const findOrderItemIndex = newState.order.items.findIndex(item => item.id === id);
-            if (findOrderItemIndex === -1) {
-                console.warn(`Order item with id ${id} not found.`);
-                return newState;
-            }
-            // Update the specific order item with the provided data   
-            newState.order.items[findOrderItemIndex] = {
-                ...newState.order.items[findOrderItemIndex],
-                ...data
-            };
-            return newState;
+        const response = TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: `${truJobApiConfig.endpoints.orderItem}/${id}`,
+            method: TruJobApiMiddleware.METHOD.PUT,
+            protectedReq: true,
+            data: data,
         });
+        if (!response || !response.data) {
+            console.error(`Failed to update order item with id ${id}. No response or data received.`);
+            return;
+        }
+        refreshEntity('order');
     }
     function updateCheckoutData(data: CheckoutContextType) {
         setCheckoutState((prevState: CheckoutContextType) => {
