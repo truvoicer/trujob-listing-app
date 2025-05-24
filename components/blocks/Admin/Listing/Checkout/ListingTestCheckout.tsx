@@ -14,6 +14,11 @@ import { create } from "underscore";
 import { title } from "process";
 import ManageListingPrice from "../Price/ManageListingPrice";
 import PaymentMethods from "@/components/blocks/Payment/PaymentMethods";
+import { PaymentGateway } from "@/types/PaymentGateway";
+import { Listing } from "@/types/Listing";
+import { PaymentMethod } from "@/types/PaymentMethod";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import CheckoutProvider from "@/components/blocks/Payment/Checkout/CheckoutProvider";
 
 export type ListingTestCheckoutProps = {
   listingId: number;
@@ -23,12 +28,79 @@ function ListingTestCheckout({
   listingId,
   modalId,
 }: ListingTestCheckoutProps) {
-  const [listing, setListing] = useState<any>(null);
+  const [listing, setListing] = useState<Listing | null>(null);
   const [price, setPrice] = useState<Price | null>(null);
+  const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
+  const [order, setOrder] = useState<any>(null);
+
   const modalService = new ModalService();
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
 
+  async function fetchOrder() {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.order,
+        5
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+    if (!response) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Failed to create order',
+        title: 'Error',
+      }, 'order-create-error-notification');
+      return false;
+    }
+    setOrder(response.data);
+  }
+  async function fetchListingPrice() {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.listingPrice.replace(':listingId', listingId.toString()),
+        1
+      ]),
+      method: ApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+
+    if (!response) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Failed to fetch listing price',
+        title: 'Error',
+      }, 'listing-price-fetch-error-notification');
+      return;
+    }
+    if (response?.data) {
+      setPrice(response.data);
+    }
+  }
+
+  async function fetchPaymentGateway() {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.paymentGateway,
+        1
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+    if (!response) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Failed to fetch payment gateways',
+        title: 'Error',
+      }, 'payment-gateway-fetch-error-notification');
+      return;
+    }
+    if (response?.data) {
+      setPaymentGateway(response.data); // Assuming you want to select the first payment gateway
+    }
+  }
   async function fetchListing() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
@@ -53,12 +125,61 @@ function ListingTestCheckout({
 
   }
 
+
   function getListingComponentProps() {
     let componentProps: any = {
       operation: 'create',
       mode: 'selector'
     };
     return componentProps;
+  }
+
+  function validateListing() {
+    if (!listing) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Listing not found',
+        title: 'Error',
+      }, 'listing-not-found-notification');
+      return false;
+    }
+    return true;
+  }
+
+  function validatePrice() {
+    if (!price) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Please select a price type first',
+        title: 'Error',
+      }, 'price-type-not-selected-notification');
+      return false;
+    }
+    return true;
+  }
+
+  function validatePaymentGateway() {
+    if (!paymentGateway) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Please select a payment method',
+        title: 'Error',
+      }, 'payment-method-not-selected-notification');
+      return false;
+    }
+    return true;
+  }
+
+  function validateQuantity() {
+    if (isNaN(quantity) || quantity <= 0) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Quantity must be greater than 0',
+        title: 'Error',
+      }, 'quantity-invalid-notification');
+      return false;
+    }
+    return true;
   }
 
   modalService.setUseStateHook(useState);
@@ -137,17 +258,40 @@ function ListingTestCheckout({
 
   useEffect(() => {
     fetchListing();
+    fetchOrder();
+    fetchListingPrice();
+    fetchPaymentGateway();
   }, [listingId]);
 
   return (
     <>
-      <Stepper
+
+      <CheckoutProvider>
+        <Checkout
+          order={order}
+          paymentMethod={paymentGateway}
+          price={price}
+        />
+      </CheckoutProvider>
+      {/* <Stepper
         title="Listing Test Checkout"
         config={[
           {
             default: true,
             id: 'priceType',
             label: 'Price Type',
+            beforeNext: async () => {
+              if (!validateListing()) {
+                return false;
+              }
+              if (!validatePrice()) {
+                return false;
+              }
+              if (!validateQuantity()) {
+                return false;
+              }
+              return true;
+            },
             component: ({
               nextStep,
               previousStep,
@@ -158,28 +302,61 @@ function ListingTestCheckout({
             }: StepActions) => {
 
               return (
-                <div>
-                  <h3>Select a price type to proceed</h3>
-                  {modalService.renderLocalTriggerButton('priceType', 'Select Price', {
-                    showNext
-                  })}
+                <div className="row justify-content-center align-items-center">
+                  <div className="col-md-12 col-sm-12 col-12 align-self-center">
+                    <div className="row">
 
-                  {price && (
-                    <div className="mt-3">
-                      <h4>Price Selected:</h4>
-                      <div>
-                        <p><strong>Currency:</strong> {price?.currency?.name}</p>
-                        <p><strong>Price Type:</strong> {price?.price_type?.name}</p>
-                        <p><strong>Price:</strong> {price?.amount}</p>
-                        <p><strong>Valid From:</strong> {price?.valid_from}</p>
-                        <p><strong>Valid To:</strong> {price?.valid_to}</p>
-                        <p><strong>Is Default:</strong> {price?.is_default ? 'Yes' : 'No'}</p>
-                        <p><strong>Is Active:</strong> {price?.is_active ? 'Yes' : 'No'}</p>
-                        <p><strong>Created At:</strong> {price?.created_at}</p>
-                        <p><strong>Updated At:</strong> {price?.updated_at}</p>
+                      <div className="col-12 col-lg-6">
+                        <div className="floating-input">
+                          <label className="d-block">
+                            Price
+                          </label>
+                          {modalService.renderLocalTriggerButton('priceType', 'Select Price', {
+                            showNext
+                          })}
+
+                          {price && (
+                            <div className="mt-3">
+                              <label className="d-block">
+                                Price selected
+                              </label>
+                              <div className="border p-3 rounded bg-light">
+                                <ul style={{ columns: 2 }} className="list-unstyled">
+                                  <li><strong>Currency:</strong> {price?.currency?.name}</li>
+                                  <li><strong>Price Type:</strong> {price?.price_type?.name}</li>
+                                  <li><strong>Price:</strong> {price?.amount}</li>
+                                  <li><strong>Valid From:</strong> {price?.valid_from}</li>
+                                  <li><strong>Valid To:</strong> {price?.valid_to}</li>
+                                  <li><strong>Is Default:</strong> {price?.is_default ? 'Yes' : 'No'}</li>
+                                  <li><strong>Is Active:</strong> {price?.is_active ? 'Yes' : 'No'}</li>
+                                  <li><strong>Created At:</strong> {price?.created_at}</li>
+                                  <li><strong>Updated At:</strong> {price?.updated_at}</li>
+                                </ul>
+                              </div>
+                            </div>
+                          )}
+                        </div>
                       </div>
+
+                      <div className="col-12 col-lg-6 mt-4">
+                        <div className="floating-input form-group">
+                          <input
+                            className="form-control"
+                            type="number"
+                            name="quantity"
+                            id="quantity"
+                            onChange={(e) => {
+                              setQuantity(Number(e.target.value));
+                            }}
+                            value={quantity} />
+                          <label className="form-label" htmlFor="quantity">
+                            Quantity
+                          </label>
+                        </div>
+                      </div>
+
                     </div>
-                  )}
+                  </div>
                 </div>
               )
             },
@@ -188,7 +365,19 @@ function ListingTestCheckout({
             id: 'paymentGateway',
             label: 'Select Payment Method',
             beforeNext: async () => {
-              const response  = await TruJobApiMiddleware.getInstance().resourceRequest({
+              if (!validateListing()) {
+                return false;
+              }
+              if (!validatePrice()) {
+                return false;
+              }
+              if (!validatePaymentGateway()) {
+                return false;
+              }
+              if (!validateQuantity()) {
+                return false;
+              }
+              const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                 endpoint: UrlHelpers.urlFromArray([
                   truJobApiConfig.endpoints.order,
                   'create'
@@ -198,7 +387,11 @@ function ListingTestCheckout({
                 data: {
                   items: [
                     {
-                      listing_id: listingId,
+                      entity_type: 'listing',
+                      entity_id: listingId,
+                      price_id: price?.id,
+                      payment_gateway_id: paymentGateway?.id,
+                      quantity: quantity,
                     }
                   ]
                 }
@@ -211,6 +404,7 @@ function ListingTestCheckout({
                 }, 'order-create-error-notification');
                 return false;
               }
+              setOrder(response.data);
               return true;
             },
             component: ({
@@ -226,11 +420,8 @@ function ListingTestCheckout({
                 <div>
                   <h3>Select a payment method to proceed</h3>
                   <PaymentMethods
-                    onSelect={(paymentMethod: any) => {
-                      console.log('Payment method selected', paymentMethod);
-                      // if (typeof showNext === 'function') {
-                      //   showNext();
-                      // }
+                    onSelect={(paymentMethod: PaymentMethod) => {
+                      setPaymentGateway(paymentMethod);
                     }}
                   />
                 </div>
@@ -248,16 +439,23 @@ function ListingTestCheckout({
               showCancel,
               showFinish,
             }: StepActions) => {
-
+              if (!paymentGateway) {
+                return null;
+              }
+              if (!price) {
+                return null;
+              }
               return (
                 <Checkout
-
+                  order={order}
+                  paymentMethod={paymentGateway}
+                  price={price}
                 />
               )
             },
           },
         ]}
-      />
+      /> */}
 
       {modalService.renderLocalModals()}
     </>

@@ -11,6 +11,7 @@ export const SESSION_USER_USERNAME = "username";
 export const SESSION_USER_EMAIL = "email";
 export const SESSION_USER_FIRSTNAME = "first_name";
 export const SESSION_USER_LASTNAME = "last_name";
+export const SESSION_USER_ADDRESSES = "addresses";
 export const SESSION_USER_ROLES = "roles";
 export const SESSION_USER_TOKEN = "token";
 export const SESSION_USER_TOKEN_EXPIRY = "token_expiry";

@@ -13,8 +13,10 @@ import {
 } from "../constants/session-constants";
 import { isSet } from "@/helpers/utils";
 import { SessionService } from "@/library/services/session/SessionService";
+import { User } from "@/types/User";
+import { strict } from "assert";
 
-export function setSessionUserAction(data, token, tokenExpiry, authenticated = false) {
+export function setSessionUserAction(data: User, token: string, tokenExpiry: number, authenticated: boolean = false) {
     let sessionUserState = { ...store.getState().session.user };
     const nextState = produce(sessionUserState, (draftState) => {
         const extractedUserData = SessionService.extractUserData(data);

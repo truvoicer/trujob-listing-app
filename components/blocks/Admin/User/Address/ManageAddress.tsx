@@ -1,15 +1,16 @@
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { uCaseFirst } from "@/helpers/utils";
+import { isObjectEmpty, uCaseFirst } from "@/helpers/utils";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Country } from "@/types/Country";
 import { User } from "@/types/User";
-import { useContext, useEffect, useState } from "react";
+import { MouseEventHandler, useContext, useEffect, useState } from "react";
 import { get, initial } from "underscore";
 import EditAddress from "./EditAddress";
-import { FormikProps, FormikValues } from "formik";
+import { FormikProps, FormikValues, isObject } from "formik";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { ModalItem } from "@/library/services/modal/ModalService";
 
 export const ADDRESS_FETCH_ERROR_NOTIFICATION_ID = 'address-fetch-error-notification';
 export const ADDRESS_CREATE_ERROR_NOTIFICATION_ID = 'address-create-error-notification';
@@ -62,12 +63,19 @@ export interface CreateAddress extends AddressRequestData {
     type: 'billing' | 'shipping';
 }
 export interface UpdateAddress extends AddressRequestData {
-    id: number;
 }
 
-function ManageAddress() {
+export type ManageAddress = {
+    mode?: 'selector' | 'manager';
+    onSelect?: (address: Address) => void;
+}
+function ManageAddress({
+    mode = 'selector',
+    onSelect,
+}: ManageAddress) {
     const [billingAddresses, setBillingAddresses] = useState<Address[]>([]);
     const [shippingAddresses, setShippingAddresses] = useState<Address[]>([]);
+    const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
 
     const notificationContext = useContext(AppNotificationContext);
     const modalContext = useContext(AppModalContext);
@@ -163,7 +171,7 @@ function ManageAddress() {
             ),
             size: 'lg',
             formProps: {
-                initialValues: { },
+                initialValues: {},
             },
             onClose: () => {
                 fetchAddresses();
@@ -179,6 +187,61 @@ function ManageAddress() {
             },
         }, CREATE_ADDRESS_MODAL_ID);
     }
+    function handleUpdateAddress({
+        e,
+        message = 'Are you sure you want to update this address?',
+        modalProps = {},
+        item,
+        data
+    }: {
+        e: React.MouseEvent,
+        modalProps: ModalItem,
+        message: string,
+        item: Address,
+        data: UpdateAddress
+    }) {
+        e.preventDefault();
+        if (!isObject(data) || isObjectEmpty(data)) {
+            console.error('Address data is required for update');
+            return;
+        }
+
+        modalContext.show({
+            component: (
+                <div>
+                    <h5>{message || ''}</h5>
+                    <p>{item.label}</p>
+                </div>
+            ),
+            onOk: async () => {
+                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.address,
+                        item.id,
+                        'update'
+                    ]),
+                    method: TruJobApiMiddleware.METHOD.PATCH,
+                    protectedReq: true,
+                    data
+                });
+                if (!response) {
+                    notificationContext.show({
+                        title: 'Error',
+                        message: 'Error setting address as default',
+                        variant: 'error',
+                    }, ADDRESS_UPDATE_ERROR_NOTIFICATION_ID);
+                    return;
+                }
+                notificationContext.show({
+                    title: 'Success',
+                    message: 'Address set as default successfully',
+                    variant: 'success',
+                }, ADDRESS_UPDATE_SUCCESS_NOTIFICATION_ID);
+                fetchAddresses();
+            },
+            ...modalProps,
+        }, DELETE_ADDRESS_MODAL_ID);
+    }
     function handleDeleteAddress(e: React.MouseEvent, item: Address, type: 'billing' | 'shipping') {
         e.preventDefault();
         modalContext.show({
@@ -189,7 +252,7 @@ function ManageAddress() {
                     <p>{item.label}</p>
                 </div>
             ),
-            size: 'md',
+            size: 'sm',
             onOk: async () => {
                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -217,6 +280,29 @@ function ManageAddress() {
             },
         }, DELETE_ADDRESS_MODAL_ID);
     }
+    function handleSelectAddress(e: React.MouseEvent, item: Address, type: 'billing' | 'shipping') {
+        e.preventDefault();
+        if (mode !== 'selector') {
+            return;
+        }
+        setSelectedAddress(item);
+        if (!item?.is_default) {
+            handleUpdateAddress({
+                e,
+                modalProps: {
+                    title: 'Set Default Address',
+                    size: 'lg',
+                    fullscreen: undefined,
+                    showFooter: true,
+                },
+                message: 'Do you want to set this address as default?',
+                item,
+                data: {
+                    is_default: true,
+                }
+            });
+        }
+    }
     function renderAddressGroup(addresses: Address[], type: 'billing' | 'shipping') {
         return (
             <>
@@ -232,10 +318,14 @@ function ManageAddress() {
                     </div>
                 </div>
                 {addresses.map((address, index) => {
+                    const isSelected = selectedAddress?.id === address.id;
                     return (
                         <div key={index} className="col-xl-3 col-lg-4 col-md-6">
-                            <div className="card card-block card-stretch card-height">
-                                <div className="card-body rounded work-detail work-detail-info">
+                            <div className="card card-block card-stretch card-height cursor-pointer"
+                                onClick={(e) => handleSelectAddress(e, address, type)}>
+                                <div className={
+                                    `card-body rounded work-detail work-detail-info ${isSelected ? 'work-detail-info--hover' : ''}`
+                                    }>
                                     <h5 className="mb-2">
                                         {address.label}
                                     </h5>
@@ -249,6 +339,25 @@ function ManageAddress() {
                                         {address.country?.name}
                                     </p>
                                     <div className="pt-3 d-flex justify-content-between">
+                                        <button
+                                            className="btn btn-info mr-3 px-4 btn-calendify"
+                                            onClick={(e) => handleUpdateAddress({
+                                                e,
+                                                modalProps: {
+                                                    title: 'Set Default Address',
+                                                    size: 'lg',
+                                                    fullscreen: undefined,
+                                                    showFooter: true,
+                                                },
+                                                message: 'Are you sure you want to set this address as default?',
+                                                item: address,
+                                                data: {
+                                                    is_default: true,
+                                                }
+                                            })}
+                                        >
+                                            Set Default
+                                        </button>
                                         <button
                                             className="btn btn-info mr-3 px-4 btn-calendify"
                                             onClick={(e) => handleEditAddress(e, address, type)}
@@ -268,9 +377,9 @@ function ManageAddress() {
                     );
                 })}
                 <div className="col-xl-3 col-lg-4 col-md-6">
-                    <div className="card card-block card-stretch card-height">
+                    <div className="card card-block card-stretch card-height cursor-pointer">
                         <div className="card-body rounded work-detail work-detail-info d-flex flex-column justify-content-center align-items-center"
-                        onClick={(e) => handleCreateAddress(e, type)}
+                            onClick={(e) => handleCreateAddress(e, type)}
                         >
                             <div className="icon iq-icon-box-2 mb-4 rounded">
                                 <i className="fab fa-chrome"></i>
@@ -289,14 +398,22 @@ function ManageAddress() {
     useEffect(() => {
         fetchAddresses();
     }, []);
-
+    useEffect(() => {
+        if (mode === 'selector' && selectedAddress) {
+            if (typeof onSelect === 'function') {
+                onSelect(selectedAddress);
+            }
+        }
+    }, [selectedAddress, mode]);
     return (
         <div className="container">
             <div className="row">
                 <div className="col-lg-12 mb-4">
                     <div className="py-4 border-bottom">
                         <div className="form-title text-center">
-                            <h3>Integrations</h3>
+                            <h3>
+                                Manage Addresses
+                            </h3>
                         </div>
                     </div>
                 </div>

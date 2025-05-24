@@ -6,6 +6,7 @@
                 border-color: $color;
                 color: $color;
             }
+            &#{$parent}--hover,
             &:hover {
                 border-color: $color;
                 .btn {
@@ -36,6 +37,7 @@
     } @else {
         #{$parent}{
             border-bottom-color: $color;
+            &#{$parent}--hover,
             &:hover {
                 border-color: $color;
             }

@@ -31,21 +31,15 @@ export type StepperItem = {
     label?: string;
 }
 export type StepperProps = {
-    title?: string;
     config: Array<StepperItem>;
 };
 
 function Stepper({
-    title,
     config,
 }: StepperProps) {
     const classes = {};
     const [tabs, setTabs] = useState<StepperItem[]>([]);
     const [activeStep, setActiveStep] = useState<string | null>(null);
-
-    function getStepItem(id: string, key: string) {
-        return tabs.find(step => step.id === id)?.[key];
-    }
 
     function previousStep() {
         setActiveStep((activeStep: string | null) => {
@@ -56,24 +50,35 @@ function Stepper({
         })
     }
     async function nextStep() {
-        const item = findTabById(activeStep);
-        if (!item) {
-            console.log('Stepper item not found', activeStep);
-            return;
+        let item;
+        let isFirstStep = false;
+        let nextStep: string | null = null;
+
+        if (activeStep === null) {
+            item = tabs?.[0];
+            nextStep = tabs?.[1]?.id || null;
+            isFirstStep = true;
+        } else {
+            item = findTabById(activeStep);
+            if (!item) {
+                console.error('Stepper item not found', activeStep);
+                return;
+            }
         }
-        if (
-            typeof item?.beforeNext === 'function'
-        ) {
-            if (!await item.beforeNext()) {
+        if (typeof item?.beforeNext === 'function') {
+            const beforeNextResult = await item.beforeNext();
+            if (!beforeNextResult) {
                 return false;
             }
         }
-        setActiveStep((activeStep: string | null) => {
+        if (!isFirstStep) {
             if (activeStep === tabs[tabs.length - 1].id) {
-                return tabs[tabs.length - 1].id;
+                nextStep = tabs[tabs.length - 1].id;
+            } else {
+                nextStep = tabs[tabs.findIndex(step => step.id === activeStep) + 1].id;
             }
-            return tabs[tabs.findIndex(step => step.id === activeStep) + 1].id;
-        })
+        }
+        setActiveStep(nextStep);
     }
 
     function updateStepperItem(id: string | null, data: any) {
@@ -98,6 +103,7 @@ function Stepper({
     }
 
     async function showNext() {
+        console.log('showNext', activeStep);
         updateStepperItem(activeStep, {
             showNext: true,
         });
@@ -138,21 +144,23 @@ function Stepper({
     function getTabContainerProps() {
         let containerProps: TabContainerProps = {
             defaultActiveKey: getDefaultKey() || '',
-            activeKey: activeStep,
             mountOnEnter: true,
             unmountOnExit: true,
             onSelect: (eventKey: string | null) => {
             }
         };
+        if (typeof activeStep === 'string' && activeStep !== null) {
+            containerProps.activeKey = activeStep;
+        }
         return containerProps;
     }
 
     useEffect(() => {
+        // console.log('Stepper useEffect', { config });
         setTabs(config);
-        setActiveStep(getDefaultKey());
     }, [config]);
 
-    console.log('Stepper', { tabs });
+    // console.log('Stepper', { activeStep, tabs, cp: getTabContainerProps() });
     return (
         <>
             {tabs.length > 0
@@ -162,9 +170,6 @@ function Stepper({
                             <div className="row">
                                 <div className="col-lg-12 mb-4">
                                     <div className="py-4 border-bottom">
-                                        {/* <div className="form-title text-center">
-                                <h3>{title}</h3>
-                            </div> */}
                                         <Nav variant="pills" className="d-flex nav nav-pills mb-4 text-center event-tab">
                                             {Array.isArray(tabs) && tabs.map((item, index) => {
                                                 if (!item?.id) {

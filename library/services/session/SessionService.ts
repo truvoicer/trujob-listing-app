@@ -1,8 +1,9 @@
 
 import { isSet } from "@/helpers/utils";
 import { setIsAuthenticatingAction, setSessionUserAction } from "@/library/redux/actions/session-actions";
-import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_STATE, SESSION_USER, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
+import { SESSION_AUTH_PROVIDER, SESSION_AUTH_PROVIDER_USER_ID, SESSION_STATE, SESSION_USER, SESSION_USER_ADDRESSES, SESSION_USER_EMAIL, SESSION_USER_FIRSTNAME, SESSION_USER_ID, SESSION_USER_LASTNAME, SESSION_USER_ROLES, SESSION_USER_USERNAME } from "@/library/redux/constants/session-constants";
 import store from "@/library/redux/store";
+import { User } from "@/types/User";
 
 export class SessionService {
 
@@ -14,6 +15,7 @@ export class SessionService {
         SESSION_USER_USERNAME,
         SESSION_USER_FIRSTNAME,
         SESSION_USER_LASTNAME,
+        SESSION_USER_ADDRESSES,
         SESSION_USER_ROLES,
     ];
     static initUserData() {
@@ -37,7 +39,7 @@ export class SessionService {
         return userData;
     }
 
-    static async handleTokenResponse(token, tokenExpiry, user) {
+    static async handleTokenResponse(token: string, tokenExpiry: number, user: User) {
         if (!token) {
             console.error('Token not found');
             console.log({

@@ -17303,25 +17303,29 @@ body.tab-horizontal .iq-footer
   color: #7858d7;
 }
 
-.work-detail-info:hover
+.work-detail-info:hover,
+.work-detail-info--hover
 {
   border-color: #7858d7;
 }
 
-.work-detail-info:hover .btn
+.work-detail-info:hover .btn,
+.work-detail-info--hover .btn
 {
   border-color: #7858d7;
   color: #7858d7;
   background: transparent;
 }
 
-.work-detail-info:hover .btn.btn-calendify
+.work-detail-info:hover .btn.btn-calendify,
+.work-detail-info--hover .btn.btn-calendify
 {
   background: #7858d7 !important;
   color: #fff;
 }
 
-.work-detail-info:hover .icon
+.work-detail-info:hover .icon,
+.work-detail-info--hover .icon
 {
   background-color: #7858d7;
   color: #fff;

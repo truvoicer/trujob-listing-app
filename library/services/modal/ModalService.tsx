@@ -22,6 +22,9 @@ export type ModalItem = {
     show: boolean;
     showFooter: boolean;
     formProps?: null | FormProps;
+    onOkButtonText?: string;
+    onCancelButtonText?: string;
+    buttons?: React.Component | React.Component[] | React.ReactNode | React.ReactNode[] | null;
     onOk: () => boolean;
     onCancel: () => boolean;
 }
@@ -43,6 +46,9 @@ export class ModalService extends MessageService {
         size: 'md',
         fullscreen: undefined,
         formProps: null,
+        onOkButtonText: 'Ok',
+        onCancelButtonText: 'Cancel',
+        buttons: null,
         onCancel: () => { return true; },
         onOk: () => { return true; },
     };
@@ -78,7 +84,7 @@ export class ModalService extends MessageService {
         if (typeof modalItem?.formProps?.onSubmit !== 'function') {
             modalFormProps.formProps.onSubmit = handleSubmit;
         }
-        
+
         modalState.update(
             modalFormProps,
             id
@@ -160,11 +166,10 @@ export class ModalService extends MessageService {
         } else if (modal?.component) {
             component = modal.component;
         }
-        
+        // console.log('Modal component', modal);
         return (
             <Modal
                 show={modal.show}
-
                 size={modal?.size || 'lg'}
                 fullscreen={modal?.fullscreen || undefined}
                 onHide={() => this.handleCancel(index, { formHelpers })}>
@@ -176,12 +181,28 @@ export class ModalService extends MessageService {
                 </Modal.Body>
                 {modal?.showFooter &&
                     <Modal.Footer>
-                        <Button variant="secondary" onClick={() => this.handleCancel(index, { formHelpers })}>
-                            Close
-                        </Button>
-                        <Button variant="primary" onClick={() => this.handleOk(index, { formHelpers })}>
-                            Save Changes
-                        </Button>
+                        {modal?.buttons
+                            ? (
+                                <>
+                                    {modal.buttons}
+                                </>
+                            )
+                            : (
+                                <>
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => this.handleCancel(index, { formHelpers })}
+                                    >
+                                        {modal?.onCancelButtonText || 'Cancel'}
+                                    </Button>
+                                    <Button
+                                        variant="primary"
+                                        onClick={() => this.handleOk(index, { formHelpers })}
+                                    >
+                                        {modal?.onOkButtonText || 'Ok'}
+                                    </Button>
+                                </>
+                            )}
                     </Modal.Footer>
                 }
             </Modal>
