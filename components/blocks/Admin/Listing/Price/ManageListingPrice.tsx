@@ -318,7 +318,7 @@ function ManageListingPrice({
             console.warn('Operation is required');
             return;
         }
-        if (['add', 'create'].includes(operation)) {
+        if (mode !== 'selector' && ['add', 'create'].includes(operation)) {
             return;
         }
         if (!listingId) {
@@ -469,6 +469,8 @@ function ManageListingPrice({
                 request={listingRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
+                    { label: 'Price Type', key: 'price_type.label' },
+                    { label: 'Label', key: 'label' },
                     { label: 'Amount', key: 'amount' },
                     { label: 'Currency', key: 'currency.name' },
                     { label: 'Country', key: 'country.name' },

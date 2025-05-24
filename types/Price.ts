@@ -25,7 +25,7 @@ export type Price = {
     user: User;
     country: Country;
     currency: Currency;
-    priceType: PriceType;
+    price_type: PriceType;
     valid_from: string;
     valid_to: string;
     valid_from_timestamp: number;
@@ -33,6 +33,8 @@ export type Price = {
     is_default: boolean;
     is_active: boolean;
     amount: number;
+    created_at: string;
+    updated_at: string;
 }
 
 export type PriceRequest = {

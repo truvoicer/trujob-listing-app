@@ -62,9 +62,8 @@ function TabLayout({
             mountOnEnter: true,
             unmountOnExit: true,
             onSelect: (eventKey: string | null) => {
-                console.log('Selected Tab:', eventKey);
                 const findKey = config.find(item => item.key === eventKey);
-                console.log('findKey', findKey);
+                
                 if (!findKey) {
                     console.log('Tab key not found', eventKey);
                     return;
