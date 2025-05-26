@@ -9,19 +9,21 @@ export type CheckoutContextType = {
     price: Price | null;
     paymentMethod: PaymentGateway | null;
     transaction: any;
+    refresh: (entity: 'order' | 'transaction' | 'paymentMethod' | 'price') => Promise<void>;
     update: (data: any) => void;
-    updateOrderItem: (id: number, data: Record<string, any>) => void;
-    removeOrderItem?: (id: number) => void;
-    addOrderItem?: (data: Record<string, any>) => void;
+    updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => void;
+    removeOrderItem?: (id: number, checkoutContext: CheckoutContextType) => void;
+    addOrderItem?: (data: Record<string, any>, checkoutContext: CheckoutContextType) => void;
 };
 export const checkoutData = {
     order: null,
     price: null,
     paymentMethod: null,
     transaction: null,
-    update: (data: CheckoutContextType) => {},
-    updateOrderItem: (id: number, data: Record<string, any>) => {},
-    removeOrderItem: (id: number) => {},
-    addOrderItem: (data: Record<string, any>) => {}
+    refresh: async (entity: 'order' | 'transaction' | 'paymentMethod' | 'price') => {},
+    update: (data: CheckoutContextType, checkoutContext: CheckoutContextType) => {},
+    updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => {},
+    removeOrderItem: (id: number, checkoutContext: CheckoutContextType) => {},
+    addOrderItem: (data: Record<string, any>, checkoutContext: CheckoutContextType) => {}
 };
 export const CheckoutContext = createContext(checkoutData);

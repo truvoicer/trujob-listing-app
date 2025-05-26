@@ -14,15 +14,9 @@ import { CheckoutContext } from "./context/CheckoutContext";
 
 export const MANAGE_ADDRESS_MODAL_ID = 'manage-address-modal';
 export type Checkout = {
-    order: any;
-    price: Price;
-    paymentMethod: PaymentGateway;
     session: any;
 }
 function Checkout({
-    order,
-    price,
-    paymentMethod,
     session,
 }: Checkout) {
     const [show, setShow] = useState(false);
@@ -30,14 +24,11 @@ function Checkout({
     const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
 
     const checkoutContext = useContext(CheckoutContext);
+    const order = checkoutContext.order;
+    const price = checkoutContext.price;
+    const paymentMethod = checkoutContext.paymentMethod as PaymentGateway | null;
+    
 
-    useEffect(() => {
-        checkoutContext.update({
-            order,
-            price,
-            paymentMethod,
-        });
-    }, [order, price, paymentMethod]);
     // console.log('Checkout component rendered with:', {
     //     order,
     //     price,

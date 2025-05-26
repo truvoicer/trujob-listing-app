@@ -20,13 +20,16 @@ function ListingOrderItem({
     const listing: Listing = item.entity;
 
     const checkoutContext = useContext(CheckoutContext);
-
+    function handleItemDelete(e: React.MouseEvent<HTMLAnchorElement>) {
+        e.preventDefault();
+        checkoutContext.removeOrderItem(item.id, checkoutContext);
+    }
     useEffect(() => {
         checkoutContext.updateOrderItem(item.id, {
             quantity: quantity,
-        });
+        }, checkoutContext);
     }, [quantity]);
-    
+
     return (
         <tr>
             <th className="text-center" scope="row">{index + 1}</th>
@@ -46,11 +49,10 @@ function ListingOrderItem({
             <td className="text-center"></td>
             {editable && (
                 <td className="text-center">
-                    <Link className="text-danger" href="#" onClick={(e) => {
-                        e.preventDefault();
-                        console.warn("Delete action not implemented for ListingOrderItem");
-                    }
-                    }>
+                    <Link
+                        className="text-danger"
+                        href="#"
+                        onClick={handleItemDelete}>
                         <i className="ri-delete-bin-6-line mr-3"></i>
                     </Link>
                 </td>

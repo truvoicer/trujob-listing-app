@@ -19,6 +19,7 @@ import { Listing } from "@/types/Listing";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import CheckoutProvider from "@/components/blocks/Payment/Checkout/CheckoutProvider";
+import Loader from "@/components/Loader";
 
 export type ListingTestCheckoutProps = {
   listingId: number;
@@ -33,16 +34,19 @@ function ListingTestCheckout({
   const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(null);
   const [quantity, setQuantity] = useState<number>(1);
   const [order, setOrder] = useState<any>(null);
+  const [orderCreated, setOrderCreated] = useState<boolean>(false);
+  const [orderIsBeingCreated, setOrderIsBeingCreated] = useState<boolean>(false);
 
   const modalService = new ModalService();
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
 
+
   async function fetchOrder() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
-        5
+        order?.id
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
@@ -55,8 +59,43 @@ function ListingTestCheckout({
       }, 'order-create-error-notification');
       return false;
     }
-    setOrder(response.data);
+    return response?.data;
   }
+
+  async function updateOrder() {
+    const response = await fetchOrder();
+    if (response) {
+      setOrder(response);
+    }
+  }
+
+  async function fetchPaymentMethod() {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.paymentGateway,
+        1
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+    if (!response) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Failed to fetch payment gateways',
+        title: 'Error',
+      }, 'payment-gateway-fetch-error-notification');
+      return;
+    }
+    return response?.data;
+  }
+
+  async function updatePaymentMethod() {
+    const response = await fetchPaymentMethod();
+    if (response) {
+      setPaymentGateway(response);
+    }
+  }
+
   async function fetchListingPrice() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
@@ -75,32 +114,16 @@ function ListingTestCheckout({
       }, 'listing-price-fetch-error-notification');
       return;
     }
-    if (response?.data) {
-      setPrice(response.data);
+    return response?.data;
+  }
+
+  async function updateListingPrice() {
+    const response = await fetchListingPrice();
+    if (response) {
+      setPrice(response);
     }
   }
 
-  async function fetchPaymentGateway() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-      endpoint: UrlHelpers.urlFromArray([
-        truJobApiConfig.endpoints.paymentGateway,
-        1
-      ]),
-      method: TruJobApiMiddleware.METHOD.GET,
-      protectedReq: true,
-    });
-    if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to fetch payment gateways',
-        title: 'Error',
-      }, 'payment-gateway-fetch-error-notification');
-      return;
-    }
-    if (response?.data) {
-      setPaymentGateway(response.data); // Assuming you want to select the first payment gateway
-    }
-  }
   async function fetchListing() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
@@ -256,23 +279,83 @@ function ListingTestCheckout({
     },
   ]);
 
+  async function createOrder() {
+    setOrderIsBeingCreated(true);
+    if (!validateListing()) {
+      return false;
+    }
+    if (!validatePrice()) {
+      return false;
+    }
+    if (!validatePaymentGateway()) {
+      return false;
+    }
+    if (!validateQuantity()) {
+      return false;
+    }
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.order,
+        'create'
+      ]),
+      method: TruJobApiMiddleware.METHOD.POST,
+      protectedReq: true,
+      data: {
+        items: [
+          {
+            entity_type: 'listing',
+            entity_id: listingId,
+            price_id: price?.id,
+            payment_gateway_id: paymentGateway?.id,
+            quantity: quantity,
+          }
+        ]
+      }
+    });
+    if (!response) {
+      notificationContext.show({
+        variant: 'danger',
+        message: 'Failed to create order',
+        title: 'Error',
+      }, 'order-create-error-notification');
+      return false;
+    }
+    setOrder(response.data);
+    setOrderCreated(true);
+    setOrderIsBeingCreated(false);
+    return true;
+  }
+
   useEffect(() => {
     fetchListing();
-    fetchOrder();
-    fetchListingPrice();
-    fetchPaymentGateway();
+    updateListingPrice();
+    updatePaymentMethod();
   }, [listingId]);
 
+  useEffect(() => {
+    if (!listing || !price || !paymentGateway || (isNaN(quantity) || quantity <= 0) || orderCreated || orderIsBeingCreated) {
+      return;
+    }
+    createOrder();
+  }, [listing, price, paymentGateway, quantity]);
   return (
     <>
+      {listing &&
+        price &&
+       paymentGateway &&
+        quantity && order
+        ?
+        <CheckoutProvider
+          fetchOrder={async () => await fetchOrder()}
+          fetchPaymentMethod={async () => await fetchPaymentMethod()}
+          fetchPrice={async () => await fetchListingPrice()}
+        >
+          <Checkout />
+        </CheckoutProvider>
+        : (
+          <Loader />
 
-      <CheckoutProvider>
-        <Checkout
-          order={order}
-          paymentMethod={paymentGateway}
-          price={price}
-        />
-      </CheckoutProvider>
+        )}
       {/* <Stepper
         title="Listing Test Checkout"
         config={[
@@ -365,46 +448,10 @@ function ListingTestCheckout({
             id: 'paymentGateway',
             label: 'Select Payment Method',
             beforeNext: async () => {
-              if (!validateListing()) {
-                return false;
-              }
-              if (!validatePrice()) {
-                return false;
-              }
-              if (!validatePaymentGateway()) {
-                return false;
-              }
-              if (!validateQuantity()) {
-                return false;
-              }
-              const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                endpoint: UrlHelpers.urlFromArray([
-                  truJobApiConfig.endpoints.order,
-                  'create'
-                ]),
-                method: TruJobApiMiddleware.METHOD.POST,
-                protectedReq: true,
-                data: {
-                  items: [
-                    {
-                      entity_type: 'listing',
-                      entity_id: listingId,
-                      price_id: price?.id,
-                      payment_gateway_id: paymentGateway?.id,
-                      quantity: quantity,
-                    }
-                  ]
-                }
-              });
+              const response = await createOrder();
               if (!response) {
-                notificationContext.show({
-                  variant: 'danger',
-                  message: 'Failed to create order',
-                  title: 'Error',
-                }, 'order-create-error-notification');
                 return false;
               }
-              setOrder(response.data);
               return true;
             },
             component: ({

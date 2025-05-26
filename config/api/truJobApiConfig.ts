@@ -7,6 +7,7 @@ export default {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
         order: '/order',
+        orderItem: '/order/:orderId/item',
         address: '/locale/address',
         currency: '/locale/currency',
         country: '/locale/country',

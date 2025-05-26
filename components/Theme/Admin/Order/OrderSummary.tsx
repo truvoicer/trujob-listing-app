@@ -1,7 +1,7 @@
 import { CheckoutContext, CheckoutContextType } from "@/components/blocks/Payment/Checkout/context/CheckoutContext";
 import { OrderService } from "@/library/services/cashier/OrderService";
 import { Order } from "@/types/Cashier";
-import { useContext } from "react";
+import React, { useContext } from "react";
 
 export type OrderSummaryProps = {
     editable?: boolean;
@@ -30,9 +30,19 @@ function OrderSummary({
                         </thead>
                         <tbody>
                             {Array.isArray(order?.items) && order.items.map((item: any, index: number) => {
-                                return orderService.getOrderItemFactory().build(item, index, {
-                                    editable: editable,
-                                });
+                                return (
+                                    <React.Fragment key={index}>
+                                        {
+                                            orderService.getOrderItemFactory().build(
+                                                item,
+                                                index,
+                                                {
+                                                    editable: editable
+                                                }
+                                            )
+                                        }
+                                    </React.Fragment>
+                                )
                             })}
                         </tbody>
                     </table>
