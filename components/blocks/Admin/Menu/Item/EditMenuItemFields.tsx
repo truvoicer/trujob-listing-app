@@ -380,7 +380,7 @@ function EditMenuItemFields({
                                             values.id,
                                             'menu',
                                             menu.id,
-                                            'create'
+                                            'store'
                                         ]),
                                         method: ApiMiddleware.METHOD.POST,
                                         protectedReq: true,

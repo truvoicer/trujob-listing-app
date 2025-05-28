@@ -296,7 +296,7 @@ function ListingTestCheckout({
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
-        'create'
+        'store'
       ]),
       method: TruJobApiMiddleware.METHOD.POST,
       protectedReq: true,

@@ -101,7 +101,7 @@ function EditCategory({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.category,
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

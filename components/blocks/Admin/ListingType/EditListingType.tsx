@@ -96,7 +96,7 @@ function EditListingType({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.listingType,
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

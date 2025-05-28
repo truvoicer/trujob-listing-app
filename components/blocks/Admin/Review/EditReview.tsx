@@ -105,7 +105,7 @@ function EditReview({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.review,
                         values.id,
-                        'create'
+                        'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

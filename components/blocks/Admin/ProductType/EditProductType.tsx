@@ -98,7 +98,7 @@ function EditProductType({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.productType,
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

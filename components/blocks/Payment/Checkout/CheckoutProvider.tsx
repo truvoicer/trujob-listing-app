@@ -101,7 +101,7 @@ function CheckoutProvider({
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
                 truJobApiConfig.endpoints.orderItem.replace(':orderId', String(checkoutContext.order?.id)),
-                'create'
+                'store'
             ]),
             method: TruJobApiMiddleware.METHOD.POST,
             protectedReq: true,

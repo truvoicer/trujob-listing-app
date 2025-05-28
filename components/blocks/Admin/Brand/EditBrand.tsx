@@ -105,7 +105,7 @@ function EditBrand({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.brand,
-                        'create'
+                        'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

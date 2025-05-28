@@ -148,7 +148,7 @@ function EditAddress({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.address,
-                        'create'
+                        'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

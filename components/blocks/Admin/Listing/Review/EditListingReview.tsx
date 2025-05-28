@@ -107,7 +107,7 @@ function EditListingReview({
                             listingId.toString()
                         ),
                         values?.id,
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

@@ -105,7 +105,7 @@ function EditPriceType({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.priceType,
-                        'create'
+                        'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

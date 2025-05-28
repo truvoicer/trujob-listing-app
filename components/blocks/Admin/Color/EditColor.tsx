@@ -102,7 +102,7 @@ function EditColor({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.color,
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

@@ -137,7 +137,7 @@ function EditPageBlockFields({
                         values.id,
                         'sidebar',
                         selectedSidebar.id,
-                        'create'
+                        'store'
                     ]),
                     method: TruJobApiMiddleware.METHOD.POST,
                     protectedReq: true,
@@ -641,7 +641,7 @@ function EditPageBlockFields({
                                                 values.id,
                                                 'role',
                                                 role.id,
-                                                'create'
+                                                'store'
                                             ]),
                                             method: ApiMiddleware.METHOD.POST,
                                             protectedReq: true,

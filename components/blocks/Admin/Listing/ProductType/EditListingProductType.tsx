@@ -73,7 +73,7 @@ function EditListingProductType({
                             ':listingId',
                             listingId.toString(),
                         ),
-                        'create',
+                        'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,

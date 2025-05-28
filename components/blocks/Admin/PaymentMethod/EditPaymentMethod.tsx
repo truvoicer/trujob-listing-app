@@ -105,7 +105,7 @@ function EditPaymentMethod({
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.paymentMethod,
-                        'create'
+                        'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
