@@ -147,6 +147,7 @@ function EditUserFields({
 
                     <div className="col-12 col-lg-6">
                         {/* <AccessControlComponent
+                        id="user_user"
                             roles={[
                                 { name: 'admin' },
                                 { name: 'superuser' },

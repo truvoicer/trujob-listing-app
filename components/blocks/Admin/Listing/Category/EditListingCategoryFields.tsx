@@ -23,6 +23,7 @@ function EditListingCategoryFields({
 
     return (
         <AccessControlComponent
+        id="edit-listing-category-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

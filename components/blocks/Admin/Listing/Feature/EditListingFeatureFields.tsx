@@ -22,6 +22,7 @@ function EditListingFeatureFields({
 
     return (
         <AccessControlComponent
+        id="edit-listing-feature-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

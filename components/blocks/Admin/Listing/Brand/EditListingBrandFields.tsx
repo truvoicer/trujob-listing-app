@@ -23,6 +23,7 @@ function EditListingBrandFields({
 
     return (
         <AccessControlComponent
+        id="edit-listing-brand-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

@@ -12,6 +12,7 @@ function MenuListItemSub({ data, session, settings }) {
     return (
         <AccessControlComponent
         roles={data?.roles}
+            id={'menuListItemSub'}
         >
             <li>
                 <Link href={data?.url || '#'}

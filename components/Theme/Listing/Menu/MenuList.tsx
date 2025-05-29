@@ -29,6 +29,7 @@ function MenuList({ name, className = '', session }) {
     function renderMenus(item, root = true) {
         return (
             <AccessControlComponent
+            id={'MenuListRenderMenus'}
             roles={item?.roles}
             >
                 <li className="has-children">
@@ -80,6 +81,7 @@ function MenuList({ name, className = '', session }) {
             case 'register':
                 return (
                     <AccessControlComponent
+            id={'enuListrenderMenuItem'}
                     roles={item?.roles}
                     >
                         <li className={liClass}>
@@ -95,6 +97,7 @@ function MenuList({ name, className = '', session }) {
         }
         return (
             <AccessControlComponent
+            id={'MenuListrenderMenuItem'}
             roles={item?.roles}
             >
                 <li className={liClass}>
@@ -123,6 +126,8 @@ function MenuList({ name, className = '', session }) {
                 : (
                     <ul className={className}>
                         <AccessControlComponent
+
+            id={'rendMenuListrItems'}
                             roles={data?.roles}
                         >
                             {renderMenuItems(data?.menu_items, true)}

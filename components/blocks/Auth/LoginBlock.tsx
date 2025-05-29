@@ -25,9 +25,11 @@ function LoginBlock({
             method: ApiMiddleware.METHOD.POST,
             data: requestData
         })
+
         if (!TruJobApiMiddleware.handleTokenResponse(
             response
         )) {
+            console.error('Login failed', response);
             return;
         }
         router.push(
@@ -68,6 +70,7 @@ function LoginBlock({
                             errors,
                             handleChange,
                             handleSubmit,
+                            handleBlur,
                             submitForm
                         }: FormikProps<FormikValues>) => {
 
@@ -87,6 +90,7 @@ function LoginBlock({
                                                 className="form-control"
                                                 value={values?.email || ""}
                                                 onChange={handleChange}
+                                                onBlur={handleBlur}
                                             />
                                             {errors?.email && <span className="text-danger">{errors?.email || ''}</span>}
                                         </div>
@@ -107,6 +111,7 @@ function LoginBlock({
                                                 className="form-control"
                                                 value={values?.password || ""}
                                                 onChange={handleChange}
+                                                onBlur={handleBlur}
                                             />
                                             {errors?.password && <span className="text-danger">{errors?.password || ''}</span>}
                                         </div>

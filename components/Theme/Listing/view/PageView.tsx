@@ -75,6 +75,7 @@ function PageView({
             return (
                 <ListingLayoutSidebar>
                     <AccessControlComponent
+                    id="pageView"
                     roles={page?.roles}
                         loader={() => <Loader fullScreen />}
                         fallback={() => <ErrorView message={"1You do not have permission to view this page."} />}
@@ -87,6 +88,7 @@ function PageView({
         return (
             <ListingLayoutFull>
                 <AccessControlComponent
+                id="pageView"
                     roles={page?.roles}
                     loader={() => <Loader fullScreen />}
                     fallback={() => <ErrorView message={"2You do not have permission to view this page."} />}

@@ -3,12 +3,14 @@ import { connect } from "react-redux";
 import Loader from "../Loader";
 import { Role } from "@/types/Role";
 import { useEffect, useState } from "react";
+import { SessionService } from "@/library/services/session/SessionService";
 
 
 type Props = {
+    id?: string;
     session: any;
     children?: React.Component | React.ReactNode;
-    onUnauthorization?: () => void;
+    onUnauthorization?: (code: string) => void;
     loader?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     fallback?: React.Component | (() => React.Component) | (() => React.ReactNode) | React.ReactNode | null;
     roles?: Array<Role | {
@@ -16,6 +18,7 @@ type Props = {
     }>;
 }
 function AccessControlComponent({
+    id,
     children,
     session,
     loader,
@@ -28,10 +31,10 @@ function AccessControlComponent({
     function hasRole(roleData: Array<Role>, name: string) {
         return roleData.find(r => r?.name === name) || false;
     }
-    function handleUnauthorized() {
+    function handleUnauthorized(code: string, id?: string) {
         setShow(false);
         if (typeof onUnauthorization === 'function') {
-            onUnauthorization();
+            onUnauthorization(code, id);
             return;
         }
         return;
@@ -57,7 +60,7 @@ function AccessControlComponent({
             !Array.isArray(userRoles) ||
             userRoles.length === 0
         ) {
-            handleUnauthorized();
+            handleUnauthorized(SessionService.AUTHORIZATION.ERROR.CODE.INVALID_USER_ROLES, id);
             return;
         }
         const userRolesHasAdmin = ['admin', 'superuser'].some(role => {
@@ -77,7 +80,7 @@ function AccessControlComponent({
                 return;
             }
         }
-        handleUnauthorized();
+        handleUnauthorized(SessionService.AUTHORIZATION.ERROR.CODE.UNAUTHORIZED, id);
         return;
     }
     function renderFallback() {
@@ -105,8 +108,8 @@ function AccessControlComponent({
             return;
         }
         showComponent();
-    }, [roles, session?.[SESSION_USER]?.[SESSION_USER_ROLES], session?.[SESSION_IS_AUTHENTICATING]]);
-    // console.log({show, session, roles});
+    }, [ session?.[SESSION_IS_AUTHENTICATING]]);
+    
     return (
         <>
             {session?.[SESSION_IS_AUTHENTICATING]

@@ -18,8 +18,12 @@ import ManageFeature from "@/components/blocks/Admin/Feature/ManageFeature";
 import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
 import { ComponentHelpers } from "@/helpers/ComponentHelpers";
 import ManageSiteSettings from "@/components/blocks/Admin/Settings/ManageSiteSettings";
-import ManagePaymentGateway from "@/components/blocks/Admin/PaymentGateway/ManagePaymentGateway";
+import ManagePaymentGateway from "@/components/blocks/Admin/Payment/PaymentGateway/ManagePaymentGateway";
 import ManageAddress from "@/components/blocks/Admin/User/Address/ManageAddress";
+import ManageTaxRate from "@/components/blocks/Admin/Tax/TaxRate/ManageTaxRate";
+import ManageDiscount from "@/components/blocks/Admin/Discount/ManageDiscount";
+import ManageShippingMethod from "@/components/blocks/Admin/Shipping/ShippingMethod/ManageShippingMethod";
+import ManageShippingZone from "@/components/blocks/Admin/Shipping/ShippingZone/ManageShippingZone";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -45,6 +49,10 @@ export class Blocks {
     static MANAGE_PAYMENT_GATEWAYS_BLOCK = 'manage-payment-gateways-block';
     static MANAGE_PAYMENT_METHODS_BLOCK = 'manage-payment-methods-block';
     static MANAGE_ADDRESSES_BLOCK = 'manage-addresses-block';
+    static MANAGE_TAX_RATES_BLOCK = 'manage-tax-rates-block';
+    static MANAGE_DISCOUNTS_BLOCK = 'manage-discounts-block';
+    static MANAGE_SHIPPING_METHODS_BLOCK = 'manage-shipping-methods-block';
+    static MANAGE_SHIPPING_ZONES_BLOCK = 'manage-shipping-zones-block';
 
     static getBlocks() {
         return {
@@ -250,6 +258,50 @@ export class Blocks {
                 icon: 'manage-addresses-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManageAddress,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_TAX_RATES_BLOCK]: {
+                title: 'Manage Tax Rates Block',
+                description: 'This is the manage tax rates block',
+                icon: 'manage-tax-rates-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageTaxRate,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_DISCOUNTS_BLOCK]: {
+                title: 'Manage Discounts Block',
+                description: 'This is the manage discounts block',
+                icon: 'manage-discounts-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageDiscount,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_SHIPPING_METHODS_BLOCK]: {
+                title: 'Manage Shipping Methods Block',
+                description: 'This is the manage shipping methods block',
+                icon: 'manage-shipping-methods-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageShippingMethod,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_SHIPPING_ZONES_BLOCK]: {
+                title: 'Manage Shipping Zones Block',
+                description: 'This is the manage shipping zones block',
+                icon: 'manage-shipping-zones-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageShippingZone,
                     {
                         mode: 'edit',
                     }

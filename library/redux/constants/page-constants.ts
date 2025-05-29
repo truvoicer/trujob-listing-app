@@ -3,6 +3,7 @@ export const PAGE_LOADED = "page_loaded";
 export const PAGE_VIEW = "view";
 export const PAGE_NAME = "name";
 export const PAGE_TITLE = "title";
+export const PAGE_PERMALINK = "permalink";
 export const PAGE_CONTENT = "content";
 export const PAGE_BLOCKS = "blocks";
 export const PAGE_HAS_SIDEBAR = "has_sidebar";

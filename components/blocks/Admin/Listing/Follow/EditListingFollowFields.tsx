@@ -25,6 +25,7 @@ function EditListingFollowFields({
 
     return (
         <AccessControlComponent
+        id="edit-listing-follow-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

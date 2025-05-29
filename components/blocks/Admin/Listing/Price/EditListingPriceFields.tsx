@@ -53,6 +53,7 @@ function EditListingPriceFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="edit-listing-price-fields-user"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -107,6 +108,7 @@ function EditListingPriceFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="edit-listing-price-fields-type"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },

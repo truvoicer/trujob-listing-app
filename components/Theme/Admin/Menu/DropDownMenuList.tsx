@@ -89,6 +89,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
     function renderMenus(item, root = true) {
         return (
             <AccessControlComponent
+            id={'renderItems'}
                 roles={item?.roles}
             >
                 <li>
@@ -138,6 +139,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
         }
         return (
             <AccessControlComponent
+            id={'renderMenuItem'}
                 roles={item?.roles}
             >
                 <Dropdown.Item
@@ -173,6 +175,7 @@ function DropDownMenuList({ name, className = '', session, children }) {
             <Dropdown.Menu as={CustomMenu}>
 
                 <AccessControlComponent
+            id={'DropdownMenuListMenu'}
                     roles={data?.roles}
                 >
                     {renderMenuItems(data?.menu_items, true)}

@@ -42,6 +42,7 @@ function MenuList({ name, className = '', session }) {
                     <ul className={className}>
                         <AccessControlComponent
                     roles={data?.roles}
+            id={'MenuList'}
                         >
                             {Array.isArray(data?.menu_items) && data?.menu_items.map((item, index) => {
                                 return (

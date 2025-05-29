@@ -225,6 +225,7 @@ function ListingTestCheckout({
 
         return (
           <AccessControlComponent
+          id="manage-listing-price"
             roles={[
               { name: 'admin' },
               { name: 'superuser' },

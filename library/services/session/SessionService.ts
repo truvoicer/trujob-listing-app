@@ -6,7 +6,14 @@ import store from "@/library/redux/store";
 import { User } from "@/types/User";
 
 export class SessionService {
-
+    static AUTHORIZATION = {
+        ERROR: {
+            CODE: {
+                INVALID_USER_ROLES: 'invalid_user_roles',
+                UNAUTHORIZED: 'unauthorized',
+            }
+        }
+    };
     static USER_FIELDS = [
         SESSION_AUTH_PROVIDER,
         SESSION_AUTH_PROVIDER_USER_ID,
@@ -71,19 +78,19 @@ export class SessionService {
         );
         SessionService.removeLocalSession();
     }
-    
+
     static setSessionLocalStorage(token, expiresAt) {
         localStorage.setItem('token', token);
         localStorage.setItem('expires_at', expiresAt);
     }
-    
+
     // removes user details from localStorage
-    static removeLocalSession()  {
+    static removeLocalSession() {
         // Clear access token and ID token from local storage
         localStorage.removeItem('token');
         localStorage.removeItem('expires_at');
     }
-    
+
     static getSessionObject() {
         if (typeof localStorage === 'undefined') {
             return false;

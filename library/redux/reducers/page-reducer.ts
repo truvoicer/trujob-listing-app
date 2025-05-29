@@ -35,6 +35,7 @@ import {
     PAGE_ROLES,
     PAGE_LOADED,
     PAGE_HAS_PERMISSION,
+    PAGE_PERMALINK,
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
 import { DebugHelpers } from '@/helpers/DebugHelpers';
@@ -43,6 +44,7 @@ export const pageStateData = {
     [ERROR]: null,
     [PAGE_LOADED]: false,
     [PAGE_VIEW]: null,
+    [PAGE_PERMALINK]: null,
     [PAGE_NAME]: null,
     [PAGE_TITLE]: null,
     [PAGE_CONTENT]: null,
@@ -80,6 +82,9 @@ const defaultReducers = {
     setPage: (state, action) => {
         state = ReduxHelpers.buildValidatedObject(action.payload, pageStateData, state);
     },
+    setPageIsLoaded: (state, action) => {
+        state[PAGE_LOADED] = action.payload;
+    },
     setPageError: (state, action) => {
         state[ERROR] = action.payload;
         console.log(state.error)
@@ -95,5 +100,6 @@ export const pageSlice = createSlice({
 export const pageReducer = pageSlice.reducer;
 export const {
     setPage,
+    setPageIsLoaded,
     setPageError
 } = pageSlice.actions;

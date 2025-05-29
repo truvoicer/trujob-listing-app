@@ -49,6 +49,7 @@ function BlockComponent(props: any) {
     
     return (
         <AccessControlComponent
+        id={props?.id || 'block-component'}
         roles={roles}
         >
             <BlockContext.Provider value={blockContextState}>

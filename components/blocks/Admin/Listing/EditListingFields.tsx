@@ -62,6 +62,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingUser"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -120,6 +121,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingReviewModal"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -171,6 +173,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                    id="listingFeatureModal"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -221,6 +224,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -271,7 +275,8 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                    roles={[
+                id="listingCategory"
+                roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
                         { name: 'user' },
@@ -321,6 +326,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingBrand"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -372,6 +378,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingColor"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -422,6 +429,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingProductType"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -472,6 +480,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="Media"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -525,6 +534,7 @@ function EditListingFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
+                id="listingPrice"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },

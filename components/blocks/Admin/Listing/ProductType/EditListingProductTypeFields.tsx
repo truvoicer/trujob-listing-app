@@ -25,6 +25,7 @@ function EditListingProductTypeFields({
     return (
 
         <AccessControlComponent
+        id="edit-listing-product-type-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

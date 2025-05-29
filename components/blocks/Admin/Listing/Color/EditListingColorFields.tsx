@@ -24,6 +24,7 @@ function EditListingColorFields({
 
     return (
         <AccessControlComponent
+        id="edit-listing-color-fields"
             roles={[
                 { name: 'admin' },
                 { name: 'superuser' },

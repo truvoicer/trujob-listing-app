@@ -28,6 +28,7 @@ function MenuListItem({ data, session, settings }) {
                 return (
                     <AccessControlComponent
                     roles={item?.roles}
+            id={'renderMenuItem'}
                     >
                         <li className={liClass}>
                             <Link
@@ -43,6 +44,7 @@ function MenuListItem({ data, session, settings }) {
         return (
             <AccessControlComponent
             roles={item?.roles}
+            id={'menuListItem'}
             >
                 <li className={liClass}>
                     <Link
