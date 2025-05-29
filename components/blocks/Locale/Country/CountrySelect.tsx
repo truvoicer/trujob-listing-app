@@ -115,6 +115,12 @@ function CountrySelect({
       }}
       parseOptions={
         (data: Record<string, any>) => {
+          if (data.hasOwnProperty('value') && data.hasOwnProperty('label')) {
+            return {
+              value: data.value,
+              label: data.label,
+            };
+          }
           return {
             value: data.id,
             label: `${data.name}`,
@@ -127,7 +133,7 @@ function CountrySelect({
         }
         if (Array.isArray(value)) {
           const filteredOptions = value.map((option) => {
-            const findInOptions = options.find((o) => o?.value === option?.id);
+            const findInOptions = options.find((o) => o?.id === option?.value);
             return findInOptions;
           })
             .filter((option) => typeof option !== 'undefined');

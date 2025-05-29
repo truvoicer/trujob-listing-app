@@ -1,3 +1,4 @@
+import { parse } from 'path';
 import React, { useState, useEffect, useRef } from 'react';
 
 export interface Option {
@@ -73,12 +74,7 @@ function SelectDropdown({
   useEffect(() => {
     if (value) {
       if (isMulti && Array.isArray(value)) {
-        const selected = value.map(val => {
-          const foundOption = options.find(option => option?.value === val?.value);
-          return foundOption;
-        })
-          .filter(Boolean) as Option[];
-        setSelectedOptions(selected);
+        setSelectedOptions(value);
       } else if (!isMulti && !Array.isArray(value)) {
         
         if (typeof value === 'string' || typeof value === 'number') {
@@ -118,7 +114,7 @@ function SelectDropdown({
     setInternalOptions(options);
     setFilteredOptions(parseDataToOptions(options));
   }, [options]);
-
+  
   useEffect(() => {
     onSearch();
   }, [searchTerm, internalOptions, enableSearch]);
@@ -132,11 +128,12 @@ function SelectDropdown({
       } else {
         newSelection = [...selectedOptions, option];
       }
+      
       setSelectedOptions(newSelection);
-      onChange(newSelection, filteredOptions);
+      onChange(newSelection, internalOptions);
     } else {
       setSelectedOption(option);
-      onChange(option, filteredOptions);
+      onChange(option, parseDataToOptions(internalOptions));
       setIsOpen(false);
     }
     setSearchTerm('');
@@ -159,7 +156,7 @@ function SelectDropdown({
   const getDisplayText = () => {
     if (isMulti) {
       return selectedOptions.length > 0
-        ? parseDataToOptions(selectedOptions).map(opt => opt.label).join(', ')
+        ? selectedOptions.map(opt => opt.label).join(', ')
         : placeholder;
     } else {
       return selectedOption ? selectedOption?.label || 'Error in display text' : placeholder;

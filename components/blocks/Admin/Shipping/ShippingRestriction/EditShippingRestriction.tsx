@@ -35,8 +35,15 @@ function EditShippingRestriction({
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: ShippingRestriction = {
         id: data?.id || 0,
-        label: data?.label || '',
-        name: data?.name || '',
+        shipping_method: data?.shipping_method || '',
+        restrictionable_type: data?.restrictionable_type || '',
+        restrictionable_id: data?.restrictionable_id || null,
+        action: data?.action || null,
+        category: data?.category || null,
+        listing: data?.listing || null,
+        country: data?.country || null,
+        region: data?.region || null,
+        currency: data?.currency || null,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
@@ -45,8 +52,10 @@ function EditShippingRestriction({
     function buildCreateData(values: ShippingRestriction) {
 
         let requestData: CreateShippingRestriction = {
-            name: values?.name || '',
-            label: values?.label || '',
+            shipping_method_id: values?.shipping_method?.id || 0,
+            type: values?.restrictionable_type || '',
+            restriction_id: values?.restrictionable_id || '',
+            action: values?.action || 'allow',
         };
 
         return requestData;
@@ -57,12 +66,19 @@ function EditShippingRestriction({
         let requestData: UpdateShippingRestriction = {
             id: values?.id || 0,
         };
-        if (values?.name) {
-            requestData.name = values?.name || '';
+        if (values?.shipping_method?.id) {
+            requestData.shipping_method_id = values?.shipping_method?.id || 0;
         }
-        if (values?.label) {
-            requestData.label = values?.label || '';
+        if (values?.restrictionable_type) {
+            requestData.type = values?.restrictionable_type || '';
         }
+        if (values?.restrictionable_id) {
+            requestData.restriction_id = values?.restrictionable_id || '';
+        }
+        if (values?.action) {
+            requestData.action = values?.action || 'allow';
+        }
+
         return requestData;
     }
     async function handleSubmit(values: ShippingRestriction) {
@@ -77,9 +93,6 @@ function EditShippingRestriction({
         switch (operation) {
             case 'edit':
             case 'update':
-                requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
-
                 if (!values?.id) {
                     throw new Error('ShippingRestriction ID is required');
                 }
@@ -91,17 +104,14 @@ function EditShippingRestriction({
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
-                    data: requestData,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
             case 'create':
                 if (Array.isArray(values?.shippingRestrictions)) {
                     return;
-                } else {
-                    requestData = buildCreateData(values);
                 }
-                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.shippingRestriction,
@@ -109,7 +119,7 @@ function EditShippingRestriction({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: requestData,
+                    data: buildCreateData(values),
                 })
                 break;
             default:

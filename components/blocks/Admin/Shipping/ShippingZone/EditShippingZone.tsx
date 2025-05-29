@@ -35,8 +35,9 @@ function EditShippingZone({
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: ShippingZone = {
         id: data?.id || 0,
-        label: data?.label || '',
         name: data?.name || '',
+        countries: data?.countries || [],
+        is_active: data?.is_active || false,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
@@ -46,7 +47,8 @@ function EditShippingZone({
 
         let requestData: CreateShippingZone = {
             name: values?.name || '',
-            label: values?.label || '',
+            country_ids: RequestHelpers.extractIdsFromArray(values?.countries || []),
+            is_active: values?.is_active || false,
         };
 
         return requestData;
@@ -60,8 +62,11 @@ function EditShippingZone({
         if (values?.name) {
             requestData.name = values?.name || '';
         }
-        if (values?.label) {
-            requestData.label = values?.label || '';
+        if (Array.isArray(values?.countries) && values?.countries.length > 0) {
+            requestData.country_ids = RequestHelpers.extractIdsFromArray(values?.countries || []);
+        }
+        if (values?.hasOwnProperty('is_active')) {
+            requestData.is_active = values?.is_active || false;
         }
         return requestData;
     }
@@ -77,11 +82,8 @@ function EditShippingZone({
         switch (operation) {
             case 'edit':
             case 'update':
-                requestData = buildUpdateData(values);
-                console.log('edit requestData', requestData);
-
                 if (!values?.id) {
-                    throw new Error('ShippingZone ID is required');
+                    throw new Error('Shipping zone ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -91,17 +93,14 @@ function EditShippingZone({
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
-                    data: requestData,
+                    data: buildUpdateData(values),
                 })
                 break;
             case 'add':
             case 'create':
                 if (Array.isArray(values?.shippingZones)) {
                     return;
-                } else {
-                    requestData = buildCreateData(values);
                 }
-                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.shippingZone,
@@ -109,7 +108,7 @@ function EditShippingZone({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: requestData,
+                    data: buildCreateData(values),
                 })
                 break;
             default:

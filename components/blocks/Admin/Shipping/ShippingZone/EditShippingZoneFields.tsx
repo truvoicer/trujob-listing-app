@@ -56,6 +56,7 @@ function EditShippingZoneFields({
                                 isMulti={true}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {
+                                    console.log("Selected countries:", value);
                                     setFieldValue("countries", value);
                                 }}
                                 loadingMore={true}

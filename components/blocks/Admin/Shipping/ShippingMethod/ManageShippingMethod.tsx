@@ -167,7 +167,7 @@ function ManageShippingMethod({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.shippingMethod,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
@@ -437,13 +437,13 @@ function ManageShippingMethod({
                 renderActionColumn={renderActionColumn}
                 request={shippingMethodRequest}
                 columns={[
-                    { label: 'Name', key: 'name' },
+                    { label: 'Carrier', key: 'carrier' },
                     { label: 'Description', key: 'description' },
-                    { label: 'Icon', key: 'icon' },
-                    { label: 'Is Active', key: 'is_active' },
-                    { label: 'Is Default', key: 'is_default' },
-                    { label: 'Created At', key: 'created_at' },
-                    { label: 'Updated At', key: 'updated_at' },
+                    { label: 'Processing Time (Days)', key: 'processing_time_days' },
+                    { label: 'Display Order', key: 'display_order' },
+                    { label: 'Is Active', key: 'is_active', type: 'boolean' },
+                    { label: 'Created At', key: 'created_at', type: 'date' },
+                    { label: 'Updated At', key: 'updated_at', type: 'date' },
                 ]}
             />
         </Suspense>

@@ -167,7 +167,7 @@ function ManageShippingZone({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.shippingZone,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
@@ -438,10 +438,8 @@ function ManageShippingZone({
                 request={shippingZoneRequest}
                 columns={[
                     { label: 'Name', key: 'name' },
-                    { label: 'Description', key: 'description' },
-                    { label: 'Icon', key: 'icon' },
+                    { label: 'Countries', key: 'countries' },
                     { label: 'Is Active', key: 'is_active' },
-                    { label: 'Is Default', key: 'is_default' },
                     { label: 'Created At', key: 'created_at' },
                     { label: 'Updated At', key: 'updated_at' },
                 ]}
