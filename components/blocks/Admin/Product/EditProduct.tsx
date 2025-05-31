@@ -3,28 +3,28 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_DISCOUNT_MODAL_ID, EDIT_DISCOUNT_MODAL_ID } from "./ManageDiscount";
+import { CREATE_PRODUCT_MODAL_ID, EDIT_PRODUCT_MODAL_ID } from "./ManageProduct";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditDiscountFields from "./EditDiscountFields";
+import EditProductFields from "./EditProducttFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { Discount, CreateDiscount, UpdateDiscount } from "@/types/Discount";
+import { Product, CreateProduct, UpdateProduct } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
-export type EditDiscountProps = {
-    data?: Discount;
+export type EditProductProps = {
+    data?: Product;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
 }
-function EditDiscount({
+function EditProduct({
     data,
     operation,
     inModal = false,
     modalId,
-}: EditDiscountProps) {
+}: EditProductProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -34,7 +34,7 @@ function EditDiscount({
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
-    const initialValues: Discount = {
+    const initialValues: Product = {
         id: data?.id || 0,
         name: data?.name || '',
         description: data?.description || '',
@@ -57,9 +57,9 @@ function EditDiscount({
     };
 
 
-    function buildCreateData(values: Discount) {
+    function buildCreateData(values: Product) {
 
-        let requestData: CreateDiscount = {
+        let requestData: CreateProduct = {
             name: values?.name || '',
             description: values?.description || '',
             type: values?.type || '',
@@ -81,9 +81,9 @@ function EditDiscount({
         return requestData;
     }
 
-    function buildUpdateData(values: Discount) {
+    function buildUpdateData(values: Product) {
 
-        let requestData: UpdateDiscount = {
+        let requestData: UpdateProduct = {
             id: values?.id || 0,
         };
         if (values?.name) {
@@ -142,7 +142,7 @@ function EditDiscount({
         }
         return requestData;
     }
-    async function handleSubmit(values: Discount) {
+    async function handleSubmit(values: Product) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
@@ -150,16 +150,16 @@ function EditDiscount({
         }
 
         let response = null;
-        let requestData: CreateDiscount | UpdateDiscount;
+        let requestData: CreateProduct | UpdateProduct;
         switch (operation) {
             case 'edit':
             case 'update':
                 if (!values?.id) {
-                    throw new Error('Discount ID is required');
+                    throw new Error('Product ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.discount,
+                        truJobApiConfig.endpoints.product,
                         values.id,
                         'update'
                     ]),
@@ -170,12 +170,12 @@ function EditDiscount({
                 break;
             case 'add':
             case 'create':
-                if (Array.isArray(values?.discounts)) {
+                if (Array.isArray(values?.products)) {
                     return;
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.discount,
+                        truJobApiConfig.endpoints.product,
                         'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -206,8 +206,8 @@ function EditDiscount({
             return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_DISCOUNT_MODAL_ID);
-        dataTableContext.modal.close(EDIT_DISCOUNT_MODAL_ID);
+        dataTableContext.modal.close(CREATE_PRODUCT_MODAL_ID);
+        dataTableContext.modal.close(EDIT_PRODUCT_MODAL_ID);
     }
 
     function getRequiredFields() {
@@ -249,7 +249,7 @@ function EditDiscount({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditDiscountFields operation={operation} />
+                        <EditProductFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -260,7 +260,7 @@ function EditDiscount({
                     >
                         {() => {
                             return (
-                                <EditDiscountFields operation={operation} />
+                                <EditProductFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -269,4 +269,4 @@ function EditDiscount({
         </div>
     );
 }
-export default EditDiscount;
+export default EditProduct;

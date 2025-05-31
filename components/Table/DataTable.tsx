@@ -182,8 +182,18 @@ function DataTable({
                     <label className="mb-0">
                         Show
                         <select
-                            name="DataTables_Table_0_length"
-                            aria-controls="DataTables_Table_0"
+                            name="entries"
+                            onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                const limit = parseInt(e.target.value, 10);
+                                if (dataTableContext && typeof dataTableContext.update === 'function') {
+                                    dataTableContext.update({
+                                        query: {
+                                            ...dataTableContext.query,
+                                            limit: limit,
+                                        },
+                                    });
+                                }
+                            }}
                         >
                             <option value="10">10</option>
                             <option value="25">25</option>
@@ -200,6 +210,16 @@ function DataTable({
                                 type="text"
                                 className="text search-input w-auto"
                                 placeholder="Search..."
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                    if (dataTableContext && typeof dataTableContext.update === 'function') {
+                                        dataTableContext.update({
+                                            query: {
+                                                ...dataTableContext.query,
+                                                query: e.target.value,
+                                            },
+                                        });
+                                    }
+                                }}
                             />
                         </form>
                     </div>

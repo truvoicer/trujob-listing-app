@@ -1,4 +1,5 @@
 import { Currency } from "./Currency";
+import { ProductType } from "./ProductType";
 
 export type Discount = {
     id: number;
@@ -21,6 +22,11 @@ export type Discount = {
     created_at: string;
     updated_at: string;
 }
+export type DiscountProduct = {
+    product_id: 'listing' | 'category' | 'shipping';
+    product_type: string;
+    price_id: number;
+}
 
 export type DiscountRequest = {
     name?: string;
@@ -39,9 +45,10 @@ export type DiscountRequest = {
     scope?: 'global' | 'order' | 'product' | 'category' | 'shipping';
     code?: string;
     is_code_required?: boolean;
+    categories?: number[];
 }
 
-export interface CreateDiscount {
+export interface CreateDiscount extends DiscountRequest {
     name: string;
     description: string;
     type: 'fixed' | 'percentage';
@@ -59,6 +66,6 @@ export interface CreateDiscount {
     code?: string;
     is_code_required?: boolean;
 }
-export interface UpdateDiscount {
+export interface UpdateDiscount extends DiscountRequest {
     id: number;
 }
