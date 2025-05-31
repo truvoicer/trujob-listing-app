@@ -1,6 +1,6 @@
 import { findInObject, isNotEmpty } from "@/helpers/utils";
 import { useContext, useEffect, useState } from "react";
-import Pagination from "../listings/Pagination";
+import Pagination from "../products/Pagination";
 import { DataTableContext } from "@/contexts/DataTableContext";
 
 

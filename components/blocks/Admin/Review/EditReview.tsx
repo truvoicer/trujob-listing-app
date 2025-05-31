@@ -83,7 +83,7 @@ function EditReview({
             case 'edit':
             case 'update':
                 if (!data?.id) {
-                    throw new Error('Listing ID is required');
+                    throw new Error('Product ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([

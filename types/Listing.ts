@@ -8,7 +8,7 @@ import { ProductType } from "./ProductType";
 import { Review } from "./Review";
 import { User } from "./User";
 
-export type Listing = {
+export type Product = {
     id: number;
     name: string;
     title: string;
@@ -16,79 +16,79 @@ export type Listing = {
     active: boolean;
     allow_offers: boolean;
     quantity: number;
-    type: ListingType;
+    type: ProductType;
     user: User;
-    follows: Array<ListingFollow>;
-    features: Array<ListingFeature>;
-    reviews: Array<ListingReview>;
-    categories: Array<ListingCategory>;
-    brands: Array<ListingBrand>;
-    colors: Array<ListingColor>;
-    product_types: Array<ListingProductType>;
+    follows: Array<ProductFollow>;
+    features: Array<ProductFeature>;
+    reviews: Array<ProductReview>;
+    categories: Array<ProductCategory>;
+    brands: Array<ProductBrand>;
+    colors: Array<ProductColor>;
+    product_types: Array<ProductProductType>;
     prices: Array<Price>;
     media: Array<Media>;
     created_at: string;
     updated_at: string;
 }
 
-export type ListingType = {
+export type ProductType = {
     id: number;
     name: string;
     label: string;
     description: string;
 }
 
-export type ListingFollow = {
+export type ProductFollow = {
     id: number;
-    listing: Listing;
+    product: Product;
     user: User;
 }
-export type ListingFeature = {
+export type ProductFeature = {
     id: number;
-    listing: Listing;
+    product: Product;
     feature: Feature;
 }
-export type ListingReview = {
+export type ProductReview = {
     id: number;
-    listing: Listing;
+    product: Product;
     user: User;
     rating: number;
     review: string;
     created_at: string;
     updated_at: string;
 }
-export type ListingCategory = {
+export type ProductCategory = {
     id: number;
-    listing: Listing;
+    product: Product;
     category: Category;
 }
-export type ListingBrand = {
+export type ProductBrand = {
     id: number;
-    listing: Listing;
+    product: Product;
     brand: Brand
 }
-export type ListingColor = {
+export type ProductColor = {
     id: number;
-    listing: Listing;
+    product: Product;
     color: Color;
 }
-export type ListingProductType = {
+export type ProductProductType = {
     id: number;
-    listing: Listing;
+    product: Product;
     product_type: ProductType;
 }   
 
-export type ListingReviewRequest = {
+export type ProductReviewRequest = {
     rating: number;
     review: string;
 }
-export interface CreateListingReview extends ListingReviewRequest {
+export interface CreateProductReview extends ProductReviewRequest {
 }
-export interface UpdateListingReview extends ListingReviewRequest {
+export interface UpdateProductReview extends ProductReviewRequest {
     id: number;
 }
 
-export type ListingRequest = {
+export type ProductRequest = {
     name?: string;
     title?: string;
     description?: string;
@@ -107,12 +107,12 @@ export type ListingRequest = {
     media?: Array<Media>;
     prices?: Array<Price>;
 }
-export interface CreateListing extends ListingRequest {
+export interface CreateProduct extends ProductRequest {
     type: number;
     name: string;
     title: string;
     active: boolean;
 }
-export interface UpdateListing extends ListingRequest {
+export interface UpdateProduct extends ProductRequest {
     id: number;
 }

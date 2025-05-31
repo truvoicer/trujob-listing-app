@@ -1,11 +1,11 @@
 import FeaturedSection from "@/components/blocks/featured/FeaturedSection";
 import IconGridSection from "@/components/blocks/icon-grid/IconGridSection";
 import HeroSection from "@/components/blocks/hero/HeroSection";
-import ListingsBlock from "@/components/listings/ListingsBlock";
+import ProductsBlock from "@/components/products/ProductsBlock";
 import LoginBlock from "@/components/blocks/Auth/LoginBlock";
 import RegisterBlock from "@/components/blocks/Auth/RegisterBlock";
 import ManagePage from "@/components/blocks/Admin/Page/ManagePage";
-import ManageListing from "@/components/blocks/Admin/Listing/ManageListing";
+import ManageProduct from "@/components/blocks/Admin/Product/ManageProduct";
 import ManageSidebar from "@/components/blocks/Admin/Sidebar/ManageSidebar";
 import ManageMenu from "@/components/blocks/Admin/Menu/ManageMenu";
 import ManageWidget from "@/components/blocks/Admin/Widget/ManageWidget";
@@ -29,7 +29,7 @@ export class Blocks {
     static HERO_BLOCK = 'hero-block';
     static FEATURED_BLOCK = 'featured-block';
     static ICON_GRID_BLOCK = 'icon-grid-block';
-    static LISTINGS_GRID_BLOCK = 'listings-grid-block';
+    static PRODUCTS_GRID_BLOCK = 'products-grid-block';
     static LOGIN_BLOCK = 'login-block';
     static REGISTER_BLOCK = 'register-block';
     static MANAGE_PAGES_BLOCK = 'manage-pages-block';
@@ -37,14 +37,13 @@ export class Blocks {
     static MANAGE_WIDGETS_BLOCK = 'manage-widgets-block';
     static MANAGE_MENUS_BLOCK = 'manage-menus-block';
     static MANAGE_USERS_BLOCK = 'manage-users-block';
-    static MANAGE_LISTINGS_BLOCK = 'manage-listings-block';
+    static MANAGE_PRODUCTS_BLOCK = 'manage-products-block';
     static MANAGE_BRANDS_BLOCK = 'manage-brands-block';
     static MANAGE_CATEGORIES_BLOCK = 'manage-categories-block';
     static MANAGE_COLORS_BLOCK = 'manage-colors-block';
     static MANAGE_PRODUCT_TYPES_BLOCK = 'manage-product-types-block';
     static MANAGE_FEATURES_BLOCK = 'manage-features-block';
     static MANAGE_REVIEWS_BLOCK = 'manage-reviews-block';
-    static MANAGE_LISTING_TYPES_BLOCK = 'manage-listing-types-block';
     static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
     static MANAGE_PAYMENT_GATEWAYS_BLOCK = 'manage-payment-gateways-block';
     static MANAGE_PAYMENT_METHODS_BLOCK = 'manage-payment-methods-block';
@@ -74,11 +73,11 @@ export class Blocks {
                 icon: 'icon-grid-block-icon',
                 component: IconGridSection,
             },
-            [Blocks.LISTINGS_GRID_BLOCK]: {
-                title: 'Listings Grid Block',
-                description: 'This is the listings grid block',
-                icon: 'listings-grid-block-icon',
-                component: ListingsBlock,
+            [Blocks.PRODUCTS_GRID_BLOCK]: {
+                title: 'Products Grid Block',
+                description: 'This is the products grid block',
+                icon: 'products-grid-block-icon',
+                component: ProductsBlock,
             },
             [Blocks.LOGIN_BLOCK]: {
                 title: 'Login Block',
@@ -106,7 +105,7 @@ export class Blocks {
             [Blocks.MANAGE_SIDEBARS_BLOCK]: {
                 title: 'Manage Sidebars',
                 description: 'This is the manage sidebars',
-                icon: 'manage-listings-block-icon',
+                icon: 'manage-products-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManageSidebar,
                     {
@@ -117,7 +116,7 @@ export class Blocks {
             [Blocks.MANAGE_WIDGETS_BLOCK]: {
                 title: 'Manage Widgets',
                 description: 'This is the manage widgets',
-                icon: 'manage-listings-block-icon',
+                icon: 'manage-products-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManageWidget,
                     {
@@ -128,7 +127,7 @@ export class Blocks {
             [Blocks.MANAGE_MENUS_BLOCK]: {
                 title: 'Manage Menus',
                 description: 'This is the manage menus',
-                icon: 'manage-listings-block-icon',
+                icon: 'manage-products-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManageMenu,
                     {
@@ -147,12 +146,12 @@ export class Blocks {
                     }
                 ),
             },
-            [Blocks.MANAGE_LISTINGS_BLOCK]: {
-                title: 'Manage Listings Block',
-                description: 'This is the manage listings block',
-                icon: 'manage-listings-block-icon',
+            [Blocks.MANAGE_PRODUCTS_BLOCK]: {
+                title: 'Manage Products Block',
+                description: 'This is the manage products block',
+                icon: 'manage-products-block-icon',
                 component: ComponentHelpers.buildComponent(
-                    ManageListing,
+                    ManageProduct,
                     {
                         mode: 'edit',
                     }

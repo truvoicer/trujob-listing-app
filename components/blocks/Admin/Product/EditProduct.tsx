@@ -1,4 +1,5 @@
 import Form from "@/components/form/Form";
+import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -6,10 +7,9 @@ import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware
 import { CREATE_PRODUCT_MODAL_ID, EDIT_PRODUCT_MODAL_ID } from "./ManageProduct";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditProductFields from "./EditProducttFields";
+import { CreateProduct, Product, ProductRequest, UpdateProduct } from "@/types/Product";
+import EditProductFields from "./EditProductFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { Product, CreateProduct, UpdateProduct } from "@/types/Product";
-import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
@@ -33,49 +33,105 @@ function EditProduct({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-
     const initialValues: Product = {
         id: data?.id || 0,
         name: data?.name || '',
+        title: data?.title || '',
         description: data?.description || '',
-        type: data?.type || '',
-        amount: data?.amount || 0,
-        rate: data?.rate || 0,
-        currency: data?.currency || '',
-        starts_at: data?.starts_at || '',
-        ends_at: data?.ends_at || '',
-        is_active: data?.is_active || false,
-        usage_limit: data?.usage_limit || 0,
-        per_user_limit: data?.per_user_limit || 0,
-        min_order_amount: data?.min_order_amount || 0,
-        min_items_quantity: data?.min_items_quantity || 0,
-        scope: data?.scope || '',
-        code: data?.code || '',
-        is_code_required: data?.is_code_required || false,
+        active: data?.active || false,
+        allow_offers: data?.allow_offers || false,
+        quantity: data?.quantity || 0,
+        type: data?.type || {
+            id: data?.type?.id || 0,
+            name: data?.type?.name || '',
+            label: data?.type?.label || '',
+            description: data?.type?.description || '',
+        },
+        user: data?.user || {
+            id: data?.user?.id || 0,
+            first_name: data?.user?.first_name || '',
+            last_name: data?.user?.last_name || '',
+            username: data?.user?.username || '',
+            email: data?.user?.email || '',
+            created_at: data?.user?.created_at || '',
+            updated_at: data?.user?.updated_at || '',
+        },
+        follows: data?.follows || [],
+        features: data?.features || [],
+        reviews: data?.reviews || [],
+        categories: data?.categories || [],
+        brands: data?.brands || [],
+        colors: data?.colors || [],
+        product_types: data?.product_types || [],
+        prices: data?.prices || [],
+        media: data?.media || [],
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
+    function buildRequestData(values: Product) {
+        let requestData: ProductRequest = {
+            active: values?.active || false,
+            name: values.name,
+            title: values.title,
+        };
+        if (values.hasOwnProperty('description')) {
+            requestData.description = values.description;
+        }
+        if (values.hasOwnProperty('allow_offers')) {
+            requestData.allow_offers = values.allow_offers;
+        }
+        if (values.hasOwnProperty('quantity')) {
+            requestData.quantity = values.quantity;
+        }
+        if (values.hasOwnProperty('type')) {
+            requestData.type = values.type.id;
+        }
+        if (values.hasOwnProperty('user')) {
+            requestData.user = values.user.id;
+        }
+        if (Array.isArray(values?.follows)) {
+            requestData.follows = RequestHelpers.extractIdsFromArray(values.follows);
+        }
+        if (Array.isArray(values?.features)) {
+            requestData.features = RequestHelpers.extractIdsFromArray(values.features);
+        }
+        if (Array.isArray(values?.reviews)) {
+            requestData.reviews = values.reviews;
+        }
+        if (Array.isArray(values?.categories)) {
+            requestData.categories = RequestHelpers.extractIdsFromArray(values.categories);
+        }
+        if (Array.isArray(values?.brands)) {
+            requestData.brands = RequestHelpers.extractIdsFromArray(values.brands);
+        }
+        if (Array.isArray(values?.colors)) {
+            requestData.colors = RequestHelpers.extractIdsFromArray(values.colors);
+        }
+        if (Array.isArray(values?.product_types)) {
+            requestData.product_types = RequestHelpers.extractIdsFromArray(values.product_types);
+        }
+        if (Array.isArray(values?.media)) {
+            requestData.media = [];
+        }
+        return requestData;
+    }
 
     function buildCreateData(values: Product) {
-
+        console.log('buildCreateData', {values});
+        if (!values?.type?.id) {
+            console.warn('Product type is required');
+            return;
+        }
         let requestData: CreateProduct = {
-            name: values?.name || '',
-            description: values?.description || '',
-            type: values?.type || '',
-            amount: values?.amount || 0,
-            rate: values?.rate || 0,
-            currency: values?.currency || '',
-            starts_at: values?.starts_at || '',
-            ends_at: values?.ends_at || '',
-            is_active: values?.is_active || false,
-            usage_limit: values?.usage_limit || 0,
-            per_user_limit: values?.per_user_limit || 0,
-            min_order_amount: values?.min_order_amount || 0,
-            min_items_quantity: values?.min_items_quantity || 0,
-            scope: values?.scope || '',
-            code: values?.code || '',
-            is_code_required: values?.is_code_required || false,
+            name: values.name,
+            title: values.title,
+            active: values?.active || false,
+            type: values.type.id
+        };
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
         };
 
         return requestData;
@@ -84,69 +140,21 @@ function EditProduct({
     function buildUpdateData(values: Product) {
 
         let requestData: UpdateProduct = {
-            id: values?.id || 0,
+            id: data?.id || 0,
         };
-        if (values?.name) {
-            requestData.name = values?.name || '';
-        }
-        if (values?.description) {
-            requestData.description = values?.description || '';
-        }
-        if (values?.type) {
-            requestData.type = values?.type || '';
-        }
-        if (values?.amount) {
-            requestData.amount = values?.amount || 0;
-        }
-        if (values?.rate) {
-            requestData.rate = values?.rate || 0;
-        }
-        if (values?.currency) {
-            requestData.currency_id = RequestHelpers.getCurrencyIdFromCode(values?.currency);
-        }
-        if (values?.starts_at) {
-            requestData.starts_at = values?.starts_at || '';
-        }
-        if (values?.ends_at) {
-            requestData.ends_at = values?.ends_at || '';
-        }
-        if (values?.hasOwnProperty('is_active')) {
-            requestData.is_active = values?.is_active || false;
-        }
-        if (values?.usage_limit) {
-            requestData.usage_limit = values?.usage_limit || 0;
-        }
-        if (values?.per_user_limit) {
-            requestData.per_user_limit = values?.per_user_limit || 0;
-        }
-        if (values?.min_order_amount) {
-            requestData.min_order_amount = values?.min_order_amount || 0;
-        }
-        if (values?.min_items_quantity) {
-            requestData.min_items_quantity = values?.min_items_quantity || 0;
-        }
-        if (values?.scope) {
-            requestData.scope = values?.scope || '';
-        }
-        if (values?.code) {
-            requestData.code = values?.code || '';
-        }
-        if (values?.hasOwnProperty('is_code_required')) {
-            requestData.is_code_required = values?.is_code_required || false;
-        }
-        if (Array.isArray(values?.products) && values?.products.length > 0) {
-            requestData.products = values?.products;
-        }
-        if (Array.isArray(values?.categories) && values?.categories.length > 0) {
-            requestData.categories = RequestHelpers.extractIdsFromArray(values?.categories || []);
-        }
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
         return requestData;
     }
+
     async function handleSubmit(values: Product) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.log('No data to update');
-            return;
+            console.warn('No data to update');
+            return false;
         }
 
         let response = null;
@@ -154,40 +162,34 @@ function EditProduct({
         switch (operation) {
             case 'edit':
             case 'update':
-                if (!values?.id) {
+                requestData = buildUpdateData(values);
+                console.log('edit requestData', {requestData, values});
+                if (!data?.id) {
                     throw new Error('Product ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.product,
-                        values.id,
-                        'update'
-                    ]),
+                    endpoint: `${truJobApiConfig.endpoints.product}/${data.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
-                    data: buildUpdateData(values),
+                    data: requestData,
                 })
                 break;
             case 'add':
             case 'create':
-                if (Array.isArray(values?.products)) {
-                    return;
-                }
+                requestData = buildCreateData(values);
+                console.log('create requestData', {requestData, values});
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.product,
-                        'store'
-                    ]),
+                    endpoint: `${truJobApiConfig.endpoints.product}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: buildCreateData(values),
+                    data: requestData,
                 })
                 break;
             default:
                 console.log('Invalid operation');
                 break;
         }
-
+        console.log('response', {response});
         if (!response) {
             setAlert({
                 show: true,
@@ -203,11 +205,12 @@ function EditProduct({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_PRODUCT_MODAL_ID);
         dataTableContext.modal.close(EDIT_PRODUCT_MODAL_ID);
+        dataTableContext.modal.close(CREATE_PRODUCT_MODAL_ID);
+
     }
 
     function getRequiredFields() {
@@ -219,6 +222,7 @@ function EditProduct({
         }
         return requiredFields;
     }
+
     useEffect(() => {
         if (!inModal) {
             return;
@@ -226,14 +230,18 @@ function EditProduct({
         if (!modalId) {
             return;
         }
-        ModalService.initializeModalWithForm({
-            modalState: dataTableContext?.modal,
-            id: modalId,
-            operation: operation,
-            initialValues: initialValues,
-            requiredFields: getRequiredFields(),
-            handleSubmit: handleSubmit,
-        });
+
+        dataTableContext.modal.update(
+            {
+                formProps: {
+                    operation: operation,
+                    initialValues: initialValues,
+                    requiredFields: getRequiredFields(),
+                    onSubmit: handleSubmit,
+                }
+            },
+            modalId
+        );
     }, [inModal, modalId]);
 
 

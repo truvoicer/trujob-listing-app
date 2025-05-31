@@ -23,7 +23,7 @@ export type Discount = {
     updated_at: string;
 }
 export type DiscountProduct = {
-    product_id: 'listing' | 'category' | 'shipping';
+    product_id: 'product' | 'category' | 'shipping';
     product_type: string;
     price_id: number;
 }

@@ -1,7 +1,7 @@
 import { Category } from "./Category";
 import { Country } from "./Country";
 import { Currency } from "./Currency";
-import { Listing } from "./Listing";
+import { Product } from "./Product";
 import { Region } from "./Region";
 
 export type ShippingMethod = {
@@ -102,7 +102,7 @@ export type ShippingRestriction = {
     restrictionable_id: string;
     action: ShippingMethod;
     category?: Category;
-    listing?: Listing;
+    product?: Product;
     country?: Country;
     region?: Region;
     currency?: Currency;

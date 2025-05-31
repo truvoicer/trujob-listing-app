@@ -1,5 +1,5 @@
 import AdminPageView from "@/components/Theme/Admin/View/AdminPageView";
-import PageView from "@/components/Theme/Listing/view/PageView";
+import PageView from "@/components/Theme/Product/view/PageView";
 import { Page } from "@/types/Page";
 
 export class ViewFactory {

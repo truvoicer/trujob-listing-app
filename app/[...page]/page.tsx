@@ -6,7 +6,7 @@ import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { Metadata, ResolvingMetadata } from "next";
-import ErrorView from "@/components/Theme/Listing/Error/ErrorView";
+import ErrorView from "@/components/Theme/Product/Error/ErrorView";
 
 type Props = {
   params: Promise<{ page: string }>

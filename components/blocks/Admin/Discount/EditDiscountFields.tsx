@@ -27,7 +27,7 @@ function EditDiscountFields({
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
-    function getListingComponentProps() {
+    function getProductComponentProps() {
         let componentProps: any = {
             operation: 'create',
             mode: 'selector'
@@ -55,7 +55,7 @@ function EditDiscountFields({
                     ]}
                 >
                     <ManageCategory
-                        {...getListingComponentProps()}
+                        {...getProductComponentProps()}
                         data={values?.categories || []}
                         rowSelection={true}
                         multiRowSelection={false}
@@ -97,7 +97,7 @@ function EditDiscountFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                    id="productsListing"
+                    id="productsProduct"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -105,7 +105,7 @@ function EditDiscountFields({
                     ]}
                 >
                     <ManageProduct
-                        {...getListingComponentProps()}
+                        {...getProductComponentProps()}
                         // data={values?.categories || []}
                         rowSelection={true}
                         multiRowSelection={false}

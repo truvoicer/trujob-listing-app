@@ -9,6 +9,8 @@ import EditProductTypeFields from "./EditProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/ProductType";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { CREATE_PRODUCT_TYPE_MODAL_ID, EDIT_PRODUCT_TYPE_MODAL_ID } from "./ManageProductType";
 
 
 export type EditProductTypeProps = {
@@ -51,13 +53,9 @@ function EditProductType({
 
         let requestData: UpdateProductType = {
             id: values?.id || 0,
+            name: values?.name || '',
+            label: values?.label || '',
         };
-        if (values?.name) {
-            requestData.name = values?.name || '';
-        }
-        if (values?.label) {
-            requestData.label = values?.label || '';
-        }
 
         return requestData;
     }
@@ -67,12 +65,12 @@ function EditProductType({
             return;
         }
 
-
         let response = null;
         let requestData: CreateProductType | UpdateProductType;
         switch (operation) {
             case 'edit':
             case 'update':
+
                 if (!values?.id) {
                     console.log('Product type ID is required');
                     return;
@@ -102,15 +100,35 @@ function EditProductType({
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: buildCreateData(values),
+                    data: requestData,
                 })
                 break;
             default:
                 console.log('Invalid operation');
                 break;
         }
+        if (!response) {
+            setAlert({
+                show: true,
+                message: 'Error occurred while processing the request',
+                type: 'danger',
+            });
+            return;
+        }
+        dataTableContext.refresh();
+        dataTableContext.modal.close(EDIT_PRODUCT_TYPE_MODAL_ID);
+        dataTableContext.modal.close(CREATE_PRODUCT_TYPE_MODAL_ID);
     }
 
+    function getRequiredFields() {
+        let requiredFields: any = {};
+        if (operation === 'edit' || operation === 'update') {
+            requiredFields = {
+                id: true,
+            };
+        }
+        return requiredFields;
+    }
 
     useEffect(() => {
         if (!inModal) {
@@ -125,6 +143,7 @@ function EditProductType({
             id: modalId,
             operation: operation,
             initialValues: initialValues,
+            requiredFields: getRequiredFields(),
             handleSubmit: handleSubmit,
         });
     }, [inModal, modalId]);

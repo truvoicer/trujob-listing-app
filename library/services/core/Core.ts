@@ -1,5 +1,5 @@
 import { ContextService } from "../context/ContextService";
-import { ListingsService } from "../listings/ListingsService";
+import { ProductsService } from "../products/ProductsService";
 import { ModalService } from "../modal/ModalService";
 import { SessionService } from "../session/SessionService";
 import { StateService } from "../state/StateService";
@@ -10,8 +10,8 @@ export class Core {
         
     }
 
-    getListingsService(context) {
-        return new ListingsService(context);
+    getProductsService(context) {
+        return new ProductsService(context);
     }
 
     getContextService(context) {

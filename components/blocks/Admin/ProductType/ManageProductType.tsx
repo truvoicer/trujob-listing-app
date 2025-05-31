@@ -1,7 +1,7 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditProductType from "./EditProductType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -9,7 +9,6 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { ProductType } from "@/types/ProductType";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -17,6 +16,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 
 import { ModalItem } from "@/library/services/modal/ModalService";
+import { ProductType } from "@/types/Product";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export interface ManageProductTypeProps extends DataManageComponentProps {
@@ -53,7 +53,6 @@ function ManageProductType({
                 return {};
         }
     }
-
     function getAddNewModalProps() {
         return {
             formProps: {
@@ -159,7 +158,7 @@ function ManageProductType({
                         dataTableContextState.modal.show({
                             title: 'Delete Product type',
                             component: (
-                                <p>Are you sure you want to delete this product type ({item?.name})?</p>
+                                <p>Are you sure you want to delete this product type ({item?.name} | {item?.label})?</p>
                             ),
                             onOk: async () => {
                                 console.log('Delete product type', { operation, item });
@@ -204,7 +203,7 @@ function ManageProductType({
                                         component: (
                                             <p>Failed to delete product type</p>
                                         ),
-                                    }, 'product-type-delete-error');
+                                    }, 'productType-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -251,7 +250,7 @@ function ManageProductType({
                                     appModalContext.show({
                                         title: 'Delete Product Type',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this product ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -260,25 +259,30 @@ function ManageProductType({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Product Type ID is required</p>
+                                                        <p>Product type ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'product-type-delete-error');
                                                 return;
                                             }
+
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: UrlHelpers.urlFromArray([
+                                                    truJobApiConfig.endpoints.productType,
+                                                    item.id,
+                                                    'delete'
+                                                ]),
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
-                                            })
+                                            });
                                             if (!response) {
                                                 notificationContext.show({
                                                     variant: 'danger',
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete product type</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'product-type-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
@@ -306,15 +310,15 @@ function ManageProductType({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
+        // if (isNotEmpty(searchParams?.product_size)) {
+        //     query[fetcherApiConfig.productSizeKey] = parseInt(searchParams.product_size);
         // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.product)) {
+            query['product'] = searchParams.product;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function productRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -360,12 +364,12 @@ function ManageProductType({
                     <EditProductType
                         operation={'add'}
                         inModal={true}
-                        modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
+                        modalId={CREATE_PRODUCT_TYPE_MODAL_ID}
                     />
                 )
             },
             ...getAddNewModalProps(),
-        }, EDIT_PRODUCT_TYPE_MODAL_ID);
+        }, CREATE_PRODUCT_TYPE_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -380,8 +384,8 @@ function ManageProductType({
             }: DMOnRowSelectActionClick) => {
 
                 dataTableContextState.confirmation.show({
-                    title: 'Edit Product type',
-                    message: 'Are you sure you want to delete selected listings?',
+                    title: 'Edit Menu',
+                    message: 'Are you sure you want to delete selected products?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -390,9 +394,9 @@ function ManageProductType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No products selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -404,11 +408,11 @@ function ManageProductType({
                                 component: (
                                     <p>Product Type IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.productType}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -421,9 +425,9 @@ function ManageProductType({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete products</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
 
@@ -434,13 +438,13 @@ function ManageProductType({
                             component: (
                                 <p>Product Types deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'product-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-product-confirmation');
             }
         });
         return actions;
@@ -459,7 +463,7 @@ function ManageProductType({
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={productRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Label', key: 'label' },

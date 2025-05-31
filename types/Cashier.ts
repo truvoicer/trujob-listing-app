@@ -1,5 +1,5 @@
 import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
-import { Listing } from "./Listing";
+import { Product } from "./Product";
 import { PaymentGateway } from "./PaymentGateway";
 import { Price } from "./Price";
 import { User } from "./User";
@@ -18,7 +18,7 @@ export type OrderItem = {
     quantity: number;
     order_itemable_id: number;
     order_itemable_type: string;
-    entity: Listing;
+    entity: Product;
     created_at: string;
     updated_at: string;
 }

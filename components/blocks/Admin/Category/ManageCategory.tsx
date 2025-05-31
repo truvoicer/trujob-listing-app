@@ -232,7 +232,7 @@ function ManageCategory({
                                     appModalContext.show({
                                         title: 'Delete Category',
                                         component: (
-                                            <p>Are you sure you want to delete this listing ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this product ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -243,11 +243,11 @@ function ManageCategory({
                                                     component: (
                                                         <p>Category ID is required</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'product-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.listing}/${item.id}/delete`,
+                                                endpoint: `${truJobApiConfig.endpoints.product}/${item.id}/delete`,
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -257,9 +257,9 @@ function ManageCategory({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete listing</p>
+                                                        <p>Failed to delete product</p>
                                                     ),
-                                                }, 'listing-delete-error');
+                                                }, 'product-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
@@ -287,15 +287,15 @@ function ManageCategory({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        // if (isNotEmpty(searchParams?.listing_size)) {
-        //     query[fetcherApiConfig.listingSizeKey] = parseInt(searchParams.listing_size);
+        // if (isNotEmpty(searchParams?.product_size)) {
+        //     query[fetcherApiConfig.productSizeKey] = parseInt(searchParams.product_size);
         // }
-        if (isNotEmpty(searchParams?.listing)) {
-            query['listing'] = searchParams.listing;
+        if (isNotEmpty(searchParams?.product)) {
+            query['product'] = searchParams.product;
         }
         return query;
     }
-    async function listingRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function productRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
@@ -363,7 +363,7 @@ function ManageCategory({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected listings?',
+                    message: 'Are you sure you want to delete selected products?',
                     onOk: async () => {
                         console.log('Yes')
                         if (!data?.length) {
@@ -372,9 +372,9 @@ function ManageCategory({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No listings selected</p>
+                                    <p>No products selected</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -386,11 +386,11 @@ function ManageCategory({
                                 component: (
                                     <p>Category IDs are required</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.listing}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.product}/bulk/delete`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -403,9 +403,9 @@ function ManageCategory({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete listings</p>
+                                    <p>Failed to delete products</p>
                                 ),
-                            }, 'listing-bulk-delete-error');
+                            }, 'product-bulk-delete-error');
                             return;
                         }
 
@@ -416,13 +416,13 @@ function ManageCategory({
                             component: (
                                 <p>Categories deleted successfully</p>
                             ),
-                        }, 'listing-bulk-delete-success');
+                        }, 'product-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-listing-confirmation');
+                }, 'delete-bulk-product-confirmation');
             }
         });
         return actions;
@@ -441,7 +441,7 @@ function ManageCategory({
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={listingRequest}
+                request={productRequest}
                 columns={[
                     { label: 'ID', key: 'id' },
                     { label: 'Label', key: 'label' },

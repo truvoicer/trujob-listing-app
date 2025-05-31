@@ -7,7 +7,7 @@ import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware
 import { EDIT_MEDIA_MODAL_ID } from "./ManageMedia";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Listing } from "@/types/Listing";
+import { Product } from "@/types/Product";
 import { Sidebar } from "@/types/Sidebar";
 import EditMediaFields from "./EditMediaFields";
 import { ModalService } from "@/library/services/modal/ModalService";
@@ -15,7 +15,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 
 
 export type EditMediaProps = {
-    data?: Listing;
+    data?: Product;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
@@ -34,7 +34,7 @@ function EditMedia({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: Listing = {
+    const initialValues: Product = {
         id: data?.id || 0,
         name: data?.name || '',
         title: data?.title || '',
@@ -42,35 +42,35 @@ function EditMedia({
         active: data?.active || false,
         allow_offers: data?.allow_offers || false,
         quantity: data?.quantity || 0,
-        listing_type: data?.listing_type || {
-            id: data?.listing_type?.id || 0,
-            name: data?.listing_type?.name || '',
-            label: data?.listing_type?.label || '',
-            description: data?.listing_type?.description || '',
+        product_type: data?.product_type || {
+            id: data?.product_type?.id || 0,
+            name: data?.product_type?.name || '',
+            label: data?.product_type?.label || '',
+            description: data?.product_type?.description || '',
         },
-        listing_user: data?.listing_user || {
-            id: data?.listing_user?.id || 0,
-            first_name: data?.listing_user?.first_name || '',
-            last_name: data?.listing_user?.last_name || '',
-            username: data?.listing_user?.username || '',
-            email: data?.listing_user?.email || '',
-            created_at: data?.listing_user?.created_at || '',
-            updated_at: data?.listing_user?.updated_at || '',
+        product_user: data?.product_user || {
+            id: data?.product_user?.id || 0,
+            first_name: data?.product_user?.first_name || '',
+            last_name: data?.product_user?.last_name || '',
+            username: data?.product_user?.username || '',
+            email: data?.product_user?.email || '',
+            created_at: data?.product_user?.created_at || '',
+            updated_at: data?.product_user?.updated_at || '',
         },
-        listing_follow: data?.listing_follow || [],
-        listing_feature: data?.listing_feature || [],
-        listing_review: data?.listing_review || [],
-        listing_category: data?.listing_category || [],
-        listing_brand: data?.listing_brand || [],
-        listing_color: data?.listing_color || [],
-        listing_product_type: data?.listing_product_type || [],
+        product_follow: data?.product_follow || [],
+        product_feature: data?.product_feature || [],
+        product_review: data?.product_review || [],
+        product_category: data?.product_category || [],
+        product_brand: data?.product_brand || [],
+        product_color: data?.product_color || [],
+        product_product_type: data?.product_product_type || [],
         media: data?.media || [],
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
-    function buildRequestData(values: Listing) {
-        let requestData: Listing = {
+    function buildRequestData(values: Product) {
+        let requestData: Product = {
         };
         if (values.hasOwnProperty('active')) {
             requestData.active = values.active;
@@ -123,7 +123,7 @@ function EditMedia({
         return requestData;
     }
 
-    function buildCreateData(values: Listing) {
+    function buildCreateData(values: Product) {
 
         let requestData: CreateMenuItem = {
             type: values?.type || '',
@@ -136,7 +136,7 @@ function EditMedia({
         return requestData;
     }
 
-    function buildUpdateData(values: Listing) {
+    function buildUpdateData(values: Product) {
 
         let requestData: CreateMenuItem = {
             type: values?.type || '',
@@ -148,7 +148,7 @@ function EditMedia({
 
         return requestData;
     }
-    async function handleSubmit(values: Listing) {
+    async function handleSubmit(values: Product) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
@@ -166,7 +166,7 @@ function EditMedia({
         //         });
         // }
         // if (Array.isArray(requestData?.blocks)) {
-        //     requestData.blocks = requestData?.blocks.map((block: ListingBlock) => {
+        //     requestData.blocks = requestData?.blocks.map((block: ProductBlock) => {
         //         if (Array.isArray(block?.sidebars)) {
         //             block.sidebars = RequestHelpers.extractIdsFromArray(block.sidebars);
         //         }
@@ -185,10 +185,10 @@ function EditMedia({
                 requestData = buildUpdateData(values);
                 console.log('edit requestData', requestData);
                 if (!data?.id) {
-                    throw new Error('Listing ID is required');
+                    throw new Error('Product ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.listing}/${data.id}/update`,
+                    endpoint: `${truJobApiConfig.endpoints.product}/${data.id}/update`,
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
                     data: requestData,
@@ -197,7 +197,7 @@ function EditMedia({
             case 'add':
             case 'create':
                 response = await truJobApiMiddleware.resourceRequest({
-                    endpoint: `${truJobApiConfig.endpoints.listing}/create`,
+                    endpoint: `${truJobApiConfig.endpoints.product}/create`,
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
                     data: requestData,

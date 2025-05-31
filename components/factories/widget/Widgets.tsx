@@ -1,6 +1,6 @@
-import SearchFilterWidget from "@/components/listings/sidebar/widgets/SearchFilterWidget";
-import RadiusFilterWidget from "@/components/listings/sidebar/widgets/RadiusFilterWidget";
-import CategoryFilterWidget from "@/components/listings/sidebar/widgets/CategoryFilterWidget";
+import SearchFilterWidget from "@/components/products/sidebar/widgets/SearchFilterWidget";
+import RadiusFilterWidget from "@/components/products/sidebar/widgets/RadiusFilterWidget";
+import CategoryFilterWidget from "@/components/products/sidebar/widgets/CategoryFilterWidget";
 
 
 export class Widgets {

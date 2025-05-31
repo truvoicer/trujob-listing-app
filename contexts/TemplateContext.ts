@@ -1,7 +1,7 @@
 import React from 'react'
 
 export const templateData = {
-    listings: {
+    products: {
         layout: null,
         paginationComponent: null,
         infiniteScrollComponent: null,

@@ -40,7 +40,7 @@ function EditShippingRestriction({
         restrictionable_id: data?.restrictionable_id || null,
         action: data?.action || null,
         category: data?.category || null,
-        listing: data?.listing || null,
+        product: data?.product || null,
         country: data?.country || null,
         region: data?.region || null,
         currency: data?.currency || null,

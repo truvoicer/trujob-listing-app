@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import SessionLayout from "../Theme/Listing/SessionLayout";
+import SessionLayout from "../Theme/Product/SessionLayout";
 import { PAGE_STATE } from "@/library/redux/constants/page-constants";
 import { ViewFactory } from "@/library/view/ViewFactory";
 import Loader from "../Loader";
