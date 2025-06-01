@@ -4,6 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { Country } from "@/types/Country";
 import { count } from "console";
 import React, { useEffect } from "react";
+import { filter, find } from "underscore";
 
 export type CountrySelect = {
   onChange?: (selected: Country | Country[]) => void;
@@ -33,7 +34,6 @@ function CountrySelect({
   showLoadingSpinner = true,
   value,
 }: CountrySelect) {
-  const [selectedCountries, setSelectedCountries] = React.useState<Country[]>([]);
   const [countries, setCountries] = React.useState<Country[]>([]);
 
   // Fetch countries from API
@@ -72,15 +72,10 @@ function CountrySelect({
     }
   };
 
+
   useEffect(() => {
     initialiseCountries();
   }, []);
-
-  useEffect(() => {
-    if (onChange) {
-      onChange(selectedCountries);
-    }
-  }, [selectedCountries]);
 
   return (
     <SelectDropdown
@@ -90,8 +85,12 @@ function CountrySelect({
       enableSearch={enableSearch}
       allowNewOptions={allowNewOptions}
       loadMoreLimit={loadMoreLimit}
-      onLoadMore={async (page: number) => {
-        let response = await fetchCountries({ page });
+      onLoadMore={async (page: number, searchTerm: string) => {
+        let response = await fetchCountries({ 
+          page, 
+          query: searchTerm,
+          page_size: loadMoreLimit
+         });
         if (!response) {
           throw new Error("Failed to fetch countries");
         }
@@ -103,11 +102,11 @@ function CountrySelect({
       showLoadingSpinner={showLoadingSpinner}
       options={countries}
       handleSearch={async (searchTerm: string) => {
-        let response = await fetchCountries({ 
+        let response = await fetchCountries({
           query: searchTerm,
           page: 1,
           page_size: loadMoreLimit
-         });
+        });
         if (!response) {
           throw new Error("Failed to fetch countries");
         }
@@ -127,25 +126,7 @@ function CountrySelect({
           };
         }
       }
-      onChange={(value: Option | Option[], options: Record<string, any>[]) => {
-        if (!Array.isArray(options)) {
-          return;
-        }
-        if (Array.isArray(value)) {
-          const filteredOptions = value.map((option) => {
-            const findInOptions = options.find((o) => o?.id === option?.value);
-            return findInOptions;
-          })
-            .filter((option) => typeof option !== 'undefined');
-          setSelectedCountries(filteredOptions);
-        } else {
-          const findInOptions = options.find((option) => option?.id === value?.value);
-          if (!findInOptions) {
-            return;
-          }
-          setSelectedCountries([findInOptions]);
-        }
-      }}
+      onChange={onChange}
     />
   );
 }

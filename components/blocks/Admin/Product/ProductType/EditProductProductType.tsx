@@ -14,7 +14,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { User } from "@/types/User";
-import { ProductType } from "@/types/ProductType";
+import { ProductType } from "@/types/Product";
 
 export type EditProductProductTypeProps = {
     data?: Product;

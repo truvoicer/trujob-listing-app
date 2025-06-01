@@ -27,7 +27,7 @@ export class MessageService {
     setter?: any;
     config: Array<any> = [];
     useStateHook: (prevState: SetStateAction<LocalItem>) => {};
-    
+
     constructor(state?: any, setter?: any) {
         this.state = state;
         this.setter = setter;
@@ -85,7 +85,7 @@ export class MessageService {
     getConfig() {
         return this.config;
     }
-    
+
     updateMessageConfigItem(id: string, data: any) {
         if (typeof data !== "object") {
             console.log("data is not an object", {
@@ -191,7 +191,7 @@ export class MessageService {
         if (
             typeof state?.onCancel === 'function' &&
             !state.onCancel({
-                state, 
+                state,
                 setState,
                 configItem: item,
             }, e)
@@ -211,7 +211,7 @@ export class MessageService {
         if (
             typeof state?.onOk === 'function' &&
             !state.onOk({
-                state, 
+                state,
                 setState,
                 configItem: item,
             }, e)
@@ -243,7 +243,7 @@ export class MessageService {
                 type="button"
                 className="btn btn-primary mr-2"
                 onClick={(e) => {
-                    MessageService.updateLocalItemState({   
+                    MessageService.updateLocalItemState({
                         id: id,
                         props: props || {},
                         show: true,
@@ -266,6 +266,32 @@ export class MessageService {
             newState.show = false;
             return newState;
         });
+    }
+
+    triggerLocalItem(id: string, props: any = {}) {
+        const findLocalMessageConfig = this.findLocalMessageConfigById(id);
+        if (!findLocalMessageConfig) {
+            console.log("local message config not found", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        if (typeof findLocalMessageConfig?.state !== "object") {
+            console.log("local message config state is not an object", {
+                id: id,
+                config: this.config
+            });
+            return null;
+        }
+        const [state, setState] = findLocalMessageConfig.state;
+        MessageService.updateLocalItemState({
+            id: id,
+            props: props || {},
+            show: true,
+            title: findLocalMessageConfig?.title || '',
+            footer: findLocalMessageConfig?.footer || true,
+        }, setState);
     }
 
     static updateLocalItemState(data: any, setter: any) {
@@ -314,7 +340,7 @@ export class MessageService {
             return true;
         }
         const messageItem = itemState.items[index];
-        
+
         if (typeof messageItem?.[callbackName] === "function") {
             return await messageItem[callbackName](callbackProps);
         }
@@ -358,7 +384,7 @@ export class MessageService {
             this.handleClose(findItemIdex);
         }
     }
-    
+
     buildItemData(data: any, id: null | string = null) {
         return {};
     }
@@ -380,7 +406,7 @@ export class MessageService {
                 item = cloneState.items[findItemIdex];
             }
         }
-        
+
         item = {
             ...item,
             ...this.buildItemData(data, id),
@@ -462,7 +488,7 @@ export class MessageService {
         }
         return MessageService.findMessageItemIndexInDataById(id, modalState);
     }
-    
+
     findItemById(id: string): ModalItem | undefined {
         if (typeof id !== "string") {
             return undefined;
@@ -474,7 +500,7 @@ export class MessageService {
         }
         return MessageService.findMessageItemInDataById(id, modalState);
     }
-    
+
     getState() {
         const findKeyData = this.findStateData();
         if (!findKeyData) {
@@ -489,7 +515,7 @@ export class MessageService {
                     {
                         ...data,
                         show: true,
-                    }, 
+                    },
                     id
                 );
             },

@@ -1,4 +1,4 @@
-import DataTable, { OnRowSelectActionClick } from "@/components/Table/DataTable";
+import DataTable, { DataTableItem, OnRowSelectActionClick } from "@/components/Table/DataTable";
 import { SetStateAction, useEffect, useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { useSearchParams } from "next/navigation";
@@ -18,6 +18,7 @@ export type DataManageComponentProps = {
     rowSelection?: boolean;
     multiRowSelection?: boolean;
     data?: Array<any>;
+    onRowSelect?: (item: DataTableItem, index: number, dataTableContextState: any) => boolean | Promise<boolean>;
 }
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
     data: Array<any>;
@@ -33,6 +34,7 @@ export type DataManagerProps = {
     enablePagination?: boolean;
     enableEdit?: boolean;
     title?: string;
+    onRowSelect?: (item: DataTableItem, index: number, dataTableContextState: any) => boolean | Promise<boolean>;
     rowSelectActions?: Array<any>
     multiRowSelection?: boolean;
     rowSelection?: boolean;
@@ -77,6 +79,7 @@ function DataManager({
     enablePagination = true,
     enableEdit = true,
     title,
+    onRowSelect,
     rowSelectActions = [],
     multiRowSelection = false,
     renderActionColumn,
@@ -193,6 +196,14 @@ function DataManager({
             });
         }
     }
+
+    function handleRowSelect(item: DataTableItem, index: number): boolean|Promise<boolean> {
+        if (typeof onRowSelect !== 'function') {
+            return true;
+        }
+        return onRowSelect(item, index, dataTableContextState);
+    }
+
     useEffect(() => {
         const someSet = Object.keys(searchParams).some(key => {
             return searchParams[key] !== null && searchParams[key] !== undefined;
@@ -227,16 +238,16 @@ function DataManager({
         if (Object.keys(params).length === 0) {
             return;
         }
-            setDataTableContextState((prevState: SetStateAction<DataTableContextType>) => {
-                let newState: DataTableContextType = {
-                    ...prevState
-                };
-                newState.query = {
-                    ...prevState.query,
-                    ...params
-                };
-                return newState;
-            });
+        setDataTableContextState((prevState: SetStateAction<DataTableContextType>) => {
+            let newState: DataTableContextType = {
+                ...prevState
+            };
+            newState.query = {
+                ...prevState.query,
+                ...params
+            };
+            return newState;
+        });
     }, [
         searchParamPage,
         searchParamSortOrder,
@@ -314,6 +325,7 @@ function DataManager({
                                         paginationMode={paginationMode}
                                         enablePagination={enablePagination}
                                         enableEdit={enableEdit}
+                                        onRowSelect={handleRowSelect}
                                         onRowSelectActionClick={handleRowSelectActionClick}
                                         rowSelectActions={rowSelectActions}
                                         multiRowSelection={multiRowSelection}

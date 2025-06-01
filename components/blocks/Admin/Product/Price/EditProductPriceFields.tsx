@@ -24,14 +24,11 @@ function EditProductPriceFields({
     operation,
     site,
 }: EditProductPriceFields) {
-    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
-
     const modalService = new ModalService();
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
 
     const { values, handleChange, setFieldValue } = useFormikContext<FormikValues>() || {};
 
+    const country = getSiteCountryAction();
     function getProductComponentProps() {
         let componentProps: any = {
             operation: 'create',
@@ -53,7 +50,7 @@ function EditProductPriceFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="edit-product-price-fields-user"
+                    id="edit-product-price-fields-user"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -108,7 +105,7 @@ function EditProductPriceFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="edit-product-price-fields-type"
+                    id="edit-product-price-fields-type"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -162,8 +159,22 @@ function EditProductPriceFields({
         },
     ]);
 
-    const country  = getSiteCountryAction();
-    // console.log('EditProductPriceFields', values);
+    function getCountrySelectValue() {
+        if (!values?.country) {
+            return {
+                value: country?.id,
+                label: country?.name,
+            };
+        }
+        return {
+            value: values?.country?.id,
+            label: values?.country?.name,
+        };
+
+    }
+
+    const countrySelectValue = getCountrySelectValue();
+    console.log('EditProductPriceFields', countrySelectValue, values);
 
     return (
 
@@ -316,24 +327,11 @@ function EditProductPriceFields({
                                 Country
                             </label>
                             <CountrySelect
-                                value={values?.country ?
-                                    {
-                                        value: values?.country?.id,
-                                        label: values?.country?.name,
-                                    } : {
-                                        value: country?.id,
-                                        label: country?.name,
-                                    }}
+                                value={countrySelectValue}
                                 isMulti={false}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {
-                                    let country;
-                                    if (Array.isArray(value) && value.length > 0) {
-                                        country = value[0];
-                                    }
-                                    if (country) {
-                                        setFieldValue("country", country);
-                                    }
+                                    setFieldValue("country", value);
                                 }}
                                 loadingMore={true}
                                 loadMoreLimit={10}

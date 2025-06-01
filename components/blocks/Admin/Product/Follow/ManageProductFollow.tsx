@@ -171,7 +171,7 @@ function ManageProductFollow({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.productFollow.replace(':productId', productId.toString()),
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

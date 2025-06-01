@@ -168,7 +168,7 @@ function ManageFeature({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.feature,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

@@ -52,7 +52,7 @@ function EditProductFields({
         }
         return componentProps;
     }
-    console.log('EditProductFields', values);
+    
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {

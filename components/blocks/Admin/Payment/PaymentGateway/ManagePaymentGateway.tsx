@@ -167,7 +167,7 @@ function ManagePaymentGateway({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.paymentGateway,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

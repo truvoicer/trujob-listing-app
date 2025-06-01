@@ -1,5 +1,4 @@
 import { Currency } from "./Currency";
-import { ProductType } from "./ProductType";
 
 export type Discount = {
     id: number;

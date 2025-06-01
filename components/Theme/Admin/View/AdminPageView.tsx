@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
@@ -14,20 +14,27 @@ import { Page } from '@/types/Page';
 import { PageBlock } from '@/types/PageBlock';
 import { SESSION_STATE } from '@/library/redux/constants/session-constants';
 import { UrlHelpers } from '@/helpers/UrlHelpers';
+import { SETTINGS_STATE } from '@/library/redux/constants/settings-constants';
+import { SettingService } from '@/library/services/app/setting/SettingService';
+import { AppNotificationContext } from '@/contexts/AppNotificationContext';
 
-type Props = {
+export type AdminPageViewProps = {
     data: Page;
     page: Page;
     session: any;
+    settings: any;
 }
 type BlockData = {
     component: any;
     props: any;
 }
-function AdminPageView({ data, page, session }: Props) {
+function AdminPageView({ data, page, session, settings }: AdminPageViewProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
     const blockFactory = new BlockFactory();
+
+    const notificationContext = useContext<any>(AppNotificationContext);
+
     function buildBlocks(blockData: Array<PageBlock>) {
         return blockData.map((item, index) => {
             let itemProps = item?.props || {};
@@ -129,6 +136,16 @@ function AdminPageView({ data, page, session }: Props) {
         );
     }
     
+    
+    useEffect(() => {
+
+    }, [page]);
+    
+    useEffect(() => {
+        if (!SettingService.validateSettings()) {
+
+        }
+    }, [settings]);
 
     return renderView(
         buildBlocks(Array.isArray(data?.blocks) ? data.blocks : [])
@@ -140,6 +157,7 @@ export default connect(
         return {
             page: state[PAGE_STATE],
             session: state[SESSION_STATE],
+            settings: state[SETTINGS_STATE],
         }
     }
 )(AdminPageView);

@@ -167,7 +167,7 @@ function ManageTaxRate({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.taxRate,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

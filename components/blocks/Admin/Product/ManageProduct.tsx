@@ -17,7 +17,6 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 import ProductTestCheckout from "./Checkout/ProductTestCheckout";
-import { size } from "underscore";
 
 
 export interface ManageProductProps extends DataManageComponentProps {
@@ -29,6 +28,7 @@ export const CREATE_PRODUCT_MODAL_ID = 'create-product-modal';
 export const DELETE_PRODUCT_MODAL_ID = 'delete-product-modal';
 
 function ManageProduct({
+    onRowSelect,
     mode = 'selector',
     operation,
     data,
@@ -37,7 +37,7 @@ function ManageProduct({
     onChange,
     paginationMode = 'router',
     enablePagination = true,
-    enableEdit = true
+    enableEdit = true,
 }: ManageProductProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
@@ -160,7 +160,7 @@ function ManageProduct({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.product,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
@@ -360,6 +360,7 @@ function ManageProduct({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+                onRowSelect={onRowSelect}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

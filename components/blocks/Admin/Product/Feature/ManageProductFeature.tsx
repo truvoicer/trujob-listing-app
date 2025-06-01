@@ -173,7 +173,7 @@ function ManageProductFeature({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.productFeature.replace(':productId', productId.toString()),
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

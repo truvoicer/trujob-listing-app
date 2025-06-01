@@ -164,7 +164,7 @@ function ManageMenu({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.menu,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

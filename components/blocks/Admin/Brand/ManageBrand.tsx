@@ -167,7 +167,7 @@ function ManageBrand({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.brand,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

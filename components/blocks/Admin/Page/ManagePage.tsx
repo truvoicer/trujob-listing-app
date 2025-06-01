@@ -167,7 +167,7 @@ function ManagePage({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.page,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

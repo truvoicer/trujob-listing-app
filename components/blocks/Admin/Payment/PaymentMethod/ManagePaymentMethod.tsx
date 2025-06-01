@@ -167,7 +167,7 @@ function ManagePaymentMethod({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.paymentMethod,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

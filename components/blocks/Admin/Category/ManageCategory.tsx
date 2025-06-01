@@ -172,7 +172,7 @@ function ManageCategory({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.category,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

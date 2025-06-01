@@ -167,7 +167,7 @@ function ManageShippingRestriction({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.shippingRestriction,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

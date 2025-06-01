@@ -168,7 +168,7 @@ function ManageColor({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.color,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

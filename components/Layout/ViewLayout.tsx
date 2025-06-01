@@ -81,6 +81,7 @@ function ViewLayout({ page }: ViewLayoutProps) {
         <AppNotificationContext.Provider value={notificationState}>
             <AppModalContext.Provider value={modalState}>
                 <AppConfirmationContext value={confirmationState}>
+                    
                     {view
                         ? (
                             <SessionLayout>

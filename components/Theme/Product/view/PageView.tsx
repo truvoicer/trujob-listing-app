@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
@@ -98,7 +98,7 @@ function PageView({
             </ProductLayoutFull>
         );
     }
-    
+
     return renderView(
         renderBlocks(
             buildBlocks(data?.blocks || [])

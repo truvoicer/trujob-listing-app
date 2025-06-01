@@ -23,7 +23,7 @@ export type DataTableProps = {
     enableEdit?: boolean;
     onRowSelectActionClick?: ({ action, data }: OnRowSelectActionClick) => void;
     rowSelectActions?: Array<any>
-    onRowSelect?: (item: DataTableItem, index: number) => void;
+    onRowSelect?: (item: DataTableItem, index: number) => boolean | Promise<boolean>;
     multiRowSelection?: boolean;
     rowSelection?: boolean;
     columns?: Array<DataTableColumn>;
@@ -35,6 +35,7 @@ function DataTable({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true,
+    onRowSelect,
     onRowSelectActionClick,
     rowSelectActions = [],
     multiRowSelection = false,
@@ -116,6 +117,13 @@ function DataTable({
 
             setTableData([]);
         }
+    }
+
+    function handleRowSelect(item: DataTableItem, index: number): boolean| Promise<boolean> {
+        if (typeof onRowSelect !== 'function') {
+            return true;
+        }
+        return onRowSelect(item, index);
     }
 
     function renderRowSelectActions() {
@@ -269,6 +277,10 @@ function DataTable({
                                                         ...newState[index],
                                                         checked: checked,
                                                     };
+                                                    const rowSelect = handleRowSelect(newState[index], index);
+                                                    if (!rowSelect) {
+                                                        return;
+                                                    }
                                                     setTableData(newState);
                                                     if (typeof onChange === 'function') {
                                                         onChange(newState);
@@ -291,6 +303,10 @@ function DataTable({
                                                             checked: tableDataItemIndex === index ? checked : false,
                                                         };
                                                     });
+                                                    const rowSelect = handleRowSelect(newState[index], index);
+                                                    if (!rowSelect) {
+                                                        return;
+                                                    }
                                                     setTableData(newState);
                                                     if (typeof onChange === 'function') {
                                                         onChange(newState);

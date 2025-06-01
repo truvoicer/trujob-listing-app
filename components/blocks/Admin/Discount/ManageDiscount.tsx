@@ -16,6 +16,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { DataTableItem } from "@/components/Table/DataTable";
 
 export const CREATE_DISCOUNT_MODAL_ID = 'create-discount-modal';
 export const EDIT_DISCOUNT_MODAL_ID = 'edit-discount-modal';
@@ -167,7 +168,7 @@ function ManageDiscount({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.discount,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
@@ -424,7 +425,7 @@ function ManageDiscount({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-            data={data}
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}

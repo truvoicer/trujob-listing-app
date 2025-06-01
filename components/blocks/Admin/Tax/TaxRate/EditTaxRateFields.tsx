@@ -3,6 +3,11 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import SelectTaxRateType from "./SelectTaxRateType";
+import SelectTaxRateAmountType from "./SelectTaxRateAmountType";
+import CurrencySelect from "@/components/blocks/Locale/Currency/CurrencySelect";
+import SelectTaxRateScope from "./SelectTaxRateScope";
+import RegionSelect from "@/components/blocks/Locale/Region/RegionSelect";
 
 type EditTaxRateFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -19,6 +24,17 @@ function EditTaxRateFields({
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
     return (
+        // 'name' => ['required', 'string', 'max:50'],
+        // 'type' => ['required', Rule::enum((TaxRateType::class))],
+        // 'amount_type' => ['required', Rule::enum((TaxRateType::class))],
+        // 'amount' => [
+        // 'rate' => [
+        // 'country_id' => ['required', 'integer', 'exists:countries,id'],
+        // 'region_id' => ['required', 'integer', 'exists:regions,id'],
+        // 'is_default' => ['required', 'boolean'],
+        // 'scope' => ['required', Rule::enum(TaxScope::class)],
+        // 'is_active' => ['required', 'boolean'],
+
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
@@ -39,34 +55,105 @@ function EditTaxRateFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="description"
-                                id="description"
-                                onChange={handleChange}
-                                value={values?.description || ""} />
-                            <label className="form-label" htmlFor="description">
-                                Description
-                            </label>
-                        </div>
+                        <SelectTaxRateScope />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
+                        <SelectTaxRateType />
+                    </div>
+
+                    <div className="col-12 col-lg-6">
+                        <SelectTaxRateAmountType />
+                    </div>
+
+                    {values?.amount_type === "fixed" && (
+                        <div className="col-12 col-lg-6">
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="amount"
+                                    id="amount"
+                                    onChange={handleChange}
+                                    value={values?.amount || ""} />
+                                <label className="form-label" htmlFor="amount">
+                                    Amount
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                    {values?.amount_type === "percentage" && (
+                        <div className="col-12 col-lg-6">
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="text"
+                                    name="rate"
+                                    id="rate"
+                                    onChange={handleChange}
+                                    value={values?.rate || ""} />
+                                <label className="form-label" htmlFor="rate">
+                                    Rate
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="col-12 col-lg-6">
+                        <label className="title">Select Currency</label>
+                        <CurrencySelect
+                            value={values?.currency ?
+                                {
+                                    value: values?.currency?.id,
+                                    label: values?.currency?.name,
+                                } : null}
+                            isMulti={false}
+                            showLoadingSpinner={true}
+                            onChange={(value) => {
+                                console.log('currency', value);
+                                setFieldValue('currency', value);
+                            }}
+                            loadingMore={true}
+                            loadMoreLimit={10}
+                        />
+                    </div>
+
+                    <div className="col-12 col-lg-6">
+                        <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
-                                className="form-control"
-                                type="text"
-                                name="icon"
-                                id="icon"
+                                className="custom-control-input"
+                                type="checkbox"
+                                name="select_region"
+                                id="select_region"
                                 onChange={handleChange}
-                                value={values?.icon || ""} />
-                            <label className="form-label" htmlFor="icon">
-                                Icon
+                                checked={values?.select_region || false} />
+                            <label className="custom-control-label" htmlFor="select_region">
+                                Is Region Required?
                             </label>
                         </div>
                     </div>
+                    {values?.select_region &&
+                        <div className="col-12 col-lg-6">
+                            <label className="title">Select Currency</label>
+                            <RegionSelect
+                                value={values?.region ?
+                                    {
+                                        value: values?.region?.id,
+                                        label: values?.region?.name,
+                                    } : null}
+                                isMulti={false}
+                                showLoadingSpinner={true}
+                                onChange={(value) => {
+                                    console.log('region', value);
+                                    setFieldValue('region', value);
+                                }}
+                                loadingMore={true}
+                                loadMoreLimit={10}
+                            />
+                        </div>
+                    }
+
                     <div className="col-12 col-lg-6">
                         <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
@@ -77,7 +164,7 @@ function EditTaxRateFields({
                                 onChange={handleChange}
                                 checked={values?.is_active || false} />
                             <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
+                                Is Active?
                             </label>
                         </div>
                     </div>
@@ -91,11 +178,10 @@ function EditTaxRateFields({
                                 onChange={handleChange}
                                 checked={values?.is_default || false} />
                             <label className="custom-control-label" htmlFor="is_default">
-                                Is Default
+                                Is Default?
                             </label>
                         </div>
                     </div>
-
                 </div>
             </div>
         </div>

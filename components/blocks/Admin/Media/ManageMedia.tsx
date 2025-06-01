@@ -191,7 +191,7 @@ function ManageMedia({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.media,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

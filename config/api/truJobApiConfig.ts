@@ -11,6 +11,7 @@ export default {
         address: '/locale/address',
         currency: '/locale/currency',
         country: '/locale/country',
+        region: '/locale/region',
         category: '/category',
         brand: '/brand',
         productType: '/product-type',

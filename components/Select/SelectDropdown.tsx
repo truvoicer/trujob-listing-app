@@ -23,7 +23,7 @@ export interface SelectDropdownProps {
   placeholder?: string;
   isMulti?: boolean;
   loadMoreLimit?: number;
-  onLoadMore?: (nextPage: number) => Promise<LaravelPaginatedResponse>;
+  onLoadMore?: (nextPage: number, searchTerm: string) => Promise<LaravelPaginatedResponse>;
   addNewOptionPosition?: 'top' | 'bottom' | 'both';
   loadingMore?: boolean;
   loadingMessage?: string;
@@ -76,7 +76,7 @@ function SelectDropdown({
       if (isMulti && Array.isArray(value)) {
         setSelectedOptions(value);
       } else if (!isMulti && !Array.isArray(value)) {
-        
+
         if (typeof value === 'string' || typeof value === 'number') {
           const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
           if (!findInOptions) {
@@ -106,18 +106,64 @@ function SelectDropdown({
       filtered = internalOptions.filter(option =>
         parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
       );
+      
     }
     setFilteredOptions(filtered);
+  }
+  
+  function findOptionByValue(value: Option, options: Record<string, any>[]) {
+    return options.find((option) => {
+      if (option?.id) {
+        return option?.id === value?.value;
+      }
+      if (option?.value) {
+        return option?.value === value?.value;
+      }
+      return false;
+    });
+  }
+
+  function buildOnChangeData(optionData: any) {
+    if (isMulti && !Array.isArray(options)) {
+      return [];
+    }
+    if (Array.isArray(value)) {
+      const filteredOptions = optionData.map((option) => {
+        let findInOptions = findOptionByValue(option, internalOptions);
+        if (!findInOptions) {
+          findInOptions = findOptionByValue(option, filteredOptions);
+          if (!findInOptions) {
+            return undefined;
+          }
+        }
+        return findInOptions;
+      })
+        .filter((option) => typeof option !== 'undefined');
+      return filteredOptions;
+    } else {
+      let findInOptions = findOptionByValue(optionData, internalOptions);
+      if (!findInOptions) {
+        findInOptions = findOptionByValue(optionData, filteredOptions);
+        if (!findInOptions) {
+          return;
+        }
+      }
+      return findInOptions;
+    }
   }
 
   useEffect(() => {
     setInternalOptions(options);
     setFilteredOptions(parseDataToOptions(options));
   }, [options]);
-  
+
   useEffect(() => {
     onSearch();
-  }, [searchTerm, internalOptions, enableSearch]);
+  }, [searchTerm, enableSearch]);
+  useEffect(() => {
+
+    setFilteredOptions(parseDataToOptions(internalOptions));
+  }, [internalOptions]);
 
   const handleSelect = (option: Option) => {
     if (isMulti) {
@@ -130,10 +176,11 @@ function SelectDropdown({
       }
       
       setSelectedOptions(newSelection);
-      onChange(newSelection, internalOptions);
+      onChange(buildOnChangeData(option));
     } else {
+      
       setSelectedOption(option);
-      onChange(option, parseDataToOptions(internalOptions));
+      onChange(buildOnChangeData(option));
       setIsOpen(false);
     }
     setSearchTerm('');
@@ -174,8 +221,13 @@ function SelectDropdown({
 
       setIsLoadingMore(true);
       try {
-        const response = await onLoadMore(currentPage + 1);
-        setInternalOptions(prev => [...prev, ...response.data]);
+        const response = await onLoadMore(currentPage + 1, searchTerm);
+        const cloneInternalOptions = [...internalOptions];
+        const newOptions = [
+          ...cloneInternalOptions,
+          ...response.data
+        ];
+        setInternalOptions(newOptions);
         setCurrentPage(response.meta.current_page);
         setLastPage(response.meta.last_page);
       } catch (err) {
@@ -186,7 +238,7 @@ function SelectDropdown({
       }
     }
   };
-
+  
   const renderAddNewOption = () => (
     allowNewOptions && searchTerm &&
     !parseDataToOptions(filteredOptions).find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase()) && (

@@ -3,9 +3,7 @@ import CountrySelect from "../../Locale/Country/CountrySelect";
 import { connect } from "react-redux";
 import { SETTINGS_STATE } from "@/library/redux/constants/settings-constants";
 import { SITE_STATE } from "@/library/redux/constants/site-constants";
-import { Country } from "@/types/Country";
 import CurrencySelect from "../../Locale/Currency/CurrencySelect";
-import { Currency } from "@/types/Currency";
 import Form from "@/components/form/Form";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
@@ -67,11 +65,11 @@ function ManageSiteSettings({
             }, SITE_SETTINGS_ERROR_NOTIFICATION);
         }
     }
-    
+
     useEffect(() => {
         siteSettingsRequest();
     }, []);
-    
+
     return (
         <div className="container">
             <div className="row">
@@ -102,22 +100,15 @@ function ManageSiteSettings({
                                                     Select Country
                                                 </label>
                                                 <CountrySelect
-                                                    value={values?.country ? 
+                                                    value={values?.country ?
                                                         {
-                                                        value: values?.country?.id,
-                                                        label: values?.country?.name,
-                                                    } : null}
+                                                            value: values?.country?.id,
+                                                            label: values?.country?.name,
+                                                        } : null}
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
                                                     onChange={(value) => {
-                                                        let selectedCountry;
-                                                        if (Array.isArray(value) && value.length > 0) {
-                                                            selectedCountry = value[0];
-                                                        }
-                                                        if (selectedCountry) {
-                                                        console.log('country value', value);
-                                                            setFieldValue('country', selectedCountry);
-                                                        }
+                                                        setFieldValue('country', value);
                                                     }}
                                                     loadingMore={true}
                                                     loadMoreLimit={10}
@@ -126,22 +117,15 @@ function ManageSiteSettings({
                                             <div className="col-lg-6 mb-4">
                                                 <label className="title">Select Currency</label>
                                                 <CurrencySelect
-                                                    value={values?.currency ? 
+                                                    value={values?.currency ?
                                                         {
-                                                        value: values?.currency?.id,
-                                                        label: values?.currency?.name,
-                                                    } : null}
+                                                            value: values?.currency?.id,
+                                                            label: values?.currency?.name,
+                                                        } : null}
                                                     isMulti={false}
                                                     showLoadingSpinner={true}
                                                     onChange={(value) => {
-                                                        let selectedCurrency;
-                                                        if (Array.isArray(value) && value.length > 0) {
-                                                            selectedCurrency = value[0];
-                                                        }
-                                                        if (selectedCurrency) {
-                                                        console.log('currency value', value);
-                                                            setFieldValue('currency', selectedCurrency);
-                                                        }
+                                                        setFieldValue('currency', value);
                                                     }}
                                                     loadingMore={true}
                                                     loadMoreLimit={10}

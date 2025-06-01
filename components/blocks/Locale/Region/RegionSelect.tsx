@@ -1,11 +1,11 @@
-import SelectDropdown, { Option, SelectDropdownProps } from "@/components/Select/SelectDropdown";
+import SelectDropdown, { Option } from "@/components/Select/SelectDropdown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { Currency } from "@/types/Currency";
 import React, { useEffect } from "react";
+import { Region } from "@/types/Region";
 
-export type CurrencySelect = {
-  onChange?: (selected: Currency | Currency[]) => void;
+export type RegionSelect = {
+  onChange?: (selected: Region | Region[]) => void;
   isMulti?: boolean;
   placeholder?: string;
   enableSearch?: boolean;
@@ -16,12 +16,12 @@ export type CurrencySelect = {
   loadingMore?: boolean;
   loadingMessage?: string;
   showLoadingSpinner?: boolean;
-  value?: number | string | Option | Option[] | null;
+  value?: number | string | Option | Option[];
 }
-function CurrencySelect({
+function RegionSelect({
   onChange,
   isMulti = false,
-  placeholder = "Select a currency",
+  placeholder = "Select a region",
   enableSearch = true,
   allowNewOptions = true,
   loadMoreLimit = 10,
@@ -30,48 +30,49 @@ function CurrencySelect({
   loadingMore = false,
   loadingMessage = "Loading more...",
   showLoadingSpinner = true,
-  value
-}: CurrencySelect) {
-  const [currencies, setCurrencies] = React.useState<Currency[]>([]);
+  value,
+}: RegionSelect) {
+  const [regions, setRegions] = React.useState<Region[]>([]);
 
-  // Fetch currencies from API
-  const fetchCurrencies = async (query: Record<string, string | number | boolean> = {
+  // Fetch regions from API
+  const fetchRegions = async (query: Record<string, string | number | boolean> = {
     page: 1,
     page_size: loadMoreLimit,
   }) => {
     try {
       const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-        endpoint: truJobApiConfig.endpoints.currency,
+        endpoint: truJobApiConfig.endpoints.region,
         method: TruJobApiMiddleware.METHOD.GET,
         protectedReq: true,
         query
       });
       if (!response) {
-        throw new Error("Failed to fetch currencies");
+        throw new Error("Failed to fetch regions");
       }
       if (!Array.isArray(response?.data)) {
         throw new Error("Invalid response format");
       }
       return response;
     } catch (error) {
-      console.error("Error fetching currencies:", error);
+      console.error("Error fetching regions:", error);
       return false;
     }
   };
-  const initialiseCurrencies = async () => {
+  const initialiseRegions = async () => {
     try {
-      const response = await fetchCurrencies();
+      const response = await fetchRegions();
       if (!response) {
-        throw new Error("Failed to fetch currencies");
+        throw new Error("Failed to fetch regions");
       }
-      setCurrencies(response.data);
+      setRegions(response.data);
     } catch (error) {
-      console.error("Error fetching currencies:", error);
+      console.error("Error fetching regions:", error);
     }
   };
 
+
   useEffect(() => {
-    initialiseCurrencies();
+    initialiseRegions();
   }, []);
 
   return (
@@ -83,21 +84,32 @@ function CurrencySelect({
       allowNewOptions={allowNewOptions}
       loadMoreLimit={loadMoreLimit}
       onLoadMore={async (page: number, searchTerm: string) => {
-        let response = await fetchCurrencies({ 
+        let response = await fetchRegions({ 
           page, 
-          query: searchTerm,
+          query: searchTerm ,
           page_size: loadMoreLimit
-         });
+        });
         if (!response) {
-          throw new Error("Failed to fetch currencies");
+          throw new Error("Failed to fetch regions");
         }
-        return response;
+        return response
       }}
       addNewOptionPosition={addNewOptionPosition}
       loadingMore={loadingMore}
       loadingMessage={loadingMessage}
       showLoadingSpinner={showLoadingSpinner}
-      options={currencies}
+      options={regions}
+      handleSearch={async (searchTerm: string) => {
+        let response = await fetchRegions({
+          query: searchTerm,
+          page: 1,
+          page_size: loadMoreLimit
+        });
+        if (!response) {
+          throw new Error("Failed to fetch regions");
+        }
+        return response.data;
+      }}
       parseOptions={
         (data: Record<string, any>) => {
           if (data.hasOwnProperty('value') && data.hasOwnProperty('label')) {
@@ -111,23 +123,10 @@ function CurrencySelect({
             label: `${data.name}`,
           };
         }
-
       }
-
-      handleSearch={async (searchTerm: string) => {
-        let response = await fetchCurrencies({
-          query: searchTerm,
-          page: 1,
-          page_size: loadMoreLimit
-        });
-        if (!response) {
-          throw new Error("Failed to fetch currencies");
-        }
-        return response.data;
-      }}
       onChange={onChange}
     />
   );
 }
 
-export default CurrencySelect;
+export default RegionSelect;

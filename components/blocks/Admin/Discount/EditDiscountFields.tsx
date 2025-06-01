@@ -1,4 +1,4 @@
-import { Dispatch, useContext, useState } from "react";
+import { Dispatch, SetStateAction, useContext, useState } from "react";
 import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
@@ -11,6 +11,9 @@ import SelectDiscountScope from "./SelectDiscountScope";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageCategory from "../Category/ManageCategory";
 import ManageProduct from "../Product/ManageProduct";
+import { DataTableItem } from "@/components/Table/DataTable";
+import ManageProductPrice from "../Product/Price/ManageProductPrice";
+import { Price } from "@/types/Price";
 
 type EditDiscountFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -20,6 +23,8 @@ function EditDiscountFields({
 }: EditDiscountFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
     const [selectedCategories, setSelectedCategories] = useState<Array<any>>([]);
+    const [selectedProducts, setSelectedProducts] = useState<Array<any>>([]);
+    const [selectedPrices, setSelectedPrices] = useState<Array<Price>>([]);
 
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
@@ -58,7 +63,7 @@ function EditDiscountFields({
                         {...getProductComponentProps()}
                         data={values?.categories || []}
                         rowSelection={true}
-                        multiRowSelection={false}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(categories: Array<any>) => {
@@ -67,7 +72,7 @@ function EditDiscountFields({
                                 console.warn('Invalid values received from  ManageCategory:', categories);
                                 return;
                             }
-                            const checked =  categories.filter((item) => item?.checked);
+                            const checked = categories.filter((item) => item?.checked);
                             if (values?.id) {
                                 setSelectedCategories(checked);
                                 return;
@@ -109,21 +114,22 @@ function EditDiscountFields({
                         // data={values?.categories || []}
                         rowSelection={true}
                         multiRowSelection={false}
+                        onRowSelect={(
+                            item: DataTableItem,
+                            index: number,
+                            dataTableContextState: any
+                        ): boolean | Promise<boolean> => {
+                            console.log('onRowSelect', item, index, dataTableContextState);
+                            modalService.triggerLocalItem(
+                                'productPrice',
+                                {
+                                    productId: item?.id || null
+                                }
+                            );
+                            return true;
+                        }}
                         enableEdit={true}
                         paginationMode="state"
-                        onChange={(products: Array<any>) => {
-                            console.log('products', products);
-                            if (!Array.isArray(products)) {
-                                console.warn('Invalid values received from  ManageCategory:', products);
-                                return;
-                            }
-                            const checked =  products.filter((item) => item?.checked);
-                            if (values?.id) {
-                                setSelectedCategories(checked);
-                                return;
-                            }
-                            setFieldValue('products', checked);
-                        }}
                     />
                 </AccessControlComponent>
             ),
@@ -140,8 +146,102 @@ function EditDiscountFields({
                 return true;
             }
         },
-    ]);
+        {
+            id: 'productPrice',
+            title: 'Manage Price',
+            size: 'lg',
+            fullscreen: true,
+            component: ({
+                state,
+                setState,
+                configItem,
+            }: {
+                state: LocalModal,
+                setState: Dispatch<SetStateAction<LocalModal>>,
+                configItem: any,
+            }) => {
+                const productId = state?.props?.productId;
+                if (!productId) {
+                    return null;
+                }
+                return (
+                    <AccessControlComponent
+                        id="productPrice"
+                        roles={[
+                            { name: 'admin' },
+                            { name: 'superuser' },
+                            { name: 'user' },
+                        ]}
+                    >
+                        <ManageProductPrice
+                            {...getProductComponentProps()}
+                            productId={productId || null}
+                            rowSelection={true}
+                            multiRowSelection={true}
+                            enableEdit={true}
+                            paginationMode="state"
+                            onChange={(prices: Array<Price>) => {
+                                if (!Array.isArray(prices)) {
+                                    console.warn('Invalid values received from component');
+                                    return;
+                                }
+                                const checked = prices.filter((item) => item?.checked);
+                                const buildProductPrice = checked.map((price: Price) => {
+                                    return {
+                                        product_id: productId,
+                                        product_type: 'product',
+                                        price_id: price?.id,
+                                    };
+                                });
+                                const existingProducts = values?.products || [];
 
+                                // Merge existing products with new prices not already included
+                                const mergedProducts = [
+                                    ...existingProducts,
+                                    ...buildProductPrice.filter((newPrice) => {
+                                        return !existingProducts.some(
+                                            (existingPrice: {
+                                                price_id: number;
+                                                product_id: number;
+                                                product_type: string;
+                                            }) =>
+                                                existingPrice.price_id === newPrice.price_id &&
+                                                existingPrice.product_id === newPrice.product_id &&
+                                                existingPrice.product_type === newPrice.product_type
+                                        );
+                                    })
+                                ];
+                                //remove if it doesn't exist in checked 
+                                const filteredProducts = mergedProducts.filter((product) => {
+                                    return checked.some((price) => price.id === product.price_id);
+                                });
+
+                                setSelectedPrices(filteredProducts);
+                                setFieldValue('products', filteredProducts);
+                            }}
+                        />
+                    </AccessControlComponent>
+                );
+            },
+            onOk: () => {
+                if (selectedPrices.length === 0) {
+                    console.warn('No prices selected');
+                    return true;
+                }
+
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('prices', selectedPrices);
+                    return true;
+                }
+                return true;
+            },
+            onCancel: () => {
+                console.log('cancel');
+                return true;
+            }
+        }
+    ]);
+    
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -210,6 +310,7 @@ function EditDiscountFields({
                         <SelectDiscountType name="type" />
                     </div>
 
+                    {values?.type === 'fixed' && (
                     <div className="col-12 col-lg-6">
                         <div className="floating-input form-group">
                             <input
@@ -224,21 +325,23 @@ function EditDiscountFields({
                             </label>
                         </div>
                     </div>
-
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="rate"
-                                id="rate"
-                                onChange={handleChange}
-                                value={values?.rate || 0} />
-                            <label className="form-label" htmlFor="rate">
-                                Rate
-                            </label>
+                    )}
+                    {values?.type === 'percentage' && (
+                        <div className="col-12 col-lg-6">
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="number"
+                                    name="rate"
+                                    id="rate"
+                                    onChange={handleChange}
+                                    value={values?.rate || 0} />
+                                <label className="form-label" htmlFor="rate">
+                                    Rate
+                                </label>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     <div className="col-12 col-lg-6">
                         <label className="title">Select Currency</label>
@@ -251,20 +354,12 @@ function EditDiscountFields({
                             isMulti={false}
                             showLoadingSpinner={true}
                             onChange={(value) => {
-                                let selectedCurrency;
-                                if (Array.isArray(value) && value.length > 0) {
-                                    selectedCurrency = value[0];
-                                }
-                                if (selectedCurrency) {
-                                    console.log('currency value', value);
-                                    setFieldValue('currency', selectedCurrency);
-                                }
+                                setFieldValue('currency', value);
                             }}
                             loadingMore={true}
                             loadMoreLimit={10}
                         />
                     </div>
-
 
                     <div className="col-12 col-lg-6 mt-3">
                         <div className="floating-input form-group">

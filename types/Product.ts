@@ -4,7 +4,6 @@ import { Color } from "./Color";
 import { Feature } from "./Feature";
 import { Media } from "./Media";
 import { Price } from "./Price";
-import { ProductType } from "./ProductType";
 import { Review } from "./Review";
 import { User } from "./User";
 
@@ -31,11 +30,49 @@ export type Product = {
     updated_at: string;
 }
 
+export type ProductRequest = {
+    name?: string;
+    title?: string;
+    description?: string;
+    active?: boolean;
+    allow_offers?: boolean;
+    quantity?: number;
+    user?: number;
+    type?: number;
+    follow_users?: Array<number>;
+    features?: Array<number>;
+    reviews?: Array<Review>;
+    categories?: Array<number>;
+    brands?: Array<number>;
+    colors?: Array<number>;
+    product_types?: Array<number>;
+    media?: Array<Media>;
+    prices?: Array<Price>;
+}
+export interface CreateProduct extends ProductRequest {
+    type: number;
+    name: string;
+    title: string;
+    active: boolean;
+}
+export interface UpdateProduct extends ProductRequest {
+    id: number;
+}
 export type ProductType = {
     id: number;
     name: string;
     label: string;
-    description: string;
+    created_at: string;
+    updated_at: string;
+}
+export type ProductTypeRequest = {
+    name: string;
+    label: string;
+}
+export interface CreateProductType extends ProductTypeRequest {
+}
+export interface UpdateProductType extends ProductTypeRequest {
+    id: number;
 }
 
 export type ProductFollow = {
@@ -85,34 +122,5 @@ export type ProductReviewRequest = {
 export interface CreateProductReview extends ProductReviewRequest {
 }
 export interface UpdateProductReview extends ProductReviewRequest {
-    id: number;
-}
-
-export type ProductRequest = {
-    name?: string;
-    title?: string;
-    description?: string;
-    active?: boolean;
-    allow_offers?: boolean;
-    quantity?: number;
-    user?: number;
-    type?: number;
-    follow_users?: Array<number>;
-    features?: Array<number>;
-    reviews?: Array<Review>;
-    categories?: Array<number>;
-    brands?: Array<number>;
-    colors?: Array<number>;
-    product_types?: Array<number>;
-    media?: Array<Media>;
-    prices?: Array<Price>;
-}
-export interface CreateProduct extends ProductRequest {
-    type: number;
-    name: string;
-    title: string;
-    active: boolean;
-}
-export interface UpdateProduct extends ProductRequest {
     id: number;
 }

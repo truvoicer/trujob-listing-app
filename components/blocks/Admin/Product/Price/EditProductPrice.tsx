@@ -14,6 +14,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { CreatePrice, Price, PriceRequest, UpdatePrice } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { has } from "underscore";
+import { getSiteCountryAction, getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
 
 export type EditProductPriceProps = {
     productId?: number;
@@ -39,11 +40,14 @@ function EditProductPrice({
     const dataTableContext = useContext(DataTableContext);
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
+    const country = getSiteCountryAction();
+    const currency = getSiteCurrencyAction();
+
     const initialValues: Price = {
         id: data?.id || 0,
         user: data?.user || null,
-        country: data?.country || null,
-        currency: data?.currency || null,
+        country: data?.country || country || null,
+        currency: data?.currency || currency || null,
         priceType: data?.priceType,
         valid_from: data?.valid_from || '',
         valid_to: data?.valid_to || '',
@@ -120,13 +124,13 @@ function EditProductPrice({
         console.log('handleSubmit', {values});
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
-            return;
+            return false;
         }
 
 
         if (!productId) {
             console.warn('Product ID is required');
-            return;
+            return false;
         }
 
         let response = null;
@@ -187,11 +191,12 @@ function EditProductPrice({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_PRICE_MODAL_ID);
         dataTableContext.modal.close(CREATE_PRODUCT_PRICE_MODAL_ID);
+        return true;
     }
 
     function getRequiredFields() {

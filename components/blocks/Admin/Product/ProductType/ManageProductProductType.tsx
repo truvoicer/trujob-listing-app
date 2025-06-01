@@ -16,7 +16,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ModalItem } from "@/library/services/modal/ModalService";
-import { ProductType } from "@/types/ProductType";
+import { ProductType } from "@/types/Product";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export interface ManageProductProductTypeProps extends DataManageComponentProps {
@@ -171,7 +171,7 @@ function ManageProductProductType({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.productProductType.replace(':productId', productId.toString()),
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

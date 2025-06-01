@@ -65,7 +65,7 @@ function EditDiscount({
             type: values?.type || '',
             amount: values?.amount || 0,
             rate: values?.rate || 0,
-            currency: values?.currency || '',
+            currency_id: values?.currency?.id || 0,
             starts_at: values?.starts_at || '',
             ends_at: values?.ends_at || '',
             is_active: values?.is_active || false,
@@ -101,8 +101,8 @@ function EditDiscount({
         if (values?.rate) {
             requestData.rate = values?.rate || 0;
         }
-        if (values?.currency) {
-            requestData.currency_id = RequestHelpers.getCurrencyIdFromCode(values?.currency);
+        if (values?.currency?.id) {
+            requestData.currency_id = values?.currency.id;
         }
         if (values?.starts_at) {
             requestData.starts_at = values?.starts_at || '';
@@ -146,7 +146,7 @@ function EditDiscount({
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return;
+            return false;
         }
 
         let response = null;
@@ -185,7 +185,7 @@ function EditDiscount({
                 break;
             default:
                 console.log('Invalid operation');
-                break;
+                return false;
         }
 
         if (!response) {
@@ -203,11 +203,12 @@ function EditDiscount({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_DISCOUNT_MODAL_ID);
         dataTableContext.modal.close(EDIT_DISCOUNT_MODAL_ID);
+        return true;
     }
 
     function getRequiredFields() {

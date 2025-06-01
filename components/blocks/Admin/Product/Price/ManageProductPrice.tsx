@@ -39,7 +39,6 @@ function ManageProductPrice({
     enablePagination = true,
     enableEdit = true
 }: ManageProductPriceProps) {
-    const [selectedPrices, setSelectedPrices] = useState<Array<Price>>([]);
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -184,7 +183,7 @@ function ManageProductPrice({
                                             productId.toString()
                                         ),
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
@@ -348,8 +347,6 @@ function ManageProductPrice({
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
     }) {
         e.preventDefault();
-        // e.stopPropagation();
-        console.log('Add New Product Price', dataTableContext.modal);
         dataTableContext.modal.show({
             title: 'Add New Product Price',
             component: ({

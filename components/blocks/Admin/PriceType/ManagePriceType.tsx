@@ -169,7 +169,7 @@ function ManagePriceType({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.priceType,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true

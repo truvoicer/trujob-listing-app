@@ -190,7 +190,7 @@ function ManageProductType({
                                     endpoint: UrlHelpers.urlFromArray([
                                         truJobApiConfig.endpoints.productType,
                                         item.id,
-                                        'delete'
+                                        'destroy'
                                     ]),
                                     method: ApiMiddleware.METHOD.DELETE,
                                     protectedReq: true
