@@ -3,6 +3,8 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditPaymentMethodFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -24,76 +26,54 @@ function EditPaymentMethodFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">
-                                Name
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            name="name"
+                            type="text"
+                            label="Name"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="description"
-                                id="description"
-                                onChange={handleChange}
-                                value={values?.description || ""} />
-                            <label className="form-label" htmlFor="description">
-                                Description
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.description || ""}
+                            onChange={handleChange}
+                            placeholder="Enter description"
+                            name="description"
+                            type="text"
+                            label="Description"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="icon"
-                                id="icon"
-                                onChange={handleChange}
-                                value={values?.icon || ""} />
-                            <label className="form-label" htmlFor="icon">
-                                Icon
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.icon || ""}
+                            onChange={handleChange}
+                            placeholder="Enter icon"
+                            name="icon"
+                            type="text"
+                            label="Icon"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_active"
-                                id="is_active"
-                                onChange={handleChange}
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active?"
+                            label="Is Active?"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_default"
-                                id="is_default"
-                                onChange={handleChange}
-                                checked={values?.is_default || false} />
-                            <label className="custom-control-label" htmlFor="is_default">
-                                Is Default
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_default'}
+                            placeholder="Is Default?"
+                            label="Is Default?"
+                            onChange={handleChange}
+                            value={values?.is_default || false}
+                        />
                     </div>
 
                 </div>

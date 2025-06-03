@@ -9,6 +9,7 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { isObjectEmpty } from "@/helpers/utils";
 import { FormikValues, useFormikContext } from "formik";
+import TextInput from "@/components/Elements/TextInput";
 
 
 export type RolesModal = {
@@ -84,45 +85,35 @@ function EditSidebarFields({
                     <div className="row">
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    onChange={handleChange}
-                                    value={values?.name || ""} />
-                                <label className="form-label" htmlFor="name">Name</label>
-                            </div>
+                            <TextInput
+                                value={values?.name || ""}
+                                onChange={handleChange}
+                                placeholder="Enter name"
+                                name="name"
+                                type="text"
+                                label="Name"
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    onChange={handleChange}
-                                    value={values?.title || ""} />
-                                <label className="form-label" htmlFor="title">
-                                    Title
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.title || ""}
+                                onChange={handleChange}
+                                placeholder="Enter title"
+                                name="title"
+                                type="text"
+                                label="Title"
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="icon"
-                                    id="icon"
-                                    onChange={handleChange}
-                                    value={values?.icon || ""} />
-                                <label className="form-label" htmlFor="icon">
-                                    Icon
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.icon || ""}
+                                onChange={handleChange}
+                                placeholder="Enter icon"
+                                name="icon"
+                                type="text"
+                                label="Icon"
+                            />
                         </div>
 
 
@@ -218,7 +209,7 @@ function EditSidebarFields({
                                             return false;
                                         }
                                         return true;
-                                    } else if (['add', 'create'].includes(operation || '')) { 
+                                    } else if (['add', 'create'].includes(operation || '')) {
                                         let roles = values?.roles || [];
                                         setFieldValue('roles', [...roles, role]);
                                         return true;

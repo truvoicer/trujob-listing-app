@@ -14,6 +14,8 @@ import SelectMenuItemType from "./SelectMenuItemType";
 import SelectPage from "../../Page/SelectPage";
 import SelectLinkTarget from "../SelectLinkTarget";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 
 type EditMenuItemFieldsProps = {
@@ -45,19 +47,13 @@ function EditMenuItemFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className=""
-                                name="active"
-                                id={"active"}
-                                checked={values?.active || false}
-                                onChange={handleChange}
-                            />
-                            <label className="" htmlFor={'active'}>
-                                Active?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'active'}
+                            placeholder="Active?"
+                            label="Active?"
+                            onChange={handleChange}
+                            value={values?.active || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
@@ -75,29 +71,24 @@ function EditMenuItemFields({
                         )}
                     </div>
                     <div className="col-12 col-lg-6">
-
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="label"
-                                id={"label"}
-                                onChange={handleChange}
-                                value={values?.label || ""} />
-                            <label className="form-label" htmlFor={'label'}>Label</label>
-                        </div>
+                        <TextInput
+                            value={values?.label || ""}
+                            onChange={handleChange}
+                            placeholder="Enter label"
+                            name="label"
+                            type="text"
+                            label="Label"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="url"
-                                id={"url"}
-                                onChange={handleChange}
-                                value={values?.url || ""} />
-                            <label className="form-label" htmlFor={'url'}>URL</label>
-                        </div>
+                        <TextInput
+                            value={values?.url || ""}
+                            onChange={handleChange}
+                            placeholder="Enter URL"
+                            name="url"
+                            type="text"
+                            label="URL"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
                         <SelectLinkTarget
@@ -106,40 +97,34 @@ function EditMenuItemFields({
                         />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="icon"
-                                id={"icon"}
-                                onChange={handleChange}
-                                value={values?.icon || ""} />
-                            <label className="form-label" htmlFor={'icon'}>Icon</label>
-                        </div>
+                        <TextInput
+                            value={values?.icon || ""}
+                            onChange={handleChange}
+                            placeholder="Enter icon"
+                            name="icon"
+                            type="text"
+                            label="Icon"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="li_class"
-                                id={"li_class"}
-                                onChange={handleChange}
-                                value={values?.li_class || ""} />
-                            <label className="form-label" htmlFor={'li_class'}>Li Class</label>
-                        </div>
+                        <TextInput
+                            value={values?.li_class || ""}
+                            onChange={handleChange}
+                            placeholder="Enter Li Class"
+                            name="li_class"
+                            type="text"
+                            label="Li Class"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="a_class"
-                                id={"a_class"}
-                                onChange={handleChange}
-                                value={values?.a_class || ""} />
-                            <label className="form-label" htmlFor={'a_class'}>A Class</label>
-                        </div>
+                        <TextInput
+                            value={values?.a_class || ""}
+                            onChange={handleChange}
+                            placeholder="Enter A Class"
+                            name="a_class"
+                            type="text"
+                            label="A Class"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
 

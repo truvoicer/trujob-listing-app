@@ -1,5 +1,7 @@
 import { FormikValues, useFormikContext } from "formik";
 import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditAddressFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -15,133 +17,95 @@ function EditAddressFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                onChange={handleChange}
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="is_default"
-                                name="is_default"
-                                checked={values?.is_default || false} />
-                            <label className="custom-control-label" htmlFor="is_default">
-                                Is Default
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_default'}
+                            placeholder="Is Default?"
+                            label="Is Default?"
+                            onChange={handleChange}
+                            value={values?.is_default || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                onChange={handleChange}
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="is_active"
-                                name="is_active"
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active?"
+                            label="Is Active?"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="label"
-                                id="label"
-                                onChange={handleChange}
-                                value={values?.label || ""} />
-                            <label className="form-label" htmlFor="label">
-                                Label
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.label || ""}
+                            onChange={handleChange}
+                            placeholder="Enter label"
+                            name="label"
+                            type="text"
+                            label="Label"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="address_line_1"
-                                id="address_line_1"
-                                onChange={handleChange}
-                                value={values?.address_line_1 || ""} />
-                            <label className="form-label" htmlFor="address_line_1">
-                                Address Line 1
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.address_line_1 || ""}
+                            onChange={handleChange}
+                            placeholder="Enter address_line_1"
+                            name="address_line_1"
+                            type="text"
+                            label="Address Line 1"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="address_line_2"
-                                id="address_line_2"
-                                onChange={handleChange}
-                                value={values?.address_line_2 || ""} />
-                            <label className="form-label" htmlFor="address_line_2">
-                                Address Line 2
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.address_line_2 || ""}
+                            onChange={handleChange}
+                            placeholder="Enter address_line_2"
+                            name="address_line_2"
+                            type="text"
+                            label="Address Line 2"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="city"
-                                id="city"
-                                onChange={handleChange}
-                                value={values?.city || ""} />
-                            <label className="form-label" htmlFor="city">
-                                City
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.city || ""}
+                            onChange={handleChange}
+                            placeholder="Enter city"
+                            name="city"
+                            type="text"
+                            label="City"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="state"
-                                id="state"
-                                onChange={handleChange}
-                                value={values?.state || ""} />
-                            <label className="form-label" htmlFor="state">
-                                State
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.state || ""}
+                            onChange={handleChange}
+                            placeholder="Enter state"
+                            name="state"
+                            type="text"
+                            label="State"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="postal_code"
-                                id="postal_code"
-                                onChange={handleChange}
-                                value={values?.postal_code || ""} />
-                            <label className="form-label" htmlFor="postal_code">
-                                Postal Code
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.postal_code || ""}
+                            onChange={handleChange}
+                            placeholder="Enter postal_code"
+                            name="postal_code"
+                            type="text"
+                            label="Postal code"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="phone"
-                                id="phone"
-                                onChange={handleChange}
-                                value={values?.phone || ""} />
-                            <label className="form-label" htmlFor="phone">
-                                Phone
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.phone || ""}
+                            onChange={handleChange}
+                            placeholder="Enter phone"
+                            name="phone"
+                            type="text"
+                            label="Phone"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6 mt-2">

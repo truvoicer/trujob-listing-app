@@ -5,6 +5,8 @@ import { Role } from "@/types/Role";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { MenuItem } from "@/types/Menu";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditMenuItemMenuFieldsProps = {
     menuId?: number;
@@ -43,34 +45,23 @@ function EditMenuItemMenuFields({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="active"
-                                id={"active" + index}
-                                checked={values?.active || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'active' + index}>
-                                Active?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'active'}
+                            placeholder="Active?"
+                            label="Active?"
+                            onChange={handleChange}
+                            value={values?.active || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id={"name" + index}
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor={'name' + index}>
-                                Name
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            type="text"
+                            name="name"
+                            label="Name"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
 
@@ -84,6 +75,14 @@ function EditMenuItemMenuFields({
                                 value={values?.ul_class || ""} />
                             <label className="form-label" htmlFor={'ul_class' + index}>UL Class</label>
                         </div>
+                        <TextInput
+                            value={values?.ul_class || ""}
+                            onChange={handleChange}
+                            placeholder="Enter UL Class"
+                            type="text"
+                            name="ul_class"
+                            label="UL Class"
+                        />
                     </div>
                 </div>
                 

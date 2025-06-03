@@ -60,7 +60,6 @@ function SelectTaxRateAmountType({
         formContext.setFieldValue(name, selectedTaxRateAmountType);
 
     }, [selectedTaxRateAmountType]);
-
     return (
         <div className="floating-input form-group">
             <select

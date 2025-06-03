@@ -16,6 +16,8 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectSidebar from "../../Sidebar/SelectSidebar";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 
 type EditPageBlockFieldsProps = {
@@ -415,94 +417,72 @@ function EditPageBlockFields({
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="default"
-                                id={"default" + index}
-                                checked={values?.default || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'default' + index}>
-                                Default?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'default'}
+                            placeholder="Default?"
+                            label="Default?"
+                            onChange={handleChange}
+                            value={values?.default || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="nav_title"
-                                id={"nav_title" + index}
-                                onChange={handleChange}
-                                value={values?.nav_title || ""} />
-                            <label className="form-label" htmlFor={'nav_title' + index}>Nav Title</label>
-                        </div>
+                        <TextInput
+                            value={values?.nav_title || ""}
+                            onChange={handleChange}
+                            placeholder="Enter nav title"
+                            name="nav_title"
+                            type="text"
+                            label="Nav Title"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="title"
-                                id={"title" + index}
-                                onChange={handleChange}
-                                value={values?.title || ""} />
-                            <label className="form-label" htmlFor={'title' + index}>Title</label>
-                        </div>
+                        <TextInput
+                            value={values?.title || ""}
+                            onChange={handleChange}
+                            placeholder="Enter title"
+                            name="title"
+                            type="text"
+                            label="Title"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="subtitle"
-                                id={"subtitle" + index}
-                                onChange={handleChange}
-                                value={values?.subtitle || ""} />
-                            <label className="form-label" htmlFor={'subtitle' + index}>Subtitle</label>
-                        </div>
+                        <TextInput
+                            value={values?.subtitle || ""}
+                            onChange={handleChange}
+                            placeholder="Enter subtitle"
+                            name="subtitle"
+                            type="text"
+                            label="Subtitle"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="background_image"
-                                id={"background_image" + index}
-                                onChange={handleChange}
-                                value={values?.background_image || ""} />
-                            <label className="form-label" htmlFor={'background_image' + index}>Background Image</label>
-                        </div>
+                        <TextInput
+                            value={values?.background_image || ""}
+                            onChange={handleChange}
+                            placeholder="Enter background image URL"
+                            name="background_image"
+                            type="text"
+                            label="Background Image"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="background_color"
-                                id={"background_color" + index}
-                                onChange={handleChange}
-                                value={values?.background_color || ""} />
-                            <label className="form-label" htmlFor={'background_color' + index}>Background Color</label>
-                        </div>
+                        <TextInput
+                            value={values?.background_color || ""}
+                            onChange={handleChange}
+                            placeholder="Enter background color"
+                            name="background_color"
+                            type="text"
+                            label="Background Color"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="pagination"
-                                id={"pagination" + index}
-                                checked={values?.pagination || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'pagination' + index}>
-                                Pagination
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'pagination'}
+                            placeholder="Pagination?"
+                            label="Pagination?"
+                            onChange={handleChange}
+                            value={values?.pagination || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
                         <SelectPaginationTypes
@@ -517,30 +497,22 @@ function EditPageBlockFields({
                         />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <textarea
-                                className="form-control"
-                                name="content"
-                                id={"content" + index}
-                                onChange={handleChange}
-                                value={values?.content || ""}></textarea>
-                            <label className="form-label" htmlFor={'content' + index}>Content</label>
-                        </div>
+                        <TextInput
+                            value={values?.content || ""}
+                            onChange={handleChange}
+                            placeholder="Enter content"
+                            name="content"
+                            label="Content"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                name="has_sidebar"
-                                id={"has_sidebar" + index}
-                                checked={values?.has_sidebar || false}
-                                onChange={handleChange}
-                            />
-                            <label className="custom-control-label" htmlFor={'has_sidebar' + index}>
-                                Has Sidebar
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'has_sidebar'}
+                            placeholder="Has Sidebar?"
+                            label="Has Sidebar?"
+                            onChange={handleChange}
+                            value={values?.has_sidebar || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">

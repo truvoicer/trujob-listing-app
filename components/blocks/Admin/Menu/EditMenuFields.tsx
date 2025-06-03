@@ -10,6 +10,7 @@ import { MenuItem } from "@/types/Menu";
 import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 
 export type EditMenuFields = {
@@ -37,27 +38,20 @@ function EditMenuFields({
         setFieldValue,
         handleChange,
     } = useFormikContext<FormikValues>() || {};
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <>
                     <div className="row">
                         <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    onChange={e => {
-                                        handleChange(e);
-                                    }}
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="active"
-                                    name="active"
-                                    checked={values?.active || false} />
-                                <label className="custom-control-label" htmlFor="active">
-                                    Active
-                                </label>
-                            </div>
+                            <Checkbox
+                                name={'active'}
+                                placeholder="Active"
+                                label="Active"
+                                onChange={handleChange}
+                                value={values?.active || false}
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
@@ -154,12 +148,12 @@ function EditMenuFields({
                                     return [];
                                 }}
                                 onAdd={async (role: Role) => {
-                                    
-                                let roles = values?.roles || [];
-                                if (['add', 'create'].includes(operation || '')) {
-                                    setFieldValue('roles', [...roles, role]);
-                                    return true;
-                                }
+
+                                    let roles = values?.roles || [];
+                                    if (['add', 'create'].includes(operation || '')) {
+                                        setFieldValue('roles', [...roles, role]);
+                                        return true;
+                                    }
                                     if (!values?.id) {
                                         console.warn('Menu ID is required');
                                         return false;
@@ -231,7 +225,7 @@ function EditMenuFields({
                                 <Button variant="secondary" onClick={() => ModalService.hideModal(setMenuItemsModal)}>
                                     Close
                                 </Button>
-                                <Button variant="primary" onClick={() => { 
+                                <Button variant="primary" onClick={() => {
                                     setFieldValue('menu_items', selectedMenuItems);
                                     ModalService.hideModal(setMenuItemsModal);
                                 }}>

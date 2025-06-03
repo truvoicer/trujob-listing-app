@@ -15,6 +15,7 @@ import { DataTableItem } from "@/components/Table/DataTable";
 import ManageProductPrice from "../Product/Price/ManageProductPrice";
 import { Price } from "@/types/Price";
 import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditDiscountFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -216,7 +217,7 @@ function EditDiscountFields({
                                 const filteredProducts = mergedProducts.filter((product) => {
                                     return checked.some((price) => price.id === product.price_id);
                                 });
-
+                                
                                 setSelectedPrices(filteredProducts);
                                 setFieldValue('products', filteredProducts);
                             }}
@@ -225,11 +226,6 @@ function EditDiscountFields({
                 );
             },
             onOk: () => {
-                if (selectedPrices.length === 0) {
-                    console.warn('No prices selected');
-                    return true;
-                }
-
                 if (['add', 'create'].includes(operation)) {
                     setFieldValue('prices', selectedPrices);
                     return true;
@@ -249,33 +245,23 @@ function EditDiscountFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_active"
-                                id="is_active"
-                                onChange={handleChange}
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active"
+                            label="Is Active"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_code_required"
-                                id="is_code_required"
-                                onChange={handleChange}
-                                checked={values?.is_code_required || false} />
-                            <label className="custom-control-label" htmlFor="is_code_required">
-                                Is Code Required
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_code_required'}
+                            placeholder="Is Code Required"
+                            label="Is Code Required"
+                            onChange={handleChange}
+                            value={values?.is_code_required || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
                         <TextInput
@@ -305,34 +291,26 @@ function EditDiscountFields({
 
                     {values?.type === 'fixed' && (
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="number"
-                                    name="amount"
-                                    id="amount"
-                                    onChange={handleChange}
-                                    value={values?.amount || 0} />
-                                <label className="form-label" htmlFor="amount">
-                                    Amount
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.amount || 0}
+                                onChange={handleChange}
+                                placeholder="Enter amount"
+                                type="number"
+                                name="amount"
+                                label="Amount"
+                            />
                         </div>
                     )}
                     {values?.type === 'percentage' && (
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="number"
-                                    name="rate"
-                                    id="rate"
-                                    onChange={handleChange}
-                                    value={values?.rate || 0} />
-                                <label className="form-label" htmlFor="rate">
-                                    Rate
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.rate || 0}
+                                onChange={handleChange}
+                                placeholder="Enter rate"
+                                type="number"
+                                name="rate"
+                                label="Rate"
+                            />
                         </div>
                     )}
 
@@ -397,63 +375,47 @@ function EditDiscountFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="usage_limit"
-                                id="usage_limit"
-                                onChange={handleChange}
-                                value={values?.usage_limit || 0} />
-                            <label className="form-label" htmlFor="usage_limit">
-                                Usage Limit
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.usage_limit || 0}
+                            onChange={handleChange}
+                            placeholder="Enter usage limit"
+                            type="number"
+                            name="usage_limit"
+                            label="Usage Limit"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="per_user_limit"
-                                id="per_user_limit"
-                                onChange={handleChange}
-                                value={values?.per_user_limit || 0} />
-                            <label className="form-label" htmlFor="per_user_limit">
-                                Per User Limit
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.per_user_limit || 0}
+                            onChange={handleChange}
+                            placeholder="Enter per user limit"
+                            type="number"
+                            name="per_user_limit"
+                            label="Per User Limit"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="min_order_amount"
-                                id="min_order_amount"
-                                onChange={handleChange}
-                                value={values?.min_order_amount || 0} />
-                            <label className="form-label" htmlFor="min_order_amount">
-                                Min Order Amount
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.min_order_amount || 0}
+                            onChange={handleChange}
+                            placeholder="Enter min order amount"
+                            type="number"
+                            name="min_order_amount"
+                            label="Min Order Amount"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="min_items_quantity"
-                                id="min_items_quantity"
-                                onChange={handleChange}
-                                value={values?.min_items_quantity || 0} />
-                            <label className="form-label" htmlFor="min_items_quantity">
-                                Min Items Quantity
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.min_items_quantity || 0}
+                            onChange={handleChange}
+                            placeholder="Enter min items quantity"
+                            type="number"
+                            name="min_items_quantity"
+                            label="Min Items Quantity"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">

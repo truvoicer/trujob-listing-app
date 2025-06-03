@@ -3,6 +3,7 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import TextInput from "@/components/Elements/TextInput";
 
 type EditProductReviewFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -24,34 +25,26 @@ function EditProductReviewFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="review"
-                                id="review"
-                                onChange={handleChange}
-                                value={values?.review || ""} />
-                            <label className="form-label" htmlFor="title">
-                                Review
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.review || ""}
+                            onChange={handleChange}
+                            placeholder="Enter review"
+                            name="review"
+                            type="text"
+                            label="Review"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="rating"
-                                id="rating"
-                                onChange={handleChange}
-                                value={values?.rating || ""} />
-                            <label className="form-label" htmlFor="rating">
-                                Rating
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.rating || ""}
+                            onChange={handleChange}
+                            placeholder="Enter rating"
+                            name="rating"
+                            type="text"
+                            label="Rating"
+                        />
                     </div>
-                    
+
                 </div>
             </div>
         </div>

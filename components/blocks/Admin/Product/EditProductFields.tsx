@@ -17,6 +17,8 @@ import ManageProductColor from "./Color/ManageProductColor";
 import ManageProductProductType from "./ProductType/ManageProductProductType";
 import { Price } from "@/types/Price";
 import ManageProductPrice from "./Price/ManageProductPrice";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditProductFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -597,84 +599,64 @@ function EditProductFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                onChange={handleChange}
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="active"
-                                name="active"
-                                checked={values?.active || false} />
-                            <label className="custom-control-label" htmlFor="active">
-                                Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'active'}
+                            placeholder="Active?"
+                            label="Active?"
+                            onChange={handleChange}
+                            value={values?.active || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="allow_offers"
-                                name="allow_offers"
-                                onChange={handleChange}
-                                checked={values?.allow_offers || false} />
-                            <label className="custom-control-label" htmlFor="allow_offers">
-                                Allow Offers
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'allow_offers'}
+                            placeholder="Allow Offers?"
+                            label="Allow Offers?"
+                            onChange={handleChange}
+                            value={values?.allow_offers || false}
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="title"
-                                id="title"
-                                onChange={handleChange}
-                                value={values?.title || ""} />
-                            <label className="form-label" htmlFor="title">Title</label>
-                        </div>
+                        <TextInput
+                            value={values?.title || ""}
+                            onChange={handleChange}
+                            placeholder="Enter title"
+                            name="title"
+                            type="text"
+                            label="Title"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">Name</label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            name="name"
+                            type="text"
+                            label="Name"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <textarea
-                                className="form-control"
-                                name="description"
-                                id="description"
-                                onChange={handleChange}
-                                value={values?.description || ""}></textarea>
-                            <label className="form-label" htmlFor="description">Description</label>
-                        </div>
+                        <TextInput
+                            value={values?.description || ""}
+                            onChange={handleChange}
+                            placeholder="Enter description"
+                            name="description"
+                            label="Description"
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="quantity"
-                                id="quantity"
-                                onChange={handleChange}
-                                value={values?.quantity || ""} />
-                            <label className="form-label" htmlFor="quantity">
-                                Quantity
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.quantity || ""}
+                            onChange={handleChange}
+                            placeholder="Enter quantity"
+                            name="quantity"
+                            type="text"
+                            label="Quantity"
+                        />
                     </div>
 
 

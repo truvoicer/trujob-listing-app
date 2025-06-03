@@ -9,6 +9,8 @@ import CurrencySelect from "@/components/blocks/Locale/Currency/CurrencySelect";
 import SelectTaxRateScope from "./SelectTaxRateScope";
 import RegionSelect from "@/components/blocks/Locale/Region/RegionSelect";
 import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditTaxRateFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -30,63 +32,51 @@ function EditTaxRateFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">
-                                Name
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            name="name"
+                            type="text"
+                            label="Name"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <SelectTaxRateScope />
+                        <SelectTaxRateScope value={values?.scope}/>
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <SelectTaxRateType />
+                        <SelectTaxRateType value={values?.type}/>
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <SelectTaxRateAmountType />
+                        <SelectTaxRateAmountType value={values?.amount_type}/>
                     </div>
 
                     {values?.amount_type === "fixed" && (
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="amount"
-                                    id="amount"
-                                    onChange={handleChange}
-                                    value={values?.amount || ""} />
-                                <label className="form-label" htmlFor="amount">
-                                    Amount
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.amount || ""}
+                                onChange={handleChange}
+                                placeholder="Enter amount"
+                                name="amount"
+                                type="text"
+                                label="Amount"
+                            />
                         </div>
                     )}
 
                     {values?.amount_type === "percentage" && (
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="rate"
-                                    id="rate"
-                                    onChange={handleChange}
-                                    value={values?.rate || ""} />
-                                <label className="form-label" htmlFor="rate">
-                                    Rate
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.rate || ""}
+                                onChange={handleChange}
+                                placeholder="Enter rate"
+                                name="rate"
+                                type="text"
+                                label="Rate"
+                            />
                         </div>
                     )}
 
@@ -129,18 +119,13 @@ function EditTaxRateFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="has_region"
-                                id="has_region"
-                                onChange={handleChange}
-                                checked={values?.has_region || false} />
-                            <label className="custom-control-label" htmlFor="has_region">
-                                Is Region Required?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'has_region'}
+                            placeholder="Has Region?"
+                            label="Has Region?"
+                            onChange={handleChange}
+                            value={values?.has_region || false}
+                        />
                     </div>
                     {values?.has_region &&
                         <div className="col-12 col-lg-6">
@@ -164,32 +149,22 @@ function EditTaxRateFields({
                     }
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_active"
-                                id="is_active"
-                                onChange={handleChange}
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active?"
+                            label="Is Active?"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_default"
-                                id="is_default"
-                                onChange={handleChange}
-                                checked={values?.is_default || false} />
-                            <label className="custom-control-label" htmlFor="is_default">
-                                Is Default?
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_default'}
+                            placeholder="Is Default?"
+                            label="Is Default?"
+                            onChange={handleChange}
+                            value={values?.is_default || false}
+                        />
                     </div>
                 </div>
             </div>

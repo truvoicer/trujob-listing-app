@@ -423,20 +423,16 @@ function ProductTestCheckout({
                       </div>
 
                       <div className="col-12 col-lg-6 mt-4">
-                        <div className="floating-input form-group">
-                          <input
-                            className="form-control"
-                            type="number"
-                            name="quantity"
-                            id="quantity"
+                        <TextInput
+                            value={values?.quantity || 0}
                             onChange={(e) => {
                               setQuantity(Number(e.target.value));
                             }}
-                            value={quantity} />
-                          <label className="form-label" htmlFor="quantity">
-                            Quantity
-                          </label>
-                        </div>
+                            placeholder="Enter quantity"
+                            type="number"
+                            name="quantity"
+                            label="Quantity"
+                        />
                       </div>
 
                     </div>

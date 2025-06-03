@@ -6,6 +6,8 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { FormikValues, useFormikContext } from "formik";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 
 export type RolesModal = {
@@ -70,7 +72,7 @@ function EditSidebarWidgetFields({
         setFieldValue,
         handleChange,
     } = useFormikContext<FormikValues>() || {};
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -78,76 +80,55 @@ function EditSidebarWidgetFields({
                     <div className="row">
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    onChange={handleChange}
-                                    value={values?.name || ""} />
-                                <label className="form-label" htmlFor="name">Name</label>
-                            </div>
+                            <TextInput
+                                value={values?.name || ""}
+                                onChange={handleChange}
+                                placeholder="Enter name"
+                                name="name"
+                                type="text"
+                                label="Name"
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    onChange={handleChange}
-                                    value={values?.title || ""} />
-                                <label className="form-label" htmlFor="title">
-                                    Title
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.title || ""}
+                                onChange={handleChange}
+                                placeholder="Enter title"
+                                name="title"
+                                type="text"
+                                label="Title"
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="description"
-                                    id="description"
-                                    onChange={handleChange}
-                                    value={values?.description || ""} />
-                                <label className="form-label" htmlFor="description">
-                                    Description
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.description || ""}
+                                onChange={handleChange}
+                                placeholder="Enter description"
+                                name="description"
+                                type="text"
+                                label="Description"
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="icon"
-                                    id="icon"
-                                    onChange={handleChange}
-                                    value={values?.icon || ""} />
-                                <label className="form-label" htmlFor="icon">
-                                    Icon
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.icon || ""}
+                                onChange={handleChange}
+                                placeholder="Enter icon"
+                                name="icon"
+                                type="text"
+                                label="Icon"
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    onChange={e => {
-                                        handleChange(e);
-                                    }}
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="has_container"
-                                    name="has_container"
-                                    checked={values?.has_container || false} />
-                                <label className="custom-control-label" htmlFor="has_container">
-                                    Has Container?
-                                </label>
-                            </div>
+                            <Checkbox
+                                name={'has_container'}
+                                placeholder="Has Container?"
+                                label="Has Container?"
+                                onChange={handleChange}
+                                value={values?.has_container || false}
+                            />
                         </div>
 
                         <div className="col-12 my-3">
@@ -232,7 +213,7 @@ function EditSidebarWidgetFields({
                                             return false;
                                         }
                                         return true;
-                                    } else if (['add', 'create'].includes(operation || '')) { 
+                                    } else if (['add', 'create'].includes(operation || '')) {
                                         let roles = values?.roles || [];
                                         setFieldValue('roles', [...roles, role]);
                                         return true;

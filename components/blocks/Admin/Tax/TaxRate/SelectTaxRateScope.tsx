@@ -10,7 +10,7 @@ export type SelectTaxRateScopeProps = {
     value?: string | null;
 }
 function SelectTaxRateScope({
-    name = 'type',
+    name = 'scope',
     value,
 }: SelectTaxRateScopeProps) {
     const [taxRateScopes, setTaxRateScopes] = useState<Array<string>>([]);
@@ -60,7 +60,7 @@ function SelectTaxRateScope({
         formContext.setFieldValue(name, selectedTaxRateScope);
 
     }, [selectedTaxRateScope]);
-
+    console.log(selectedTaxRateScope);
     return (
         <div className="floating-input form-group">
             <select

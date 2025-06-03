@@ -15,6 +15,7 @@ import moment from "moment";
 import ManageUser from "../../User/ManageUser";
 import { PriceType } from "@/types/Price";
 import { User } from "@/types/User";
+import Checkbox from "@/components/Elements/Checkbox";
 
 export type EditProductPriceFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -278,32 +279,22 @@ function EditProductPriceFields({
 
 
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                onChange={handleChange}
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="is_default"
-                                name="is_default"
-                                checked={values?.is_default || false} />
-                            <label className="custom-control-label" htmlFor="is_default">
-                                Is Default
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_default'}
+                            placeholder="Is Default?"
+                            label="Is Default?"
+                            onChange={handleChange}
+                            value={values?.is_default || false}
+                        />
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                onChange={handleChange}
-                                type="checkbox"
-                                className="custom-control-input"
-                                id="is_active"
-                                name="is_active"
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active?"
+                            label="Is Active?"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
 
 

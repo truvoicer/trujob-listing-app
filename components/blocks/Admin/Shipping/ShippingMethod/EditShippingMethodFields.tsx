@@ -4,6 +4,8 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import QuantityInput from "@/components/QuantityInput";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
 
 type EditShippingMethodFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -25,33 +27,25 @@ function EditShippingMethodFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="carrier"
-                                id="carrier"
-                                onChange={handleChange}
-                                value={values?.carrier || ""} />
-                            <label className="form-label" htmlFor="carrier">
-                                Carrier
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.carrier || ""}
+                            onChange={handleChange}
+                            placeholder="Enter carrier"
+                            name="carrier"
+                            type="text"
+                            label="Carrier"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="description"
-                                id="description"
-                                onChange={handleChange}
-                                value={values?.description || ""} />
-                            <label className="form-label" htmlFor="description">
-                                Description
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.description || ""}
+                            onChange={handleChange}
+                            placeholder="Enter description"
+                            name="description"
+                            type="text"
+                            label="Description"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
@@ -68,18 +62,13 @@ function EditShippingMethodFields({
                         </div>
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="custom-control custom-checkbox mb-3 text-left">
-                            <input
-                                className="custom-control-input"
-                                type="checkbox"
-                                name="is_active"
-                                id="is_active"
-                                onChange={handleChange}
-                                checked={values?.is_active || false} />
-                            <label className="custom-control-label" htmlFor="is_active">
-                                Is Active
-                            </label>
-                        </div>
+                        <Checkbox
+                            name={'is_active'}
+                            placeholder="Is Active?"
+                            label="Is Active?"
+                            onChange={handleChange}
+                            value={values?.is_active || false}
+                        />
                     </div>
 
                 </div>

@@ -16,6 +16,9 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import RoleForm from "../Role/RoleForm";
 import { Role } from "@/types/Role";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import TextInput from "@/components/Elements/TextInput";
+import Checkbox from "@/components/Elements/Checkbox";
+import Textarea from "@/components/Elements/Textarea";
 
 
 type EditPageFields = {
@@ -386,97 +389,74 @@ function EditPageFields({
                             />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    onChange={handleChange}
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="is_active"
-                                    name="is_active"
-                                    checked={values?.is_active || false} />
-                                <label className="custom-control-label" htmlFor="is_active">
-                                    Is active
-                                </label>
-                            </div>
+                            <Checkbox
+                                name={'is_active'}
+                                placeholder="Is active?"
+                                label="Is active?"
+                                onChange={handleChange}
+                                value={values?.is_active || false}
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="is_featured"
-                                    name="is_featured"
-                                    onChange={handleChange}
-                                    checked={values?.is_featured || false} />
-                                <label className="custom-control-label" htmlFor="is_featured">
-                                    Is Featured
-                                </label>
-                            </div>
+                            <Checkbox
+                                name={'is_featured'}
+                                placeholder="Is featured?"
+                                label="Is featured?"
+                                onChange={handleChange}
+                                value={values?.is_featured || false}
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="custom-control custom-checkbox mb-3 text-left">
-                                <input
-                                    type="checkbox"
-                                    className="custom-control-input"
-                                    id="is_home"
-                                    name="is_home"
-                                    onChange={handleChange}
-                                    checked={values?.is_home || false} />
-                                <label className="custom-control-label" htmlFor="is_home">
-                                    Is Home
-                                </label>
-                            </div>
+                            <Checkbox
+                                name={'is_home'}
+                                placeholder="Is Home?"
+                                label="Is Home?"
+                                onChange={handleChange}
+                                value={values?.is_home || false}
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    onChange={handleChange}
-                                    value={values?.title || ""} />
-                                <label className="form-label" htmlFor="title">Title</label>
-                            </div>
+                            <TextInput
+                                value={values?.title || ""}
+                                onChange={handleChange}
+                                placeholder="Enter title"
+                                name="title"
+                                type="text"
+                                label="Title"
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    onChange={handleChange}
-                                    value={values?.name || ""} />
-                                <label className="form-label" htmlFor="name">Name</label>
-                            </div>
+                            <TextInput
+                                value={values?.name || ""}
+                                onChange={handleChange}
+                                placeholder="Enter name"
+                                name="name"
+                                type="text"
+                                label="Name"
+                            />
                         </div>
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="permalink"
-                                    id="permalink"
-                                    onChange={handleChange}
-                                    value={values?.permalink || ""} />
-                                <label className="form-label" htmlFor="permalink">Permalink</label>
-                            </div>
+                            <TextInput
+                                value={values?.permalink || ""}
+                                onChange={handleChange}
+                                placeholder="Enter permalink"
+                                name="permalink"
+                                type="text"
+                                label="Permalink"
+                            />
                         </div>
 
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <textarea
-                                    className="form-control"
-                                    name="content"
-                                    id="content"
-                                    onChange={handleChange}
-                                    value={values?.content || ""}></textarea>
-                                <label className="form-label" htmlFor="content">Content</label>
-                            </div>
+                            <TextInput
+                                value={values?.content || ""}
+                                onChange={handleChange}
+                                placeholder="Enter content"
+                                name="content"
+                                label="Content"
+                            />
                         </div>
 
 
