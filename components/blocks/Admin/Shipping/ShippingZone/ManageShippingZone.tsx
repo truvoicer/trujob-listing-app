@@ -114,8 +114,8 @@ function ManageShippingZone({
                         dataTableContextState.modal.show({
                             title: 'Edit shipping zone',
                             component: (
-                                <EditShippingZone
-                                    data={item}
+                                <EditShippingZone 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_SHIPPING_ZONE_MODAL_ID}
@@ -205,8 +205,8 @@ function ManageShippingZone({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Shipping zone',
                                         component: (
-                                            <EditShippingZone
-                                                data={item}
+                                            <EditShippingZone 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_SHIPPING_ZONE_MODAL_ID}
@@ -332,8 +332,8 @@ function ManageShippingZone({
         modalState.show({
             title: 'Create shipping zone',
             component: (
-                <EditShippingZone
-                    operation={'create'}
+                <EditShippingZone 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_SHIPPING_ZONE_MODAL_ID}
                 />

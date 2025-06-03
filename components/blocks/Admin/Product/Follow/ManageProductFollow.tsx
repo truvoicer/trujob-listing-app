@@ -106,8 +106,8 @@ function ManageProductFollow({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditProductFollow
-                                    productId={productId}
+                                <EditProductFollow 
+                        dataTable={dataTableContextState}                                     productId={productId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -209,8 +209,8 @@ function ManageProductFollow({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product',
                                         component: (
-                                            <EditProductFollow
-                                                productId={productId}
+                                            <EditProductFollow 
+                        dataTable={dataTableContextState}                                                 productId={productId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -364,8 +364,8 @@ function ManageProductFollow({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditProductFollow
-                        productId={productId}
+                    <EditProductFollow 
+                        dataTable={dataTableContextState}                         productId={productId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_PRODUCT_FOLLOW_MODAL_ID}

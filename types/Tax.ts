@@ -1,4 +1,5 @@
 import { Country } from "./Country";
+import { Currency } from "./Currency";
 import { Region } from "./Region";
 
 export type TaxRate = {
@@ -8,6 +9,8 @@ export type TaxRate = {
     amount: number | null;
     rate: number | null;
     country: Country;
+    currency: Currency;
+    has_region: boolean;
     region: Region;
     is_default: boolean;
     scope: 'shipping' | 'product' | 'all';
@@ -23,6 +26,8 @@ export type TaxRateRequest = {
     amount?: number | null;
     rate?: number | null;
     country_id?: number;
+    currency_id?: number;
+    has_region?: boolean;
     region_id?: number;
     is_default?: boolean;
     scope?: 'shipping' | 'product' | 'all';
@@ -35,6 +40,8 @@ export interface CreateTaxRate extends TaxRateRequest {
     amount?: number | null;
     rate?: number | null;
     country_id: number;
+    currency_id?: number;
+    has_region?: boolean;
     region_id?: number;
     is_default?: boolean;
     scope?: 'shipping' | 'product' | 'all';

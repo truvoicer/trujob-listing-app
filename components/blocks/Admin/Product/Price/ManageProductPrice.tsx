@@ -73,7 +73,7 @@ function ManageProductPrice({
                     console.warn('submitForm is not a function');
                     return;
                 }
-                
+
                 switch (mode) {
                     case 'selector':
                         DataManagerService.selectorModeHandler({
@@ -115,6 +115,7 @@ function ManageProductPrice({
                             title: 'Edit Product Price',
                             component: (
                                 <EditProductPrice
+                                    dataTable={dataTableContextState}
                                     productId={productId}
                                     data={item}
                                     operation={'edit'}
@@ -223,6 +224,7 @@ function ManageProductPrice({
                                         title: 'Edit Product',
                                         component: (
                                             <EditProductPrice
+                                                dataTable={dataTableContextState}
                                                 productId={productId}
                                                 data={item}
                                                 operation={'edit'}
@@ -360,6 +362,7 @@ function ManageProductPrice({
             }) => {
                 return (
                     <EditProductPrice
+                        dataTable={dataTableContextState}
                         productId={productId}
                         operation={'create'}
                         inModal={true}

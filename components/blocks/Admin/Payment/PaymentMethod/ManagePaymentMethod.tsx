@@ -114,8 +114,8 @@ function ManagePaymentMethod({
                         dataTableContextState.modal.show({
                             title: 'Edit payment method',
                             component: (
-                                <EditPaymentMethod
-                                    data={item}
+                                <EditPaymentMethod 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
@@ -205,8 +205,8 @@ function ManagePaymentMethod({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Payment method',
                                         component: (
-                                            <EditPaymentMethod
-                                                data={item}
+                                            <EditPaymentMethod 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
@@ -332,8 +332,8 @@ function ManagePaymentMethod({
         modalState.show({
             title: 'Create payment method',
             component: (
-                <EditPaymentMethod
-                    operation={'create'}
+                <EditPaymentMethod 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_PAYMENT_METHOD_MODAL_ID}
                 />

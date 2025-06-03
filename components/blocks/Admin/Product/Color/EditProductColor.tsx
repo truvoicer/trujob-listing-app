@@ -1,19 +1,18 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_COLOR_MODAL_ID, EDIT_COLOR_MODAL_ID, EDIT_PRODUCT_COLOR_MODAL_ID } from "./ManageProductColor";
+import { CREATE_PRODUCT_COLOR_MODAL_ID, EDIT_PRODUCT_COLOR_MODAL_ID } from "./ManageProductColor";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import { Sidebar } from "@/types/Sidebar";
 import EditProductColorFields from "./EditProductColorFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Color } from "@/types/Color";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductColorProps = {
     productId?: number;
@@ -21,8 +20,10 @@ export type EditProductColorProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductColor({
+    dataTable,
     productId,
     data,
     operation,
@@ -65,7 +66,7 @@ function EditProductColor({
             case 'add':
             case 'create':
             case 'edit':
-                case 'update':
+            case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -101,6 +102,9 @@ function EditProductColor({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_COLOR_MODAL_ID);

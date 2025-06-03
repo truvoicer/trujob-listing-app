@@ -9,8 +9,8 @@ import EditProductTypeFields from "./EditProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { CREATE_PRODUCT_TYPE_MODAL_ID, EDIT_PRODUCT_TYPE_MODAL_ID } from "./ManageProductType";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditProductTypeProps = {
@@ -18,8 +18,10 @@ export type EditProductTypeProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductType({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -114,6 +116,9 @@ function EditProductType({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_TYPE_MODAL_ID);

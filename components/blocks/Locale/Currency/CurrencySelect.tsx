@@ -108,7 +108,7 @@ function CurrencySelect({
           }
           return {
             value: data.id,
-            label: `${data.name}`,
+            label: `${data.name} (${data?.country?.name})`,
           };
         }
 

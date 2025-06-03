@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -8,10 +7,10 @@ import { EDIT_MEDIA_MODAL_ID } from "./ManageMedia";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import { Sidebar } from "@/types/Sidebar";
 import EditMediaFields from "./EditMediaFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditMediaProps = {
@@ -19,8 +18,10 @@ export type EditMediaProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditMedia({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -224,6 +225,9 @@ function EditMedia({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_MEDIA_MODAL_ID);

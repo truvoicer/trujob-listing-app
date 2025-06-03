@@ -14,6 +14,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Feature } from "@/types/Feature";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductFeatureProps = {
     productId?: number;
@@ -21,8 +22,10 @@ export type EditProductFeatureProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductFeature({
+    dataTable,
     productId,
     data,
     operation,
@@ -65,7 +68,7 @@ function EditProductFeature({
             case 'add':
             case 'create':
             case 'edit':
-                case 'update':
+            case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -101,6 +104,9 @@ function EditProductFeature({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_FEATURE_MODAL_ID);

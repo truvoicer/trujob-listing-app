@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditBrandProps = {
@@ -18,8 +19,10 @@ export type EditBrandProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditBrand({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -133,6 +136,9 @@ function EditBrand({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_BRAND_MODAL_ID);

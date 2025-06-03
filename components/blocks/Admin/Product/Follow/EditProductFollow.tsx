@@ -11,6 +11,7 @@ import { User } from "@/types/User";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CREATE_PRODUCT_FOLLOW_MODAL_ID, EDIT_PRODUCT_FOLLOW_MODAL_ID } from "./ManageProductFollow";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditProductFollowProps = {
@@ -19,8 +20,10 @@ export type EditProductFollowProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+        dataTable?: DataTableContextType;
 }
 function EditProductFollow({
+    dataTable,
     productId,
     data,
     operation,
@@ -99,6 +102,9 @@ function EditProductFollow({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_FOLLOW_MODAL_ID);

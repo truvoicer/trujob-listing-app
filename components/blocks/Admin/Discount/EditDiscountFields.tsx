@@ -14,6 +14,7 @@ import ManageProduct from "../Product/ManageProduct";
 import { DataTableItem } from "@/components/Table/DataTable";
 import ManageProductPrice from "../Product/Price/ManageProductPrice";
 import { Price } from "@/types/Price";
+import TextInput from "@/components/Elements/TextInput";
 
 type EditDiscountFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -241,7 +242,7 @@ function EditDiscountFields({
             }
         }
     ]);
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -277,33 +278,25 @@ function EditDiscountFields({
                         </div>
                     </div>
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">
-                                Name
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            type="text"
+                            name="name"
+                            label="Name"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="description"
-                                id="description"
-                                onChange={handleChange}
-                                value={values?.description || ""} />
-                            <label className="form-label" htmlFor="description">
-                                Description
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.description || ""}
+                            onChange={handleChange}
+                            placeholder="Enter description"
+                            type="text"
+                            name="description"
+                            label="Description"
+                        />
                     </div>
 
                     <div className="col-12 col-lg-6">
@@ -311,20 +304,20 @@ function EditDiscountFields({
                     </div>
 
                     {values?.type === 'fixed' && (
-                    <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="number"
-                                name="amount"
-                                id="amount"
-                                onChange={handleChange}
-                                value={values?.amount || 0} />
-                            <label className="form-label" htmlFor="amount">
-                                Amount
-                            </label>
+                        <div className="col-12 col-lg-6">
+                            <div className="floating-input form-group">
+                                <input
+                                    className="form-control"
+                                    type="number"
+                                    name="amount"
+                                    id="amount"
+                                    onChange={handleChange}
+                                    value={values?.amount || 0} />
+                                <label className="form-label" htmlFor="amount">
+                                    Amount
+                                </label>
+                            </div>
                         </div>
-                    </div>
                     )}
                     {values?.type === 'percentage' && (
                         <div className="col-12 col-lg-6">
@@ -468,18 +461,14 @@ function EditDiscountFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="code"
-                                id="code"
-                                onChange={handleChange}
-                                value={values?.code || ""} />
-                            <label className="form-label" htmlFor="code">
-                                Code
-                            </label>
-                        </div>
+                        <TextInput
+                            value={values?.code || ""}
+                            onChange={handleChange}
+                            placeholder="Enter code"
+                            type="text"
+                            name="code"
+                            label="Code"
+                        />
                     </div>
 
                     <div className="col-12 my-3">

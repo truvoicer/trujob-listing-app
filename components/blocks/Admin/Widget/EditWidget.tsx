@@ -10,6 +10,7 @@ import EditWidgetFields from "./EditWidgetFields";
 import { EDIT_SIDEBAR_MODAL_ID } from "./ManageWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditWidgetProps = {
@@ -17,12 +18,14 @@ export type EditWidgetProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 };
 function EditWidget({
     data,
     operation,
     inModal = false,
     modalId,
+    dataTable,
 }: EditWidgetProps) {
 
     const [alert, setAlert] = useState<{
@@ -163,7 +166,10 @@ function EditWidget({
                 ),
                 type: 'danger',
             });
-            return;
+            
+        if (dataTable) {
+            dataTable.refresh();
+        }return;
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);

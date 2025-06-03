@@ -20,10 +20,12 @@ import { DataManagerService } from "@/library/services/data-manager/DataManagerS
 export interface ManageUserProps extends DataManageComponentProps {
     data?: Array<User>;
     values?: Array<User>;
+    fixSessionUser?: boolean;
 }
 export const EDIT_USER_MODAL_ID = 'edit-user-modal';
 
 function ManageUser({
+    fixSessionUser = false,
     operation = 'create',
     mode = 'selector',
     values,
@@ -111,8 +113,8 @@ function ManageUser({
                         dataTableContextState.modal.show({
                             title: 'Edit User',
                             component: (
-                                <EditUser
-                                    data={item}
+                                <EditUser 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_USER_MODAL_ID}
@@ -136,8 +138,8 @@ function ManageUser({
                                     dataTableContextState.modal.show({
                                         title: 'Edit User',
                                         component: (
-                                            <EditUser
-                                                data={item}
+                                            <EditUser 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_USER_MODAL_ID}
@@ -230,7 +232,8 @@ function ManageUser({
         const preparedQuery = await prepareSearch(searchParams);
         query = {
             ...query,
-            ...preparedQuery
+            ...preparedQuery,
+            fix_session_user: fixSessionUser ? true : false,
         }
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -251,8 +254,8 @@ function ManageUser({
         dataTableContextState.modal.show({
             title: 'Add New User',
             component: (
-                <EditUser
-                    operation={'add'}
+                <EditUser 
+                        dataTable={dataTableContextState}                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_USER_MODAL_ID}
                 />
@@ -276,7 +279,6 @@ function ManageUser({
                     title: 'Edit Menu',
                     message: 'Are you sure you want to delete selected users?',
                     onOk: async () => {
-                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',

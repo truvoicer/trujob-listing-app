@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { ShippingZone, CreateShippingZone, UpdateShippingZone } from "@/types/ShippingZone";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditShippingZoneProps = {
@@ -18,8 +19,10 @@ export type EditShippingZoneProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditShippingZone({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -132,6 +135,9 @@ function EditShippingZone({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_SHIPPING_ZONE_MODAL_ID);

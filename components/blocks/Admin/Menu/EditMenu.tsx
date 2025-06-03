@@ -11,6 +11,7 @@ import EditMenuFields from "./EditMenuFields";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { FormikProps, FormikValues } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditMenuProps = {
@@ -18,8 +19,10 @@ export type EditMenuProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+        dataTable?: DataTableContextType;
 };
 function EditMenu({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -211,6 +214,9 @@ function EditMenu({
             return;
         }
 
+        if (dataTable) {
+            dataTable.refresh();
+        }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_MENU_MODAL_ID);
     }

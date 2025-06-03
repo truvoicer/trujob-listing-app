@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -11,6 +10,7 @@ import { CreateProduct, Product, ProductRequest, UpdateProduct } from "@/types/P
 import EditProductFields from "./EditProductFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditProductProps = {
@@ -18,8 +18,10 @@ export type EditProductProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProduct({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -118,7 +120,7 @@ function EditProduct({
     }
 
     function buildCreateData(values: Product) {
-        console.log('buildCreateData', {values});
+        console.log('buildCreateData', { values });
         if (!values?.type?.id) {
             console.warn('Product type is required');
             return;
@@ -163,7 +165,7 @@ function EditProduct({
             case 'edit':
             case 'update':
                 requestData = buildUpdateData(values);
-                console.log('edit requestData', {requestData, values});
+                console.log('edit requestData', { requestData, values });
                 if (!data?.id) {
                     throw new Error('Product ID is required');
                 }
@@ -177,7 +179,7 @@ function EditProduct({
             case 'add':
             case 'create':
                 requestData = buildCreateData(values);
-                console.log('create requestData', {requestData, values});
+                console.log('create requestData', { requestData, values });
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: `${truJobApiConfig.endpoints.product}/create`,
                     method: ApiMiddleware.METHOD.POST,
@@ -189,7 +191,7 @@ function EditProduct({
                 console.log('Invalid operation');
                 break;
         }
-        console.log('response', {response});
+        console.log('response', { response });
         if (!response) {
             setAlert({
                 show: true,
@@ -206,6 +208,9 @@ function EditProduct({
                 type: 'danger',
             });
             return false;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_MODAL_ID);

@@ -11,6 +11,7 @@ import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
 import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
 import { CreateWidget, Widget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditSidebarProps = {
@@ -18,8 +19,10 @@ export type EditSidebarProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 };
 function EditSidebar({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -180,6 +183,9 @@ function EditSidebar({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);

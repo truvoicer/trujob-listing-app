@@ -114,8 +114,8 @@ function ManageBrand({
                         dataTableContextState.modal.show({
                             title: 'Edit Brand',
                             component: (
-                                <EditBrand
-                                    data={item}
+                                <EditBrand 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_BRAND_MODAL_ID}
@@ -205,8 +205,8 @@ function ManageBrand({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Brand',
                                         component: (
-                                            <EditBrand
-                                                data={item}
+                                            <EditBrand 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_BRAND_MODAL_ID}
@@ -332,8 +332,8 @@ function ManageBrand({
         modalState.show({
             title: 'Create Brand',
             component: (
-                <EditBrand
-                    operation={'create'}
+                <EditBrand 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_BRAND_MODAL_ID}
                 />

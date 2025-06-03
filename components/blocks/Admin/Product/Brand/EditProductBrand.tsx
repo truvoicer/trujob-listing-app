@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -8,12 +7,12 @@ import { CREATE_PRODUCT_BRAND_MODAL_ID, EDIT_PRODUCT_BRAND_MODAL_ID } from "./Ma
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import { Sidebar } from "@/types/Sidebar";
 import EditProductBrandFields from "./EditProductBrandFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Brand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductBrandProps = {
     productId?: number;
@@ -21,8 +20,10 @@ export type EditProductBrandProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductBrand({
+    dataTable,
     productId,
     data,
     operation,
@@ -102,6 +103,9 @@ function EditProductBrand({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_BRAND_MODAL_ID);

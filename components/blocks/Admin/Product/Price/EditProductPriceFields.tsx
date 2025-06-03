@@ -58,7 +58,8 @@ function EditProductPriceFields({
                 >
                     <ManageUser
                         {...getProductComponentProps()}
-                        values={values?.user ? [values?.user] : []}
+                        fixSessionUser={true}
+                        values={values?.created_by_user ? [values?.created_by_user] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -80,7 +81,7 @@ function EditProductPriceFields({
                             }
                             const selectedUser = checked[0];
 
-                            setFieldValue('user', selectedUser);
+                            setFieldValue('created_by_user', selectedUser);
                         }}
                     />
                 </AccessControlComponent>
@@ -205,28 +206,35 @@ function EditProductPriceFields({
                         </div>
                     </div>
 
-                    <div className="col-12 col-lg-6 mt-3">
-                        <div className="floating-input">
-                            <label className="d-block fw-bold">
-                                User
-                            </label>
-                            {values?.user && (
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    Selected:
-                                    <div className="d-flex flex-wrap">
-                                        <div className="badge bg-primary-light mr-2 mb-2">
-                                            {values?.user?.first_name} {values?.user?.last_name} ({values?.user?.email})
+                    <AccessControlComponent
+                        id="edit-product-price-fields-user"
+                        roles={[
+                            { name: 'admin' },
+                            { name: 'superuser' },
+                        ]}
+                    >
+                        <div className="col-12 col-lg-6 mt-3">
+                            <div className="floating-input">
+                                <label className="d-block fw-bold">
+                                    Created By
+                                </label>
+                                {values?.created_by_user && (
+                                    <div className="d-flex justify-content-between align-items-center mb-3">
+                                        Selected:
+                                        <div className="d-flex flex-wrap">
+                                            <div className="badge bg-primary-light mr-2 mb-2">
+                                                {values?.created_by_user?.first_name} {values?.created_by_user?.last_name} ({values?.created_by_user?.email})
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            )}
-                            {modalService.renderLocalTriggerButton(
-                                'user',
-                                'Select User',
-                            )}
+                                )}
+                                {modalService.renderLocalTriggerButton(
+                                    'user',
+                                    'Select User',
+                                )}
+                            </div>
                         </div>
-                    </div>
-
+                    </AccessControlComponent>
                     <div className="col-12 col-lg-6 mt-3">
                         <div className="floating-input form-group">
                             <DateTimePicker
@@ -268,6 +276,7 @@ function EditProductPriceFields({
                         </div>
                     </div>
 
+
                     <div className="col-12 col-lg-6">
                         <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
@@ -282,7 +291,6 @@ function EditProductPriceFields({
                             </label>
                         </div>
                     </div>
-
                     <div className="col-12 col-lg-6">
                         <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
@@ -297,6 +305,7 @@ function EditProductPriceFields({
                             </label>
                         </div>
                     </div>
+
 
 
 

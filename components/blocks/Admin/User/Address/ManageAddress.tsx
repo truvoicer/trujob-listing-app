@@ -129,8 +129,8 @@ function ManageAddress({
         modalContext.show({
             title: 'Edit Address',
             component: (
-                <EditAddress
-                    type={type}
+                <EditAddress 
+                        dataTable={dataTableContextState}                     type={type}
                     data={item}
                     operation={'edit'}
                     inModal={true}
@@ -161,8 +161,8 @@ function ManageAddress({
         modalContext.show({
             title: 'Create Address',
             component: (
-                <EditAddress
-                    type={type}
+                <EditAddress 
+                        dataTable={dataTableContextState}                     type={type}
                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_ADDRESS_MODAL_ID}

@@ -9,9 +9,8 @@ import { CreateProductReview, ProductReview, UpdateProductReview } from "@/types
 import EditProductReviewFields from "./EditProductReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-
-import { FormikValues } from "formik";
 import { ADD_PRODUCT_REVIEW_MODAL_ID, EDIT_PRODUCT_REVIEW_MODAL_ID } from "./ManageProductReview";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductReviewProps = {
     productId?: number;
@@ -19,8 +18,10 @@ export type EditProductReviewProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductReview({
+    dataTable,
     productId,
     data,
     operation,
@@ -76,7 +77,7 @@ function EditProductReview({
         }
 
         let response = null;
-        
+
         switch (operation) {
             case 'edit':
             case 'update':
@@ -129,7 +130,10 @@ function EditProductReview({
                 ),
                 type: 'success',
             });
-        } 
+        }
+        if (dataTable) {
+            dataTable.refresh();
+        }
         dataTableContext?.modal?.close(ADD_PRODUCT_REVIEW_MODAL_ID);
         dataTableContext?.modal?.close(EDIT_PRODUCT_REVIEW_MODAL_ID);
         dataTableContext?.refresh();

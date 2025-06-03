@@ -169,3 +169,13 @@ export function objectMerge(obj1: any, obj2: any): any {
     }
     return merged;
 }
+
+export function randomStr(length: number): string {
+    var result           = '';
+    var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}

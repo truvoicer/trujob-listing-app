@@ -8,9 +8,9 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditTaxRateFields from "./EditTaxRateFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { TaxRate, CreateTaxRate, UpdateTaxRate } from "@/types/Tax";
+import { TaxRate, CreateTaxRate, UpdateTaxRate, TaxRateRequest } from "@/types/Tax";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditTaxRateProps = {
@@ -18,8 +18,10 @@ export type EditTaxRateProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditTaxRate({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -35,8 +37,18 @@ function EditTaxRate({
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: TaxRate = {
         id: data?.id || 0,
-        label: data?.label || '',
         name: data?.name || '',
+        label: data?.label || '',
+        type: data?.type || 'vat',
+        amount_type: data?.amount_type || 'fixed',
+        amount: data?.amount || null,
+        rate: data?.rate || null,
+        country_id: data?.country_id || 0,
+        has_region: data?.has_region || false,
+        region_id: data?.region_id || 0,
+        is_default: data?.is_default || false,
+        scope: data?.scope || 'all',
+        is_active: data?.is_active || true,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
@@ -44,11 +56,49 @@ function EditTaxRate({
 
     function buildCreateData(values: TaxRate) {
 
-        let requestData: CreateTaxRate = {
-            name: values?.name || '',
-            label: values?.label || '',
-        };
+        let requestData: CreateTaxRate = buildRequestData(values) as CreateTaxRate;
+        return requestData;
+    }
 
+    function buildRequestData(values: TaxRate) {
+
+        let requestData: TaxRateRequest = {};
+        if (values?.name) {
+            requestData.name = values.name;
+        }
+        if (values?.type) {
+            requestData.type = values.type;
+        }
+        if (values?.amount_type) {
+            requestData.amount_type = values.amount_type;
+        }
+        if (values?.amount !== undefined) {
+            requestData.amount = values.amount;
+        }
+        if (values?.rate !== undefined) {
+            requestData.rate = values.rate;
+        }
+        if (values?.country?.id) {
+            requestData.country_id = values.country.id;
+        }
+        if (values?.currency?.id) {
+            requestData.currency_id = values.currency.id;
+        }
+        if (values.hasOwnProperty('has_region')) {
+            requestData.has_region = values.has_region;
+        }
+        if (values?.region?.id) {
+            requestData.region_id = values.region.id;
+        }
+        if (values.hasOwnProperty('is_default')) {
+            requestData.is_default = values.is_default;
+        }
+        if (values?.scope) {
+            requestData.scope = values.scope;
+        }
+        if (values.hasOwnProperty('is_active')) {
+            requestData.is_active = values.is_active;
+        }
         return requestData;
     }
 
@@ -57,19 +107,19 @@ function EditTaxRate({
         let requestData: UpdateTaxRate = {
             id: values?.id || 0,
         };
-        if (values?.name) {
-            requestData.name = values?.name || '';
-        }
-        if (values?.label) {
-            requestData.label = values?.label || '';
-        }
+
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
         return requestData;
     }
     async function handleSubmit(values: TaxRate) {
 
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return;
+            return false;
         }
 
         let response = null;
@@ -132,11 +182,15 @@ function EditTaxRate({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_TAX_RATE_MODAL_ID);
         dataTableContext.modal.close(EDIT_TAX_RATE_MODAL_ID);
+        return true;
     }
 
     function getRequiredFields() {

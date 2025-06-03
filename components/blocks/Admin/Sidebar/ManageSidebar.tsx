@@ -111,8 +111,8 @@ function ManageSidebar({
                         dataTableContextState.modal.show({
                             title: 'Edit Sidebar',
                             component: (
-                                <EditSidebar
-                                    data={item}
+                                <EditSidebar 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_SIDEBAR_MODAL_ID}
@@ -136,8 +136,8 @@ function ManageSidebar({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Sidebar',
                                         component: (
-                                            <EditSidebar
-                                                data={item}
+                                            <EditSidebar 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_SIDEBAR_MODAL_ID}
@@ -226,8 +226,8 @@ function ManageSidebar({
         dataTableContextState.modal.show({
             title: 'New Sidebar',
             component: (
-                <EditSidebar
-                    operation={'add'}
+                <EditSidebar 
+                        dataTable={dataTableContextState}                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_SIDEBAR_MODAL_ID}
                 />

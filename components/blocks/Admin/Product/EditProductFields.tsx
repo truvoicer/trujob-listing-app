@@ -40,7 +40,7 @@ function EditProductFields({
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
+
     function getProductComponentProps() {
         let componentProps: any = {
             operation: 'create',
@@ -52,7 +52,7 @@ function EditProductFields({
         }
         return componentProps;
     }
-    
+
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
@@ -62,7 +62,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productUser"
+                    id="productUser"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -70,7 +70,8 @@ function EditProductFields({
                 >
                     <ManageUser
                         {...getProductComponentProps()}
-                        values={values?.user? [values?.user] : []}
+                        fixSessionUser={true}
+                        values={values?.user ? [values?.user] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -121,7 +122,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productReviewModal"
+                    id="productReviewModal"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -275,8 +276,8 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productCategory"
-                roles={[
+                    id="productCategory"
+                    roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
                         { name: 'user' },
@@ -326,7 +327,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productBrand"
+                    id="productBrand"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -351,7 +352,7 @@ function EditProductFields({
                                 );
                                 return;
                             }
-                             console.log('brands', brands);
+                            console.log('brands', brands);
                             setFieldValue('brands', brands);
                         }}
                     />
@@ -378,7 +379,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productColor"
+                    id="productColor"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -429,7 +430,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productProductType"
+                    id="productProductType"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -480,7 +481,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="Media"
+                    id="Media"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
@@ -534,7 +535,7 @@ function EditProductFields({
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                id="productPrice"
+                    id="productPrice"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },

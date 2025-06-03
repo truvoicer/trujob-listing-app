@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { PriceType, CreatePriceType, UpdatePriceType } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditPriceTypeProps = {
@@ -18,8 +19,10 @@ export type EditPriceTypeProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType
 }
 function EditPriceType({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -133,6 +136,9 @@ function EditPriceType({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_PRICE_TYPE_MODAL_ID);

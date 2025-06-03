@@ -114,8 +114,8 @@ function ManageTaxRate({
                         dataTableContextState.modal.show({
                             title: 'Edit tax rate',
                             component: (
-                                <EditTaxRate
-                                    data={item}
+                                <EditTaxRate 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_TAX_RATE_MODAL_ID}
@@ -205,8 +205,8 @@ function ManageTaxRate({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Tax rate',
                                         component: (
-                                            <EditTaxRate
-                                                data={item}
+                                            <EditTaxRate 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_TAX_RATE_MODAL_ID}
@@ -332,8 +332,8 @@ function ManageTaxRate({
         modalState.show({
             title: 'Create tax rate',
             component: (
-                <EditTaxRate
-                    operation={'create'}
+                <EditTaxRate 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_TAX_RATE_MODAL_ID}
                 />

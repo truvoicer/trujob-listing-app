@@ -1,3 +1,4 @@
+import { Option } from "@/components/Select/SelectDropdown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import React, { useState, useEffect, useRef } from "react";
@@ -46,11 +47,12 @@ export default function CurrencyPriceInput({
   dropdownMenuClass = "dropdown-menu show",
   dropdownItemClass = "dropdown-item",
 }: CurrencyPriceInputProps) {
+
+  const [filteredOptions, setFilteredOptions] = useState<Currency[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [currency, setCurrency] = useState<Currency>(currencies[0] || defaultCurrency);
   const [amount, setAmount] = useState<string>("");
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [currencyList, setCurrencyList] = useState<Currency[]>(currencies);
   const [page, setPage] = useState<number>(2); // Start from page 2 assuming first page is already loaded
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
@@ -58,18 +60,18 @@ export default function CurrencyPriceInput({
 
 
   useEffect(() => {
-    if (!Array.isArray(currencyList) || currencyList.length === 0) {
+    if (!Array.isArray(filteredOptions) || filteredOptions.length === 0) {
       return;
     }
     if (!currencyValue) {
-      setCurrency(currencyList[0]);
+      setCurrency(filteredOptions[0]);
 
-      if (onCurrencyChange) onCurrencyChange(currencyList[0]);
+      if (onCurrencyChange) onCurrencyChange(filteredOptions[0]);
       return;
     }
     if (typeof currencyValue === 'string' || typeof currencyValue === 'number') {
 
-      const selectedCurrency = currencyList.find((cur) => cur?.id === currencyValue);
+      const selectedCurrency = filteredOptions.find((cur) => cur?.id === currencyValue);
       if (selectedCurrency) {
         setCurrency(selectedCurrency);
         if (onCurrencyChange) onCurrencyChange(selectedCurrency);
@@ -84,7 +86,7 @@ export default function CurrencyPriceInput({
       setCurrency(currencyValue);
       if (onCurrencyChange) onCurrencyChange(currencyValue);
     }
-  }, [currencyValue, currencyList]);
+  }, [currencyValue, filteredOptions]);
 
   useEffect(() => {
     if (typeof amountValue === "undefined") {
@@ -126,7 +128,7 @@ export default function CurrencyPriceInput({
       if (!response) {
         throw new Error("Failed to fetch currencies");
       }
-      setCurrencyList(response.data);
+      setFilteredOptions(response.data);
     } catch (error) {
       console.error("Error fetching currencies:", error);
     }
@@ -139,7 +141,7 @@ export default function CurrencyPriceInput({
   useEffect(() => {
     if (currencies.length > 0) {
       setCurrency(currencies[0]);
-      setCurrencyList(currencies);
+      setFilteredOptions(currencies);
       setPage(2);
       setHasMore(true);
     }
@@ -160,7 +162,7 @@ export default function CurrencyPriceInput({
           );
         }
         if (response?.data?.length) {
-          setCurrencyList((prev) => [...prev, ...response.data]);
+          setFilteredOptions((prev) => [...prev, ...response.data]);
           setPage((prevPage) => prevPage + 1);
         } else {
           setHasMore(false);
@@ -187,6 +189,25 @@ export default function CurrencyPriceInput({
     if (onAmountChange) onAmountChange(value);
   };
 
+
+  async function onSearch() {
+    let response = await fetchCurrencies({
+      query: searchTerm,
+      page: 1,
+    });
+    if (!response) {
+      throw new Error("Failed to fetch countries");
+    }
+    setFilteredOptions(response.data);
+  }
+
+  useEffect(() => {
+    onSearch();
+  }, [searchTerm]);
+  useEffect(() => {
+    setFilteredOptions(filteredOptions);
+  }, [filteredOptions]);
+
   return (
     <div className="d-flex align-items-center position-relative gap-2">
       <div className="dropdown">
@@ -210,7 +231,7 @@ export default function CurrencyPriceInput({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
-            {currencyList
+            {filteredOptions
               .filter(cur =>
                 cur.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 cur.symbol.toLowerCase().includes(searchTerm.toLowerCase())
@@ -224,7 +245,8 @@ export default function CurrencyPriceInput({
                     setSearchTerm(""); // Clear search on select
                   }}
                 >
-                  {cur.symbol} {cur.code}
+                  {/* {cur.symbol} {cur.code} */}
+                  {`${cur.symbol} ${cur.name} (${cur?.country?.name})`}
                 </button>
               ))
             }

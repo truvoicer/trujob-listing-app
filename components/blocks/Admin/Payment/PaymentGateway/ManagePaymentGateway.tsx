@@ -114,8 +114,8 @@ function ManagePaymentGateway({
                         dataTableContextState.modal.show({
                             title: 'Edit payment gateway',
                             component: (
-                                <EditPaymentGateway
-                                    data={item}
+                                <EditPaymentGateway 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
@@ -205,8 +205,8 @@ function ManagePaymentGateway({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Payment gateway',
                                         component: (
-                                            <EditPaymentGateway
-                                                data={item}
+                                            <EditPaymentGateway 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PAYMENT_METHOD_MODAL_ID}
@@ -332,8 +332,8 @@ function ManagePaymentGateway({
         modalState.show({
             title: 'Create payment gateway',
             component: (
-                <EditPaymentGateway
-                    operation={'create'}
+                <EditPaymentGateway 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_PAYMENT_METHOD_MODAL_ID}
                 />

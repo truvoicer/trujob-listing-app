@@ -3,6 +3,7 @@ import { FormikValues, useFormikContext } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import TextInput from "@/components/Elements/TextInput";
 
 type EditMediaFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -24,16 +25,14 @@ function EditMediaFields({
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <div className="floating-input form-group">
-                            <input
-                                className="form-control"
-                                type="text"
-                                name="name"
-                                id="name"
-                                onChange={handleChange}
-                                value={values?.name || ""} />
-                            <label className="form-label" htmlFor="name">Name</label>
-                        </div>
+                        <TextInput
+                            value={values?.name || ""}
+                            onChange={handleChange}
+                            placeholder="Enter name"
+                            type="text"
+                            name="name"
+                            label="Name"
+                        />
                     </div>
                 </div>
             </div>

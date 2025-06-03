@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditAddressProps = {
@@ -20,8 +21,10 @@ export type EditAddressProps = {
     inModal?: boolean;
     modalId?: string;
     fetchAddresses?: () => void;
+    dataTable?: DataTableContextType;
 }
 function EditAddress({
+    dataTable,
     fetchAddresses,
     type,
     data,
@@ -118,7 +121,7 @@ function EditAddress({
     }
 
     async function handleSubmit(values: Address) {
-        
+
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
             return;
@@ -177,12 +180,15 @@ function EditAddress({
             });
             return;
         }
+        if (dataTable) {
+            dataTable.refresh();
+        }
         notificationContext.show({
             title: 'Success',
             message: 'Address updated successfully',
             variant: 'success',
         }, 'address-update-success-notification');
-        
+
         if (typeof fetchAddresses === 'function') {
             fetchAddresses();
         }
@@ -196,7 +202,7 @@ function EditAddress({
         if (!modalId) {
             return;
         }
-        
+
         ModalService.initializeModalWithForm({
             modalState: modalContext,
             id: modalId,

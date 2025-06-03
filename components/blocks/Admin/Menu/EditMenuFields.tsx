@@ -9,6 +9,7 @@ import { Role } from "@/types/Role";
 import { MenuItem } from "@/types/Menu";
 import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
+import TextInput from "@/components/Elements/TextInput";
 
 
 export type EditMenuFields = {
@@ -60,31 +61,25 @@ function EditMenuFields({
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="name"
-                                    id="name"
-                                    onChange={handleChange}
-                                    value={values?.name || ""} />
-                                <label className="form-label" htmlFor="name">Name</label>
-                            </div>
+                            <TextInput
+                                value={values?.name || ""}
+                                onChange={handleChange}
+                                placeholder="Enter name"
+                                type="text"
+                                name="name"
+                                label="Name"
+                            />
                         </div>
 
                         <div className="col-12 col-lg-6">
-                            <div className="floating-input form-group">
-                                <input
-                                    className="form-control"
-                                    type="text"
-                                    name="ul_class"
-                                    id="ul_class"
-                                    onChange={handleChange}
-                                    value={values?.ul_class || ""} />
-                                <label className="form-label" htmlFor="ul_class">
-                                    UL Class
-                                </label>
-                            </div>
+                            <TextInput
+                                value={values?.ul_class || ""}
+                                onChange={handleChange}
+                                placeholder="Enter UL Class"
+                                type="text"
+                                name="ul_class"
+                                label="UL Class"
+                            />
                         </div>
 
 

@@ -13,6 +13,7 @@ import { PageBlock } from "@/types/PageBlock";
 import EditPageFields from "./EditPageFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditPageProps = {
@@ -20,8 +21,10 @@ export type EditPageProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditPage({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -143,6 +146,9 @@ function EditPage({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PAGE_MODAL_ID);

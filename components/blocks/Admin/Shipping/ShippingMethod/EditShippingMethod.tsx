@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { ShippingMethod, CreateShippingMethod, UpdateShippingMethod } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditShippingMethodProps = {
@@ -18,8 +19,10 @@ export type EditShippingMethodProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditShippingMethod({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -145,6 +148,9 @@ function EditShippingMethod({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_SHIPPING_METHOD_MODAL_ID);

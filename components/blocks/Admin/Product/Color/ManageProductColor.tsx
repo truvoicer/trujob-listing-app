@@ -108,8 +108,8 @@ function ManageProductColor({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditProductColor
-                                    productId={productId}
+                                <EditProductColor 
+                        dataTable={dataTableContextState}                                     productId={productId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -211,8 +211,8 @@ function ManageProductColor({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product',
                                         component: (
-                                            <EditProductColor
-                                                productId={productId}
+                                            <EditProductColor 
+                        dataTable={dataTableContextState}                                                 productId={productId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -366,8 +366,8 @@ function ManageProductColor({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditProductColor
-                        productId={productId}
+                    <EditProductColor 
+                        dataTable={dataTableContextState}                         productId={productId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_PRODUCT_COLOR_MODAL_ID}

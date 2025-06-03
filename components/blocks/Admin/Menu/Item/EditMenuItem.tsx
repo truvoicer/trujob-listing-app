@@ -270,8 +270,8 @@ function EditMenuItem({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditMenuItemFields
-                            operation={operation}
+                        <EditMenuItemFields 
+                        dataTable={dataTableContextState}                             operation={operation}
                             menuId={menuId}
                         />
                     )
@@ -285,8 +285,8 @@ function EditMenuItem({
                     >
                         {() => {
                             return (
-                                <EditMenuItemFields
-                                    operation={operation}
+                                <EditMenuItemFields 
+                        dataTable={dataTableContextState}                                     operation={operation}
                                     menuId={menuId}
                                 />
                             )

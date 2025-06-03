@@ -137,8 +137,8 @@ function ManageProductType({
                         dataTableContextState.modal.show({
                             title: 'Edit Product Type',
                             component: (
-                                <EditProductType
-                                    data={item}
+                                <EditProductType 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
@@ -228,8 +228,8 @@ function ManageProductType({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product Type',
                                         component: (
-                                            <EditProductType
-                                                data={item}
+                                            <EditProductType 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PRODUCT_TYPE_MODAL_ID}
@@ -361,8 +361,8 @@ function ManageProductType({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditProductType
-                        operation={'add'}
+                    <EditProductType 
+                        dataTable={dataTableContextState}                         operation={'add'}
                         inModal={true}
                         modalId={CREATE_PRODUCT_TYPE_MODAL_ID}
                     />

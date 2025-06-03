@@ -111,8 +111,8 @@ function ManageMenu({
                         dataTableContextState.modal.show({
                             title: 'Edit Menu',
                             component: (
-                                <EditMenu
-                                    data={item}
+                                <EditMenu 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_MENU_MODAL_ID}
@@ -202,8 +202,8 @@ function ManageMenu({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Menu',
                                         component: (
-                                            <EditMenu
-                                                data={item}
+                                            <EditMenu 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_MENU_MODAL_ID}
@@ -292,8 +292,8 @@ function ManageMenu({
         dataTableContextState.modal.show({
             title: 'New Menu',
             component: (
-                <EditMenu
-                    operation={'add'}
+                <EditMenu 
+                        dataTable={dataTableContextState}                     operation={'add'}
                     inModal={true}
                     modalId={EDIT_MENU_MODAL_ID}
 

@@ -9,6 +9,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { Role } from "@/types/Role";
 import { Sidebar } from "@/types/Sidebar";
 import { isObjectEmpty } from "@/helpers/utils";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 type EditPageBlockProps = {
@@ -18,8 +19,10 @@ type EditPageBlockProps = {
     pageId?: number;
     index?: number;
     data?: PageBlock;
+        dataTable?: DataTableContextType;
 }
 function EditPageBlock({ 
+    dataTable,
     data,
     index,
     pageId,
@@ -234,6 +237,9 @@ function EditPageBlock({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_WIDGET_MODAL_ID);

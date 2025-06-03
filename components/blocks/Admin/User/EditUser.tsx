@@ -12,6 +12,7 @@ import { Sidebar } from "@/types/Sidebar";
 import EditUserFields from "./EditUserFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditUserProps = {
@@ -19,12 +20,14 @@ export type EditUserProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditUser({
     data,
     operation,
     inModal = false,
     modalId,
+    dataTable,
 }: EditUserProps) {
 
     const [alert, setAlert] = useState<{
@@ -117,6 +120,9 @@ function EditUser({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_USER_MODAL_ID);

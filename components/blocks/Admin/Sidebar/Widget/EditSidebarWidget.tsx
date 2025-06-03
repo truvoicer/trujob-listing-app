@@ -9,6 +9,7 @@ import { Role } from "@/types/Role";
 import EditSidebarWidgetFields from "./EditSidebarWidgetFields";
 import { EDIT_SIDEBAR_WIDGET_MODAL_ID } from "./ManageSidebarWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditSidebarWidgetProps = {
@@ -18,8 +19,10 @@ export type EditSidebarWidgetProps = {
     modalId?: string;
     sidebarId?: number;
     index?: number;
+    dataTable?: DataTableContextType;
 };
 function EditSidebarWidget({
+    dataTable,
     index,
     sidebarId,
     data,
@@ -187,6 +190,9 @@ function EditSidebarWidget({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_SIDEBAR_WIDGET_MODAL_ID);

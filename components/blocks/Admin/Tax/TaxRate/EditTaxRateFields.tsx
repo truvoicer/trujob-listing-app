@@ -8,6 +8,7 @@ import SelectTaxRateAmountType from "./SelectTaxRateAmountType";
 import CurrencySelect from "@/components/blocks/Locale/Currency/CurrencySelect";
 import SelectTaxRateScope from "./SelectTaxRateScope";
 import RegionSelect from "@/components/blocks/Locale/Region/RegionSelect";
+import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
 
 type EditTaxRateFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -24,17 +25,6 @@ function EditTaxRateFields({
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
     return (
-        // 'name' => ['required', 'string', 'max:50'],
-        // 'type' => ['required', Rule::enum((TaxRateType::class))],
-        // 'amount_type' => ['required', Rule::enum((TaxRateType::class))],
-        // 'amount' => [
-        // 'rate' => [
-        // 'country_id' => ['required', 'integer', 'exists:countries,id'],
-        // 'region_id' => ['required', 'integer', 'exists:regions,id'],
-        // 'is_default' => ['required', 'boolean'],
-        // 'scope' => ['required', Rule::enum(TaxScope::class)],
-        // 'is_active' => ['required', 'boolean'],
-
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
@@ -120,20 +110,39 @@ function EditTaxRateFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
+                        <label className="title">Select Country</label>
+                        <CountrySelect
+                            value={values?.country ?
+                                {
+                                    value: values?.country?.id,
+                                    label: values?.country?.name,
+                                } : null}
+                            isMulti={false}
+                            showLoadingSpinner={true}
+                            onChange={(value) => {
+                                console.log('country', value);
+                                setFieldValue('country', value);
+                            }}
+                            loadingMore={true}
+                            loadMoreLimit={10}
+                        />
+                    </div>
+
+                    <div className="col-12 col-lg-6">
                         <div className="custom-control custom-checkbox mb-3 text-left">
                             <input
                                 className="custom-control-input"
                                 type="checkbox"
-                                name="select_region"
-                                id="select_region"
+                                name="has_region"
+                                id="has_region"
                                 onChange={handleChange}
-                                checked={values?.select_region || false} />
-                            <label className="custom-control-label" htmlFor="select_region">
+                                checked={values?.has_region || false} />
+                            <label className="custom-control-label" htmlFor="has_region">
                                 Is Region Required?
                             </label>
                         </div>
                     </div>
-                    {values?.select_region &&
+                    {values?.has_region &&
                         <div className="col-12 col-lg-6">
                             <label className="title">Select Currency</label>
                             <RegionSelect

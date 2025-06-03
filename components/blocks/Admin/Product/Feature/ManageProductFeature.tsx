@@ -108,8 +108,8 @@ function ManageProductFeature({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditProductFeature
-                                    productId={productId}
+                                <EditProductFeature 
+                        dataTable={dataTableContextState}                                     productId={productId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -211,8 +211,8 @@ function ManageProductFeature({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product',
                                         component: (
-                                            <EditProductFeature
-                                                productId={productId}
+                                            <EditProductFeature 
+                        dataTable={dataTableContextState}                                                 productId={productId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -367,8 +367,8 @@ function ManageProductFeature({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditProductFeature
-                        productId={productId}
+                    <EditProductFeature 
+                        dataTable={dataTableContextState}                         productId={productId}
                         operation={operation}
                         inModal={true}
                         modalId={CREATE_PRODUCT_FEATURE_MODAL_ID}

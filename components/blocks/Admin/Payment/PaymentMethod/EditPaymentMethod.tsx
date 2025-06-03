@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { PaymentMethod, CreatePaymentMethod, UpdatePaymentMethod } from "@/types/PaymentMethod";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditPaymentMethodProps = {
@@ -18,8 +19,10 @@ export type EditPaymentMethodProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType
 }
 function EditPaymentMethod({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -133,6 +136,9 @@ function EditPaymentMethod({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_PAYMENT_METHOD_MODAL_ID);

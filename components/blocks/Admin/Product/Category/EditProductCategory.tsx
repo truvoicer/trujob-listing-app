@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -8,12 +7,12 @@ import { CREATE_PRODUCT_CATEGORY_MODAL_ID, EDIT_PRODUCT_CATEGORY_MODAL_ID } from
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import { Sidebar } from "@/types/Sidebar";
 import EditProductCategoryFields from "./EditProductCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Category } from "@/types/Category";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductCategoryProps = {
     productId?: number;
@@ -21,8 +20,10 @@ export type EditProductCategoryProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductCategory({
+    dataTable,
     productId,
     data,
     operation,
@@ -64,7 +65,7 @@ function EditProductCategory({
         switch (operation) {
             case 'add':
             case 'create':
-                case 'edit':
+            case 'edit':
             case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
@@ -101,6 +102,9 @@ function EditProductCategory({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_CATEGORY_MODAL_ID);

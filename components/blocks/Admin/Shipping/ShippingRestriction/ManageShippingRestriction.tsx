@@ -114,8 +114,8 @@ function ManageShippingRestriction({
                         dataTableContextState.modal.show({
                             title: 'Edit shipping restriction',
                             component: (
-                                <EditShippingRestriction
-                                    data={item}
+                                <EditShippingRestriction 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_SHIPPING_RESTRICTION_MODAL_ID}
@@ -205,8 +205,8 @@ function ManageShippingRestriction({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Shipping restriction',
                                         component: (
-                                            <EditShippingRestriction
-                                                data={item}
+                                            <EditShippingRestriction 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_SHIPPING_RESTRICTION_MODAL_ID}
@@ -332,8 +332,8 @@ function ManageShippingRestriction({
         modalState.show({
             title: 'Create shipping restriction',
             component: (
-                <EditShippingRestriction
-                    operation={'create'}
+                <EditShippingRestriction 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_SHIPPING_RESTRICTION_MODAL_ID}
                 />

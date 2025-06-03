@@ -10,7 +10,7 @@ import EditCategoryFields from "./EditCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Category, CreateCategory, UpdateCategory } from "@/types/Category";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditCategoryProps = {
@@ -18,8 +18,10 @@ export type EditCategoryProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditCategory({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -129,6 +131,9 @@ function EditCategory({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_CATEGORY_MODAL_ID);

@@ -115,8 +115,8 @@ function ManageFeature({
                         dataTableContextState.modal.show({
                             title: 'Edit Feature',
                             component: (
-                                <EditFeature
-                                    data={item}
+                                <EditFeature 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_FEATURE_MODAL_ID}
@@ -206,8 +206,8 @@ function ManageFeature({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Feature',
                                         component: (
-                                            <EditFeature
-                                                data={item}
+                                            <EditFeature 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_FEATURE_MODAL_ID}
@@ -344,8 +344,8 @@ function ManageFeature({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditFeature
-                        operation={'add'}
+                    <EditFeature 
+                        dataTable={dataTableContextState}                         operation={'add'}
                         inModal={true}
                         modalId={CREATE_FEATURE_MODAL_ID}
                     />

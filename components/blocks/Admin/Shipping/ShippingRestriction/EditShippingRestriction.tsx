@@ -10,7 +10,7 @@ import EditShippingRestrictionFields from "./EditShippingRestrictionFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { ShippingRestriction, CreateShippingRestriction, UpdateShippingRestriction } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditShippingRestrictionProps = {
@@ -18,8 +18,10 @@ export type EditShippingRestrictionProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditShippingRestriction({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -143,6 +145,9 @@ function EditShippingRestriction({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_SHIPPING_RESTRICTION_MODAL_ID);

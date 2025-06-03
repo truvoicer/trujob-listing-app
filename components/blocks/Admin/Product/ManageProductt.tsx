@@ -112,8 +112,8 @@ function ManageProduct({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditProduct
-                                    data={item}
+                                <EditProduct 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PRODUCT_MODAL_ID}
@@ -269,8 +269,8 @@ function ManageProduct({
         dataTableContextState.modal.show({
             title: 'Add New Product',
             component: (
-                <EditProduct
-                    operation={'add'}
+                <EditProduct 
+                        dataTable={dataTableContextState}                     operation={'add'}
                     inModal={true}
                     modalId={CREATE_PRODUCT_MODAL_ID}
                 />

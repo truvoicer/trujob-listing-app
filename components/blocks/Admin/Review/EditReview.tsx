@@ -10,15 +10,18 @@ import EditReviewFields from "./EditReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { Review, CreateReview, UpdateReview } from "@/types/Review";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditReviewProps = {
     data?: Review;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
+    dataTable?: DataTableContextType;
     modalId?: string;
 }
 function EditReview({
+    dataTable,
     data,
     operation = 'create',
     inModal = false,
@@ -116,7 +119,7 @@ function EditReview({
                 console.log('Invalid operation');
                 break;
         }
-        
+
         if (!response) {
             setAlert({
                 show: true,
@@ -133,6 +136,9 @@ function EditReview({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_REVIEW_MODAL_ID);

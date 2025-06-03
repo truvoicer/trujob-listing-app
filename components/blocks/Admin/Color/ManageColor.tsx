@@ -115,8 +115,8 @@ function ManageColor({
                         dataTableContextState.modal.show({
                             title: 'Edit Color',
                             component: (
-                                <EditColor
-                                    data={item}
+                                <EditColor 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_COLOR_MODAL_ID}
@@ -206,8 +206,8 @@ function ManageColor({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Color',
                                         component: (
-                                            <EditColor
-                                                data={item}
+                                            <EditColor 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_COLOR_MODAL_ID}
@@ -330,8 +330,8 @@ function ManageColor({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditColor
-                        operation={'add'}
+                    <EditColor 
+                        dataTable={dataTableContextState}                         operation={'add'}
                         inModal={true}
                         modalId={CREATE_COLOR_MODAL_ID}
                     />

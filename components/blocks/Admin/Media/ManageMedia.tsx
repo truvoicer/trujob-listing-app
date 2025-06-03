@@ -138,8 +138,8 @@ function ManageMedia({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditMedia
-                                    data={item}
+                                <EditMedia 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_MEDIA_MODAL_ID}
@@ -229,8 +229,8 @@ function ManageMedia({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product',
                                         component: (
-                                            <EditMedia
-                                                data={item}
+                                            <EditMedia 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_MEDIA_MODAL_ID}
@@ -352,8 +352,8 @@ function ManageMedia({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditMedia
-                        operation={'add'}
+                    <EditMedia 
+                        dataTable={dataTableContextState}                         operation={'add'}
                         inModal={true}
                         modalId={CREATE_MEDIA_MODAL_ID}
                     />

@@ -116,8 +116,8 @@ function ManagePriceType({
                         dataTableContextState.modal.show({
                             title: 'Edit Price type',
                             component: (
-                                <EditPriceType
-                                    data={item}
+                                <EditPriceType 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PRICE_TYPE_MODAL_ID}
@@ -207,8 +207,8 @@ function ManagePriceType({
                                     dataTableContextState.modal.show({
                                         title: 'Edit price type',
                                         component: (
-                                            <EditPriceType
-                                                data={item}
+                                            <EditPriceType 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PRICE_TYPE_MODAL_ID}
@@ -334,8 +334,8 @@ function ManagePriceType({
         modalState.show({
             title: 'Create price type',
             component: (
-                <EditPriceType
-                    operation={'create'}
+                <EditPriceType 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_PRICE_TYPE_MODAL_ID}
                 />

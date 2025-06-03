@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { PaymentGateway, CreatePaymentGateway, UpdatePaymentGateway } from "@/types/PaymentGateway";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditPaymentGatewayProps = {
@@ -18,8 +19,10 @@ export type EditPaymentGatewayProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType
 }
 function EditPaymentGateway({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -133,6 +136,9 @@ function EditPaymentGateway({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_PAYMENT_METHOD_MODAL_ID);

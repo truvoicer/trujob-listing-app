@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -8,13 +7,12 @@ import { CREATE_PRODUCT_PRODUCT_TYPE_MODAL_ID, EDIT_PRODUCT_PRODUCT_TYPE_MODAL_I
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import { Sidebar } from "@/types/Sidebar";
 import EditProductProductTypeFields from "./EditProductProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { User } from "@/types/User";
 import { ProductType } from "@/types/Product";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductProductTypeProps = {
     data?: Product;
@@ -22,8 +20,10 @@ export type EditProductProductTypeProps = {
     inModal?: boolean;
     modalId?: string;
     productId?: number;
+    dataTable?: DataTableContextType;
 }
 function EditProductProductType({
+    dataTable,
     productId,
     data,
     operation,
@@ -65,7 +65,7 @@ function EditProductProductType({
             case 'add':
             case 'create':
             case 'edit':
-                case 'update':
+            case 'update':
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -101,6 +101,9 @@ function EditProductProductType({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_PRODUCT_TYPE_MODAL_ID);

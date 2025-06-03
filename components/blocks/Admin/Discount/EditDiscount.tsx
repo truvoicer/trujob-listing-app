@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { Discount, CreateDiscount, UpdateDiscount } from "@/types/Discount";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditDiscountProps = {
@@ -18,8 +19,10 @@ export type EditDiscountProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditDiscount({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -204,6 +207,9 @@ function EditDiscount({
                 type: 'danger',
             });
             return false;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_DISCOUNT_MODAL_ID);

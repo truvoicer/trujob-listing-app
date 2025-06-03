@@ -114,8 +114,8 @@ function ManagePage({
                         dataTableContextState.modal.show({
                             title: 'Edit Page',
                             component: (
-                                <EditPage
-                                    data={item}
+                                <EditPage 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_PAGE_MODAL_ID}
@@ -205,8 +205,8 @@ function ManagePage({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Page',
                                         component: (
-                                            <EditPage
-                                                data={item}
+                                            <EditPage 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_PAGE_MODAL_ID}
@@ -318,8 +318,8 @@ function ManagePage({
         dataTableContextState.modal.show({
             title: 'Add New Page',
             component: (
-                <EditPage
-                    operation={'add'}
+                <EditPage 
+                        dataTable={dataTableContextState}                     operation={'add'}
                     inModal={true}
                     modalId={CREATE_PAGE_MODAL_ID}
                 />

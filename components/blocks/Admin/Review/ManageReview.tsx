@@ -112,8 +112,8 @@ function ManageReview({
                         dataTableContextState.modal.show({
                             title: 'Edit Review',
                             component: (
-                                <EditReview
-                                    data={item}
+                                <EditReview 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_REVIEW_MODAL_ID}
@@ -199,8 +199,8 @@ function ManageReview({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Review',
                                         component: (
-                                            <EditReview
-                                                data={item}
+                                            <EditReview 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_REVIEW_MODAL_ID}
@@ -317,8 +317,8 @@ function ManageReview({
         dataTableContextState.modal.show({
             title: 'Create Review',
             component: (
-                <EditReview
-                    operation={'create'}
+                <EditReview 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={'create-review-modal'}
                 />

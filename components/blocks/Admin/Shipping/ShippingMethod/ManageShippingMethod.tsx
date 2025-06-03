@@ -114,8 +114,8 @@ function ManageShippingMethod({
                         dataTableContextState.modal.show({
                             title: 'Edit shipping method',
                             component: (
-                                <EditShippingMethod
-                                    data={item}
+                                <EditShippingMethod 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_SHIPPING_METHOD_MODAL_ID}
@@ -205,8 +205,8 @@ function ManageShippingMethod({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Shipping method',
                                         component: (
-                                            <EditShippingMethod
-                                                data={item}
+                                            <EditShippingMethod 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_SHIPPING_METHOD_MODAL_ID}
@@ -332,8 +332,8 @@ function ManageShippingMethod({
         modalState.show({
             title: 'Create shipping method',
             component: (
-                <EditShippingMethod
-                    operation={'create'}
+                <EditShippingMethod 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_SHIPPING_METHOD_MODAL_ID}
                 />

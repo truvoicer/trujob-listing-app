@@ -9,9 +9,8 @@ import EditFeatureFields from "./EditFeatureFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateFeature, Feature, UpdateFeature } from "@/types/Feature";
-import { request } from "http";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { CREATE_FEATURE_MODAL_ID, EDIT_FEATURE_MODAL_ID } from "./ManageFeature";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditFeatureProps = {
@@ -19,8 +18,10 @@ export type EditFeatureProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditFeature({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -122,6 +123,9 @@ function EditFeature({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_FEATURE_MODAL_ID);

@@ -115,8 +115,8 @@ function ManageDiscount({
                         dataTableContextState.modal.show({
                             title: 'Edit discount',
                             component: (
-                                <EditDiscount
-                                    data={item}
+                                <EditDiscount 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_DISCOUNT_MODAL_ID}
@@ -206,8 +206,8 @@ function ManageDiscount({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Discount',
                                         component: (
-                                            <EditDiscount
-                                                data={item}
+                                            <EditDiscount 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_DISCOUNT_MODAL_ID}
@@ -333,8 +333,8 @@ function ManageDiscount({
         modalState.show({
             title: 'Create discount',
             component: (
-                <EditDiscount
-                    operation={'create'}
+                <EditDiscount 
+                        dataTable={dataTableContextState}                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_DISCOUNT_MODAL_ID}
                 />

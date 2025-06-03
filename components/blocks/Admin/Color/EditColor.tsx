@@ -11,6 +11,7 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateColor, UpdateColor, Color } from "@/types/Color";
 import { CREATE_COLOR_MODAL_ID, EDIT_COLOR_MODAL_ID } from "./ManageColor";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 
 export type EditColorProps = {
@@ -18,8 +19,10 @@ export type EditColorProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditColor({
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -76,7 +79,7 @@ function EditColor({
         switch (operation) {
             case 'edit':
             case 'update':
-                
+
                 if (!values?.id) {
                     console.warn('Color ID is required');
                     return;
@@ -120,6 +123,9 @@ function EditColor({
                 type: 'danger',
             });
             return;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.modal.close(EDIT_COLOR_MODAL_ID);
         dataTableContext.modal.close(CREATE_COLOR_MODAL_ID);

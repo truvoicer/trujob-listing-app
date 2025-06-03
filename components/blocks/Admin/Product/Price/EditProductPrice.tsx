@@ -1,5 +1,4 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -7,14 +6,12 @@ import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware
 import { CREATE_PRODUCT_PRICE_MODAL_ID, EDIT_PRODUCT_PRICE_MODAL_ID } from "./ManageProductPrice";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Product } from "@/types/Product";
 import EditProductPriceFields from "./EditProductPriceFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { CreatePrice, Price, PriceRequest, UpdatePrice } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { has } from "underscore";
 import { getSiteCountryAction, getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
+import { DataTableContextType } from "@/components/Table/DataManager";
 
 export type EditProductPriceProps = {
     productId?: number;
@@ -22,9 +19,11 @@ export type EditProductPriceProps = {
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
+    dataTable?: DataTableContextType;
 }
 function EditProductPrice({
     productId,
+    dataTable,
     data,
     operation,
     inModal = false,
@@ -45,7 +44,7 @@ function EditProductPrice({
 
     const initialValues: Price = {
         id: data?.id || 0,
-        user: data?.user || null,
+        created_by_user: data?.created_by_user,
         country: data?.country || country || null,
         currency: data?.currency || currency || null,
         priceType: data?.priceType,
@@ -72,8 +71,8 @@ function EditProductPrice({
         if (values?.priceType) {
             requestData.price_type_id = values?.priceType?.id;
         }
-        if (values?.user) {
-            requestData.user_id = values?.user?.id;
+        if (values?.created_by_user) {
+            requestData.user_id = values?.created_by_user?.id;
         }
         if (values?.valid_from) {
             requestData.valid_from = values?.valid_from;
@@ -110,8 +109,8 @@ function EditProductPrice({
             id: values?.id || 0,
         };
 
-        if (values?.user) {
-            requestData.user_id = values?.user?.id;
+        if (values?.created_by_user) {
+            requestData.user_id = values?.created_by_user?.id;
         }
         requestData = {
             ...requestData,
@@ -192,6 +191,9 @@ function EditProductPrice({
                 type: 'danger',
             });
             return false;
+        }
+        if (dataTable) {
+            dataTable.refresh();
         }
         dataTableContext.refresh();
         dataTableContext.modal.close(EDIT_PRODUCT_PRICE_MODAL_ID);

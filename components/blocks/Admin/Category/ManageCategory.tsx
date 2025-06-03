@@ -119,8 +119,8 @@ function ManageCategory({
                         dataTableContextState.modal.show({
                             title: 'Edit Category',
                             component: (
-                                <EditCategory
-                                    data={item}
+                                <EditCategory 
+                        dataTable={dataTableContextState}                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_CATEGORY_MODAL_ID}
@@ -210,8 +210,8 @@ function ManageCategory({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Category',
                                         component: (
-                                            <EditCategory
-                                                data={item}
+                                            <EditCategory 
+                        dataTable={dataTableContextState}                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_CATEGORY_MODAL_ID}
@@ -339,8 +339,8 @@ function ManageCategory({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditCategory
-                        operation={'add'}
+                    <EditCategory 
+                        dataTable={dataTableContextState}                         operation={'add'}
                         inModal={true}
                         modalId={CREATE_CATEGORY_MODAL_ID}
                     />

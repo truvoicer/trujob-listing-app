@@ -108,8 +108,8 @@ function ManageProductBrand({
                         dataTableContextState.modal.show({
                             title: 'Edit Product',
                             component: (
-                                <EditProductBrand
-                                    productId={productId}
+                                <EditProductBrand 
+                        dataTable={dataTableContextState}                                     productId={productId}
                                     data={item}
                                     operation={'edit'}
                                     inModal={true}
@@ -216,8 +216,8 @@ function ManageProductBrand({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Product',
                                         component: (
-                                            <EditProductBrand
-                                                productId={productId}
+                                            <EditProductBrand 
+                        dataTable={dataTableContextState}                                                 productId={productId}
                                                 data={item}
                                                 operation={'edit'}
                                                 inModal={true}
@@ -355,8 +355,8 @@ function ManageProductBrand({
                 formHelpers?: any
             }) => {
                 return (
-                    <EditProductBrand
-                        productId={productId}
+                    <EditProductBrand 
+                        dataTable={dataTableContextState}                         productId={productId}
                         operation={'create'}
                         inModal={true}
                         modalId={CREATE_PRODUCT_BRAND_MODAL_ID}
