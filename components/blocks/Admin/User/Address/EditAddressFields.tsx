@@ -10,7 +10,7 @@ function EditAddressFields({
     operation
 }: EditAddressFields) {
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -122,13 +122,7 @@ function EditAddressFields({
                                 isMulti={false}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {
-                                    let country;
-                                    if (Array.isArray(value) && value.length > 0) {
-                                        country = value[0];
-                                    }
-                                    if (country) {
-                                        setFieldValue("country", country);
-                                    }
+                                    setFieldValue("country", value);
                                 }}
                                 loadingMore={true}
                                 loadMoreLimit={10}

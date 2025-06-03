@@ -16,8 +16,8 @@ export type Order = {
 export type OrderItem = {
     id: number;
     quantity: number;
-    order_itemable_id: number;
-    order_itemable_type: string;
+    productable_id: number;
+    productable_type: string;
     entity: Product;
     created_at: string;
     updated_at: string;

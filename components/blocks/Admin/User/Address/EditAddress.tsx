@@ -53,7 +53,7 @@ function EditAddress({
         phone: data?.phone || '',
         country: data?.country,
         user: data?.user,
-        type: data?.type,
+        type: data?.type || type,
         is_default: data?.is_default || false,
         is_active: data?.is_active || false,
     };
@@ -93,19 +93,16 @@ function EditAddress({
     }
 
     function buildCreateData(values: any) {
-        let requestData: CreateAddress = {
-            label: values.label,
-            address_line_1: values.address_line_1,
-            city: values.city,
-            postal_code: values.postal_code,
-            phone: values.phone,
-            country_id: values.country.id,
-            type,
-        };
-        requestData = {
-            ...requestData,
-            ...buildRequestData(values),
+        if (!values?.type) {
+            notificationContext.show({
+                title: 'Error',
+                message: 'Address type is invalid',
+                variant: 'danger',
+            }, 'invalid-address-type-notification');
+            return false;
         }
+        let requestData: CreateAddress = buildRequestData(values) as CreateAddress;
+        requestData.type = values.type;
         return requestData;
     }
 

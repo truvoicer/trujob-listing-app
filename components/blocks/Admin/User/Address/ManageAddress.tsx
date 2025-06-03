@@ -129,8 +129,8 @@ function ManageAddress({
         modalContext.show({
             title: 'Edit Address',
             component: (
-                <EditAddress 
-                        dataTable={dataTableContextState}                     type={type}
+                <EditAddress
+                    type={type}
                     data={item}
                     operation={'edit'}
                     inModal={true}
@@ -161,8 +161,8 @@ function ManageAddress({
         modalContext.show({
             title: 'Create Address',
             component: (
-                <EditAddress 
-                        dataTable={dataTableContextState}                     type={type}
+                <EditAddress
+                    type={type}
                     operation={'create'}
                     inModal={true}
                     modalId={CREATE_ADDRESS_MODAL_ID}
@@ -325,7 +325,7 @@ function ManageAddress({
                                 onClick={(e) => handleSelectAddress(e, address, type)}>
                                 <div className={
                                     `card-body rounded work-detail work-detail-info ${isSelected ? 'work-detail-info--hover' : ''}`
-                                    }>
+                                }>
                                     <h5 className="mb-2">
                                         {address.label}
                                     </h5>
