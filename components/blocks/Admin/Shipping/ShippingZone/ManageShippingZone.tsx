@@ -9,13 +9,15 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { ShippingZone } from "@/types/ShippingZone";
+import { ShippingZone } from "@/types/Shipping";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { render } from "sass";
+import { values } from "underscore";
 
 export const CREATE_SHIPPING_ZONE_MODAL_ID = 'create-shipping-zone-modal';
 export const EDIT_SHIPPING_ZONE_MODAL_ID = 'edit-shipping-zone-modal';
@@ -23,9 +25,11 @@ export const DELETE_SHIPPING_ZONE_MODAL_ID = 'delete-shipping-zone-modal';
 
 export interface ManageShippingZoneProps extends DataManageComponentProps {
     data?: Array<ShippingZone>;
+    values?: ShippingZone[];
 }
 
 function ManageShippingZone({
+    values,
     mode = 'selector',
     data,
     operation = 'create',
@@ -114,8 +118,8 @@ function ManageShippingZone({
                         dataTableContextState.modal.show({
                             title: 'Edit shipping zone',
                             component: (
-                                <EditShippingZone 
-                        dataTable={dataTableContextState}                                     data={item}
+                                <EditShippingZone
+                                    dataTable={dataTableContextState} data={item}
                                     operation={'edit'}
                                     inModal={true}
                                     modalId={EDIT_SHIPPING_ZONE_MODAL_ID}
@@ -205,8 +209,9 @@ function ManageShippingZone({
                                     dataTableContextState.modal.show({
                                         title: 'Edit Shipping zone',
                                         component: (
-                                            <EditShippingZone 
-                        dataTable={dataTableContextState}                                                 data={item}
+                                            <EditShippingZone
+                                                dataTable={dataTableContextState}
+                                                data={item}
                                                 operation={'edit'}
                                                 inModal={true}
                                                 modalId={EDIT_SHIPPING_ZONE_MODAL_ID}
@@ -332,8 +337,8 @@ function ManageShippingZone({
         modalState.show({
             title: 'Create shipping zone',
             component: (
-                <EditShippingZone 
-                        dataTable={dataTableContextState}                     operation={'create'}
+                <EditShippingZone
+                    dataTable={dataTableContextState} operation={'create'}
                     inModal={true}
                     modalId={CREATE_SHIPPING_ZONE_MODAL_ID}
                 />
@@ -424,7 +429,8 @@ function ManageShippingZone({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
-            data={data}
+                values={values}
+                data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
                 onChange={onChange}
@@ -438,7 +444,28 @@ function ManageShippingZone({
                 request={shippingZoneRequest}
                 columns={[
                     { label: 'Name', key: 'name' },
-                    { label: 'Countries', key: 'countries' },
+                    {
+                        label: 'Countries',
+                        key: 'countries',
+                        render: (col: Record<string, any>, item: ShippingZone) => {
+                            if (item?.all) {
+                                return (
+                                    <span className="badge bg-success">
+                                        All Countries
+                                    </span>
+                                );
+                            }
+                            return (
+                                <div className="d-flex flex-wrap">
+                                    {item?.countries?.map((country, index) => (
+                                        <span key={index} className="badge bg-secondary mr-1 mb-1">
+                                            {country.name} ({country.iso2}) <br />
+                                        </span>
+                                    ))}
+                                </div>
+                            );
+                        }
+                    },
                     { label: 'Is Active', key: 'is_active' },
                     { label: 'Created At', key: 'created_at' },
                     { label: 'Updated At', key: 'updated_at' },

@@ -16,6 +16,12 @@ import ManageUser from "../../User/ManageUser";
 import { PriceType } from "@/types/Price";
 import { User } from "@/types/User";
 import Checkbox from "@/components/Elements/Checkbox";
+import ManageTaxRate from "../../Tax/TaxRate/ManageTaxRate";
+import { TaxRate } from "@/types/Tax";
+import SelectedDisplay from "@/components/Elements/SelectedDisplay";
+import SelectedListDisplay from "@/components/Elements/SelectedListDisplay";
+import { Discount } from "@/types/Discount";
+import ManageDiscount from "../../Discount/ManageDiscount";
 
 export type EditProductPriceFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -115,7 +121,7 @@ function EditProductPriceFields({
                 >
                     <ManagePriceType
                         {...getProductComponentProps()}
-                        values={values?.priceType ? [values?.priceType] : []}
+                        values={values?.price_type ? [values?.price_type] : []}
                         rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={false}
@@ -141,7 +147,143 @@ function EditProductPriceFields({
                             if (values?.id) {
                                 return;
                             }
-                            setFieldValue('priceType', selected);
+                            setFieldValue('price_type', selected);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: ({ state }: {
+                state: LocalModal,
+                setState: Dispatch<React.SetStateAction<LocalModal>>,
+                configItem: any,
+            },
+                e?: React.MouseEvent | null
+            ) => {
+                return true;
+            },
+            onCancel: () => {
+                return true;
+            }
+        },
+        {
+            id: 'tax-rates',
+            title: 'Select Tax Rates',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    id="edit-product-price-fields-tax-rates"
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageTaxRate
+                        {...getProductComponentProps()}
+                        values={values?.tax_rates ? [values?.tax_rates] : []}
+                        rowSelection={true}
+                        multiRowSelection={true}
+                        enableEdit={true}
+                        paginationMode="state"
+                        onChange={(taxRates: Array<any>) => {
+                            if (!Array.isArray(taxRates)) {
+                                console.warn('Invalid values received from ManageTaxRate component');
+                                return;
+                            }
+
+                            if (taxRates.length === 0) {
+                                console.warn('Tax rates are empty');
+                                return true;
+                            }
+                            const checked = taxRates.filter((item) => item?.checked);
+                            if (checked.length === 0) {
+                                console.warn('No tax rate selected');
+                                return true;
+                            }
+
+                            const existingTaxRates = values?.tax_rates || [];
+
+                            // Merge existing products with new prices not already included
+                            const mergedProducts = [
+                                ...existingTaxRates,
+                                ...checked.filter((taxRate: TaxRate) => {
+                                    return !existingTaxRates.some(
+                                        (existingTaxRate: {
+                                            id: number;
+                                        }) =>
+                                            existingTaxRate.id === taxRate.id
+                                    );
+                                })
+                            ];
+                            setFieldValue('tax_rates', mergedProducts);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: ({ state }: {
+                state: LocalModal,
+                setState: Dispatch<React.SetStateAction<LocalModal>>,
+                configItem: any,
+            },
+                e?: React.MouseEvent | null
+            ) => {
+                return true;
+            },
+            onCancel: () => {
+                return true;
+            }
+        },
+        {
+            id: 'discounts',
+            title: 'Select Discounts',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    id="edit-product-price-fields-discounts"
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                    ]}
+                >
+                    <ManageDiscount
+                        {...getProductComponentProps()}
+                        values={values?.discounts ? [values?.discounts] : []}
+                        rowSelection={true}
+                        multiRowSelection={true}
+                        enableEdit={true}
+                        paginationMode="state"
+                        onChange={(discounts: Array<any>) => {
+                            if (!Array.isArray(discounts)) {
+                                console.warn('Invalid values received from ManageDiscount component');
+                                return;
+                            }
+
+                            if (discounts.length === 0) {
+                                console.warn('Discounts are empty');
+                                return true;
+                            }
+                            const checked = discounts.filter((item) => item?.checked);
+                            if (checked.length === 0) {
+                                console.warn('No discount selected');
+                                return true;
+                            }
+
+                            const existingDiscounts = values?.discounts || [];
+
+                            // Merge existing products with new prices not already included
+                            const mergedDiscounts = [
+                                ...existingDiscounts,
+                                ...checked.filter((discount: Discount) => {
+                                    return !existingDiscounts.some(
+                                        (existingDiscount: {
+                                            id: number;
+                                        }) =>
+                                            existingDiscount.id === discount.id
+                                    );
+                                })
+                            ];
+                            setFieldValue('discounts', mergedDiscounts);
                         }}
                     />
                 </AccessControlComponent>
@@ -186,20 +328,15 @@ function EditProductPriceFields({
 
                     <div className="col-12 col-lg-6">
                         <div className="floating-input">
-                            <label className="d-block fw-bold">
-                                Price Type
-                            </label>
-                            {values?.priceType && (
-                                <div className="d-flex justify-content-between align-items-center mb-3">
-                                    Selected:
-                                    <div className="d-flex flex-wrap">
-                                        <div className="badge bg-primary-light mr-2 mb-2">
-                                            {values?.priceType?.label}
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
+                            <SelectedDisplay
+                                label="Price Type"
+                                data={values?.price_type}
+                                render={(priceType: Record<string, any>) => (
+                                    <>
+                                        {priceType?.label}
+                                    </>
+                                )}
+                            />
                             {modalService.renderLocalTriggerButton(
                                 'Type',
                                 'Select Type',
@@ -216,19 +353,15 @@ function EditProductPriceFields({
                     >
                         <div className="col-12 col-lg-6 mt-3">
                             <div className="floating-input">
-                                <label className="d-block fw-bold">
-                                    Created By
-                                </label>
-                                {values?.created_by_user && (
-                                    <div className="d-flex justify-content-between align-items-center mb-3">
-                                        Selected:
-                                        <div className="d-flex flex-wrap">
-                                            <div className="badge bg-primary-light mr-2 mb-2">
-                                                {values?.created_by_user?.first_name} {values?.created_by_user?.last_name} ({values?.created_by_user?.email})
-                                            </div>
-                                        </div>
-                                    </div>
-                                )}
+                                <SelectedDisplay
+                                    label="Created By"
+                                    data={values?.created_by_user}
+                                    render={(createdByUser: Record<string, any>) => (
+                                        <>
+                                            {createdByUser?.first_name} {createdByUser?.last_name} ({createdByUser?.email})
+                                        </>
+                                    )}
+                                />
                                 {modalService.renderLocalTriggerButton(
                                     'user',
                                     'Select User',
@@ -236,6 +369,38 @@ function EditProductPriceFields({
                             </div>
                         </div>
                     </AccessControlComponent>
+
+
+                    <div className="col-12 col-lg-6 mt-3">
+                        <div className="floating-input">
+                            <SelectedListDisplay
+                                label="Tax Rates"
+                                data={values?.tax_rates || []}
+                                render={(taxRate: Record<string, any>) => taxRate.name || 'No Tax Rates Selected'}
+                            />
+
+                            {modalService.renderLocalTriggerButton(
+                                'tax-rates',
+                                'Select Tax Rates',
+                            )}
+                        </div>
+                    </div>
+                    
+                    <div className="col-12 col-lg-6 mt-3">
+                        <div className="floating-input">
+                            <SelectedListDisplay
+                                label="Discounts"
+                                data={values?.discounts || []}
+                                render={(discount: Record<string, any>) => discount.name || 'No Discounts Selected'}
+                            />
+
+                            {modalService.renderLocalTriggerButton(
+                                'discounts',
+                                'Select Discounts',
+                            )}
+                        </div>
+                    </div>
+
                     <div className="col-12 col-lg-6 mt-3">
                         <div className="floating-input form-group">
                             <DateTimePicker

@@ -38,6 +38,16 @@ function EditShippingZoneFields({
                         />
                     </div>
                     <div className="col-12 col-lg-6">
+                        <TextInput
+                            value={values?.description || ""}
+                            onChange={handleChange}
+                            placeholder="Enter description"
+                            name="description"
+                            type="text"
+                            label="Description"
+                        />
+                    </div>
+                    <div className="col-12 col-lg-6">
                         <div className="floating-input">
                             <label className="fw-bold" htmlFor="country">
                                 Countries
@@ -54,7 +64,6 @@ function EditShippingZoneFields({
                                 isMulti={true}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {
-                                    console.log("Selected countries:", value);
                                     setFieldValue("countries", value);
                                 }}
                                 loadingMore={true}
@@ -71,7 +80,16 @@ function EditShippingZoneFields({
                             value={values?.is_active || false}
                         />
                     </div>
-
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name={'all'}
+                            placeholder="All Countries?"
+                            label="All Countries?"
+                            onChange={handleChange}
+                            value={values?.all || false}
+                        />
+                    </div>
+                    
                 </div>
             </div>
         </div>

@@ -1,5 +1,6 @@
 import { Country } from "./Country";
 import { Currency } from "./Currency";
+import { TaxRate } from "./Tax";
 import { User } from "./User";
 
 export type PriceType = {
@@ -33,6 +34,8 @@ export type Price = {
     is_default: boolean;
     is_active: boolean;
     amount: number;
+    tax_rates?: TaxRate[];
+    discounts?: any[];
     created_at: string;
     updated_at: string;
 }
@@ -47,6 +50,8 @@ export type PriceRequest = {
     is_default?: boolean;
     is_active?: boolean;
     amount?: number;
+    tax_rate_ids?: number[];
+    discount_ids?: number[];
 }
 
 export type CreatePrice = {

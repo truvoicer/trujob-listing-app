@@ -3,31 +3,31 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_SHIPPING_ZONE_MODAL_ID, EDIT_SHIPPING_ZONE_MODAL_ID } from "./ManageShippingZone";
+import { CREATE_SHIPPING_RATE_MODAL_ID, EDIT_SHIPPING_RATE_MODAL_ID } from "./ManageShippingRate";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditShippingZoneFields from "./EditShippingZoneFields";
+import EditShippingRateFields from "./EditShippingRateFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { ShippingZone, CreateShippingZone, UpdateShippingZone } from "@/types/ShippingZone";
+import { ShippingRate, CreateShippingRate, UpdateShippingRate } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 
 
-export type EditShippingZoneProps = {
-    data?: ShippingZone;
+export type EditShippingRateProps = {
+    data?: ShippingRate;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
     dataTable?: DataTableContextType;
 }
-function EditShippingZone({
+function EditShippingRate({
     dataTable,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditShippingZoneProps) {
+}: EditShippingRateProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -36,41 +36,42 @@ function EditShippingZone({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: ShippingZone = {
+    const initialValues: ShippingRate = {
         id: data?.id || 0,
-        description: data?.description || '',
-        name: data?.name || '',
-        countries: data?.countries || [],
-        is_active: data?.is_active || false,
-        all: data?.all || false,
+        shipping_method: data?.shipping_method || '',
+        shipping_zone: data?.shipping_zone || '',
+        type: data?.type || '',
+        min_amount: data?.min_amount || 0,
+        max_amount: data?.max_amount || 0,
+        amount: data?.amount || 0,
+        currency: data?.currency || '',
+        is_free_shipping_possible: data?.is_free_shipping_possible || false,
+        zone: data?.zone || null,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
 
-    function buildCreateData(values: ShippingZone) {
+    function buildCreateData(values: ShippingRate) {
 
-        let requestData: CreateShippingZone = {
+        let requestData: CreateShippingRate = {
             name: values?.name || '',
-            description: values?.description || '',
             country_ids: RequestHelpers.extractIdsFromArray(values?.countries || []),
             is_active: values?.is_active || false,
-            all: values?.all || false,
         };
-
+        if (values?.zone?.id) {
+            requestData.zone_id = values?.zone?.id || 0;
+        }
         return requestData;
     }
 
-    function buildUpdateData(values: ShippingZone) {
+    function buildUpdateData(values: ShippingRate) {
 
-        let requestData: UpdateShippingZone = {
+        let requestData: UpdateShippingRate = {
             id: values?.id || 0,
         };
         if (values?.name) {
             requestData.name = values?.name || '';
-        }
-        if (values?.description) {
-            requestData.description = values?.description || '';
         }
         if (Array.isArray(values?.countries) && values?.countries.length > 0) {
             requestData.country_ids = RequestHelpers.extractIdsFromArray(values?.countries || []);
@@ -78,29 +79,30 @@ function EditShippingZone({
         if (values?.hasOwnProperty('is_active')) {
             requestData.is_active = values?.is_active || false;
         }
-        if (values?.hasOwnProperty('all')) {
-            requestData.all = values?.all || false;
+        if (values?.zone?.id) {
+            requestData.zone_id = values?.zone?.id || 0;
         }
         return requestData;
     }
-    async function handleSubmit(values: ShippingZone) {
-
+    async function handleSubmit(values: ShippingRate) {
+        console.log('handleSubmit', values);
+        return;
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return false;
+            return;
         }
 
         let response = null;
-
+        let requestData: CreateShippingRate | UpdateShippingRate;
         switch (operation) {
             case 'edit':
             case 'update':
                 if (!values?.id) {
-                    throw new Error('Shipping zone ID is required');
+                    throw new Error('Shipping rate ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.shippingZone,
+                        truJobApiConfig.endpoints.shippingMethodRate,
                         values.id,
                         'update'
                     ]),
@@ -111,12 +113,12 @@ function EditShippingZone({
                 break;
             case 'add':
             case 'create':
-                if (Array.isArray(values?.shippingZones)) {
+                if (Array.isArray(values?.shippingRates)) {
                     return;
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.shippingZone,
+                        truJobApiConfig.endpoints.shippingMethodRate,
                         'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -144,15 +146,14 @@ function EditShippingZone({
                 ),
                 type: 'danger',
             });
-            return false;
+            return;
         }
         if (dataTable) {
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_SHIPPING_ZONE_MODAL_ID);
-        dataTableContext.modal.close(EDIT_SHIPPING_ZONE_MODAL_ID);
-        return true;
+        dataTableContext.modal.close(CREATE_SHIPPING_RATE_MODAL_ID);
+        dataTableContext.modal.close(EDIT_SHIPPING_RATE_MODAL_ID);
     }
 
     function getRequiredFields() {
@@ -194,7 +195,7 @@ function EditShippingZone({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditShippingZoneFields operation={operation} />
+                        <EditShippingRateFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -205,7 +206,7 @@ function EditShippingZone({
                     >
                         {() => {
                             return (
-                                <EditShippingZoneFields operation={operation} />
+                                <EditShippingRateFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -214,4 +215,4 @@ function EditShippingZone({
         </div>
     );
 }
-export default EditShippingZone;
+export default EditShippingRate;

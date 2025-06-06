@@ -2,14 +2,14 @@ import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
 import { Suspense, useContext, useEffect, useState } from "react";
-import EditShippingMethod from "./EditShippingMethod";
+import EditShippingRate from "./EditShippingRate";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
 import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
-import { ShippingMethod } from "@/types/Shipping";
+import { ShippingRate } from "@/types/Shipping";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
@@ -17,15 +17,17 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export const CREATE_SHIPPING_METHOD_MODAL_ID = 'create-shipping-method-modal';
-export const EDIT_SHIPPING_METHOD_MODAL_ID = 'edit-shipping-method-modal';
-export const DELETE_SHIPPING_METHOD_MODAL_ID = 'delete-shipping-method-modal';
+export const CREATE_SHIPPING_RATE_MODAL_ID = 'create-shipping-rate-modal';
+export const EDIT_SHIPPING_RATE_MODAL_ID = 'edit-shipping-rate-modal';
+export const DELETE_SHIPPING_RATE_MODAL_ID = 'delete-shipping-rate-modal';
 
-export interface ManageShippingMethodProps extends DataManageComponentProps {
-    data?: Array<ShippingMethod>;
+export interface ManageShippingRateProps extends DataManageComponentProps {
+    data?: Array<ShippingRate>;
+    shippingMethodId?: number;
 }
 
-function ManageShippingMethod({
+function ManageShippingRate({
+    shippingMethodId,
     mode = 'selector',
     data,
     operation = 'create',
@@ -35,7 +37,7 @@ function ManageShippingMethod({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true
-}: ManageShippingMethodProps) {
+}: ManageShippingRateProps) {
     const appModalContext = useContext(AppModalContext);
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
@@ -44,7 +46,7 @@ function ManageShippingMethod({
         switch (mode) {
             case 'selector':
                 return {
-                    shippingMethods: [],
+                    shippingRates: [],
                 };
             case 'edit':
                 return {};
@@ -53,7 +55,7 @@ function ManageShippingMethod({
         }
     }
 
-    function getShippingMethodFormModalProps(index?: number) {
+    function getShippingRateFormModalProps(index?: number) {
         return {
             formProps: {
                 operation: operation,
@@ -80,7 +82,7 @@ function ManageShippingMethod({
                         DataManagerService.selectorModeHandler({
                             onChange,
                             data,
-                            values: formHelpers?.values?.shippingMethods,
+                            values: formHelpers?.values?.shippingRates,
                             index
                         });
                         break;
@@ -102,7 +104,7 @@ function ManageShippingMethod({
         }
     }
 
-    function renderActionColumn(item: ShippingMethod, index: number, dataTableContextState: DataTableContextType) {
+    function renderActionColumn(item: ShippingRate, index: number, dataTableContextState: DataTableContextType) {
         return (
             <div className="d-flex align-items-center list-action">
                 <Link className="badge bg-success-light mr-2"
@@ -112,17 +114,17 @@ function ManageShippingMethod({
                         e.preventDefault();
                         e.stopPropagation();
                         dataTableContextState.modal.show({
-                            title: 'Edit shipping method',
+                            title: 'Edit shipping rate',
                             component: (
-                                <EditShippingMethod
+                                <EditShippingRate
                                     dataTable={dataTableContextState} data={item}
                                     operation={'edit'}
                                     inModal={true}
-                                    modalId={EDIT_SHIPPING_METHOD_MODAL_ID}
+                                    modalId={EDIT_SHIPPING_RATE_MODAL_ID}
                                 />
                             ),
-                            ...getShippingMethodFormModalProps(index),
-                        }, EDIT_SHIPPING_METHOD_MODAL_ID);
+                            ...getShippingRateFormModalProps(index),
+                        }, EDIT_SHIPPING_RATE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -133,12 +135,12 @@ function ManageShippingMethod({
                     onClick={e => {
                         e.preventDefault();
                         dataTableContextState.modal.show({
-                            title: 'Delete shipping method',
+                            title: 'Delete shipping rate',
                             component: (
-                                <p>Are you sure you want to delete this shipping method ({item?.name} | {item?.label})?</p>
+                                <p>Are you sure you want to delete this shipping rate ({item?.name} | {item?.label})?</p>
                             ),
                             onOk: async () => {
-                                console.log('Delete shipping method', { operation, item });
+                                console.log('Delete shipping rate', { operation, item });
                                 if (!operation) {
                                     console.warn('Operation is required');
                                     return;
@@ -149,7 +151,18 @@ function ManageShippingMethod({
                                     if (typeof onChange === 'function') {
                                         onChange(cloneData);
                                     }
-                                    dataTableContext.modal.close(DELETE_SHIPPING_METHOD_MODAL_ID);
+                                    dataTableContext.modal.close(DELETE_SHIPPING_RATE_MODAL_ID);
+                                    return;
+                                }
+                                if (!shippingMethodId) {
+                                    notificationContext.show({
+                                        variant: 'danger',
+                                        type: 'toast',
+                                        title: 'Error',
+                                        component: (
+                                            <p>Shipping method ID is required</p>
+                                        ),
+                                    }, 'shipping-rate-delete-error');
                                     return;
                                 }
                                 if (!item?.id) {
@@ -158,14 +171,14 @@ function ManageShippingMethod({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Shipping method ID is required</p>
+                                            <p>Shipping rate ID is required</p>
                                         ),
-                                    }, 'shipping-method-delete-error');
+                                    }, 'shipping-rate-delete-error');
                                     return;
                                 }
                                 const response = await TruJobApiMiddleware.getInstance().resourceRequest({
                                     endpoint: UrlHelpers.urlFromArray([
-                                        truJobApiConfig.endpoints.shippingMethod,
+                                        truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
                                         item.id,
                                         'destroy'
                                     ]),
@@ -178,9 +191,9 @@ function ManageShippingMethod({
                                         type: 'toast',
                                         title: 'Error',
                                         component: (
-                                            <p>Failed to delete shipping method</p>
+                                            <p>Failed to delete shipping rate</p>
                                         ),
-                                    }, 'shipping-method-delete-error');
+                                    }, 'shipping-rate-delete-error');
                                     return;
                                 }
                                 dataTableContextState.refresh();
@@ -188,7 +201,7 @@ function ManageShippingMethod({
                             },
                             show: true,
                             showFooter: true
-                        }, DELETE_SHIPPING_METHOD_MODAL_ID);
+                        }, DELETE_SHIPPING_RATE_MODAL_ID);
                     }}
                 >
                     <i className="lar la-eye"></i>
@@ -203,17 +216,17 @@ function ManageShippingMethod({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     dataTableContextState.modal.show({
-                                        title: 'Edit Shipping method',
+                                        title: 'Edit Shipping rate',
                                         component: (
-                                            <EditShippingMethod
+                                            <EditShippingRate
                                                 dataTable={dataTableContextState} data={item}
                                                 operation={'edit'}
                                                 inModal={true}
-                                                modalId={EDIT_SHIPPING_METHOD_MODAL_ID}
+                                                modalId={EDIT_SHIPPING_RATE_MODAL_ID}
                                             />
                                         ),
-                                        ...getShippingMethodFormModalProps(index),
-                                    }, EDIT_SHIPPING_METHOD_MODAL_ID);
+                                        ...getShippingRateFormModalProps(index),
+                                    }, EDIT_SHIPPING_RATE_MODAL_ID);
                                 }
                             }
                         },
@@ -225,9 +238,9 @@ function ManageShippingMethod({
                                     e.preventDefault();
                                     e.stopPropagation();
                                     appModalContext.show({
-                                        title: 'Delete shipping method',
+                                        title: 'Delete shipping rate',
                                         component: (
-                                            <p>Are you sure you want to delete this shippingMethod ({item?.title})?</p>
+                                            <p>Are you sure you want to delete this shippingRate ({item?.title})?</p>
                                         ),
                                         onOk: async () => {
                                             if (!item?.id) {
@@ -236,13 +249,28 @@ function ManageShippingMethod({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
+                                                        <p>Shipping rate ID is required</p>
+                                                    ),
+                                                }, 'shipping-rate-delete-error');
+                                                return;
+                                            }
+                                            if (!shippingMethodId) {
+                                                notificationContext.show({
+                                                    variant: 'danger',
+                                                    type: 'toast',
+                                                    title: 'Error',
+                                                    component: (
                                                         <p>Shipping method ID is required</p>
                                                     ),
-                                                }, 'shipping-method-delete-error');
+                                                }, 'shipping-rate-delete-error');
                                                 return;
                                             }
                                             const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: `${truJobApiConfig.endpoints.shippingMethod}/${item.id}/delete`,
+                                                endpoint: UrlHelpers.urlFromArray([
+                                                    truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
+                                                    item.id,
+                                                    'destroy'
+                                                ]),
                                                 method: ApiMiddleware.METHOD.DELETE,
                                                 protectedReq: true
                                             })
@@ -252,16 +280,16 @@ function ManageShippingMethod({
                                                     type: 'toast',
                                                     title: 'Error',
                                                     component: (
-                                                        <p>Failed to delete shippingMethod</p>
+                                                        <p>Failed to delete shippingRate</p>
                                                     ),
-                                                }, 'shipping-method-delete-error');
+                                                }, 'shipping-rate-delete-error');
                                                 return;
                                             }
                                             dataTableContextState.refresh();
                                         },
                                         show: true,
                                         showFooter: true
-                                    }, EDIT_SHIPPING_METHOD_MODAL_ID);
+                                    }, EDIT_SHIPPING_RATE_MODAL_ID);
                                 }
                             }
                         }
@@ -282,18 +310,22 @@ function ManageShippingMethod({
             query[SORT_ORDER] = searchParams?.sort_order;
         }
 
-        if (isNotEmpty(searchParams?.shippingMethod)) {
-            query['shippingMethod'] = searchParams.shippingMethod;
+        if (isNotEmpty(searchParams?.shippingRate)) {
+            query['shippingRate'] = searchParams.shippingRate;
         }
         return query;
     }
-    async function shippingMethodRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
+    async function shippingRateRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
         dataTableContextState: DataTableContextType,
         setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
         searchParams: any
     }) {
         if (!operation) {
             console.warn('Operation is required');
+            return;
+        }
+        if (!shippingMethodId) {
+            console.warn('Shipping method ID is required');
             return;
         }
         let query = dataTableContextState?.query || {};
@@ -306,7 +338,7 @@ function ManageShippingMethod({
 
         return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.shippingMethod,
+                truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString())
             ]),
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
@@ -315,32 +347,33 @@ function ManageShippingMethod({
         });
     }
 
-    function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>, { dataTableContextState, setDataTableContextState }: {
-        dataTableContextState: DataTableContextType,
-        setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
-    }) {
+    function renderAddNew(
+        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+        { dataTableContextState, setDataTableContextState }: {
+            dataTableContextState: DataTableContextType,
+            setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
+        }) {
         e.preventDefault();
         let modalState;
         if (mode === 'selector') {
             modalState = dataTableContext.modal;
         } else if (mode === 'edit') {
-            modalState = dataTableContextState.modal;
+            modalState = dataTableContext.modal;
         } else {
             console.warn('Invalid mode');
             return;
         }
         modalState.show({
-            title: 'Create shipping method',
+            title: 'Create shipping rate',
             component: (
-                <EditShippingMethod
-                    dataTable={dataTableContextState}
-                    operation={'create'}
+                <EditShippingRate
+                    dataTable={dataTableContextState} operation={'create'}
                     inModal={true}
-                    modalId={CREATE_SHIPPING_METHOD_MODAL_ID}
+                    modalId={CREATE_SHIPPING_RATE_MODAL_ID}
                 />
             ),
-            ...getShippingMethodFormModalProps(),
-        }, CREATE_SHIPPING_METHOD_MODAL_ID);
+            ...getShippingRateFormModalProps(),
+        }, CREATE_SHIPPING_RATE_MODAL_ID);
     }
 
     function getRowSelectActions() {
@@ -356,18 +389,17 @@ function ManageShippingMethod({
 
                 dataTableContextState.confirmation.show({
                     title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected shippingMethods?',
+                    message: 'Are you sure you want to delete selected shippingRates?',
                     onOk: async () => {
-                        console.log('Yes')
                         if (!data?.length) {
                             notificationContext.show({
                                 variant: 'danger',
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>No shippingMethods selected</p>
+                                    <p>No shipping rates selected</p>
                                 ),
-                            }, 'shipping-method-bulk-delete-error');
+                            }, 'shipping-rate-bulk-delete-error');
                             return;
                         }
                         const ids = RequestHelpers.extractIdsFromArray(data);
@@ -377,13 +409,27 @@ function ManageShippingMethod({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Shipping method IDs are required</p>
+                                    <p>Shipping rate IDs are required</p>
                                 ),
-                            }, 'shipping-method-bulk-delete-error');
+                            }, 'shipping-rate-bulk-delete-error');
+                            return;
+                        }
+                        if (!shippingMethodId) {
+                            notificationContext.show({
+                                variant: 'danger',
+                                type: 'toast',
+                                title: 'Error',
+                                component: (
+                                    <p>Shipping method ID is required</p>
+                                ),
+                            }, 'shipping-rate-bulk-delete-error');
                             return;
                         }
                         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.shippingMethod}/bulk/delete`,
+                            endpoint: UrlHelpers.urlFromArray([
+                                truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
+                                'bulk/delete',
+                            ]),
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {
@@ -396,9 +442,9 @@ function ManageShippingMethod({
                                 type: 'toast',
                                 title: 'Error',
                                 component: (
-                                    <p>Failed to delete shippingMethods</p>
+                                    <p>Failed to delete shippingRates</p>
                                 ),
-                            }, 'shipping-method-bulk-delete-error');
+                            }, 'shipping-rate-bulk-delete-error');
                             return;
                         }
 
@@ -407,15 +453,15 @@ function ManageShippingMethod({
                             type: 'toast',
                             title: 'Success',
                             component: (
-                                <p>Shipping methods deleted successfully</p>
+                                <p>Shipping rates deleted successfully</p>
                             ),
-                        }, 'shipping-method-bulk-delete-success');
+                        }, 'shipping-rate-bulk-delete-success');
                         dataTableContextState.refresh();
                     },
                     onCancel: () => {
                         console.log('Cancel delete');
                     },
-                }, 'delete-bulk-shipping-method-confirmation');
+                }, 'delete-bulk-shipping-rate-confirmation');
             }
         });
         return actions;
@@ -432,22 +478,59 @@ function ManageShippingMethod({
                 enableEdit={enableEdit}
                 paginationMode={paginationMode}
                 enablePagination={enablePagination}
-                title={'Manage Shipping methods'}
+                title={'Manage Shipping rates'}
                 rowSelectActions={getRowSelectActions()}
                 renderAddNew={renderAddNew}
                 renderActionColumn={renderActionColumn}
-                request={shippingMethodRequest}
+                request={shippingRateRequest}
                 columns={[
-                    { label: 'Carrier', key: 'carrier' },
-                    { label: 'Description', key: 'description' },
-                    { label: 'Processing Time (Days)', key: 'processing_time_days' },
-                    { label: 'Display Order', key: 'display_order' },
-                    { label: 'Is Active', key: 'is_active', type: 'boolean' },
-                    { label: 'Created At', key: 'created_at', type: 'date' },
-                    { label: 'Updated At', key: 'updated_at', type: 'date' },
+                    {
+                        label: 'ID',
+                        key: 'id',
+                    },
+                    {
+                        label: 'Shipping Method',
+                        key: 'shipping_method.name',
+                    },
+                    {
+                        label: 'Shipping Zone',
+                        key: 'shipping_zone.name',
+                    },
+                    {
+                        label: 'Type',
+                        key: 'type',
+                    },
+                    {
+                        label: 'Min Amount',
+                        key: 'min_amount',
+                    },
+                    {
+                        label: 'Max Amount',
+                        key: 'max_amount',
+                    },
+                    {
+                        label: 'Amount',
+                        key: 'amount',
+                    },
+                    {
+                        label: 'Currency',
+                        key: 'currency.name',
+                    },
+                    {
+                        label: 'Free Shipping Possible',
+                        key: 'is_free_shipping_possible',
+                    },
+                    {
+                        label: 'Created At',
+                        key: 'created_at',
+                    },
+                    {
+                        label: 'Updated At',
+                        key: 'updated_at',
+                    },
                 ]}
             />
         </Suspense>
     );
 }
-export default ManageShippingMethod;
+export default ManageShippingRate;

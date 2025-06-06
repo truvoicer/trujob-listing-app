@@ -11,6 +11,8 @@ export type ShippingMethod = {
     is_active: boolean;
     processing_time_days: number;
     display_order: number;
+    rates: ShippingRate[];
+    restrictions: ShippingRestriction[];
     created_at: string;
     updated_at: string;
 }
@@ -61,12 +63,13 @@ export type ShippingRate = {
     id: number;
     shipping_method: ShippingMethod;
     shipping_zone: ShippingZone;
-    rate_type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
-    min_value: number;
-    max_value: number;
-    rate_amount: number;
+    type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
+    min_amount: number;
+    max_amount: number;
+    amount: number;
     currency: Currency;
     is_free_shipping_possible: boolean;
+    zone?: ShippingZone | null;
     created_at: string;
     updated_at: string;
 }

@@ -74,7 +74,12 @@ function SelectDropdown({
   useEffect(() => {
     if (value) {
       if (isMulti && Array.isArray(value)) {
-        setSelectedOptions(value);
+        setSelectedOptions(
+          value.filter((val) => typeof val === 'object' &&
+            (val.hasOwnProperty('value') && typeof val.value !== 'undefined') &&
+            (val.hasOwnProperty('label') && typeof val.label !== 'undefined')
+          )
+        );
       } else if (!isMulti && !Array.isArray(value)) {
 
         if (typeof value === 'string' || typeof value === 'number') {
@@ -106,11 +111,11 @@ function SelectDropdown({
       filtered = internalOptions.filter(option =>
         parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
       );
-      
+
     }
     setFilteredOptions(filtered);
   }
-  
+
   function findOptionByValue(value: Option, options: Record<string, any>[]) {
     return options.find((option) => {
       if (option?.id) {
@@ -127,8 +132,11 @@ function SelectDropdown({
     if (isMulti && !Array.isArray(options)) {
       return [];
     }
+    if (!Array.isArray(optionData)) {
+      return optionData;
+    }
     if (Array.isArray(value)) {
-      const filteredOptions = optionData.map((option) => {
+      const newFilteredOptions = optionData.map((option) => {
         let findInOptions = findOptionByValue(option, internalOptions);
         if (!findInOptions) {
           findInOptions = findOptionByValue(option, filteredOptions);
@@ -139,7 +147,7 @@ function SelectDropdown({
         return findInOptions;
       })
         .filter((option) => typeof option !== 'undefined');
-      return filteredOptions;
+      return newFilteredOptions;
     } else {
       let findInOptions = findOptionByValue(optionData, internalOptions);
       if (!findInOptions) {
@@ -174,18 +182,17 @@ function SelectDropdown({
       } else {
         newSelection = [...selectedOptions, option];
       }
-      
       setSelectedOptions(newSelection);
-      onChange(buildOnChangeData(option));
+      onChange(buildOnChangeData(newSelection));
     } else {
-      
+
       setSelectedOption(option);
       onChange(buildOnChangeData(option));
       setIsOpen(false);
     }
     setSearchTerm('');
   };
-
+  
   const handleAddNew = () => {
     const newOption: Option = {
       label: searchTerm,
@@ -238,7 +245,7 @@ function SelectDropdown({
       }
     }
   };
-  
+
   const renderAddNewOption = () => (
     allowNewOptions && searchTerm &&
     !parseDataToOptions(filteredOptions).find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase()) && (

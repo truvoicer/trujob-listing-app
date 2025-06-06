@@ -1,7 +1,7 @@
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense, useContext } from "react";
 import EditPriceType from "./EditPriceType";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -17,9 +17,9 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export const CREATE_PRICE_TYPE_MODAL_ID = 'create-priceType-modal';
-export const EDIT_PRICE_TYPE_MODAL_ID = 'edit-priceType-modal';
-export const DELETE_PRICE_TYPE_MODAL_ID = 'delete-priceType-modal';
+export const CREATE_PRICE_TYPE_MODAL_ID = 'create-price-type-modal';
+export const EDIT_PRICE_TYPE_MODAL_ID = 'edit-price-type-modal';
+export const DELETE_PRICE_TYPE_MODAL_ID = 'delete-price-type-modal';
 
 export interface ManagePriceTypeProps extends DataManageComponentProps {
     data?: Array<PriceType>;

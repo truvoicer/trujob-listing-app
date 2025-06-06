@@ -43,6 +43,8 @@ function EditShippingMethod({
         processing_time_days: data?.processing_time_days || 0,
         display_order: data?.display_order || 0,
         is_active: data?.is_active || false,
+        rates: data?.rates || [],
+        restrictions: data?.restrictions || [],
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
@@ -88,14 +90,13 @@ function EditShippingMethod({
         return requestData;
     }
     async function handleSubmit(values: ShippingMethod) {
-
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return;
+            return false;
         }
 
         let response = null;
-        let requestData: CreateShippingMethod | UpdateShippingMethod;
+
         switch (operation) {
             case 'edit':
                 if (!values?.id) {
@@ -147,7 +148,7 @@ function EditShippingMethod({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         if (dataTable) {
             dataTable.refresh();
@@ -155,6 +156,7 @@ function EditShippingMethod({
         dataTableContext.refresh();
         dataTableContext.modal.close(CREATE_SHIPPING_METHOD_MODAL_ID);
         dataTableContext.modal.close(EDIT_SHIPPING_METHOD_MODAL_ID);
+        return true;
     }
 
     function getRequiredFields() {

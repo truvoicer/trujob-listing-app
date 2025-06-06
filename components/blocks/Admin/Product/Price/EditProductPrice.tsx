@@ -12,6 +12,8 @@ import { CreatePrice, Price, PriceRequest, UpdatePrice } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { getSiteCountryAction, getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { isArray } from "underscore";
 
 export type EditProductPriceProps = {
     productId?: number;
@@ -47,13 +49,15 @@ function EditProductPrice({
         created_by_user: data?.created_by_user,
         country: data?.country || country || null,
         currency: data?.currency || currency || null,
-        priceType: data?.priceType,
+        price_type: data?.price_type,
         valid_from: data?.valid_from || '',
         valid_to: data?.valid_to || '',
         valid_from_timestamp: data?.valid_from_timestamp || 0,
         valid_to_timestamp: data?.valid_to_timestamp || 0,
         is_default: data?.is_default || false,
         is_active: data?.is_active || false,
+        tax_rates: data?.tax_rates || [],
+        discounts: data?.discounts || [],
         amount: data?.amount || 0,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
@@ -68,11 +72,11 @@ function EditProductPrice({
         if (values?.currency) {
             requestData.currency_id = values?.currency?.id;
         }
-        if (values?.priceType) {
-            requestData.price_type_id = values?.priceType?.id;
+        if (values?.price_type) {
+            requestData.price_type_id = values?.price_type?.id;
         }
         if (values?.created_by_user) {
-            requestData.user_id = values?.created_by_user?.id;
+            requestData.created_by_user_id = values?.created_by_user?.id;
         }
         if (values?.valid_from) {
             requestData.valid_from = values?.valid_from;
@@ -89,14 +93,18 @@ function EditProductPrice({
         if (values.hasOwnProperty('amount')) {
             requestData.amount = values?.amount;
         }
+        if (Array.isArray(values?.tax_rates) && values?.tax_rates.length > 0) {
+            requestData.tax_rate_ids = RequestHelpers.extractIdsFromArray(values.tax_rates);
+        }
+        if (Array.isArray(values?.discounts) && values?.discounts.length > 0) {
+            requestData.discount_ids = RequestHelpers.extractIdsFromArray(values.discounts);
+        }
         return requestData;
     }
 
     function buildCreateData(values: Price) {
 
-        let requestData: CreatePrice = {
-            
-        };
+        let requestData: CreatePrice = {};
         requestData = {
             ...requestData,
             ...buildRequestData(values),
@@ -110,7 +118,7 @@ function EditProductPrice({
         };
 
         if (values?.created_by_user) {
-            requestData.user_id = values?.created_by_user?.id;
+            requestData.created_by_user_id = values?.created_by_user?.id;
         }
         requestData = {
             ...requestData,
@@ -140,7 +148,7 @@ function EditProductPrice({
             case 'update':
                 if (!values?.id) {
                     console.warn('Product review ID is required');
-                    return;
+                    return false;
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([

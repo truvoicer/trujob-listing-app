@@ -3,33 +3,35 @@ import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
-import QuantityInput from "@/components/QuantityInput";
+import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
+import { Country } from "@/types/Country";
 import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
+import CurrencyPriceInput from "@/components/blocks/Locale/Currency/CurrencyPriceInput";
+import { getSiteCurrencyAction } from "@/library/redux/actions/site-actions";
+import SelectShippingRateType from "./SelectShippingRateType";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import ManageShippingRate from "../ShippingRate/ManageShippingRate";
+import ManageShippingZone from "../ShippingZone/ManageShippingZone";
 import SelectedDisplay from "@/components/Elements/SelectedDisplay";
-import SelectedListDisplay from "@/components/Elements/SelectedListDisplay";
-import { ShippingRate } from "@/types/Shipping";
 
-type EditShippingMethodFields = {
+type EditShippingRateFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditShippingMethodFields({
+function EditShippingRateFields({
     operation
-}: EditShippingMethodFields) {
-    const [selectedShippingRates, setSelectedShippingRates] = useState<Array<ShippingRate>>([]);
+}: EditShippingRateFields) {
+    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
     const notificationContext = useContext(AppNotificationContext);
     const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    console.log('EditShippingMethodFields values', values);
+
     function getComponentProps() {
         let componentProps: any = {
             operation: 'create',
-            // mode: 'selector'
+            mode: 'selector'
         };
         if (values?.id) {
             componentProps.shippingMethodId = values.id;
@@ -40,57 +42,42 @@ function EditShippingMethodFields({
     modalService.setUseStateHook(useState);
     modalService.setConfig([
         {
-            id: 'rates',
-            title: 'Select Rates',
+            id: 'zones',
+            title: 'Select Zone',
             size: 'lg',
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                    id="edit-shipping-method-rates"
+                    id="select-shipping-rate-zone"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
                     ]}
                 >
-                    <ManageShippingRate
+                    <ManageShippingZone
                         {...getComponentProps()}
-                    
-                        values={values?.rates ? [values?.rates] : []}
-                        data={values?.rates || []}
-                        rowSelection={false}
-                        mode={'edit'}
+                        values={values?.zone ? [values?.zone] : []}
+                        rowSelection={true}
                         multiRowSelection={false}
                         enableEdit={true}
                         paginationMode="state"
-                        onChange={(rates: Array<any>) => {
-                            console.log('rates', rates);
-                            if (!Array.isArray(rates)) {
-                                console.warn('Invalid values received from ManageShippingRate component');
+                        onChange={(zones: Array<any>) => {
+                            if (!Array.isArray(zones)) {
+                                console.warn('Invalid values received from ManageShippingZone component');
                                 return;
                             }
 
-                            if (rates.length === 0) {
-                                console.warn('Rates is empty');
+                            if (zones.length === 0) {
+                                console.warn('Zones is empty');
                                 return true;
                             }
-                            let newRates = [];
-                            
-                            if (['add', 'create'].includes(operation)) {
-                                newRates = rates.map((item) => {
-                                    return {
-                                        ...item,
-                                        checked: true,
-                                    };
-                                });
-                            } else {
-                                newRates = rates.filter((item) => item?.checked);
-                                if (newRates.length === 0) {
-                                    console.warn('No rates selected');
-                                    return true;
-                                }
+                            const checked = zones.filter((item) => item?.checked);
+                            if (checked.length === 0) {
+                                console.warn('No zones selected');
+                                return true;
                             }
-                            console.log('newRates', newRates);
-                            setFieldValue('rates', newRates);
+                        
+                            setFieldValue('zone', checked[0]);
                         }}
                     />
                 </AccessControlComponent>
@@ -109,70 +96,83 @@ function EditShippingMethodFields({
             }
         },
     ]);
+
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
                 <div className="row">
 
                     <div className="col-12 col-lg-6">
-                        <TextInput
-                            value={values?.carrier || ""}
-                            onChange={handleChange}
-                            placeholder="Enter carrier"
-                            name="carrier"
-                            type="text"
-                            label="Carrier"
-                        />
+                        <SelectShippingRateType name='type' value={values?.type || ''} />
                     </div>
 
                     <div className="col-12 col-lg-6">
                         <TextInput
-                            value={values?.description || ""}
+                            value={values?.min_amount || ""}
                             onChange={handleChange}
-                            placeholder="Enter description"
-                            name="description"
+                            placeholder="Enter min amount"
+                            name="min_amount"
                             type="text"
-                            label="Description"
+                            label="Min Amount"
                         />
                     </div>
-
                     <div className="col-12 col-lg-6">
-                        <div className="">
-                            <label className="form-label" htmlFor="icon">
-                                Procesing Time (Days)
+                        <TextInput
+                            value={values?.max_amount || ""}
+                            onChange={handleChange}
+                            placeholder="Enter max amount"
+                            name="max_amount"
+                            type="text"
+                            label="Max Amount"
+                        />
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        <div className="floating-input">
+                            <label className="fw-bold" htmlFor="amount">
+                                Amount
                             </label>
-                            <QuantityInput
-                                value={values?.processing_time_days || 1}
-                                min={1}
-                                max={365}
-                                onChange={(val) => setFieldValue('processing_time_days', val)}
+                            <CurrencyPriceInput
+                                amountValue={values?.amount || ''}
+                                currencyValue={
+                                    values?.currency
+                                        ? values?.currency
+                                        : getSiteCurrencyAction()
+                                }
+                                onAmountChange={(value) => {
+                                    setFieldValue("amount", value);
+                                }}
+                                onCurrencyChange={(value) => {
+                                    setFieldValue("currency", value);
+                                }}
                             />
                         </div>
                     </div>
+
                     <div className="col-12 col-lg-6">
                         <Checkbox
-                            name={'is_active'}
-                            placeholder="Is Active?"
-                            label="Is Active?"
+                            name="is_free_shipping_possible"
+                            value={values?.is_free_shipping_possible || false}
                             onChange={handleChange}
-                            value={values?.is_active || false}
+                            label="Is Free Shipping Possible?"
+                            placeholder="Is Free Shipping Possible?"
                         />
                     </div>
 
+
                     <div className="col-12 col-lg-6">
                         <div className="floating-input">
-                            <SelectedListDisplay
-                                label="Rates"
-                                data={values?.rates}
-                                render={(rate: Record<string, any>) => (
+                            <SelectedDisplay
+                                label="Zone"
+                                data={values?.zone}
+                                render={(zone: Record<string, any>) => (
                                     <>
-                                        {rate?.label}
+                                        {zone?.name || 'No Zone Selected'}
                                     </>
                                 )}
                             />
                             {modalService.renderLocalTriggerButton(
-                                'rates',
-                                'Select Rates',
+                                'zones',
+                                'Select Zone',
                             )}
                         </div>
                     </div>
@@ -183,4 +183,4 @@ function EditShippingMethodFields({
         </div>
     );
 }
-export default EditShippingMethodFields;
+export default EditShippingRateFields;
