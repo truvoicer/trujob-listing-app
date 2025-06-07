@@ -306,6 +306,7 @@ export class ApiMiddleware {
         setAuthenticatedAction(false);
         setIsAuthenticatingAction(false)
         setShowLoginModalAction(true);
+
     }
 
     async handleResponse(requestUrl: string, response: Response | Promise<Response>) {
@@ -314,6 +315,11 @@ export class ApiMiddleware {
         }
         const responsePromise = await response;
         const responseData = await responsePromise.json();
+        console.log('ApiMiddleware.handleResponse', {
+            requestUrl,
+            responsePromise,
+            responseData,
+        });
         switch (responsePromise?.status) {
             case 200:
             case 201:

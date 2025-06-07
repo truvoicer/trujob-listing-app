@@ -64,8 +64,22 @@ export type ShippingRate = {
     shipping_method: ShippingMethod;
     shipping_zone: ShippingZone;
     type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
-    min_amount: number;
-    max_amount: number;
+    weight_limit: boolean;
+    height_limit: boolean;
+    length_limit: boolean;
+    width_limit: boolean;
+    weight_unit: string;
+    height_unit: string;
+    width_unit: string;
+    length_unit: string;
+    min_weight: number | null;
+    max_weight: number | null;
+    min_height: number | null;
+    max_height: number | null;
+    min_width: number | null;
+    max_width: number | null;
+    min_length: number | null;
+    max_length: number | null;
     amount: number;
     currency: Currency;
     is_free_shipping_possible: boolean;
@@ -77,20 +91,32 @@ export type ShippingRate = {
 export type ShippingRateRequest = {
     shipping_method_id?: number;
     shipping_zone_id?: number;
-    rate_type?: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
-    min_value?: number;
-    max_value?: number;
-    rate_amount?: number;
+    type?: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
+    amount?: number;
+    weight_unit?: string;
+    height_unit?: string;
+    width_unit?: string;
+    length_unit?: string;
+    weight_limit?: boolean;
+    height_limit?: boolean;
+    length_limit?: boolean;
+    width_limit?: boolean;
+    min_weight?: number | null;
+    max_weight?: number | null;
+    min_height?: number | null;
+    max_height?: number | null;
+    min_width?: number | null;
+    max_width?: number | null;
+    min_length?: number | null;
+    max_length?: number | null;
     currency_id?: number;
     is_free_shipping_possible?: boolean;
 }
 export interface CreateShippingRate extends ShippingRateRequest {
     shipping_method_id: number;
     shipping_zone_id: number;
-    rate_type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
-    min_value?: number;
-    max_value?: number;
-    rate_amount: number;
+    type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
+    amount: number;
     currency_id: number;
     is_free_shipping_possible?: boolean;
 }

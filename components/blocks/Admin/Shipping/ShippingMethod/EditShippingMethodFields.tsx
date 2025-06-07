@@ -69,28 +69,8 @@ function EditShippingMethodFields({
                                 return;
                             }
 
-                            if (rates.length === 0) {
-                                console.warn('Rates is empty');
-                                return true;
-                            }
-                            let newRates = [];
+                            setFieldValue('rates', rates);
                             
-                            if (['add', 'create'].includes(operation)) {
-                                newRates = rates.map((item) => {
-                                    return {
-                                        ...item,
-                                        checked: true,
-                                    };
-                                });
-                            } else {
-                                newRates = rates.filter((item) => item?.checked);
-                                if (newRates.length === 0) {
-                                    console.warn('No rates selected');
-                                    return true;
-                                }
-                            }
-                            console.log('newRates', newRates);
-                            setFieldValue('rates', newRates);
                         }}
                     />
                 </AccessControlComponent>

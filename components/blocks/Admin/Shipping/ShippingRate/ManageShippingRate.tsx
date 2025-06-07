@@ -16,6 +16,7 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { render } from "sass";
 
 export const CREATE_SHIPPING_RATE_MODAL_ID = 'create-shipping-rate-modal';
 export const EDIT_SHIPPING_RATE_MODAL_ID = 'edit-shipping-rate-modal';
@@ -137,10 +138,92 @@ function ManageShippingRate({
                         dataTableContextState.modal.show({
                             title: 'Delete shipping rate',
                             component: (
-                                <p>Are you sure you want to delete this shipping rate ({item?.name} | {item?.label})?</p>
+                                <>
+                                    <p>Are you sure you want to delete this shipping rate:</p>
+                                    <ul>
+                                        <li><strong>Type:</strong> {item?.type}</li>
+                                        <li><strong>Zone:</strong> {item?.zone?.name || 'N/A'}</li>
+                                        <li>
+                                            <strong>Weight:</strong>
+                                            {item?.weight_limit ? (
+                                                <>
+                                                    <span className="">
+                                                        Min: {item?.min_weight || 0} {item?.weight_unit || 'kg'}
+                                                    </span>
+                                                    <span className="">
+                                                        Max: {item?.max_weight || 0} {item?.weight_unit || 'kg'}
+                                                    </span>
+                                                </>
+                                            )
+                                                : (
+                                                    <span className="">
+                                                        No weight limit
+                                                    </span>
+                                                )}
+                                        </li>
+                                        <li>
+                                            <strong>Height:</strong>
+                                            {item?.height_limit ? (
+                                                <>
+                                                    <span className="">
+                                                        Min: {item?.min_height || 0} {item?.height_unit || 'cm'}
+                                                    </span>
+                                                    <span className="">
+                                                        Max: {item?.max_height || 0} {item?.height_unit || 'cm'}
+                                                    </span>
+                                                </>
+                                            )
+                                                : (
+                                                    <span className="">
+                                                        No height limit
+                                                    </span>
+                                                )}
+                                        </li>
+                                        <li>
+                                            <strong>Length:</strong>
+                                            {item?.length_limit ? (
+                                                <>
+                                                    <span className="">
+                                                        Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
+                                                    </span>
+                                                    <span className="">
+                                                        Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
+                                                    </span>
+                                                </>
+                                            )
+                                                : (
+                                                    <span className="">
+                                                        No length limit
+                                                    </span>
+                                                )}
+                                        </li>
+                                        <li>
+                                            <strong>Width:</strong>
+                                            {item?.width_limit ? (
+                                                <>
+                                                    <span className="">
+                                                        Min: {item?.min_width || 0} {item?.width_unit || 'cm'}
+                                                    </span>
+                                                    <span className="">
+                                                        Max: {item?.max_width || 0} {item?.width_unit || 'cm'}
+                                                    </span>
+                                                </>
+                                            )
+                                                : (
+                                                    <span className="">
+                                                        No width limit
+                                                    </span>
+                                                )}
+                                        </li>
+                                        <li><strong>Amount:</strong> {item?.amount || 0} {item?.currency?.name || 'USD'}</li>
+                                        <li><strong>Free Shipping Possible:</strong> {item?.is_free_shipping_possible ? 'Yes' : 'No'}</li>
+                                        <li><strong>Created At:</strong> {item?.created_at}</li>
+                                        <li><strong>Updated At:</strong> {item?.updated_at}</li>
+                                    </ul>
+                                </>
                             ),
                             onOk: async () => {
-                                console.log('Delete shipping rate', { operation, item });
+                                console.log('Delete shipping rate', { operation, item, index, data });
                                 if (!operation) {
                                     console.warn('Operation is required');
                                     return;
@@ -151,7 +234,7 @@ function ManageShippingRate({
                                     if (typeof onChange === 'function') {
                                         onChange(cloneData);
                                     }
-                                    dataTableContext.modal.close(DELETE_SHIPPING_RATE_MODAL_ID);
+                                    dataTableContextState.modal.close(DELETE_SHIPPING_RATE_MODAL_ID);
                                     return;
                                 }
                                 if (!shippingMethodId) {
@@ -501,12 +584,124 @@ function ManageShippingRate({
                         key: 'type',
                     },
                     {
-                        label: 'Min Amount',
-                        key: 'min_amount',
+                        label: 'Weight',
+                        render: (column: Record<string, any>, item: ShippingRate) => {
+                            return (
+                                <div>
+                                    {item?.weight_limit ? (
+                                        <>
+                                            <span className="badge bg-success-light mr-2">
+                                                Min: {item?.min_weight || 0} {item?.weight_unit || 'kg'}
+                                            </span>
+                                            <span className="badge bg-danger-light">
+                                                Max: {item?.max_weight || 0} {item?.weight_unit || 'kg'}
+                                            </span>
+                                        </>
+                                    )
+                                        : (
+                                            <span className="badge bg-secondary-light">
+                                                No weight limit
+                                            </span>
+                                        )}
+                                </div>
+                            );
+                        }
                     },
                     {
-                        label: 'Max Amount',
-                        key: 'max_amount',
+                        label: 'Height',
+                        render: (column: Record<string, any>, item: ShippingRate) => {
+                            return (
+                                <div>
+                                    {item?.height_limit ? (
+                                        <>
+                                            <span className="badge bg-success-light mr-2">
+                                                Min: {item?.min_height || 0} {item?.height_unit || 'cm'}
+                                            </span>
+                                            <span className="badge bg-danger-light">
+                                                Max: {item?.max_height || 0} {item?.height_unit || 'cm'}
+                                            </span>
+                                        </>
+                                    )
+                                        : (
+                                            <span className="badge bg-secondary-light">
+                                                No height limit
+                                            </span>
+                                        )}
+                                </div>
+                            );
+                        }
+                    },
+                    {
+                        label: 'Length',
+                        render: (column: Record<string, any>, item: ShippingRate) => {
+                            return (
+                                <div>
+                                    {item?.length_limit ? (
+                                        <>
+                                            <span className="badge bg-success-light mr-2">
+                                                Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
+                                            </span>
+                                            <span className="badge bg-danger-light">
+                                                Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
+                                            </span>
+                                        </>
+                                    )
+                                        : (
+                                            <span className="badge bg-secondary-light">
+                                                No length limit
+                                            </span>
+                                        )}
+                                </div>
+                            );
+                        }
+                    },
+                    {
+                        label: 'Width',
+                        render: (column: Record<string, any>, item: ShippingRate) => {
+                            return (
+                                <div>
+                                    {item?.width_limit ? (
+                                        <>
+                                            <span className="badge bg-success-light mr-2">
+                                                Min: {item?.min_width || 0} {item?.width_unit || 'cm'}
+                                            </span>
+                                            <span className="badge bg-danger-light">
+                                                Max: {item?.max_width || 0} {item?.width_unit || 'cm'}
+                                            </span>
+                                        </>
+                                    )
+                                        : (
+                                            <span className="badge bg-secondary-light">
+                                                No width limit
+                                            </span>
+                                        )}
+                                </div>
+                            );
+                        }
+                    },
+                    {
+                        label: 'Length',
+                        render: (column: Record<string, any>, item: ShippingRate) => {
+                            return (
+                                <div>
+                                    {item?.length_limit ? (
+                                        <>
+                                            <span className="badge bg-success-light mr-2">
+                                                Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
+                                            </span>
+                                            <span className="badge bg-danger-light">
+                                                Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
+                                            </span>
+                                        </>
+                                    )
+                                        : (
+                                            <span className="badge bg-secondary-light">
+                                                No length limit
+                                            </span>
+                                        )}
+                                </div>
+                            );
+                        }
                     },
                     {
                         label: 'Amount',

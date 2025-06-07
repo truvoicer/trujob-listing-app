@@ -26,6 +26,7 @@ export default {
         paymentGateway: '/payment-gateway',
         taxRate: '/tax-rate',
         discount: '/discount',
+        shipping: '/shipping',
         shippingMethod: '/shipping/method',
         shippingZone: '/shipping/zone',
         shippingRestriction: '/shipping/method/:shippingMethodId/restriction',

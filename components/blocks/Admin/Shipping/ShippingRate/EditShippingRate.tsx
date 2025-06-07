@@ -41,8 +41,22 @@ function EditShippingRate({
         shipping_method: data?.shipping_method || '',
         shipping_zone: data?.shipping_zone || '',
         type: data?.type || '',
-        min_amount: data?.min_amount || 0,
-        max_amount: data?.max_amount || 0,
+        weight_limit: data?.weight_limit || false,
+        height_limit: data?.height_limit || false,
+        length_limit: data?.length_limit || false,
+        width_limit: data?.width_limit || false,
+        weight_unit: data?.weight_unit || 'kg',
+        height_unit: data?.height_unit || 'cm',
+        length_unit: data?.length_unit || 'cm',
+        width_unit: data?.width_unit || 'cm',
+        min_weight: data?.min_weight || 0,
+        max_weight: data?.max_weight || 0,
+        min_height: data?.min_height || 0,
+        max_height: data?.max_height || 0,
+        min_length: data?.min_length || 0,
+        max_length: data?.max_length || 0,
+        min_width: data?.min_width || 0,
+        max_width: data?.max_width || 0,
         amount: data?.amount || 0,
         currency: data?.currency || '',
         is_free_shipping_possible: data?.is_free_shipping_possible || false,
@@ -51,6 +65,35 @@ function EditShippingRate({
         updated_at: data?.updated_at || '',
     };
 
+    function buildRequestData(values: ShippingRate) {
+        let requestData: CreateShippingRate | UpdateShippingRate = {};
+        if (values.hasOwnProperty('weight_limit')) {
+            requestData.weight_limit = values?.weight_limit || false;
+            requestData.min_weight = values?.min_weight ? parseFloat(values?.min_weight) || 0 : 0;
+            requestData.max_weight = values?.max_weight ? parseFloat(values?.max_weight) || 0 : 0;
+            requestData.weight_unit = values?.weight_unit || 'kg';
+        }
+        if (values.hasOwnProperty('height_limit')) {
+            requestData.height_limit = values?.height_limit || false;
+            requestData.min_height = values?.min_height ? parseFloat(values?.min_height) || 0 : 0;
+            requestData.max_height = values?.max_height ? parseFloat(values?.max_height) || 0 : 0;
+            requestData.height_unit = values?.height_unit || 'cm';
+        }
+        if (values.hasOwnProperty('length_limit')) {
+            requestData.length_limit = values?.length_limit || false;
+            requestData.min_length = values?.min_length ? parseFloat(values?.min_length) || 0 : 0;
+            requestData.max_length = values?.max_length ? parseFloat(values?.max_length) || 0 : 0;
+            requestData.length_unit = values?.length_unit || 'cm';
+        }
+        if (values.hasOwnProperty('width_limit')) {
+            requestData.width_limit = values?.width_limit || false;
+            requestData.min_width = values?.min_width ? parseFloat(values?.min_width) || 0 : 0;
+            requestData.max_width = values?.max_width ? parseFloat(values?.max_width) || 0 : 0;
+            requestData.width_unit = values?.width_unit || 'cm';
+        }
+        
+        return requestData;
+    }
 
     function buildCreateData(values: ShippingRate) {
 
@@ -62,6 +105,11 @@ function EditShippingRate({
         if (values?.zone?.id) {
             requestData.zone_id = values?.zone?.id || 0;
         }
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
+
         return requestData;
     }
 
@@ -82,6 +130,11 @@ function EditShippingRate({
         if (values?.zone?.id) {
             requestData.zone_id = values?.zone?.id || 0;
         }
+
+        requestData = {
+            ...requestData,
+            ...buildRequestData(values),
+        };
         return requestData;
     }
     async function handleSubmit(values: ShippingRate) {

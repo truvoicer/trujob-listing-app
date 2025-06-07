@@ -77,7 +77,7 @@ function SessionLayout({
         }
         authViewRequest();
     }, [session[SESSION_IS_AUTHENTICATING]]);
-
+    console.log('SessionLayout', session);
     return children;
 }
 export default connect(

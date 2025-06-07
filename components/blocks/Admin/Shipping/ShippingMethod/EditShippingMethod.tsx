@@ -12,6 +12,7 @@ import { ShippingMethod, CreateShippingMethod, UpdateShippingMethod } from "@/ty
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { min } from "underscore";
 
 
 export type EditShippingMethodProps = {
@@ -63,7 +64,37 @@ function EditShippingMethod({
         if (values.hasOwnProperty('is_active')) {
             requestData.is_active = values?.is_active || false;
         }
+        if (Array.isArray(values?.rates)) {
+            requestData.rates = buildShippingRates(values?.rates || []);
+        }
+
         return requestData;
+    }
+
+    function buildShippingRates(rates: any[]) {
+        return rates.map((rate) => {
+            return {
+                id: rate?.id || 0,
+                shipping_method_id: rate?.shipping_method?.id || '',
+                shipping_zone_id: rate?.shipping_zone?.id || '',
+                type: rate?.type || '',
+                amount: rate?.amount ? parseFloat(rate?.amount) || 0 : 0,
+                weight_limit: rate?.weight_limit || false,
+                height_limit: rate?.height_limit || false,
+                length_limit: rate?.length_limit || false,
+                width_limit: rate?.width_limit || false,
+                min_weight: rate?.min_weight? parseFloat(rate?.min_weight) || 0 : 0,
+                max_weight: rate?.max_weight ? parseFloat(rate?.max_weight) || 0 : 0,
+                min_height: rate?.min_height ? parseFloat(rate?.min_height) || 0 : 0,  
+                max_height: rate?.max_height ? parseFloat(rate?.max_height) || 0 : 0,
+                min_length: rate?.min_length ? parseFloat(rate?.min_length) || 0 : 0,
+                max_length: rate?.max_length ? parseFloat(rate?.max_length) || 0 : 0,
+                min_width: rate?.min_width ? parseFloat(rate?.min_width) || 0 : 0,
+                max_width: rate?.max_width ? parseFloat(rate?.max_width) || 0 : 0,
+                currency_id: rate?.currency?.id || '',
+                is_free_shipping_possible: rate?.is_free_shipping_possible || false,
+            }
+        });
     }
 
     function buildCreateData(values: ShippingMethod) {
@@ -73,6 +104,7 @@ function EditShippingMethod({
             description: values?.description || '',
             processing_time_days: values?.processing_time_days || 0,
             is_active: values?.is_active || false,
+            rates: buildShippingRates(values?.rates || []),
         };
 
         return requestData;

@@ -13,6 +13,8 @@ import SelectShippingRateType from "./SelectShippingRateType";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageShippingZone from "../ShippingZone/ManageShippingZone";
 import SelectedDisplay from "@/components/Elements/SelectedDisplay";
+import SelectShippingUnit from "../SelectShippingUnit";
+import SelectShippingWeightUnit from "../SelectShippingWeightUnit";
 
 type EditShippingRateFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -76,8 +78,8 @@ function EditShippingRateFields({
                                 console.warn('No zones selected');
                                 return true;
                             }
-                        
-                            setFieldValue('zone', checked[0]);
+                            console.log('Selected zones', checked);
+                            setFieldValue('shipping_zone', checked[0]);
                         }}
                     />
                 </AccessControlComponent>
@@ -107,25 +109,170 @@ function EditShippingRateFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <TextInput
-                            value={values?.min_amount || ""}
+                        <Checkbox
+                            name="weight_limit"
+                            value={values?.weight_limit || false}
                             onChange={handleChange}
-                            placeholder="Enter min amount"
-                            name="min_amount"
-                            type="text"
-                            label="Min Amount"
+                            label="Is Weight Limit Applied?"
+                            placeholder="Is Weight Limit Applied?"
                         />
                     </div>
+                    {values?.weight_limit && (
+                        <>
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.min_weight || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter min weight"
+                                    name="min_weight"
+                                    type="number"
+                                    label="Min Weight"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.max_weight || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter max weight"
+                                    name="max_weight"
+                                    type="number"
+                                    label="Max Weight"
+                                />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                <SelectShippingWeightUnit
+                                    name="weight_unit"
+                                    value={values?.weight_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
                     <div className="col-12 col-lg-6">
-                        <TextInput
-                            value={values?.max_amount || ""}
+                        <Checkbox
+                            name="height_limit"
+                            value={values?.height_limit || false}
                             onChange={handleChange}
-                            placeholder="Enter max amount"
-                            name="max_amount"
-                            type="text"
-                            label="Max Amount"
+                            label="Is Height Limit Applied?"
+                            placeholder="Is Height Limit Applied?"
                         />
                     </div>
+                    {values?.height_limit && (
+                        <>
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.min_height || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter min height"
+                                    name="min_height"
+                                    type="number"
+                                    label="Min Height"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.max_height || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter max height"
+                                    name="max_height"
+                                    type="number"
+                                    label="Max Height"
+                                />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                <SelectShippingUnit
+                                    name="height_unit"
+                                    value={values?.height_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="length_limit"
+                            value={values?.length_limit || false}
+                            onChange={handleChange}
+                            label="Is Length Limit Applied?"
+                            placeholder="Is Length Limit Applied?"
+                        />
+                    </div>
+                    {values?.length_limit && (
+                        <>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.min_length || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter min length"
+                                    name="min_length"
+                                    type="number"
+                                    label="Min Length"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.max_length || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter max length"
+                                    name="max_length"
+                                    type="number"
+                                    label="Max Length"
+                                />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                <SelectShippingUnit
+                                    name="length_unit"
+                                    value={values?.length_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="width_limit"
+                            value={values?.width_limit || false}
+                            onChange={handleChange}
+                            label="Is Width Limit Applied?"
+                            placeholder="Is Width Limit Applied?"
+                        />
+                    </div>
+                    {values?.width_limit && (
+                        <>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.min_width || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter min width"
+                                    name="min_width"
+                                    type="number"
+                                    label="Min Width"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.max_width || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter max width"
+                                    name="max_width"
+                                    type="number"
+                                    label="Max Width"
+                                />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                <SelectShippingUnit
+                                    name="width_unit"
+                                    value={values?.width_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
                     <div className="col-12 col-lg-6">
                         <div className="floating-input">
                             <label className="fw-bold" htmlFor="amount">
