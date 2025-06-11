@@ -58,7 +58,7 @@ function EditShippingMethodFields({
                         values={values?.rates ? [values?.rates] : []}
                         data={values?.rates || []}
                         rowSelection={false}
-                        mode={'edit'}
+                        mode={'selector'}
                         multiRowSelection={false}
                         enableEdit={true}
                         paginationMode="state"

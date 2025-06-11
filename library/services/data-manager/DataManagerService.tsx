@@ -7,7 +7,44 @@ export type SelectorModeHandler = {
     format?: 'array' | 'object',
     index?: number
 }
+export type selectorAndEditModeHandler = {
+    onChange: (values: any) => void,
+    data?: Array<any>,
+    values?: FormikValues,
+    format?: 'array' | 'object',
+    index?: number
+}
 export class DataManagerService {
+
+    static getId(id: string, mode: 'delete' | 'edit' | 'create') {
+        if (typeof id !== 'string' || !id?.length) {
+            console.warn('Invalid id specified');
+            return '';
+        }
+        switch (mode) {
+            case 'delete':
+                return `${id}-delete`;
+            case 'edit':
+                return `${id}-edit`;
+            case 'create':
+                return `${id}-create`;
+            default:
+                console.warn('Invalid mode specified');
+                return '';
+        }
+    }
+    static async selectorAndEditModeHandler({
+        onChange,
+        data,
+        values = [],
+        index
+    }: selectorAndEditModeHandler) {
+        DataManagerService.editModeCreateHandler({
+            onChange,
+            data,
+            values
+        });
+    }
 
     static async selectorModeHandler({
         onChange,

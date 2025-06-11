@@ -6,9 +6,17 @@ import EditShippingRate from "./EditShippingRate";
 import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import DataManager, { DataManageComponentProps, DataTableContextType, DatatableSearchParams, DMOnRowSelectActionClick } from "@/components/Table/DataManager";
+import DataManager, {
+  DataManageComponentProps,
+  DataTableContextType,
+  DatatableSearchParams,
+  DMOnRowSelectActionClick,
+} from "@/components/Table/DataManager";
 import { isNotEmpty } from "@/helpers/utils";
-import { SORT_BY, SORT_ORDER } from "@/library/redux/constants/search-constants";
+import {
+  SORT_BY,
+  SORT_ORDER,
+} from "@/library/redux/constants/search-constants";
 import { ShippingRate } from "@/types/Shipping";
 import { FormikProps, FormikValues } from "formik";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
@@ -18,714 +26,817 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 import { render } from "sass";
 
-export const CREATE_SHIPPING_RATE_MODAL_ID = 'create-shipping-rate-modal';
-export const EDIT_SHIPPING_RATE_MODAL_ID = 'edit-shipping-rate-modal';
-export const DELETE_SHIPPING_RATE_MODAL_ID = 'delete-shipping-rate-modal';
+export const CREATE_SHIPPING_RATE_MODAL_ID = "create-shipping-rate-modal";
+export const EDIT_SHIPPING_RATE_MODAL_ID = "edit-shipping-rate-modal";
+export const DELETE_SHIPPING_RATE_MODAL_ID = "delete-shipping-rate-modal";
 
 export interface ManageShippingRateProps extends DataManageComponentProps {
-    data?: Array<ShippingRate>;
-    shippingMethodId?: number;
+  data?: Array<ShippingRate>;
+  shippingMethodId?: number;
 }
 
 function ManageShippingRate({
-    shippingMethodId,
-    mode = 'selector',
-    data,
-    operation = 'create',
-    rowSelection = true,
-    multiRowSelection = true,
-    onChange,
-    paginationMode = 'router',
-    enablePagination = true,
-    enableEdit = true
+  shippingMethodId,
+  mode = "selector",
+  data,
+  operation = "create",
+  rowSelection = true,
+  multiRowSelection = true,
+  onChange,
+  paginationMode = "router",
+  enablePagination = true,
+  enableEdit = true,
 }: ManageShippingRateProps) {
-    const appModalContext = useContext(AppModalContext);
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
+  const appModalContext = useContext(AppModalContext);
+  const notificationContext = useContext(AppNotificationContext);
+  const dataTableContext = useContext(DataTableContext);
 
-    function getAddNewModalInitialValues() {
-        switch (mode) {
-            case 'selector':
-                return {
-                    shippingRates: [],
-                };
-            case 'edit':
-                return {};
-            default:
-                return {};
-        }
-    }
-
-    function getShippingRateFormModalProps(index?: number) {
+  function getAddNewModalInitialValues() {
+    switch (mode) {
+      case "selector":
         return {
-            formProps: {
-                operation: operation,
-                initialValues: getAddNewModalInitialValues(),
-            },
-            show: true,
-            showFooter: true,
-            onOk: async ({ formHelpers }: {
-                formHelpers?: FormikProps<FormikValues>
-            }) => {
-                if (!formHelpers) {
-                    return;
-                }
-                if (!operation) {
-                    console.warn('Operation is required');
-                    return;
-                }
-                if (typeof formHelpers?.submitForm !== 'function') {
-                    console.warn('submitForm is not a function');
-                    return;
-                }
-                switch (mode) {
-                    case 'selector':
-                        DataManagerService.selectorModeHandler({
-                            onChange,
-                            data,
-                            values: formHelpers?.values?.shippingRates,
-                            index
-                        });
-                        break;
-                    case 'edit':
-                        DataManagerService.editModeCreateHandler({
-                            onChange,
-                            data,
-                            values: formHelpers?.values,
-                        });
-                        break;
-                    default:
-                        console.warn('Invalid mode');
-                        return;
-                }
-
-                return await formHelpers.submitForm();
-            },
-            fullscreen: true
-        }
+          shippingRates: [],
+        };
+      case "edit":
+        return {};
+      default:
+        return {};
     }
+  }
 
-    function renderActionColumn(item: ShippingRate, index: number, dataTableContextState: DataTableContextType) {
-        return (
-            <div className="d-flex align-items-center list-action">
-                <Link className="badge bg-success-light mr-2"
-                    target="_blank"
-                    href="http://google.com"
-                    onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        dataTableContextState.modal.show({
-                            title: 'Edit shipping rate',
-                            component: (
-                                <EditShippingRate
-                                    dataTable={dataTableContextState} data={item}
-                                    operation={'edit'}
-                                    inModal={true}
-                                    modalId={EDIT_SHIPPING_RATE_MODAL_ID}
-                                />
-                            ),
-                            ...getShippingRateFormModalProps(index),
-                        }, EDIT_SHIPPING_RATE_MODAL_ID);
-                    }}
-                >
-                    <i className="lar la-eye"></i>
-                </Link>
-                <Link className="badge bg-danger-light mr-2"
-                    target="_blank"
-                    href="#"
-                    onClick={e => {
-                        e.preventDefault();
-                        dataTableContextState.modal.show({
-                            title: 'Delete shipping rate',
-                            component: (
-                                <>
-                                    <p>Are you sure you want to delete this shipping rate:</p>
-                                    <ul>
-                                        <li><strong>Type:</strong> {item?.type}</li>
-                                        <li><strong>Zone:</strong> {item?.zone?.name || 'N/A'}</li>
-                                        <li>
-                                            <strong>Weight:</strong>
-                                            {item?.weight_limit ? (
-                                                <>
-                                                    <span className="">
-                                                        Min: {item?.min_weight || 0} {item?.weight_unit || 'kg'}
-                                                    </span>
-                                                    <span className="">
-                                                        Max: {item?.max_weight || 0} {item?.weight_unit || 'kg'}
-                                                    </span>
-                                                </>
-                                            )
-                                                : (
-                                                    <span className="">
-                                                        No weight limit
-                                                    </span>
-                                                )}
-                                        </li>
-                                        <li>
-                                            <strong>Height:</strong>
-                                            {item?.height_limit ? (
-                                                <>
-                                                    <span className="">
-                                                        Min: {item?.min_height || 0} {item?.height_unit || 'cm'}
-                                                    </span>
-                                                    <span className="">
-                                                        Max: {item?.max_height || 0} {item?.height_unit || 'cm'}
-                                                    </span>
-                                                </>
-                                            )
-                                                : (
-                                                    <span className="">
-                                                        No height limit
-                                                    </span>
-                                                )}
-                                        </li>
-                                        <li>
-                                            <strong>Length:</strong>
-                                            {item?.length_limit ? (
-                                                <>
-                                                    <span className="">
-                                                        Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
-                                                    </span>
-                                                    <span className="">
-                                                        Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
-                                                    </span>
-                                                </>
-                                            )
-                                                : (
-                                                    <span className="">
-                                                        No length limit
-                                                    </span>
-                                                )}
-                                        </li>
-                                        <li>
-                                            <strong>Width:</strong>
-                                            {item?.width_limit ? (
-                                                <>
-                                                    <span className="">
-                                                        Min: {item?.min_width || 0} {item?.width_unit || 'cm'}
-                                                    </span>
-                                                    <span className="">
-                                                        Max: {item?.max_width || 0} {item?.width_unit || 'cm'}
-                                                    </span>
-                                                </>
-                                            )
-                                                : (
-                                                    <span className="">
-                                                        No width limit
-                                                    </span>
-                                                )}
-                                        </li>
-                                        <li><strong>Amount:</strong> {item?.amount || 0} {item?.currency?.name || 'USD'}</li>
-                                        <li><strong>Free Shipping Possible:</strong> {item?.is_free_shipping_possible ? 'Yes' : 'No'}</li>
-                                        <li><strong>Created At:</strong> {item?.created_at}</li>
-                                        <li><strong>Updated At:</strong> {item?.updated_at}</li>
-                                    </ul>
-                                </>
-                            ),
-                            onOk: async () => {
-                                console.log('Delete shipping rate', { operation, item, index, data });
-                                if (!operation) {
-                                    console.warn('Operation is required');
-                                    return;
-                                }
-                                if (Array.isArray(data) && data.length) {
-                                    let cloneData = [...data];
-                                    cloneData.splice(index, 1);
-                                    if (typeof onChange === 'function') {
-                                        onChange(cloneData);
-                                    }
-                                    dataTableContextState.modal.close(DELETE_SHIPPING_RATE_MODAL_ID);
-                                    return;
-                                }
-                                if (!shippingMethodId) {
-                                    notificationContext.show({
-                                        variant: 'danger',
-                                        type: 'toast',
-                                        title: 'Error',
-                                        component: (
-                                            <p>Shipping method ID is required</p>
-                                        ),
-                                    }, 'shipping-rate-delete-error');
-                                    return;
-                                }
-                                if (!item?.id) {
-                                    notificationContext.show({
-                                        variant: 'danger',
-                                        type: 'toast',
-                                        title: 'Error',
-                                        component: (
-                                            <p>Shipping rate ID is required</p>
-                                        ),
-                                    }, 'shipping-rate-delete-error');
-                                    return;
-                                }
-                                const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                    endpoint: UrlHelpers.urlFromArray([
-                                        truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
-                                        item.id,
-                                        'destroy'
-                                    ]),
-                                    method: ApiMiddleware.METHOD.DELETE,
-                                    protectedReq: true
-                                })
-                                if (!response) {
-                                    notificationContext.show({
-                                        variant: 'danger',
-                                        type: 'toast',
-                                        title: 'Error',
-                                        component: (
-                                            <p>Failed to delete shipping rate</p>
-                                        ),
-                                    }, 'shipping-rate-delete-error');
-                                    return;
-                                }
-                                dataTableContextState.refresh();
-
-                            },
-                            show: true,
-                            showFooter: true
-                        }, DELETE_SHIPPING_RATE_MODAL_ID);
-                    }}
-                >
-                    <i className="lar la-eye"></i>
-                </Link>
-                <BadgeDropDown
-                    data={[
-                        {
-                            text: 'Edit',
-                            linkProps: {
-                                href: '#',
-                                onClick: e => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    dataTableContextState.modal.show({
-                                        title: 'Edit Shipping rate',
-                                        component: (
-                                            <EditShippingRate
-                                                dataTable={dataTableContextState} data={item}
-                                                operation={'edit'}
-                                                inModal={true}
-                                                modalId={EDIT_SHIPPING_RATE_MODAL_ID}
-                                            />
-                                        ),
-                                        ...getShippingRateFormModalProps(index),
-                                    }, EDIT_SHIPPING_RATE_MODAL_ID);
-                                }
-                            }
-                        },
-                        {
-                            text: 'Delete',
-                            linkProps: {
-                                href: '#',
-                                onClick: e => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    appModalContext.show({
-                                        title: 'Delete shipping rate',
-                                        component: (
-                                            <p>Are you sure you want to delete this shippingRate ({item?.title})?</p>
-                                        ),
-                                        onOk: async () => {
-                                            if (!item?.id) {
-                                                notificationContext.show({
-                                                    variant: 'danger',
-                                                    type: 'toast',
-                                                    title: 'Error',
-                                                    component: (
-                                                        <p>Shipping rate ID is required</p>
-                                                    ),
-                                                }, 'shipping-rate-delete-error');
-                                                return;
-                                            }
-                                            if (!shippingMethodId) {
-                                                notificationContext.show({
-                                                    variant: 'danger',
-                                                    type: 'toast',
-                                                    title: 'Error',
-                                                    component: (
-                                                        <p>Shipping method ID is required</p>
-                                                    ),
-                                                }, 'shipping-rate-delete-error');
-                                                return;
-                                            }
-                                            const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                                                endpoint: UrlHelpers.urlFromArray([
-                                                    truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
-                                                    item.id,
-                                                    'destroy'
-                                                ]),
-                                                method: ApiMiddleware.METHOD.DELETE,
-                                                protectedReq: true
-                                            })
-                                            if (!response) {
-                                                notificationContext.show({
-                                                    variant: 'danger',
-                                                    type: 'toast',
-                                                    title: 'Error',
-                                                    component: (
-                                                        <p>Failed to delete shippingRate</p>
-                                                    ),
-                                                }, 'shipping-rate-delete-error');
-                                                return;
-                                            }
-                                            dataTableContextState.refresh();
-                                        },
-                                        show: true,
-                                        showFooter: true
-                                    }, EDIT_SHIPPING_RATE_MODAL_ID);
-                                }
-                            }
-                        }
-                    ]}
-                />
-            </div>
-        )
-    }
-    async function prepareSearch(searchParams: DatatableSearchParams = {}) {
-
-        let query: any = {};
-
-        if (isNotEmpty(searchParams?.sort_by)) {
-            query[SORT_BY] = searchParams?.sort_by;
+  function getShippingRateFormModalProps(index?: number) {
+    return {
+      formProps: {
+        operation: operation,
+        initialValues: getAddNewModalInitialValues(),
+      },
+      show: true,
+      showFooter: true,
+      onOk: async ({
+        formHelpers,
+      }: {
+        formHelpers?: FormikProps<FormikValues>;
+      }) => {
+        if (!formHelpers) {
+          return;
         }
-
-        if (isNotEmpty(searchParams?.sort_order)) {
-            query[SORT_ORDER] = searchParams?.sort_order;
-        }
-
-        if (isNotEmpty(searchParams?.shippingRate)) {
-            query['shippingRate'] = searchParams.shippingRate;
-        }
-        return query;
-    }
-    async function shippingRateRequest({ dataTableContextState, setDataTableContextState, searchParams }: {
-        dataTableContextState: DataTableContextType,
-        setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
-        searchParams: any
-    }) {
         if (!operation) {
-            console.warn('Operation is required');
-            return;
+          console.warn("Operation is required");
+          return;
         }
-        if (!shippingMethodId) {
-            console.warn('Shipping method ID is required');
-            return;
+        if (typeof formHelpers?.submitForm !== "function") {
+          console.warn("submitForm is not a function");
+          return;
         }
-        let query = dataTableContextState?.query || {};
-        let post = dataTableContextState?.post || {};
-        const preparedQuery = await prepareSearch(searchParams);
-        query = {
-            ...query,
-            ...preparedQuery
-        }
-
-        return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: UrlHelpers.urlFromArray([
-                truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString())
-            ]),
-            method: ApiMiddleware.METHOD.GET,
-            protectedReq: true,
-            query,
-            data: post,
-        });
-    }
-
-    function renderAddNew(
-        e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
-        { dataTableContextState, setDataTableContextState }: {
-            dataTableContextState: DataTableContextType,
-            setDataTableContextState: React.Dispatch<React.SetStateAction<DataTableContextType>>,
-        }) {
-        e.preventDefault();
-        let modalState;
-        if (mode === 'selector') {
-            modalState = dataTableContext.modal;
-        } else if (mode === 'edit') {
-            modalState = dataTableContext.modal;
-        } else {
-            console.warn('Invalid mode');
-            return;
-        }
-        modalState.show({
-            title: 'Create shipping rate',
-            component: (
-                <EditShippingRate
-                    dataTable={dataTableContextState} operation={'create'}
-                    inModal={true}
-                    modalId={CREATE_SHIPPING_RATE_MODAL_ID}
-                />
-            ),
-            ...getShippingRateFormModalProps(),
-        }, CREATE_SHIPPING_RATE_MODAL_ID);
-    }
-
-    function getRowSelectActions() {
-        let actions = [];
-        actions.push({
-            label: 'Delete',
-            name: 'delete',
-            onClick: ({
-                action,
+        console.log("formHelpers", { mode, formHelpers });
+        switch (mode) {
+          case "selector":
+            if (enableEdit) {
+              DataManagerService.selectorAndEditModeHandler({
+                onChange,
                 data,
-                dataTableContextState,
-            }: DMOnRowSelectActionClick) => {
+                values: formHelpers?.values,
+                index,
+              });
+            } else {
+              DataManagerService.selectorModeHandler({
+                onChange,
+                data,
+                values: formHelpers?.values?.shippingRates,
+                index,
+              });
+            }
+            break;
+          case "edit":
+            DataManagerService.editModeCreateHandler({
+              onChange,
+              data,
+              values: formHelpers?.values,
+            });
+            break;
+          default:
+            console.warn("Invalid mode");
+            return;
+        }
 
-                dataTableContextState.confirmation.show({
-                    title: 'Edit Menu',
-                    message: 'Are you sure you want to delete selected shippingRates?',
-                    onOk: async () => {
-                        if (!data?.length) {
-                            notificationContext.show({
-                                variant: 'danger',
-                                type: 'toast',
-                                title: 'Error',
-                                component: (
-                                    <p>No shipping rates selected</p>
-                                ),
-                            }, 'shipping-rate-bulk-delete-error');
-                            return;
-                        }
-                        const ids = RequestHelpers.extractIdsFromArray(data);
-                        if (!ids?.length) {
-                            notificationContext.show({
-                                variant: 'danger',
-                                type: 'toast',
-                                title: 'Error',
-                                component: (
-                                    <p>Shipping rate IDs are required</p>
-                                ),
-                            }, 'shipping-rate-bulk-delete-error');
-                            return;
+        return await formHelpers.submitForm();
+      },
+      fullscreen: true,
+    };
+  }
+
+  function renderActionColumn(
+    item: ShippingRate,
+    index: number,
+    dataTableContextState: DataTableContextType
+  ) {
+    return (
+      <div className="d-flex align-items-center list-action">
+        <Link
+          className="badge bg-success-light mr-2"
+          target="_blank"
+          href="http://google.com"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dataTableContextState.modal.show(
+              {
+                title: "Edit shipping rate",
+                component: (
+                  <EditShippingRate
+                    dataTable={dataTableContextState}
+                    data={item}
+                    operation={"edit"}
+                    inModal={true}
+                    modalId={EDIT_SHIPPING_RATE_MODAL_ID}
+                  />
+                ),
+                ...getShippingRateFormModalProps(index),
+              },
+              EDIT_SHIPPING_RATE_MODAL_ID
+            );
+          }}
+        >
+          <i className="lar la-eye"></i>
+        </Link>
+        <Link
+          className="badge bg-danger-light mr-2"
+          target="_blank"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            dataTableContextState.modal.show(
+              {
+                title: "Delete shipping rate",
+                component: (
+                  <>
+                    <p>Are you sure you want to delete this shipping rate:</p>
+                    <ul>
+                      <li>
+                        <strong>Type:</strong> {item?.type}
+                      </li>
+                      <li>
+                        <strong>Zone:</strong> {item?.zone?.name || "N/A"}
+                      </li>
+                      <li>
+                        <strong>Weight:</strong>
+                        {item?.weight_limit ? (
+                          <>
+                            <span className="">
+                              Min: {item?.min_weight || 0}{" "}
+                              {item?.weight_unit || "kg"}
+                            </span>
+                            <span className="">
+                              Max: {item?.max_weight || 0}{" "}
+                              {item?.weight_unit || "kg"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">No weight limit</span>
+                        )}
+                      </li>
+                      <li>
+                        <strong>Height:</strong>
+                        {item?.height_limit ? (
+                          <>
+                            <span className="">
+                              Min: {item?.min_height || 0}{" "}
+                              {item?.height_unit || "cm"}
+                            </span>
+                            <span className="">
+                              Max: {item?.max_height || 0}{" "}
+                              {item?.height_unit || "cm"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">No height limit</span>
+                        )}
+                      </li>
+                      <li>
+                        <strong>Length:</strong>
+                        {item?.length_limit ? (
+                          <>
+                            <span className="">
+                              Min: {item?.min_length || 0}{" "}
+                              {item?.length_unit || "cm"}
+                            </span>
+                            <span className="">
+                              Max: {item?.max_length || 0}{" "}
+                              {item?.length_unit || "cm"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">No length limit</span>
+                        )}
+                      </li>
+                      <li>
+                        <strong>Width:</strong>
+                        {item?.width_limit ? (
+                          <>
+                            <span className="">
+                              Min: {item?.min_width || 0}{" "}
+                              {item?.width_unit || "cm"}
+                            </span>
+                            <span className="">
+                              Max: {item?.max_width || 0}{" "}
+                              {item?.width_unit || "cm"}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="">No width limit</span>
+                        )}
+                      </li>
+                      <li>
+                        <strong>Amount:</strong> {item?.amount || 0}{" "}
+                        {item?.currency?.name || "USD"}
+                      </li>
+                      <li>
+                        <strong>Free Shipping Possible:</strong>{" "}
+                        {item?.is_free_shipping_possible ? "Yes" : "No"}
+                      </li>
+                      <li>
+                        <strong>Created At:</strong> {item?.created_at}
+                      </li>
+                      <li>
+                        <strong>Updated At:</strong> {item?.updated_at}
+                      </li>
+                    </ul>
+                  </>
+                ),
+                onOk: async () => {
+                  console.log("Delete shipping rate", {
+                    operation,
+                    item,
+                    index,
+                    data,
+                  });
+                  if (!operation) {
+                    console.warn("Operation is required");
+                    return;
+                  }
+                  if (Array.isArray(data) && data.length) {
+                    let cloneData = [...data];
+                    cloneData.splice(index, 1);
+                    if (typeof onChange === "function") {
+                      onChange(cloneData);
+                    }
+                    dataTableContextState.modal.close(
+                      DELETE_SHIPPING_RATE_MODAL_ID
+                    );
+                    return;
+                  }
+                  if (!shippingMethodId) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Shipping method ID is required</p>,
+                      },
+                      "shipping-rate-delete-error"
+                    );
+                    return;
+                  }
+                  if (!item?.id) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Shipping rate ID is required</p>,
+                      },
+                      "shipping-rate-delete-error"
+                    );
+                    return;
+                  }
+                  const response =
+                    await TruJobApiMiddleware.getInstance().resourceRequest({
+                      endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.shippingMethodRate.replace(
+                          ":shippingMethodId",
+                          shippingMethodId.toString()
+                        ),
+                        item.id,
+                        "destroy",
+                      ]),
+                      method: ApiMiddleware.METHOD.DELETE,
+                      protectedReq: true,
+                    });
+                  if (!response) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Failed to delete shipping rate</p>,
+                      },
+                      "shipping-rate-delete-error"
+                    );
+                    return;
+                  }
+                  dataTableContextState.refresh();
+                },
+                show: true,
+                showFooter: true,
+              },
+              DELETE_SHIPPING_RATE_MODAL_ID
+            );
+          }}
+        >
+          <i className="lar la-eye"></i>
+        </Link>
+        <BadgeDropDown
+          data={[
+            {
+              text: "Edit",
+              linkProps: {
+                href: "#",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  dataTableContextState.modal.show(
+                    {
+                      title: "Edit Shipping rate",
+                      component: (
+                        <EditShippingRate
+                          dataTable={dataTableContextState}
+                          data={item}
+                          operation={"edit"}
+                          inModal={true}
+                          modalId={EDIT_SHIPPING_RATE_MODAL_ID}
+                        />
+                      ),
+                      ...getShippingRateFormModalProps(index),
+                    },
+                    EDIT_SHIPPING_RATE_MODAL_ID
+                  );
+                },
+              },
+            },
+            {
+              text: "Delete",
+              linkProps: {
+                href: "#",
+                onClick: (e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  appModalContext.show(
+                    {
+                      title: "Delete shipping rate",
+                      component: (
+                        <p>
+                          Are you sure you want to delete this shippingRate (
+                          {item?.title})?
+                        </p>
+                      ),
+                      onOk: async () => {
+                        if (!item?.id) {
+                          notificationContext.show(
+                            {
+                              variant: "danger",
+                              type: "toast",
+                              title: "Error",
+                              component: <p>Shipping rate ID is required</p>,
+                            },
+                            "shipping-rate-delete-error"
+                          );
+                          return;
                         }
                         if (!shippingMethodId) {
-                            notificationContext.show({
-                                variant: 'danger',
-                                type: 'toast',
-                                title: 'Error',
-                                component: (
-                                    <p>Shipping method ID is required</p>
-                                ),
-                            }, 'shipping-rate-bulk-delete-error');
-                            return;
+                          notificationContext.show(
+                            {
+                              variant: "danger",
+                              type: "toast",
+                              title: "Error",
+                              component: <p>Shipping method ID is required</p>,
+                            },
+                            "shipping-rate-delete-error"
+                          );
+                          return;
                         }
-                        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: UrlHelpers.urlFromArray([
-                                truJobApiConfig.endpoints.shippingMethodRate.replace(':shippingMethodId', shippingMethodId.toString()),
-                                'bulk/delete',
-                            ]),
-                            method: ApiMiddleware.METHOD.DELETE,
-                            protectedReq: true,
-                            data: {
-                                ids: ids
+                        const response =
+                          await TruJobApiMiddleware.getInstance().resourceRequest(
+                            {
+                              endpoint: UrlHelpers.urlFromArray([
+                                truJobApiConfig.endpoints.shippingMethodRate.replace(
+                                  ":shippingMethodId",
+                                  shippingMethodId.toString()
+                                ),
+                                item.id,
+                                "destroy",
+                              ]),
+                              method: ApiMiddleware.METHOD.DELETE,
+                              protectedReq: true,
                             }
-                        })
+                          );
                         if (!response) {
-                            notificationContext.show({
-                                variant: 'danger',
-                                type: 'toast',
-                                title: 'Error',
-                                component: (
-                                    <p>Failed to delete shippingRates</p>
-                                ),
-                            }, 'shipping-rate-bulk-delete-error');
-                            return;
+                          notificationContext.show(
+                            {
+                              variant: "danger",
+                              type: "toast",
+                              title: "Error",
+                              component: <p>Failed to delete shippingRate</p>,
+                            },
+                            "shipping-rate-delete-error"
+                          );
+                          return;
                         }
-
-                        notificationContext.show({
-                            variant: 'success',
-                            type: 'toast',
-                            title: 'Success',
-                            component: (
-                                <p>Shipping rates deleted successfully</p>
-                            ),
-                        }, 'shipping-rate-bulk-delete-success');
                         dataTableContextState.refresh();
+                      },
+                      show: true,
+                      showFooter: true,
                     },
-                    onCancel: () => {
-                        console.log('Cancel delete');
-                    },
-                }, 'delete-bulk-shipping-rate-confirmation');
-            }
-        });
-        return actions;
+                    EDIT_SHIPPING_RATE_MODAL_ID
+                  );
+                },
+              },
+            },
+          ]}
+        />
+      </div>
+    );
+  }
+  async function prepareSearch(searchParams: DatatableSearchParams = {}) {
+    let query: any = {};
+
+    if (isNotEmpty(searchParams?.sort_by)) {
+      query[SORT_BY] = searchParams?.sort_by;
     }
 
+    if (isNotEmpty(searchParams?.sort_order)) {
+      query[SORT_ORDER] = searchParams?.sort_order;
+    }
 
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <DataManager
-                data={data}
-                rowSelection={rowSelection}
-                multiRowSelection={multiRowSelection}
-                onChange={onChange}
-                enableEdit={enableEdit}
-                paginationMode={paginationMode}
-                enablePagination={enablePagination}
-                title={'Manage Shipping rates'}
-                rowSelectActions={getRowSelectActions()}
-                renderAddNew={renderAddNew}
-                renderActionColumn={renderActionColumn}
-                request={shippingRateRequest}
-                columns={[
-                    {
-                        label: 'ID',
-                        key: 'id',
-                    },
-                    {
-                        label: 'Shipping Method',
-                        key: 'shipping_method.name',
-                    },
-                    {
-                        label: 'Shipping Zone',
-                        key: 'shipping_zone.name',
-                    },
-                    {
-                        label: 'Type',
-                        key: 'type',
-                    },
-                    {
-                        label: 'Weight',
-                        render: (column: Record<string, any>, item: ShippingRate) => {
-                            return (
-                                <div>
-                                    {item?.weight_limit ? (
-                                        <>
-                                            <span className="badge bg-success-light mr-2">
-                                                Min: {item?.min_weight || 0} {item?.weight_unit || 'kg'}
-                                            </span>
-                                            <span className="badge bg-danger-light">
-                                                Max: {item?.max_weight || 0} {item?.weight_unit || 'kg'}
-                                            </span>
-                                        </>
-                                    )
-                                        : (
-                                            <span className="badge bg-secondary-light">
-                                                No weight limit
-                                            </span>
-                                        )}
-                                </div>
-                            );
-                        }
-                    },
-                    {
-                        label: 'Height',
-                        render: (column: Record<string, any>, item: ShippingRate) => {
-                            return (
-                                <div>
-                                    {item?.height_limit ? (
-                                        <>
-                                            <span className="badge bg-success-light mr-2">
-                                                Min: {item?.min_height || 0} {item?.height_unit || 'cm'}
-                                            </span>
-                                            <span className="badge bg-danger-light">
-                                                Max: {item?.max_height || 0} {item?.height_unit || 'cm'}
-                                            </span>
-                                        </>
-                                    )
-                                        : (
-                                            <span className="badge bg-secondary-light">
-                                                No height limit
-                                            </span>
-                                        )}
-                                </div>
-                            );
-                        }
-                    },
-                    {
-                        label: 'Length',
-                        render: (column: Record<string, any>, item: ShippingRate) => {
-                            return (
-                                <div>
-                                    {item?.length_limit ? (
-                                        <>
-                                            <span className="badge bg-success-light mr-2">
-                                                Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
-                                            </span>
-                                            <span className="badge bg-danger-light">
-                                                Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
-                                            </span>
-                                        </>
-                                    )
-                                        : (
-                                            <span className="badge bg-secondary-light">
-                                                No length limit
-                                            </span>
-                                        )}
-                                </div>
-                            );
-                        }
-                    },
-                    {
-                        label: 'Width',
-                        render: (column: Record<string, any>, item: ShippingRate) => {
-                            return (
-                                <div>
-                                    {item?.width_limit ? (
-                                        <>
-                                            <span className="badge bg-success-light mr-2">
-                                                Min: {item?.min_width || 0} {item?.width_unit || 'cm'}
-                                            </span>
-                                            <span className="badge bg-danger-light">
-                                                Max: {item?.max_width || 0} {item?.width_unit || 'cm'}
-                                            </span>
-                                        </>
-                                    )
-                                        : (
-                                            <span className="badge bg-secondary-light">
-                                                No width limit
-                                            </span>
-                                        )}
-                                </div>
-                            );
-                        }
-                    },
-                    {
-                        label: 'Length',
-                        render: (column: Record<string, any>, item: ShippingRate) => {
-                            return (
-                                <div>
-                                    {item?.length_limit ? (
-                                        <>
-                                            <span className="badge bg-success-light mr-2">
-                                                Min: {item?.min_length || 0} {item?.length_unit || 'cm'}
-                                            </span>
-                                            <span className="badge bg-danger-light">
-                                                Max: {item?.max_length || 0} {item?.length_unit || 'cm'}
-                                            </span>
-                                        </>
-                                    )
-                                        : (
-                                            <span className="badge bg-secondary-light">
-                                                No length limit
-                                            </span>
-                                        )}
-                                </div>
-                            );
-                        }
-                    },
-                    {
-                        label: 'Amount',
-                        key: 'amount',
-                    },
-                    {
-                        label: 'Currency',
-                        key: 'currency.name',
-                    },
-                    {
-                        label: 'Free Shipping Possible',
-                        key: 'is_free_shipping_possible',
-                    },
-                    {
-                        label: 'Created At',
-                        key: 'created_at',
-                    },
-                    {
-                        label: 'Updated At',
-                        key: 'updated_at',
-                    },
-                ]}
-            />
-        </Suspense>
+    if (isNotEmpty(searchParams?.shippingRate)) {
+      query["shippingRate"] = searchParams.shippingRate;
+    }
+    return query;
+  }
+  async function shippingRateRequest({
+    dataTableContextState,
+    setDataTableContextState,
+    searchParams,
+  }: {
+    dataTableContextState: DataTableContextType;
+    setDataTableContextState: React.Dispatch<
+      React.SetStateAction<DataTableContextType>
+    >;
+    searchParams: any;
+  }) {
+    if (!operation) {
+      console.warn("Operation is required");
+      return;
+    }
+    if (!shippingMethodId) {
+      console.warn("Shipping method ID is required");
+      return;
+    }
+    let query = dataTableContextState?.query || {};
+    let post = dataTableContextState?.post || {};
+    const preparedQuery = await prepareSearch(searchParams);
+    query = {
+      ...query,
+      ...preparedQuery,
+    };
+
+    return await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.shippingMethodRate.replace(
+          ":shippingMethodId",
+          shippingMethodId.toString()
+        ),
+      ]),
+      method: ApiMiddleware.METHOD.GET,
+      protectedReq: true,
+      query,
+      data: post,
+    });
+  }
+
+  function renderAddNew(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    {
+      dataTableContextState,
+      setDataTableContextState,
+    }: {
+      dataTableContextState: DataTableContextType;
+      setDataTableContextState: React.Dispatch<
+        React.SetStateAction<DataTableContextType>
+      >;
+    }
+  ) {
+    e.preventDefault();
+    let modalState;
+    if (mode === "selector") {
+      modalState = dataTableContext.modal;
+    } else if (mode === "edit") {
+      modalState = dataTableContext.modal;
+    } else {
+      console.warn("Invalid mode");
+      return;
+    }
+    modalState.show(
+      {
+        title: "Create shipping rate",
+        component: (
+          <EditShippingRate
+            dataTable={dataTableContextState}
+            operation={"create"}
+            inModal={true}
+            modalId={CREATE_SHIPPING_RATE_MODAL_ID}
+          />
+        ),
+        ...getShippingRateFormModalProps(),
+      },
+      CREATE_SHIPPING_RATE_MODAL_ID
     );
+  }
+
+  function getRowSelectActions() {
+    let actions = [];
+    actions.push({
+      label: "Delete",
+      name: "delete",
+      onClick: ({
+        action,
+        data,
+        dataTableContextState,
+      }: DMOnRowSelectActionClick) => {
+        dataTableContextState.confirmation.show(
+          {
+            title: "Edit Menu",
+            message: "Are you sure you want to delete selected shippingRates?",
+            onOk: async () => {
+              if (!data?.length) {
+                notificationContext.show(
+                  {
+                    variant: "danger",
+                    type: "toast",
+                    title: "Error",
+                    component: <p>No shipping rates selected</p>,
+                  },
+                  "shipping-rate-bulk-delete-error"
+                );
+                return;
+              }
+              const ids = RequestHelpers.extractIdsFromArray(data);
+              if (!ids?.length) {
+                notificationContext.show(
+                  {
+                    variant: "danger",
+                    type: "toast",
+                    title: "Error",
+                    component: <p>Shipping rate IDs are required</p>,
+                  },
+                  "shipping-rate-bulk-delete-error"
+                );
+                return;
+              }
+              if (!shippingMethodId) {
+                notificationContext.show(
+                  {
+                    variant: "danger",
+                    type: "toast",
+                    title: "Error",
+                    component: <p>Shipping method ID is required</p>,
+                  },
+                  "shipping-rate-bulk-delete-error"
+                );
+                return;
+              }
+              const response =
+                await TruJobApiMiddleware.getInstance().resourceRequest({
+                  endpoint: UrlHelpers.urlFromArray([
+                    truJobApiConfig.endpoints.shippingMethodRate.replace(
+                      ":shippingMethodId",
+                      shippingMethodId.toString()
+                    ),
+                    "bulk/delete",
+                  ]),
+                  method: ApiMiddleware.METHOD.DELETE,
+                  protectedReq: true,
+                  data: {
+                    ids: ids,
+                  },
+                });
+              if (!response) {
+                notificationContext.show(
+                  {
+                    variant: "danger",
+                    type: "toast",
+                    title: "Error",
+                    component: <p>Failed to delete shippingRates</p>,
+                  },
+                  "shipping-rate-bulk-delete-error"
+                );
+                return;
+              }
+
+              notificationContext.show(
+                {
+                  variant: "success",
+                  type: "toast",
+                  title: "Success",
+                  component: <p>Shipping rates deleted successfully</p>,
+                },
+                "shipping-rate-bulk-delete-success"
+              );
+              dataTableContextState.refresh();
+            },
+            onCancel: () => {
+              console.log("Cancel delete");
+            },
+          },
+          "delete-bulk-shipping-rate-confirmation"
+        );
+      },
+    });
+    return actions;
+  }
+
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DataManager
+        deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {}}
+        deleteItemRequest={async ({ item }: { item: any }) => {}}
+        fetchItemsRequest={async ({
+          post,
+          query,
+        }: {
+          post?: Record<string, any>;
+          query?: Record<string, any>;
+        }) => {}}
+        mode={mode}
+        operation={operation}
+        id={MANAGE_SHIPPING_METHOD_ID}
+        editFormComponent={EditShippingMethod}
+        data={data}
+        rowSelection={rowSelection}
+        multiRowSelection={multiRowSelection}
+        onChange={onChange}
+        enableEdit={enableEdit}
+        paginationMode={paginationMode}
+        enablePagination={enablePagination}
+        title={"Manage Shipping rates"}
+        rowSelectActions={getRowSelectActions()}
+        renderAddNew={renderAddNew}
+        renderActionColumn={renderActionColumn}
+        request={shippingRateRequest}
+        columns={[
+          {
+            label: "ID",
+            key: "id",
+          },
+          {
+            label: "Shipping Method",
+            key: "shipping_method.name",
+          },
+          {
+            label: "Shipping Zone",
+            key: "shipping_zone.name",
+          },
+          {
+            label: "Type",
+            key: "type",
+          },
+          {
+            label: "Weight",
+            render: (column: Record<string, any>, item: ShippingRate) => {
+              return (
+                <div>
+                  {item?.weight_limit ? (
+                    <>
+                      <span className="badge bg-success-light mr-2">
+                        Min: {item?.min_weight || 0} {item?.weight_unit || "kg"}
+                      </span>
+                      <span className="badge bg-danger-light">
+                        Max: {item?.max_weight || 0} {item?.weight_unit || "kg"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No weight limit
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
+            label: "Height",
+            render: (column: Record<string, any>, item: ShippingRate) => {
+              return (
+                <div>
+                  {item?.height_limit ? (
+                    <>
+                      <span className="badge bg-success-light mr-2">
+                        Min: {item?.min_height || 0} {item?.height_unit || "cm"}
+                      </span>
+                      <span className="badge bg-danger-light">
+                        Max: {item?.max_height || 0} {item?.height_unit || "cm"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No height limit
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
+            label: "Length",
+            render: (column: Record<string, any>, item: ShippingRate) => {
+              return (
+                <div>
+                  {item?.length_limit ? (
+                    <>
+                      <span className="badge bg-success-light mr-2">
+                        Min: {item?.min_length || 0} {item?.length_unit || "cm"}
+                      </span>
+                      <span className="badge bg-danger-light">
+                        Max: {item?.max_length || 0} {item?.length_unit || "cm"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No length limit
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
+            label: "Width",
+            render: (column: Record<string, any>, item: ShippingRate) => {
+              return (
+                <div>
+                  {item?.width_limit ? (
+                    <>
+                      <span className="badge bg-success-light mr-2">
+                        Min: {item?.min_width || 0} {item?.width_unit || "cm"}
+                      </span>
+                      <span className="badge bg-danger-light">
+                        Max: {item?.max_width || 0} {item?.width_unit || "cm"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No width limit
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
+            label: "Length",
+            render: (column: Record<string, any>, item: ShippingRate) => {
+              return (
+                <div>
+                  {item?.length_limit ? (
+                    <>
+                      <span className="badge bg-success-light mr-2">
+                        Min: {item?.min_length || 0} {item?.length_unit || "cm"}
+                      </span>
+                      <span className="badge bg-danger-light">
+                        Max: {item?.max_length || 0} {item?.length_unit || "cm"}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No length limit
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
+          {
+            label: "Amount",
+            key: "amount",
+          },
+          {
+            label: "Currency",
+            key: "currency.name",
+          },
+          {
+            label: "Free Shipping Possible",
+            key: "is_free_shipping_possible",
+          },
+          {
+            label: "Created At",
+            key: "created_at",
+          },
+          {
+            label: "Updated At",
+            key: "updated_at",
+          },
+        ]}
+      />
+    </Suspense>
+  );
 }
 export default ManageShippingRate;

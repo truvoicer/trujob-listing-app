@@ -424,6 +424,19 @@ function ManageShippingRestriction({
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <DataManager
+        deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {}}
+        deleteItemRequest={async ({ item }: { item: any }) => {}}
+        fetchItemsRequest={async ({
+          post,
+          query,
+        }: {
+          post?: Record<string, any>;
+          query?: Record<string, any>;
+        }) => {}}
+        mode={mode}
+        operation={operation}
+        id={MANAGE_SHIPPING_METHOD_ID}
+        editFormComponent={EditShippingMethod}
             data={data}
                 rowSelection={rowSelection}
                 multiRowSelection={multiRowSelection}
