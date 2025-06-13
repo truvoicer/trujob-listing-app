@@ -4,7 +4,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_FEATURE_MODAL_ID, EDIT_PRODUCT_FEATURE_MODAL_ID } from "./ManageProductFeature";
+import { MANAGE_PRODUCT_FEATURE_ID } from "./ManageProductFeature";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product, ProductFeature } from "@/types/Product";
@@ -15,6 +15,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Feature } from "@/types/Feature";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export type EditProductFeatureProps = {
     productId?: number;
@@ -41,12 +42,12 @@ function EditProductFeature({
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: {
-        features: Array<Feature>;
+        items: Array<Feature>;
     } = {
-        features: data?.features || [],
+        items: data?.items || [],
     };
 
-    async function handleSubmit(values: { features: Array<Feature> }) {
+    async function handleSubmit(values: { items: Array<Feature> }) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.warn('No data to update');
             return;
@@ -56,26 +57,27 @@ function EditProductFeature({
             console.log('Product ID is required');
             return;
         }
-        if (!Array.isArray(values?.features)) {
+        if (!Array.isArray(values?.items)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.features),
+            ids: RequestHelpers.extractIdsFromArray(values?.items),
         }
         switch (operation) {
             case 'add':
             case 'create':
             case 'edit':
             case 'update':
-                console.log('create requestData', requestData);
+                console.log('create requestData', {requestData, values});
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
                         truJobApiConfig.endpoints.productFeature.replace(
                             ':productId',
                             productId.toString(),
                         ),
+                        'bulk',
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -109,8 +111,8 @@ function EditProductFeature({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_FEATURE_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_FEATURE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_FEATURE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_FEATURE_ID, 'create'));
     }
 
     function getRequiredFields() {

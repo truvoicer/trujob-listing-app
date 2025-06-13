@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_COLOR_MODAL_ID, EDIT_PRODUCT_COLOR_MODAL_ID } from "./ManageProductColor";
+import { MANAGE_PRODUCT_COLOR_ID } from "./ManageProductColor";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
@@ -13,6 +13,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Color } from "@/types/Color";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export type EditProductColorProps = {
     productId?: number;
@@ -54,19 +55,19 @@ function EditProductColor({
             console.log('Product ID is required');
             return;
         }
-        if (!Array.isArray(values?.colors)) {
+        if (!Array.isArray(values?.items)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.colors),
+            ids: RequestHelpers.extractIdsFromArray(values?.items),
         }
         switch (operation) {
             case 'add':
             case 'create':
             case 'edit':
-            case 'update':
+            case 'update': 
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
@@ -74,6 +75,7 @@ function EditProductColor({
                             ':productId',
                             productId.toString(),
                         ),
+                        'bulk',
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -107,8 +109,8 @@ function EditProductColor({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_COLOR_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_COLOR_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_COLOR_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_COLOR_ID, 'create'));
     }
 
 

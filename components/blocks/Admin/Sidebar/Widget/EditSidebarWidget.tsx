@@ -7,9 +7,10 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
 import EditSidebarWidgetFields from "./EditSidebarWidgetFields";
-import { EDIT_SIDEBAR_WIDGET_MODAL_ID } from "./ManageSidebarWidget";
+import { MANAGE_SIDEBAR_WIDGET_ID } from "./ManageSidebarWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditSidebarWidgetProps = {
@@ -195,7 +196,8 @@ function EditSidebarWidget({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_SIDEBAR_WIDGET_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SIDEBAR_WIDGET_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SIDEBAR_WIDGET_ID, 'edit'));
     }
     const dataTableContext = useContext(DataTableContext);
 

@@ -52,7 +52,7 @@ function ManageColor({
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.color}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.color}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {

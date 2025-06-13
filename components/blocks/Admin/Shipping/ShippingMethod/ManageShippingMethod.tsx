@@ -12,6 +12,7 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 export const CREATE_SHIPPING_METHOD_MODAL_ID = "create-shipping-method-modal";
 export const EDIT_SHIPPING_METHOD_MODAL_ID = "edit-shipping-method-modal";
 export const DELETE_SHIPPING_METHOD_MODAL_ID = "delete-shipping-method-modal";
+export const MANAGE_SHIPPING_METHOD_ID = "manage-shipping-method";
 
 export interface ManageShippingMethodProps extends DataManageComponentProps {
   data?: Array<ShippingMethod>;
@@ -28,14 +29,12 @@ function ManageShippingMethod({
   enablePagination = true,
   enableEdit = true,
 }: ManageShippingMethodProps) {
-    const MANAGE_SHIPPING_METHOD_ID = "manage-shipping-method";
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.shippingMethod}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.shippingMethod}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {

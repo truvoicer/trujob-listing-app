@@ -33,7 +33,7 @@ function ManageFeature({
             <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
             return await TruJobApiMiddleware.getInstance().resourceRequest({
-                            endpoint: `${truJobApiConfig.endpoints.product}/bulk/delete`,
+                            endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,
                             method: ApiMiddleware.METHOD.DELETE,
                             protectedReq: true,
                             data: {

@@ -36,14 +36,14 @@ function EditProductBrandFields({
                 multiRowSelection={true}
                 enableEdit={false}
                 paginationMode="state"
-                onChange={async (brands: Array<any>) => {
-                    if (!Array.isArray(brands)) {
+                onChange={async (items: Array<any>) => {
+                    if (!Array.isArray(items)) {
                         console.log('Invalid values received from ManageUser component');
                         return;
                     }
-                    const checkedBrands = brands.filter((item) => item?.checked);
-                    const existingBrands = formContext?.values?.brands || [];
-                    formContext.setFieldValue('brands', [
+                    const checkedBrands = items.filter((item) => item?.checked);
+                    const existingBrands = formContext?.values?.items || [];
+                    formContext.setFieldValue('items', [
                         ...existingBrands,
                         ...checkedBrands.filter((item) => {
                             return !existingBrands.find((checkedItem) => checkedItem?.id === item?.id);

@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_BRAND_MODAL_ID, EDIT_BRAND_MODAL_ID } from "./ManageBrand";
+import { MANAGE_BRAND_ID } from "./ManageBrand";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditBrandFields from "./EditBrandFields";
@@ -12,6 +12,7 @@ import { Brand, CreateBrand, UpdateBrand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditBrandProps = {
@@ -141,8 +142,8 @@ function EditBrand({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_BRAND_MODAL_ID);
-        dataTableContext.modal.close(EDIT_BRAND_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_BRAND_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_BRAND_ID, 'edit'));
     }
 
     function getRequiredFields() {

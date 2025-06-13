@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_SHIPPING_METHOD_MODAL_ID, EDIT_SHIPPING_METHOD_MODAL_ID } from "./ManageShippingMethod";
+import { MANAGE_SHIPPING_METHOD_ID } from "./ManageShippingMethod";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditShippingMethodFields from "./EditShippingMethodFields";
@@ -13,6 +13,7 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { min } from "underscore";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditShippingMethodProps = {
@@ -186,8 +187,8 @@ function EditShippingMethod({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_SHIPPING_METHOD_MODAL_ID);
-        dataTableContext.modal.close(EDIT_SHIPPING_METHOD_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_METHOD_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_METHOD_ID, 'create'));
         return true;
     }
 

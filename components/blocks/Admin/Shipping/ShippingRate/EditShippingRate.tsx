@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_SHIPPING_RATE_MODAL_ID, EDIT_SHIPPING_RATE_MODAL_ID } from "./ManageShippingRate";
+import { MANAGE_SHIPPING_RATE_ID } from "./ManageShippingRate";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditShippingRateFields from "./EditShippingRateFields";
@@ -12,6 +12,7 @@ import { ShippingRate, CreateShippingRate, UpdateShippingRate } from "@/types/Sh
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditShippingRateProps = {
@@ -205,8 +206,8 @@ function EditShippingRate({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_SHIPPING_RATE_MODAL_ID);
-        dataTableContext.modal.close(EDIT_SHIPPING_RATE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RATE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RATE_ID, 'create'));
     }
 
     function getRequiredFields() {

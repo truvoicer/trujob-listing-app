@@ -47,7 +47,7 @@ function ManageProduct({
   enablePagination = true,
   enableEdit = true,
 }: ManageProductProps) {
-function renderCHeckoutButton() {
+function renderCheckoutButton() {
     return (
       <Link
         href={`/admin/product/checkout`}
@@ -86,7 +86,7 @@ function renderCHeckoutButton() {
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.product}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {
@@ -112,6 +112,7 @@ function renderCHeckoutButton() {
           post?: Record<string, any>;
           query?: Record<string, any>;
         }) => {
+          console.log("fetchItemsRequest", { post, query });
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}`,
             method: ApiMiddleware.METHOD.GET,

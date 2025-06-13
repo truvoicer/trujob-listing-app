@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_TAX_RATE_MODAL_ID, EDIT_TAX_RATE_MODAL_ID } from "./ManageTaxRate";
+import { MANAGE_TAX_RATE_ID } from "./ManageTaxRate";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditTaxRateFields from "./EditTaxRateFields";
@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { TaxRate, CreateTaxRate, UpdateTaxRate, TaxRateRequest } from "@/types/Tax";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditTaxRateProps = {
@@ -189,8 +190,8 @@ function EditTaxRate({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_TAX_RATE_MODAL_ID);
-        dataTableContext.modal.close(EDIT_TAX_RATE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_TAX_RATE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_TAX_RATE_ID, 'create'));
         return true;
     }
 

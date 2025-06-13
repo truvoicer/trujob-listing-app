@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_MENU_MODAL_ID } from "./ManageMenu";
+import { MANAGE_MENU_ID } from "./ManageMenu";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { CreateMenu, CreateMenuItem, Menu, MenuItem, UpdateMenu, UpdateMenuItem } from "@/types/Menu";
@@ -12,6 +12,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { FormikProps, FormikValues } from "formik";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditMenuProps = {
@@ -218,7 +219,8 @@ function EditMenu({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_MENU_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_MENU_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_MENU_ID, 'create'));
     }
     const dataTableContext = useContext(DataTableContext);
     useEffect(() => {

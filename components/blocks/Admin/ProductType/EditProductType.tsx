@@ -9,8 +9,9 @@ import EditProductTypeFields from "./EditProductTypeFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { CreateProductType, ProductType, UpdateProductType } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { CREATE_PRODUCT_TYPE_MODAL_ID, EDIT_PRODUCT_TYPE_MODAL_ID } from "./ManageProductType";
+import { MANAGE_PRODUCT_TYPE_ID } from "./ManageProductType";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditProductTypeProps = {
@@ -121,8 +122,8 @@ function EditProductType({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_TYPE_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_TYPE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_TYPE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_TYPE_ID, 'create'));
     }
 
     function getRequiredFields() {

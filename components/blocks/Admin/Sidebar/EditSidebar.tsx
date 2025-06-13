@@ -7,11 +7,12 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
 import EditSidebarFields from "./EditSidebarFields";
-import { EDIT_SIDEBAR_MODAL_ID } from "./ManageSidebar";
+import { MANAGE_SIDEBAR_ID } from "./ManageSidebar";
 import { CreateSidebar, Sidebar, UpdateSidebar } from "@/types/Sidebar";
 import { CreateWidget, Widget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditSidebarProps = {
@@ -188,7 +189,7 @@ function EditSidebar({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SIDEBAR_ID, 'edit'));
     }
     const dataTableContext = useContext(DataTableContext);
     useEffect(() => {

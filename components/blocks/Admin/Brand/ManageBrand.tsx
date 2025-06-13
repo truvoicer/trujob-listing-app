@@ -35,7 +35,7 @@ function ManageBrand({
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.brand}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.brand}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {

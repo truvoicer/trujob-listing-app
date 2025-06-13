@@ -10,6 +10,7 @@ import { Role } from "@/types/Role";
 import { Sidebar } from "@/types/Sidebar";
 import { isObjectEmpty } from "@/helpers/utils";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 type EditPageBlockProps = {
@@ -242,7 +243,6 @@ function EditPageBlock({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_SIDEBAR_WIDGET_MODAL_ID);
     }
     const dataTableContext = useContext(DataTableContext);
 

@@ -9,9 +9,10 @@ import EditColorFields from "./EditColorFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateColor, UpdateColor, Color } from "@/types/Color";
-import { CREATE_COLOR_MODAL_ID, EDIT_COLOR_MODAL_ID } from "./ManageColor";
+import { MANAGE_COLOR_ID } from "./ManageColor";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditColorProps = {
@@ -127,8 +128,8 @@ function EditColor({
         if (dataTable) {
             dataTable.refresh();
         }
-        dataTableContext.modal.close(EDIT_COLOR_MODAL_ID);
-        dataTableContext.modal.close(CREATE_COLOR_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_COLOR_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_COLOR_ID, 'create'));
     }
 
     function getRequiredFields() {

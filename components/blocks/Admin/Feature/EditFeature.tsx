@@ -9,8 +9,9 @@ import EditFeatureFields from "./EditFeatureFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { CreateFeature, Feature, UpdateFeature } from "@/types/Feature";
-import { CREATE_FEATURE_MODAL_ID, EDIT_FEATURE_MODAL_ID } from "./ManageFeature";
+import { MANAGE_FEATURE_ID } from "./ManageFeature";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditFeatureProps = {
@@ -128,8 +129,8 @@ function EditFeature({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_FEATURE_MODAL_ID);
-        dataTableContext.modal.close(CREATE_FEATURE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_FEATURE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_FEATURE_ID, 'create'));
     }
 
     function getRequiredFields() {

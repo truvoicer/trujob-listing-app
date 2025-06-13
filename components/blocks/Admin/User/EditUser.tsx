@@ -1,10 +1,9 @@
 import Form from "@/components/form/Form";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_USER_MODAL_ID } from "./ManageUser";
+import { MANAGE_USER_ID } from "./ManageUser";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { User } from "@/types/User";
@@ -13,6 +12,7 @@ import EditUserFields from "./EditUserFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditUserProps = {
@@ -125,8 +125,8 @@ function EditUser({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_USER_MODAL_ID);
-
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_USER_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_USER_ID, 'create'));
     }
 
 

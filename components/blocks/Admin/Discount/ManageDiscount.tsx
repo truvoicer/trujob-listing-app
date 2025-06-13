@@ -35,7 +35,7 @@ function ManageDiscount({
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.discount}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.discount}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {

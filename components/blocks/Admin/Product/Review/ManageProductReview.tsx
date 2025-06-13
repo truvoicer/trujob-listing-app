@@ -36,7 +36,14 @@ function ManageProductReview({
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.product}/bulk/delete`,
+            endpoint: UrlHelpers.urlFromArray([
+              truJobApiConfig.endpoints.productReview.replace(
+                ":productId",
+                productId.toString()
+              ),
+              "bulk",
+              "destroy",
+            ]),
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {
@@ -81,7 +88,12 @@ function ManageProductReview({
         mode={mode}
         operation={operation}
         id={MANAGE_PRODUCT_REVIEW_ID}
-        editFormComponent={EditProductReview}
+        editFormComponent={{
+          component: EditProductReview,
+          props: {
+            productId: productId,
+          },
+        }}
         data={data}
         rowSelection={rowSelection}
         multiRowSelection={multiRowSelection}

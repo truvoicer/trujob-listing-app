@@ -186,8 +186,8 @@ function EditProductFields({
                     <ManageProductFeature
                         {...getProductComponentProps()}
                         data={values?.features || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(features: Array<any>) => {
@@ -237,8 +237,8 @@ function EditProductFields({
                     <ManageProductFollow
                         {...getProductComponentProps()}
                         data={values?.follows || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(follows: Array<any>) => {
@@ -288,8 +288,8 @@ function EditProductFields({
                     <ManageProductCategory
                         {...getProductComponentProps()}
                         data={values?.categories || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(categories: Array<any>) => {
@@ -339,8 +339,8 @@ function EditProductFields({
                     <ManageProductBrand
                         {...getProductComponentProps()}
                         data={values?.brands || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(brands: Array<any>) => {
@@ -391,8 +391,8 @@ function EditProductFields({
                     <ManageProductColor
                         {...getProductComponentProps()}
                         data={values?.colors || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(colors: Array<any>) => {
@@ -442,8 +442,8 @@ function EditProductFields({
                     <ManageProductProductType
                         {...getProductComponentProps()}
                         data={values?.product_types || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(productTypes: Array<any>) => {
@@ -492,8 +492,8 @@ function EditProductFields({
                 >
                     <ManageMedia
                         data={values?.media || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(media: Array<any>) => {
@@ -547,8 +547,8 @@ function EditProductFields({
                     <ManageProductPrice
                         {...getProductComponentProps()}
                         data={values?.prices || []}
-                        rowSelection={false}
-                        multiRowSelection={false}
+                        rowSelection={true}
+                        multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(prices: Array<Price>) => {

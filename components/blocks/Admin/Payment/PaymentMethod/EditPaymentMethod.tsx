@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PAYMENT_METHOD_MODAL_ID, EDIT_PAYMENT_METHOD_MODAL_ID } from "./ManagePaymentMethod";
+import { MANAGE_PAYMENT_METHOD_ID } from "./ManagePaymentMethod";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditPaymentMethodFields from "./EditPaymentMethodFields";
@@ -11,7 +11,8 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { PaymentMethod, CreatePaymentMethod, UpdatePaymentMethod } from "@/types/PaymentMethod";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
-import { DataTableContextType } from "@/components/Table/DataManager";
+import DataManager, { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditPaymentMethodProps = {
@@ -141,8 +142,9 @@ function EditPaymentMethod({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_PAYMENT_METHOD_MODAL_ID);
-        dataTableContext.modal.close(EDIT_PAYMENT_METHOD_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PAYMENT_METHOD_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PAYMENT_METHOD_ID, 'edit'));
+
     }
 
     function getRequiredFields() {

@@ -9,9 +9,10 @@ import EditProductFollowFields from "./EditProductFollowFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { User } from "@/types/User";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { CREATE_PRODUCT_FOLLOW_MODAL_ID, EDIT_PRODUCT_FOLLOW_MODAL_ID } from "./ManageProductFollow";
+import { MANAGE_PRODUCT_FOLLOW_ID } from "./ManageProductFollow";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditProductFollowProps = {
@@ -54,13 +55,13 @@ function EditProductFollow({
             console.log('Product ID is required');
             return;
         }
-        if (!Array.isArray(values?.users)) {
+        if (!Array.isArray(values?.items)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.users),
+            user_ids: RequestHelpers.extractIdsFromArray(values?.items),
         }
         switch (operation) {
             case 'add':
@@ -74,6 +75,7 @@ function EditProductFollow({
                             ':productId',
                             productId.toString(),
                         ),
+                        'bulk',
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -107,8 +109,8 @@ function EditProductFollow({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_FOLLOW_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_FOLLOW_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_FOLLOW_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_FOLLOW_ID, 'create'));
     }
 
     function getRequiredFields() {

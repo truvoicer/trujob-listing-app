@@ -13,12 +13,7 @@ type EditProductFollowFields = {
 function EditProductFollowFields({
     operation
 }: EditProductFollowFields) {
-    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
-
-    const modalService = new ModalService();
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
-
+   
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
     const formHelpers = useFormikContext<FormikValues>() || {};
     console.log('values', values);
@@ -36,12 +31,12 @@ function EditProductFollowFields({
                 multiRowSelection={true}
                 enableEdit={false}
                 paginationMode="state"
-                onChange={(users: Array<any>) => {
-                    if (!Array.isArray(users)) {
+                onChange={(items: Array<any>) => {
+                    if (!Array.isArray(items)) {
                         console.warn('Invalid values received from ManageUser component');
                         return;
                     }
-                    formHelpers.setFieldValue('users', users.filter((item) => item?.checked));
+                    formHelpers.setFieldValue('items', items.filter((item) => item?.checked));
                 }}
             />
         </AccessControlComponent>

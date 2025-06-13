@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_SHIPPING_RESTRICTION_MODAL_ID, EDIT_SHIPPING_RESTRICTION_MODAL_ID } from "./ManageShippingRestriction";
+import { MANAGE_SHIPPING_RESTRICTION_ID } from "./ManageShippingRestriction";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditShippingRestrictionFields from "./EditShippingRestrictionFields";
@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { ShippingRestriction, CreateShippingRestriction, UpdateShippingRestriction } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditShippingRestrictionProps = {
@@ -150,8 +151,8 @@ function EditShippingRestriction({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_SHIPPING_RESTRICTION_MODAL_ID);
-        dataTableContext.modal.close(EDIT_SHIPPING_RESTRICTION_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RESTRICTION_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RESTRICTION_ID, 'create'));
     }
 
     function getRequiredFields() {

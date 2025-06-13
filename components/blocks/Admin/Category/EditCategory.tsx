@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { EDIT_CATEGORY_MODAL_ID } from "./ManageCategory";
+import { MANAGE_CATEGORY_ID } from "./ManageCategory";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditCategoryFields from "./EditCategoryFields";
@@ -11,6 +11,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { Category, CreateCategory, UpdateCategory } from "@/types/Category";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditCategoryProps = {
@@ -136,7 +137,8 @@ function EditCategory({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_CATEGORY_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_CATEGORY_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_CATEGORY_ID, 'edit'));
 
     }
 

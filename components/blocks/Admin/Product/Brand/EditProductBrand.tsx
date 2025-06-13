@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_BRAND_MODAL_ID, EDIT_PRODUCT_BRAND_MODAL_ID } from "./ManageProductBrand";
+import { MANAGE_PRODUCT_BRAND_ID } from "./ManageProductBrand";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
@@ -13,6 +13,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { Brand } from "@/types/Brand";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export type EditProductBrandProps = {
     productId?: number;
@@ -55,13 +56,13 @@ function EditProductBrand({
             console.log('Product ID is required');
             return;
         }
-        if (!Array.isArray(values?.brands)) {
+        if (!Array.isArray(values?.items)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.brands),
+            ids: RequestHelpers.extractIdsFromArray(values?.items),
         }
         switch (operation) {
             case 'add':
@@ -75,6 +76,7 @@ function EditProductBrand({
                             ':productId',
                             productId.toString(),
                         ),
+                        'bulk',
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -108,8 +110,8 @@ function EditProductBrand({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_BRAND_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_BRAND_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_BRAND_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_BRAND_ID, 'create'));
 
     }
 

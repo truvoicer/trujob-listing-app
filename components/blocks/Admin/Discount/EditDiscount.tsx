@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_DISCOUNT_MODAL_ID, EDIT_DISCOUNT_MODAL_ID } from "./ManageDiscount";
+import { MANAGE_DISCOUNT_ID } from "./ManageDiscount";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditDiscountFields from "./EditDiscountFields";
@@ -12,6 +12,7 @@ import { Discount, CreateDiscount, UpdateDiscount } from "@/types/Discount";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditDiscountProps = {
@@ -212,8 +213,8 @@ function EditDiscount({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_DISCOUNT_MODAL_ID);
-        dataTableContext.modal.close(EDIT_DISCOUNT_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_DISCOUNT_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_DISCOUNT_ID, 'edit'));
         return true;
     }
 

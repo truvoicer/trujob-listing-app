@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_MODAL_ID, EDIT_PRODUCT_MODAL_ID } from "./ManageProduct";
+import { MANAGE_PRODUCT_ID } from "./ManageProduct";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { CreateProduct, Product, ProductRequest, UpdateProduct } from "@/types/Product";
@@ -11,6 +11,7 @@ import EditProductFields from "./EditProductFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditProductProps = {
@@ -213,8 +214,8 @@ function EditProduct({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_ID, 'create'));
 
     }
 

@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRICE_TYPE_MODAL_ID, EDIT_PRICE_TYPE_MODAL_ID } from "./ManagePriceType";
+import { MANAGE_PRICE_TYPE_ID } from "./ManagePriceType";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditPriceTypeFields from "./EditPriceTypeFields";
@@ -12,6 +12,7 @@ import { PriceType, CreatePriceType, UpdatePriceType } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditPriceTypeProps = {
@@ -141,8 +142,8 @@ function EditPriceType({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(CREATE_PRICE_TYPE_MODAL_ID);
-        dataTableContext.modal.close(EDIT_PRICE_TYPE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRICE_TYPE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRICE_TYPE_ID, 'create'));
     }
 
     function getRequiredFields() {

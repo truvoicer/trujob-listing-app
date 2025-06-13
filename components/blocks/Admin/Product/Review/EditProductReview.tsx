@@ -9,8 +9,9 @@ import { CreateProductReview, ProductReview, UpdateProductReview } from "@/types
 import EditProductReviewFields from "./EditProductReviewFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { ADD_PRODUCT_REVIEW_MODAL_ID, EDIT_PRODUCT_REVIEW_MODAL_ID } from "./ManageProductReview";
+import { MANAGE_PRODUCT_REVIEW_ID } from "./ManageProductReview";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export type EditProductReviewProps = {
     productId?: number;
@@ -134,8 +135,8 @@ function EditProductReview({
         if (dataTable) {
             dataTable.refresh();
         }
-        dataTableContext?.modal?.close(ADD_PRODUCT_REVIEW_MODAL_ID);
-        dataTableContext?.modal?.close(EDIT_PRODUCT_REVIEW_MODAL_ID);
+        dataTableContext?.modal?.close(DataManagerService.getId(MANAGE_PRODUCT_REVIEW_ID, 'edit'));
+        dataTableContext?.modal?.close(DataManagerService.getId(MANAGE_PRODUCT_REVIEW_ID, 'create'));
         dataTableContext?.refresh();
     }
 

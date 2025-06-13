@@ -37,15 +37,15 @@ function EditProductColorFields({
                 multiRowSelection={true}
                 enableEdit={false}
                 paginationMode="state"
-                onChange={async (colors: Array<any>) => {
-                    if (!Array.isArray(colors)) {
+                onChange={async (items: Array<any>) => {
+                    if (!Array.isArray(items)) {
                         console.log('Invalid values received from ManageUser component');
                         return;
                     }
-                    const checked = colors.filter((item) => item?.checked);
+                    const checked = items.filter((item) => item?.checked);
 
-                    const existing = formHelpers?.values?.colors || [];
-                    formHelpers.setFieldValue('colors', [
+                    const existing = formHelpers?.values?.items || [];
+                    formHelpers.setFieldValue('items', [
                         ...existing,
                         ...checked.filter((item) => {
                             return !existing.find((checkedItem) => checkedItem?.id === item?.id);

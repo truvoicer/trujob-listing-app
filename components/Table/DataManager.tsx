@@ -5,7 +5,7 @@ import DataTable, {
 import { SetStateAction, useContext, useEffect, useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { useSearchParams } from "next/navigation";
-import { isObject, isObjectEmpty } from "@/helpers/utils";
+import { isNotEmpty, isObject, isObjectEmpty } from "@/helpers/utils";
 import {
   DataTableContext,
   dataTableContextData,
@@ -19,6 +19,11 @@ import { DataManagerService } from "@/library/services/data-manager/DataManagerS
 import { FormikProps, FormikValues } from "formik";
 import Link from "next/link";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
+import {
+  SORT_BY,
+  SORT_ORDER,
+} from "@/library/redux/constants/search-constants";
+import BadgeDropDown from "../BadgeDropDown";
 
 export type DataManageComponentProps = {
   mode?: "selector" | "edit";
@@ -74,7 +79,12 @@ export type DataManagerProps = {
     links: Array<Record<string, any>>;
     meta: Record<string, any>;
   }>;
-  editFormComponent?: React.ComponentType<any>;
+  editFormComponent?:
+    | React.ComponentType<any>
+    | {
+        component: React.ComponentType<any>;
+        props?: Record<string, any>;
+      };
 };
 
 export type DataTableContextType = {
@@ -138,7 +148,6 @@ function DataManager({
   const appModalContext = useContext(AppModalContext);
   const notificationContext = useContext(AppNotificationContext);
 
-  
   function updateDataTableContextState(data: any) {
     if (!isObject(data)) {
       return;
@@ -256,7 +265,7 @@ function DataManager({
     switch (mode) {
       case "selector":
         return {
-          shippingMethods: [],
+          items: [],
         };
       case "edit":
         return {};
@@ -294,7 +303,7 @@ function DataManager({
             DataManagerService.selectorModeHandler({
               onChange,
               data,
-              values: formHelpers?.values?.shippingMethods,
+              values: formHelpers?.values?.items,
               index,
             });
             break;
@@ -316,12 +325,28 @@ function DataManager({
     };
   }
 
+  function getFormComponentData() {
+    let component: React.ComponentType<any> | null = null;
+    let props: Record<string, any> = {};
+    if (typeof editFormComponent === "function") {
+      component = editFormComponent;
+    } else if (editFormComponent?.component) {
+      component = editFormComponent.component;
+      props = editFormComponent.props || {};
+    }
+    return {
+      component,
+      props,
+    };
+  }
+
   function renderActionColumn(item: ShippingMethod, index: number) {
-    if (!editFormComponent) {
+    const editFormComponentData = getFormComponentData();
+    if (!editFormComponentData?.component) {
       console.warn("editFormComponent is required");
       return null;
     }
-    const EditForm = editFormComponent;
+    const EditForm = editFormComponentData.component;
     return (
       <div className="d-flex align-items-center list-action">
         <Link
@@ -341,6 +366,7 @@ function DataManager({
                     operation={"edit"}
                     inModal={true}
                     modalId={DataManagerService.getId(id, "edit")}
+                    {...(editFormComponentData?.props || {})}
                   />
                 ),
                 ...getShippingMethodFormModalProps(index),
@@ -443,6 +469,7 @@ function DataManager({
                           operation={"edit"}
                           inModal={true}
                           modalId={DataManagerService.getId(id, "edit")}
+                          {...(editFormComponentData?.props || {})}
                         />
                       ),
                       ...getShippingMethodFormModalProps(index),
@@ -516,7 +543,7 @@ function DataManager({
     );
   }
   async function prepareSearch(searchParams: DatatableSearchParams = {}) {
-    let query: any = {};
+    const query: Record<string, any> = {};
 
     if (isNotEmpty(searchParams?.sort_by)) {
       query[SORT_BY] = searchParams?.sort_by;
@@ -536,10 +563,6 @@ function DataManager({
   }: {
     searchParams: Record<string, string | null | undefined>;
   }) {
-    if (!operation) {
-      console.warn("Operation is required");
-      return;
-    }
     let query = dataTableContextState?.query || {};
     let post = dataTableContextState?.post || {};
     const preparedQuery = await prepareSearch(searchParams);
@@ -569,12 +592,12 @@ function DataManager({
       return;
     }
 
-    if (!editFormComponent) {
+    const editFormComponentData = getFormComponentData();
+    if (!editFormComponentData?.component) {
       console.warn("editFormComponent is required");
       return null;
     }
-
-    const EditForm = editFormComponent;
+    const EditForm = editFormComponentData.component;
     modalState.show(
       {
         title: "Create shipping method",
@@ -584,6 +607,7 @@ function DataManager({
             operation={"create"}
             inModal={true}
             modalId={DataManagerService.getId(id, "create")}
+            {...(editFormComponentData?.props || {})}
           />
         ),
         ...getShippingMethodFormModalProps(),
@@ -593,7 +617,11 @@ function DataManager({
   }
 
   function getRowSelectActions() {
-    let actions = [];
+    const actions: Array<{
+      label: string;
+      name: string;
+      onClick: (params: DMOnRowSelectActionClick) => void;
+    }> = [];
     actions.push({
       label: "Delete",
       name: "delete",
@@ -605,8 +633,7 @@ function DataManager({
         dataTableContextState.confirmation.show(
           {
             title: "Edit Menu",
-            message:
-              "Are you sure you want to delete selected shippingMethods?",
+            message: "Are you sure you want to delete selected items?",
             onOk: async () => {
               console.log("Yes");
               if (!data?.length) {
@@ -615,7 +642,7 @@ function DataManager({
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>No shippingMethods selected</p>,
+                    component: <p>No items selected</p>,
                   },
                   "shipping-method-bulk-delete-error"
                 );
@@ -628,7 +655,7 @@ function DataManager({
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>Shipping method IDs are required</p>,
+                    component: <p>Item IDs are required</p>,
                   },
                   "shipping-method-bulk-delete-error"
                 );
@@ -645,7 +672,7 @@ function DataManager({
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>Failed to delete shippingMethods</p>,
+                    component: <p>Failed to delete items</p>,
                   },
                   "shipping-method-bulk-delete-error"
                 );

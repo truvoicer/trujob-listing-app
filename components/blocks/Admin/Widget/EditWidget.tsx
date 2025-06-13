@@ -7,10 +7,11 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Role } from "@/types/Role";
 import EditWidgetFields from "./EditWidgetFields";
-import { EDIT_SIDEBAR_MODAL_ID } from "./ManageWidget";
+import { MANAGE_WIDGET_ID } from "./ManageWidget";
 import { CreateWidget, Widget, UpdateWidget } from "@/types/Widget";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
 export type EditWidgetProps = {
@@ -172,7 +173,8 @@ function EditWidget({
         }return;
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_SIDEBAR_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_WIDGET_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_WIDGET_ID, 'create'));
     }
     const dataTableContext = useContext(DataTableContext);
 

@@ -37,7 +37,7 @@ function ManagePriceType({
       <DataManager
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/delete`,
+            endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/destroy`,
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
             data: {

@@ -3,7 +3,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { CREATE_PRODUCT_PRODUCT_TYPE_MODAL_ID, EDIT_PRODUCT_PRODUCT_TYPE_MODAL_ID } from "./ManageProductProductType";
+import { MANAGE_PRODUCT_PRODUCT_TYPE_ID } from "./ManageProductProductType";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
@@ -13,6 +13,7 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ProductType } from "@/types/Product";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export type EditProductProductTypeProps = {
     data?: Product;
@@ -53,13 +54,13 @@ function EditProductProductType({
             console.log('Product ID is required');
             return;
         }
-        if (!Array.isArray(values?.productTypes)) {
+        if (!Array.isArray(values?.items)) {
             console.warn('Invalid values received');
             return;
         }
         let response = null;
         let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.productTypes),
+            ids: RequestHelpers.extractIdsFromArray(values?.items),
         }
         switch (operation) {
             case 'add':
@@ -73,6 +74,7 @@ function EditProductProductType({
                             ':productId',
                             productId.toString(),
                         ),
+                        'bulk',
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -106,8 +108,8 @@ function EditProductProductType({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(EDIT_PRODUCT_PRODUCT_TYPE_MODAL_ID);
-        dataTableContext.modal.close(CREATE_PRODUCT_PRODUCT_TYPE_MODAL_ID);
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_PRODUCT_TYPE_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_PRODUCT_TYPE_ID, 'create'));
     }
 
     function getRequiredFields() {

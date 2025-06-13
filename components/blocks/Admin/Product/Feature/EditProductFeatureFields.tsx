@@ -35,15 +35,15 @@ function EditProductFeatureFields({
                 multiRowSelection={true}
                 enableEdit={false}
                 paginationMode="state"
-                onChange={async (features: Array<any>) => {
-                    if (!Array.isArray(features)) {
+                onChange={async (items: Array<any>) => {
+                    if (!Array.isArray(items)) {
                         console.log('Invalid values received from ManageUser component');
                         return;
                     }
-                    const checked = features.filter((item) => item?.checked);
+                    const checked = items.filter((item) => item?.checked);
 
-                    const existing = formHelpers?.values?.features || [];
-                    formHelpers.setFieldValue('features', [
+                    const existing = formHelpers?.values?.items || [];
+                    formHelpers.setFieldValue('items', [
                         ...existing,
                         ...checked.filter((item) => {
                             return !existing.find((checkedItem) => checkedItem?.id === item?.id);

@@ -3,7 +3,7 @@ import {setIsAuthenticatingAction, setSessionUserAction} from "@/library/redux/a
 import { SessionService } from "@/library/services/session/SessionService";
 import { features } from "process";
 
-export default {
+const config = {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
         order: '/order',
@@ -40,7 +40,6 @@ export default {
         productColor: '/product/:productId/color',
         productProductType: '/product/:productId/product-type',
         productPrice: '/product/:productId/price',
-        productProductType: '/product/:productId/product-type',
         productTransaction: '/product/:productId/transaction',
         settings: '/settings',
         menu: '/menu',
@@ -91,3 +90,5 @@ export default {
     },
     token: process.env.NEXT_PUBLIC_TRU_JOB_API_TOKEN,
 }
+
+export default config;
