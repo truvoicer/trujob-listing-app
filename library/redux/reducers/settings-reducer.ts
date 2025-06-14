@@ -7,9 +7,17 @@ import {
 } from "@/library/redux/constants/settings-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
+export type SettingsState = {
+    [SETTINGS_TIMEZONE]: string | null;
+    [ERROR]: {
+        show: boolean;
+        message: string;
+        data: Record<string, unknown>;
+    };
+};
 
-export const settingsStateData = {
-        [SETTINGS_TIMEZONE]: null,
+export const settingsStateData: SettingsState = {
+    [SETTINGS_TIMEZONE]: null,
     [ERROR]: {
         show: false,
         message: "",

@@ -40,19 +40,8 @@ export class DataManagerService {
     format = "array",
     index,
   }: SelectorModeHandler) {
-    if (!Array.isArray(data?.items)) {
-      DataManagerService.editModeCreateHandler({
-        onChange,
-        data,
-        values,
-        index,
-      });
-      return false;
-    }
-
-    let origData = data.items;
+    const origData = data?.items;
     if (!Array.isArray(origData)) {
-      origData = [];
       return false;
     }
 
@@ -156,19 +145,17 @@ export class DataManagerService {
     values = [],
     index,
   }: {
-    data?: Array<any>;
+    data?: Array<unknown>;
     values: FormikValues;
-    onChange: (values: any) => void;
+    onChange: (values: unknown) => void;
     index?: number;
   }): Promise<boolean> {
+    
     if (!Array.isArray(data)) {
       return false;
     }
-    let origData = [...data];
-    if (!Array.isArray(origData)) {
-      origData = [];
-      return false;
-    }
+    const origData = [...data];
+
     if (typeof index !== "undefined") {
       origData[index] = values;
     } else {

@@ -24,6 +24,10 @@ import {
   SORT_ORDER,
 } from "@/library/redux/constants/search-constants";
 import BadgeDropDown from "../BadgeDropDown";
+import EntityBrowser from "../EntityBrowser/EntityBrowser";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 export type DataManageComponentProps = {
   isChild?: boolean;
@@ -32,20 +36,20 @@ export type DataManageComponentProps = {
   enableEdit?: boolean;
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
-  onChange: (tableData: Array<any>) => void;
+  onChange: (values: unknown[]) => void;
   rowSelection?: boolean;
   multiRowSelection?: boolean;
-  data?: Array<any>;
+  data?: Array<unknown>;
   onRowSelect?: (
     item: DataTableItem,
     index: number,
-    dataTableContextState: any
+    dataTableContextState: unknown
   ) => boolean | Promise<boolean>;
 };
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
-  data: Array<any>;
-  dataTableContextState: any;
-  setDataTableContextState: (data: any) => void;
+  data: Array<unknown>;
+  dataTableContextState: unknown;
+  setDataTableContextState: (data: unknown) => void;
 }
 
 export type DataManagerProps = {
@@ -53,9 +57,9 @@ export type DataManagerProps = {
   id: string;
   mode?: "selector" | "edit";
   operation?: "edit" | "update" | "add" | "create";
-  values?: Array<any>;
-  data?: Array<any>;
-  onChange: (tableData: Array<any>) => void;
+  values?: Array<unknown>;
+  data?: Array<unknown>;
+  onChange: (tableData: Array<unknown>) => void;
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
   enableEdit?: boolean;
@@ -63,43 +67,43 @@ export type DataManagerProps = {
   onRowSelect?: (
     item: DataTableItem,
     index: number,
-    dataTableContextState: any
+    dataTableContextState: unknown
   ) => boolean | Promise<boolean>;
   multiRowSelection?: boolean;
   rowSelection?: boolean;
-  columns?: Array<any>;
-  deleteItemRequest?: ({ item }: { item: any }) => Promise<boolean>;
-  deleteBulkItemsRequest?: ({ ids }: { ids: any }) => Promise<boolean>;
+  columns?: Array<unknown>;
+  deleteItemRequest?: ({ item }: { item: unknown }) => Promise<boolean>;
+  deleteBulkItemsRequest?: ({ ids }: { ids: unknown }) => Promise<boolean>;
   fetchItemsRequest?: ({
     post,
     query,
   }: {
-    post: Record<string, any>;
-    query: Record<string, any>;
+    post: Record<string, unknown>;
+    query: Record<string, unknown>;
   }) => Promise<{
-    data: Array<Record<string, any>>;
-    links: Array<Record<string, any>>;
-    meta: Record<string, any>;
+    data: Array<Record<string, unknown>>;
+    links: Array<Record<string, unknown>>;
+    meta: Record<string, unknown>;
   }>;
   editFormComponent?:
-    | React.ComponentType<any>
+    | React.ComponentType<unknown>
     | {
-        component: React.ComponentType<any>;
-        props?: Record<string, any>;
+        component: React.ComponentType<unknown>;
+        props?: Record<string, unknown>;
       };
 };
 
 export type DataTableContextType = {
-  [key: string]: any | Array<any> | string | null | undefined;
+  [key: string]: unknown | Array<unknown> | string | null | undefined;
   requestStatus: string;
-  data: Array<any>;
-  links: any;
-  meta: any;
-  query: any;
-  post: any;
-  modal: any;
+  data: Array<unknown>;
+  links: unknown;
+  meta: unknown;
+  query: unknown;
+  post: unknown;
+  modal: unknown;
   refresh: () => void;
-  update: (data: any) => void;
+  update: (data: unknown) => void;
 };
 
 export type DatatableSearchParams = {
@@ -152,7 +156,7 @@ function DataManager({
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
 
-  function updateDataTableContextState(data: any) {
+  function updateDataTableContextState(data: unknown) {
     if (!isObject(data)) {
       return;
     }
@@ -207,11 +211,11 @@ function DataManager({
         const data = response?.data || [];
         setDataTableContextState((prevState) => {
           let newState = { ...prevState };
-          newState.data = data.map((item: any, index: number) => {
+          newState.data = data.map((item: unknown, index: number) => {
             let cloneItem = { ...item };
             let isChecked = false;
             if (Array.isArray(values)) {
-              isChecked = values.some((value: any) => {
+              isChecked = values.some((value: unknown) => {
                 if (typeof value === "object") {
                   return value.id === item.id;
                 }
@@ -317,6 +321,7 @@ function DataManager({
               onChange,
               data,
               values: formHelpers?.values,
+              index,
             });
             break;
           default:
@@ -324,6 +329,13 @@ function DataManager({
             return;
         }
 
+        console.log(
+          "DataManager onOk",
+          formHelpers?.values,
+          operation,
+          mode,
+          response
+        );
         if (response) {
           return await formHelpers.submitForm();
         }
@@ -333,8 +345,8 @@ function DataManager({
   }
 
   function getFormComponentData() {
-    let component: React.ComponentType<any> | null = null;
-    let props: Record<string, any> = {};
+    let component: React.ComponentType<unknown> | null = null;
+    let props: Record<string, unknown> = {};
     if (typeof editFormComponent === "function") {
       component = editFormComponent;
     } else if (editFormComponent?.component) {
@@ -558,7 +570,7 @@ function DataManager({
     );
   }
   async function prepareSearch(searchParams: DatatableSearchParams = {}) {
-    const query: Record<string, any> = {};
+    const query: Record<string, unknown> = {};
 
     if (isNotEmpty(searchParams?.sort_by)) {
       query[SORT_BY] = searchParams?.sort_by;
@@ -802,6 +814,7 @@ function DataManager({
                 <div className="iq-header-title">
                   {title && <h4 className="card-title mb-0">{title}</h4>}
                 </div>
+
                 {enableEdit && (
                   <a
                     href="#"

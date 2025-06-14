@@ -4,15 +4,22 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
-import { FormikContextType, FormikHandlers, FormikProps, FormikValues } from "formik";
+import { SessionState } from "@/library/redux/reducers/session-reducer";
+// import RootState from your Redux store definition
+import { RootState } from "@/library/redux/store";
+import { FormikProps, FormikValues } from "formik";
 import { useRouter, useSearchParams } from "next/navigation";
 import { connect } from "react-redux";
 
 export type LoginBlockProps = {
-    session: any;
+    session: SessionState;
+    onSuccess?: (data: any) => void;
+    onError?: (error: ErrorItem) => void;
 }
 function LoginBlock({
-    session
+    session,
+    onSuccess,
+    onError
 }: LoginBlockProps) {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -30,6 +37,16 @@ function LoginBlock({
             response
         )) {
             console.error('Login failed', response);
+            if (typeof onError === 'function') {
+                onError({
+                    requestData,
+                    response
+                });
+            }
+            return;
+        }
+        if (typeof onSuccess === 'function') {
+            onSuccess(response?.data);
             return;
         }
         router.push(
@@ -148,7 +165,7 @@ function LoginBlock({
     );
 }
 export default connect(
-    (state: any) => ({
+    (state: RootState) => ({
         session: state[SESSION_STATE]
     })
 )(LoginBlock);

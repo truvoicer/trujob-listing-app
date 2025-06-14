@@ -88,7 +88,7 @@ function ViewLayout({ page }: ViewLayoutProps) {
                                 {view}
                             </SessionLayout>
                         )
-                        : <Loader fullScreen />
+                        : <Loader />
                     }
 
                     {modalService.render()}

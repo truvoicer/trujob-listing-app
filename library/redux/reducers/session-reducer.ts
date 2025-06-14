@@ -14,8 +14,30 @@ import {
     SESSION_USER_USERNAME
 } from "../constants/session-constants";
 
-
-const defaultState = {
+export type SessionState = {
+    [SESSION_USER]: {
+        [SESSION_AUTH_PROVIDER]: string | null;
+        [SESSION_AUTH_PROVIDER_USER_ID]: string | null;
+        [SESSION_USER_ID]: string | null;
+        [SESSION_USER_USERNAME]: string | null;
+        [SESSION_USER_EMAIL]: string | null;
+        [SESSION_USER_FIRSTNAME]: string | null;
+        [SESSION_USER_LASTNAME]: string | null;
+        [SESSION_USER_ADDRESSES]: Array<unknown>;
+        [SESSION_USER_TOKEN]: string | null;
+        [SESSION_USER_ROLES]: Array<string>;
+    };
+    [SESSION_SHOW_LOGIN_MODAL]: boolean;
+    [SESSION_PASSWORD_RESET_KEY]: string | null;
+    [SESSION_AUTHENTICATED]: boolean;
+    [SESSION_IS_AUTHENTICATING]: boolean;
+    [SESSION_ERROR]: {
+        show: boolean;
+        message: string | null;
+        data: Record<string, unknown>;
+    };
+};
+const defaultState: SessionState = {
     [SESSION_USER]: {
         [SESSION_AUTH_PROVIDER]: null,
         [SESSION_AUTH_PROVIDER_USER_ID]: null,

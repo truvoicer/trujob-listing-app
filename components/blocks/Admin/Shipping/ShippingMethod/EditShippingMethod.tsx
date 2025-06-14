@@ -16,12 +16,14 @@ import {
   CreateShippingMethod,
   UpdateShippingMethod,
   CreateShippingRate,
+  ShippingRateRequest,
 } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { min } from "underscore";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { buildShippingRate, buildShippingRates } from "../ShippingRate/EditShippingRate";
 
 export type EditShippingMethodProps = {
   data?: ShippingMethod;
@@ -78,74 +80,9 @@ function EditShippingMethod({
     return requestData;
   }
 
-  function buildShippingRates(rates: any[]) {
-    return rates.map((rate) => {
-      let shippingRate: CreateShippingRate = {};
-      if (rate?.shipping_method_id) {
-        shippingRate.shipping_method_id = rate?.shipping_method_id || "";
-      }
-      if (rate?.shipping_zone_id) {
-        shippingRate.shipping_zone_id = rate?.shipping_zone_id || "";
-      }
-      if (rate?.type) {
-        shippingRate.type = rate?.type || "";
-      }
-      if (rate?.amount) {
-        shippingRate.amount = parseFloat(rate?.amount) || 0;
-      }
-      if (rate?.weight_limit) {
-        shippingRate.weight_limit = rate?.weight_limit || false;
-        if (rate?.min_weight) {
-          shippingRate.min_weight = parseFloat(rate?.min_weight) || 0;
-        }
-        if (rate?.max_weight) {
-          shippingRate.max_weight = parseFloat(rate?.max_weight) || 0;
-        }
-      }
-      if (rate?.height_limit) {
-        shippingRate.height_limit = rate?.height_limit || false;
-        if (rate?.min_height) {
-          shippingRate.min_height = parseFloat(rate?.min_height) || 0;
-        }
-        if (rate?.max_height) {
-          shippingRate.max_height = parseFloat(rate?.max_height) || 0;
-        }
-      }
-      if (rate?.length_limit) {
-        shippingRate.length_limit = rate?.length_limit || false;
-        if (rate?.min_length) {
-          shippingRate.min_length = parseFloat(rate?.min_length) || 0;
-        }
-        if (rate?.max_length) {
-          shippingRate.max_length = parseFloat(rate?.max_length) || 0;
-        }
-      }
-      if (rate?.width_limit) {
-        shippingRate.width_limit = rate?.width_limit || false;
-        if (rate?.min_width) {
-          shippingRate.min_width = parseFloat(rate?.min_width) || 0;
-        }
-        if (rate?.max_width) {
-          shippingRate.max_width = parseFloat(rate?.max_width) || 0;
-        }
-      }
-
-      if (rate?.currency?.id) {
-        shippingRate.currency_id = rate?.currency?.id || "";
-      }
-      if (rate.hasOwnProperty("is_free_shipping_possible")) {
-        shippingRate.is_free_shipping_possible =
-          rate?.is_free_shipping_possible || false;
-      }
-      if (rate?.shipping_zone?.id) {
-        shippingRate.shipping_zone_id = rate?.shipping_zone?.id || "";
-      }
-      return shippingRate;
-    });
-  }
 
   function buildCreateData(values: ShippingMethod) {
-    let requestData: CreateShippingMethod = {
+    const requestData: CreateShippingMethod = {
       carrier: values?.carrier || "",
       description: values?.description || "",
       processing_time_days: values?.processing_time_days || 0,

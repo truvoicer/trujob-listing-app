@@ -30,7 +30,6 @@ import {
     PAGE_CREATED_AT,
     PAGE_UPDATED_AT,
     ERROR,
-    DATA,
     PAGE_STATE,
     PAGE_ROLES,
     PAGE_LOADED,
@@ -38,9 +37,30 @@ import {
     PAGE_PERMALINK,
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
-import { DebugHelpers } from '@/helpers/DebugHelpers';
 
-export const pageStateData = {
+export type PageState = {
+    [ERROR]: string | null;
+    [PAGE_LOADED]: boolean;
+    [PAGE_VIEW]: string | null;
+    [PAGE_PERMALINK]: string | null;
+    [PAGE_NAME]: string | null;
+    [PAGE_TITLE]: string | null;
+    [PAGE_CONTENT]: string | null;
+    [PAGE_IS_ACTIVE]: boolean;
+    [PAGE_IS_HOME]: boolean;
+    [PAGE_IS_FEATURED]: boolean;
+    [PAGE_IS_PROTECTED]: boolean;
+    [PAGE_HAS_SIDEBAR]: boolean;
+    [PAGE_SIDEBAR_WIDGETS]: Array<unknown>;
+    [PAGE_BLOCKS]: Array<unknown>;
+    [PAGE_ROLES]: Array<string>;
+    [PAGE_HAS_PERMISSION]: boolean;
+    [PAGE_SETTINGS]: Record<string, unknown>;
+    [PAGE_DELETED_AT]: string | null;
+    [PAGE_CREATED_AT]: string | null;
+    [PAGE_UPDATED_AT]: string | null;
+};
+export const pageStateData: PageState = {
     [ERROR]: null,
     [PAGE_LOADED]: false,
     [PAGE_VIEW]: null,

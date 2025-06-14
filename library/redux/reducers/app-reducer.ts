@@ -11,8 +11,21 @@ import {
     ERROR
 } from "@/library/redux/constants/app-constants";
 
+export type AppState = {
+    [APP_LOADED]: boolean;
+    [APP_CURRENT_ROUTE]: string | null;
+    [APP_REQUESTED_ROUTE]: string | null;
+    [APP_SETTINGS]: Record<string, unknown>;
+    [APP_MODE]: "light" | "dark";
+    [APP_SIDEBAR_OPEN]: boolean;
+    [ERROR]: {
+        show: boolean;
+        message: string;
+        data: Record<string, unknown>;
+    };
+};
 
-const defaultState = {
+const defaultState: AppState = {
     [APP_LOADED]: false,
     [APP_CURRENT_ROUTE]: null,
     [APP_REQUESTED_ROUTE]: null,

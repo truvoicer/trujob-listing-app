@@ -92,7 +92,12 @@ function ManageShippingRate({
         mode={mode}
         operation={operation}
         id={MANAGE_SHIPPING_RATE_ID}
-        editFormComponent={EditShippingRate}
+        editFormComponent={{
+          component: EditShippingRate,
+          props: {
+            shippingMethodId: shippingMethodId,
+          },
+        }}
         data={data}
         rowSelection={rowSelection}
         multiRowSelection={multiRowSelection}

@@ -18,15 +18,14 @@ export type ShippingMethod = {
 }
 
 export type ShippingMethodRequest = {
-    name?: string;
     carrier?: string;
     description?: string;
     is_active?: boolean;
     processing_time_days?: number;
     display_order?: number;
+    rates?: ShippingRateRequest[];
 }
 export interface CreateShippingMethod extends ShippingMethodRequest {
-    name: string;
     carrier: string;
     description: string;
     is_active?: boolean;
@@ -89,7 +88,6 @@ export type ShippingRate = {
 }
 
 export type ShippingRateRequest = {
-    shipping_method_id?: number;
     shipping_zone_id?: number;
     type?: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
     amount?: number;
@@ -126,10 +124,9 @@ export interface UpdateShippingRate extends ShippingRateRequest {
 
 export type ShippingRestriction = {
     id: number;
-    shipping_method: ShippingMethod;
     restrictionable_type: string;
-    restrictionable_id: string;
-    action: ShippingMethod;
+    restrictionable_id: number;
+    action: 'allow' | 'deny';
     category?: Category;
     product?: Product;
     country?: Country;
@@ -140,19 +137,18 @@ export type ShippingRestriction = {
 }
 
 export type ShippingRestrictionRequest = {
-    shipping_method_id?: number;
-    type?: string;
-    restriction_id?: string;
+    restrictionable_type?: string;
+    restrictionable_id?: number;
     action?: 'allow' | 'deny';
 }
 
 export interface CreateShippingRestriction extends ShippingRestrictionRequest {
-    shipping_method_id: number;
-    type: string;
-    restriction_id: string;
+    restrictionable_id: number;
+    restrictionable_type: string;
     action: 'allow' | 'deny';
 }
 
-export interface UpdateShippingRestriction extends ShippingRestrictionRequest {
+export interface UpdateShippingRestriction {
     id: number;
+    action: 'allow' | 'deny';
 }

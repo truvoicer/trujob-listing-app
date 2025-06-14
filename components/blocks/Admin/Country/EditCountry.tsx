@@ -3,33 +3,32 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { MANAGE_SHIPPING_RESTRICTION_ID } from "./ManageShippingRestriction";
+import { MANAGE_COUNTRY_ID } from "./ManageCountry";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import EditShippingRestrictionFields from "./EditShippingRestrictionFields";
+import EditCountryFields from "./EditCountryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { ShippingRestriction, CreateShippingRestriction, UpdateShippingRestriction, ShippingRestrictionRequest } from "@/types/Shipping";
+import { Country, CreateCountry, UpdateCountry } from "@/types/Country";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 
-export type EditShippingRestrictionProps = {
-    data?: ShippingRestriction;
+export type EditCountryProps = {
+    data?: Country;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
     dataTable?: DataTableContextType;
-    shippingMethodId?: number;
 }
-function EditShippingRestriction({
+function EditCountry({
     dataTable,
     data,
     operation,
     inModal = false,
     modalId,
-    shippingMethodId,
-}: EditShippingRestrictionProps) {
+}: EditCountryProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -38,115 +37,83 @@ function EditShippingRestriction({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    
-    const initialValues: ShippingRestriction = {
+    const initialValues: Country = {
         id: data?.id || 0,
-        restrictionable_type: data?.restrictionable_type || '',
-        restrictionable_id: data?.restrictionable_id || 0,
-        action: data?.action || 'allow',
+        label: data?.label || '',
+        name: data?.name || '',
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
-    if (data?.category) {
-        initialValues.category = data?.category;
-    }
-    if (data?.product) {
-        initialValues.product = data?.product;
-    }
-    if (data?.country) {
-        initialValues.country = data?.country;
-    }
-    if (data?.region) {
-        initialValues.region = data?.region;
-    }
-    if (data?.currency) {
-        initialValues.currency = data?.currency;
-    }
 
-    function buildRequestData(values: ShippingRestriction) {
+    function buildCreateData(values: Country) {
 
-        const requestData: ShippingRestrictionRequest = {};
-        if (values?.restrictionable_type) {
-            requestData.restrictionable_type = values?.restrictionable_type;
-        }
-        if (values?.restrictionable_id) {
-            requestData.restrictionable_id = values?.restrictionable_id || 0;
-        }
-        if (values?.action) {
-            requestData.action = values?.action || 'allow';
-        }
-
-        return requestData;
-    }
-    function buildCreateData(values: ShippingRestriction) {
-
-        const requestData: CreateShippingRestriction = {
-            ...buildRequestData(values),
+        let requestData: CreateCountry = {
+            name: values?.name || '',
+            label: values?.label || '',
         };
 
         return requestData;
     }
 
-    function buildUpdateData(values: ShippingRestriction) {
+    function buildUpdateData(values: Country) {
 
-        const requestData: UpdateShippingRestriction = {
+        let requestData: UpdateCountry = {
             id: values?.id || 0,
-            ...buildRequestData(values),
         };
-
+        if (values?.name) {
+            requestData.name = values?.name || '';
+        }
+        if (values?.label) {
+            requestData.label = values?.label || '';
+        }
         return requestData;
     }
-    async function handleSubmit(values: ShippingRestriction) {
-        
+    async function handleSubmit(values: Country) {
+
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return false;
-        }
-
-        if (Array.isArray(values?.items)) {
-            return false;
-        }
-
-        if (!shippingMethodId) {
-            throw new Error('Shipping method ID is required');
+            return;
         }
 
         let response = null;
-        
+        let requestData: CreateCountry | UpdateCountry;
         switch (operation) {
             case 'edit':
             case 'update':
+                requestData = buildUpdateData(values);
+                console.log('edit requestData', requestData);
+
                 if (!values?.id) {
-                    throw new Error('Shipping restriction ID is required');
+                    throw new Error('Country ID is required');
                 }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.shippingRestriction.replace(
-                            ':shippingMethodId',
-                            shippingMethodId?.toString()
-                        ),
+                        truJobApiConfig.endpoints.country,
                         values.id,
                         'update'
                     ]),
                     method: ApiMiddleware.METHOD.PATCH,
                     protectedReq: true,
-                    data: buildUpdateData(values),
+                    data: requestData,
                 })
                 break;
             case 'add':
             case 'create':
+                if (Array.isArray(values?.countrys)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
+                console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.shippingRestriction.replace(
-                            ':shippingMethodId',
-                            shippingMethodId?.toString()
-                        ),
+                        truJobApiConfig.endpoints.country,
                         'store'
                     ]),
                     method: ApiMiddleware.METHOD.POST,
                     protectedReq: true,
-                    data: buildCreateData(values),
+                    data: requestData,
                 })
                 break;
             default:
@@ -169,15 +136,14 @@ function EditShippingRestriction({
                 ),
                 type: 'danger',
             });
-            return false;
+            return;
         }
         if (dataTable) {
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RESTRICTION_ID, 'edit'));
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_SHIPPING_RESTRICTION_ID, 'create'));
-        return true;
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_COUNTRY_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_COUNTRY_ID, 'edit'));
     }
 
     function getRequiredFields() {
@@ -219,7 +185,7 @@ function EditShippingRestriction({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditShippingRestrictionFields operation={operation} />
+                        <EditCountryFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -230,7 +196,7 @@ function EditShippingRestriction({
                     >
                         {() => {
                             return (
-                                <EditShippingRestrictionFields operation={operation} />
+                                <EditCountryFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -239,4 +205,4 @@ function EditShippingRestriction({
         </div>
     );
 }
-export default EditShippingRestriction;
+export default EditCountry;

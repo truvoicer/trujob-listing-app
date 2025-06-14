@@ -58,7 +58,7 @@ function App({ data, settings, site, page }: Props) {
             {isPageLoaded()
                 ? <ViewLayout />
 
-                : <Loader fullScreen />
+                : <Loader />
             }
         </div>
     );

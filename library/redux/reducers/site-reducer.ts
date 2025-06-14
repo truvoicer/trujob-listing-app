@@ -35,8 +35,42 @@ import {
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 
+export type SiteState = {
+    [SITE_ID]: string | null;
+    [SITE_NAME]: string | null;
+    [SITE_TITLE]: string | null;
+    [SITE_DESCRIPTION]: string | null;
+    [SITE_SEO_TITLE]: string | null;
+    [SITE_SEO_DESCRIPTION]: string | null;
+    [SITE_SEO_KEYWORDS]: string | null;
+    [SITE_AUTHOR]: string | null;
+    [SITE_LOGO]: string | null;
+    [SITE_FAVICON]: string | null;
+    [SITE_ADDRESS]: string | null;
+    [SITE_PHONE]: string | null;
+    [SITE_EMAIL]: string | null;
+    [SITE_GOOGLE_LOGIN_CLIENT_ID]: string | null;
+    [SITE_GOOGLE_TAG_MANAGER_ID]: string | null;
+    [SITE_HUBSPOT_ACCESS_TOKEN]: string | null;
+    [SITE_FACEBOOK_APP_ID]: string | null;
+    [SITE_FACEBOOK_APP_SECRET]: string | null;
+    [SITE_FACEBOOK_GRAPH_VERSION]: string | null;
+    [SITE_FACEBOOK_FOLLOW_URL]: string | null;
+    [SITE_INSTAGRAM_FOLLOW_URL]: string | null;
+    [SITE_TIKTOK_FOLLOW_URL]: string | null;
+    [SITE_PINTEREST_FOLLOW_URL]: string | null;
+    [SITE_X_FOLLOW_URL]: string | null;
+    [SITE_TIMEZONE]: string | null;
+    [SITE_MEDIA]: Array<unknown>;
+    [SITE_SETTINGS]: Record<string, unknown>;
+    [ERROR]: {
+        show: boolean;
+        message: string;
+        data: Record<string, unknown>;
+    };
+};
 
-export const siteStateData = {
+export const siteStateData: SiteState = {
     [SITE_ID]: null,
     [SITE_NAME]: null,
     [SITE_TITLE]: null,
