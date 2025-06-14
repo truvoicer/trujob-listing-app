@@ -19,6 +19,7 @@ export interface ManageSidebarWidgetProps extends DataManageComponentProps {
   sidebarId?: number;
 }
 function ManageSidebarWidget({
+  isChild = false,
   operation = "create",
   data,
   mode = "selector",
@@ -33,6 +34,7 @@ function ManageSidebarWidget({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           if (!sidebarId) {
             throw new Error("Sidebar ID is required for bulk delete.");

@@ -20,6 +20,7 @@ export interface ManagePriceTypeProps extends DataManageComponentProps {
 }
 
 function ManagePriceType({
+  isChild = false,
   values,
   mode = "selector",
   data,
@@ -35,6 +36,7 @@ function ManagePriceType({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/destroy`,

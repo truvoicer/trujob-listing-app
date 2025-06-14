@@ -33,6 +33,7 @@ function EditProductProductTypeFields({
             ]}
         >
             <ManageProductType
+                isChild={true}
                 operation={operation}
                 rowSelection={true}
                 multiRowSelection={true}

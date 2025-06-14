@@ -1,31 +1,13 @@
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import Link from "next/link";
-import { Suspense, useContext } from "react";
+import { Suspense } from "react";
 import EditColor from "./EditColor";
-import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, {
   DataManageComponentProps,
-  DataTableContextType,
-  DatatableSearchParams,
-  DMOnRowSelectActionClick,
 } from "@/components/Table/DataManager";
-import { isNotEmpty } from "@/helpers/utils";
-import {
-  SORT_BY,
-  SORT_ORDER,
-} from "@/library/redux/constants/search-constants";
 import { Color } from "@/types/Color";
-import { FormikProps, FormikValues } from "formik";
-import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DataTableContext } from "@/contexts/DataTableContext";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-
-import { ModalItem } from "@/library/services/modal/ModalService";
-import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
 export interface ManageColorProps extends DataManageComponentProps {
   data?: Array<Color>;
@@ -36,6 +18,7 @@ export const DELETE_COLOR_MODAL_ID = "delete-color-modal";
 export const MANAGE_COLOR_ID = "manage-color-modal";
 
 function ManageColor({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -50,6 +33,8 @@ function ManageColor({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.color}/bulk/destroy`,

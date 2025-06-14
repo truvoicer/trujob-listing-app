@@ -19,6 +19,7 @@ export interface ManageBrandProps extends DataManageComponentProps {
 }
 
 function ManageBrand({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -33,6 +34,7 @@ function ManageBrand({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.brand}/bulk/destroy`,

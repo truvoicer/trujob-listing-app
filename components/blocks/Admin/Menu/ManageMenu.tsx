@@ -18,6 +18,7 @@ export interface ManageMenuProps extends DataManageComponentProps {
   data?: Array<Menu>;
 }
 function ManageMenu({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -31,6 +32,8 @@ function ManageMenu({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.menu}/bulk/destroy`,

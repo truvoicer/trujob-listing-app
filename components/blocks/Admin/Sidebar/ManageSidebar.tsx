@@ -17,6 +17,7 @@ export interface ManageSidebarProps extends DataManageComponentProps {
   data?: Array<Sidebar>;
 }
 function ManageSidebar({
+  isChild = false,
   operation = "create",
   data,
   mode = "selector",
@@ -30,6 +31,8 @@ function ManageSidebar({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.sidebar}/bulk/destroy`,

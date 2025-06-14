@@ -148,6 +148,7 @@ function EditProductFeature({
 
 
     const dataTableContext = useContext(DataTableContext);
+    console.log('EditProductFeature dataTableContext', inModal, ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId));
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">

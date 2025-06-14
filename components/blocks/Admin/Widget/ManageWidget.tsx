@@ -16,6 +16,7 @@ export interface ManageWidgetProps extends DataManageComponentProps {
 }
 
 function ManageWidget({
+  isChild = false,
   operation = "create",
   data,
   mode = "selector",
@@ -29,6 +30,8 @@ function ManageWidget({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.widget}/bulk/destroy`,

@@ -19,6 +19,7 @@ export const CREATE_PRODUCT_BRAND_MODAL_ID = "create-product-brand-modal";
 export const MANAGE_PRODUCT_BRAND_ID = "manage-product-brand-modal";
 
 function ManageProductBrand({
+  isChild = false,
   mode = "selector",
   data,
   operation,
@@ -34,6 +35,7 @@ function ManageProductBrand({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

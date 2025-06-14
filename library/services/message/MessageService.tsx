@@ -242,7 +242,7 @@ export class MessageService {
             <button
                 type="button"
                 className="btn btn-primary mr-2"
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                     MessageService.updateLocalItemState({
                         id: id,
                         props: props || {},

@@ -18,6 +18,7 @@ export interface ManagePaymentGatewayProps extends DataManageComponentProps {
 }
 
 function ManagePaymentGateway({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -31,6 +32,7 @@ function ManagePaymentGateway({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.paymentGateway}/bulk/destroy`,

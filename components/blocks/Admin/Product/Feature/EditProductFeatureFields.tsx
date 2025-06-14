@@ -30,6 +30,7 @@ function EditProductFeatureFields({
             ]}
         >
             <ManageFeature
+                isChild={true}
                 operation={operation}
                 rowSelection={true}
                 multiRowSelection={true}
@@ -41,7 +42,6 @@ function EditProductFeatureFields({
                         return;
                     }
                     const checked = items.filter((item) => item?.checked);
-
                     const existing = formHelpers?.values?.items || [];
                     formHelpers.setFieldValue('items', [
                         ...existing,

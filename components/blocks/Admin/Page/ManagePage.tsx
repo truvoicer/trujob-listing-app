@@ -18,6 +18,7 @@ export const DELETE_PAGE_MODAL_ID = "delete-page-modal";
 export const MANAGE_PAGE_ID = "manage-page-modal";
 
 function ManagePage({
+  isChild = false,
   mode = "selector",
   operation = "edit",
   data,
@@ -31,6 +32,8 @@ function ManagePage({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.page}/bulk/destroy`,

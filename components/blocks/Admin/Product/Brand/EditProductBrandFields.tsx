@@ -31,6 +31,7 @@ function EditProductBrandFields({
             ]}
         >
             <ManageBrand
+                isChild={true}
                 operation={operation}
                 rowSelection={true}
                 multiRowSelection={true}

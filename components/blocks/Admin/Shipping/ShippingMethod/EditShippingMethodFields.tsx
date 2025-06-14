@@ -18,17 +18,15 @@ type EditShippingMethodFields = {
 function EditShippingMethodFields({
     operation
 }: EditShippingMethodFields) {
-    const [selectedShippingRates, setSelectedShippingRates] = useState<Array<ShippingRate>>([]);
 
     const modalService = new ModalService();
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-    console.log('EditShippingMethodFields values', values);
+    
     function getComponentProps() {
         let componentProps: any = {
             operation: 'create',
+            isChild: true,
             // mode: 'selector'
         };
         if (values?.id) {
@@ -63,7 +61,6 @@ function EditShippingMethodFields({
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(rates: Array<any>) => {
-                            console.log('rates', rates);
                             if (!Array.isArray(rates)) {
                                 console.warn('Invalid values received from ManageShippingRate component');
                                 return;
@@ -89,6 +86,7 @@ function EditShippingMethodFields({
             }
         },
     ]);
+    console.log('values', values);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -143,10 +141,21 @@ function EditShippingMethodFields({
                         <div className="floating-input">
                             <SelectedListDisplay
                                 label="Rates"
+                                direction="vertical"
                                 data={values?.rates}
                                 render={(rate: Record<string, any>) => (
                                     <>
-                                        {rate?.label}
+                                        {[
+                                            `Amount: ${rate?.amount || 0}`,
+                                            `Currency: ${rate?.currency?.name || 'N/A'}`,
+                                            `Min Weight: ${rate?.min_weight || 0} ${rate?.weight_unit || 'kg'}`,
+                                            `Max Weight: ${rate?.max_weight || 0} ${rate?.weight_unit || 'kg'}`,
+                                            `Min Height: ${rate?.min_height || 0} ${rate?.height_unit || 'cm'}`,
+                                            `Max Height: ${rate?.max_height || 0} ${rate?.height_unit || 'cm'}`,
+                                            `Shipping Zone: ${rate?.shipping_zone?.name || 'N/A'}`,
+                                            `Type: ${rate?.type || 'N/A'}`,
+                                            `Is Active: ${rate?.is_active ? 'Yes' : 'No'}`,
+                                        ].join(' | ')}
                                     </>
                                 )}
                             />

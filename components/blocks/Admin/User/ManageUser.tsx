@@ -18,6 +18,8 @@ export const EDIT_USER_MODAL_ID = "edit-user-modal";
 export const MANAGE_USER_ID = "manage-user-modal";
 
 function ManageUser({
+  isChild = false,
+  data,
   fixSessionUser = false,
   operation = "create",
   mode = "selector",
@@ -47,6 +49,8 @@ function ManageUser({
       )}
 
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.user}/bulk/destroy`,

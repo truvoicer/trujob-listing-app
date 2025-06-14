@@ -20,6 +20,7 @@ export interface ManageShippingZoneProps extends DataManageComponentProps {
 }
 
 function ManageShippingZone({
+  isChild = false,
   values,
   mode = "selector",
   data,
@@ -34,6 +35,7 @@ function ManageShippingZone({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingZone}/bulk/destroy`,

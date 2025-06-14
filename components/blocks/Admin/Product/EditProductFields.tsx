@@ -44,9 +44,10 @@ function EditProductFields({
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
     function getProductComponentProps() {
-        let componentProps: any = {
+        const componentProps: Record<string, unknown> = {
             operation: 'create',
-            mode: 'selector'
+            mode: 'selector',
+            isChild: true
         };
         if (values?.id) {
             componentProps.productId = values.id;
@@ -141,7 +142,7 @@ function EditProductFields({
                         onChange={(reviews: Array<any>) => {
                             console.log('reviews', reviews);
                             if (!Array.isArray(reviews)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductReview component');
                                 return;
                             }
                             if (values?.id) {
@@ -191,8 +192,9 @@ function EditProductFields({
                         enableEdit={true}
                         paginationMode="state"
                         onChange={(features: Array<any>) => {
+                            console.log('features', features);
                             if (!Array.isArray(features)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductFeature component');
                                 return;
                             }
                             if (values?.id) {
@@ -243,7 +245,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(follows: Array<any>) => {
                             if (!Array.isArray(follows)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductFollow component');
                                 return;
                             }
                             if (values?.id) {
@@ -294,7 +296,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(categories: Array<any>) => {
                             if (!Array.isArray(categories)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductCategory component');
                                 return;
                             }
                             if (values?.id) {
@@ -345,7 +347,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(brands: Array<any>) => {
                             if (!Array.isArray(brands)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductBrand component');
                                 return;
                             }
                             if (values?.id) {
@@ -397,7 +399,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(colors: Array<any>) => {
                             if (!Array.isArray(colors)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductColor component');
                                 return;
                             }
                             if (values?.id) {
@@ -448,7 +450,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(productTypes: Array<any>) => {
                             if (!Array.isArray(productTypes)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageProductProductType component');
                                 return;
                             }
                             if (values?.id) {
@@ -498,7 +500,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(media: Array<any>) => {
                             if (!Array.isArray(media)) {
-                                console.warn('Invalid values received from ManageUser component');
+                                console.warn('Invalid values received from ManageMedia component');
                                 return;
                             }
                             if (values?.id) {
@@ -553,7 +555,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(prices: Array<Price>) => {
                             if (!Array.isArray(prices)) {
-                                console.warn('Invalid values received from component');
+                                console.warn('Invalid values received from ManageProductPrice component');
                                 return;
                             }
                             if (values?.id) {

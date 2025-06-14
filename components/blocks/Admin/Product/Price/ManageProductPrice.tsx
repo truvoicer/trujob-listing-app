@@ -19,6 +19,7 @@ export const CREATE_PRODUCT_PRICE_MODAL_ID = "create-product-price-modal";
 export const MANAGE_PRODUCT_PRICE_ID = "manage-product-price-modal";
 
 function ManageProductPrice({
+  isChild = false,
   mode = "selector",
   data,
   operation,
@@ -34,6 +35,7 @@ function ManageProductPrice({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

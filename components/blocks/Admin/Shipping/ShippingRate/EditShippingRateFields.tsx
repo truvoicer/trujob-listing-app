@@ -33,7 +33,8 @@ function EditShippingRateFields({
     function getComponentProps() {
         let componentProps: any = {
             operation: 'create',
-            mode: 'selector'
+            mode: 'selector',
+            isChild: true,
         };
         if (values?.id) {
             componentProps.shippingMethodId = values.id;
@@ -310,7 +311,7 @@ function EditShippingRateFields({
                         <div className="floating-input">
                             <SelectedDisplay
                                 label="Zone"
-                                data={values?.zone}
+                                data={values?.shipping_zone}
                                 render={(zone: Record<string, any>) => (
                                     <>
                                         {zone?.name || 'No Zone Selected'}

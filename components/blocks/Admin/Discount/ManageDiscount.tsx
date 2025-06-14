@@ -19,6 +19,7 @@ export interface ManageDiscountProps extends DataManageComponentProps {
 }
 
 function ManageDiscount({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -33,6 +34,8 @@ function ManageDiscount({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.discount}/bulk/destroy`,

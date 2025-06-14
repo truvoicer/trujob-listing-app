@@ -36,6 +36,7 @@ export const DELETE_PRODUCT_MODAL_ID = "delete-product-modal";
 export const MANAGE_PRODUCT_ID = "manage-product-modal";
 
 function ManageProduct({
+  isChild = false,
   onRowSelect,
   mode = "selector",
   operation,
@@ -84,6 +85,7 @@ function renderCheckoutButton() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,

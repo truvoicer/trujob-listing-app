@@ -24,6 +24,7 @@ export const MANAGE_PRODUCT_PRODUCT_TYPE_ID =
   "manage-product-product-type-modal";
 
 function ManageProductProductType({
+  isChild = false,
   mode = "selector",
   data,
   operation,
@@ -39,6 +40,7 @@ function ManageProductProductType({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

@@ -39,7 +39,8 @@ function EditProductPriceFields({
     function getProductComponentProps() {
         let componentProps: any = {
             operation: 'create',
-            mode: 'selector'
+            mode: 'selector',
+            isChild: true
         };
         if (values?.id) {
             componentProps.productId = values.id;

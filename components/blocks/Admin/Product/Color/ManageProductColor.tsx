@@ -19,6 +19,7 @@ export const DELETE_PRODUCT_COLOR_MODAL_ID = "delete-product-color-modal";
 export const MANAGE_PRODUCT_COLOR_ID = "manage-product-color-modal";
 
 function ManageProductColor({
+  isChild = false,
   mode = "selector",
   data,
   operation,
@@ -34,6 +35,7 @@ function ManageProductColor({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

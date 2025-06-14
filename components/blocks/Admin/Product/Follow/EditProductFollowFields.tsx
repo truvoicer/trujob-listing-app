@@ -27,6 +27,7 @@ function EditProductFollowFields({
             ]}
         >
             <ManageUser
+                isChild={true}
                 rowSelection={true}
                 multiRowSelection={true}
                 enableEdit={false}
@@ -36,7 +37,14 @@ function EditProductFollowFields({
                         console.warn('Invalid values received from ManageUser component');
                         return;
                     }
-                    formHelpers.setFieldValue('items', items.filter((item) => item?.checked));
+                    const checked = items.filter((item) => item?.checked);
+                    const existing = formHelpers?.values?.items || [];
+                    formHelpers.setFieldValue('items', [
+                        ...existing,
+                        ...checked.filter((item) => {
+                            return !existing.find((checkedItem) => checkedItem?.id === item?.id);
+                        })
+                    ]);
                 }}
             />
         </AccessControlComponent>

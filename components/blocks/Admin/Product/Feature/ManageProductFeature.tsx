@@ -20,6 +20,7 @@ export interface ManageProductFeatureProps extends DataManageComponentProps {
 }
 
 function ManageProductFeature({
+  isChild = false,
   mode = "selector",
   data = [],
   operation,
@@ -34,6 +35,7 @@ function ManageProductFeature({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

@@ -18,6 +18,7 @@ export const DELETE_CATEGORY_MODAL_ID = "delete-category-modal";
 export const MANAGE_CATEGORY_ID = "manage-category-modal";
 
 function ManageCategory({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -31,6 +32,8 @@ function ManageCategory({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,

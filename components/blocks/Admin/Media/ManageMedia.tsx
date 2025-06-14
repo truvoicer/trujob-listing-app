@@ -19,6 +19,7 @@ export const DELETE_MEDIA_MODAL_ID = "delete-media-modal";
 export const MANAGE_MEDIA_ID = "manage-media-modal";
 
 function ManageMedia({
+  isChild = false,
   mode = "selector",
   operation = "edit",
   data,
@@ -29,10 +30,11 @@ function ManageMedia({
   enablePagination = true,
   enableEdit = true,
 }: ManageMediaProps) {
-
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
+        data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,

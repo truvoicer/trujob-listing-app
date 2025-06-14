@@ -19,6 +19,7 @@ export const DELETE_PRODUCT_FOLLOW_MODAL_ID = "delete-product-follow-modal";
 export const MANAGE_PRODUCT_FOLLOW_ID = "manage-product-follow-modal";
 
 function ManageProductFollow({
+  isChild = false,
   data,
   mode = "selector",
   operation,
@@ -34,6 +35,7 @@ function ManageProductFollow({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

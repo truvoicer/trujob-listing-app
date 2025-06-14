@@ -26,6 +26,7 @@ import {
 import BadgeDropDown from "../BadgeDropDown";
 
 export type DataManageComponentProps = {
+  isChild?: boolean;
   mode?: "selector" | "edit";
   operation?: "edit" | "update" | "add" | "create";
   enableEdit?: boolean;
@@ -48,6 +49,7 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+  isChild?: boolean;
   id: string;
   mode?: "selector" | "edit";
   operation?: "edit" | "update" | "add" | "create";
@@ -110,6 +112,7 @@ export type DatatableSearchParams = {
 };
 
 function DataManager({
+  isChild = false,
   id,
   operation,
   mode = "selector",
@@ -147,6 +150,7 @@ function DataManager({
 
   const appModalContext = useContext(AppModalContext);
   const notificationContext = useContext(AppNotificationContext);
+  const dataTableContext = useContext(DataTableContext);
 
   function updateDataTableContextState(data: any) {
     if (!isObject(data)) {
@@ -298,17 +302,18 @@ function DataManager({
           console.warn("submitForm is not a function");
           return;
         }
+        let response: boolean | Promise<boolean> = false;
         switch (mode) {
           case "selector":
             DataManagerService.selectorModeHandler({
               onChange,
               data,
-              values: formHelpers?.values?.items,
+              values: formHelpers?.values,
               index,
             });
             break;
           case "edit":
-            DataManagerService.editModeCreateHandler({
+            response = DataManagerService.editModeCreateHandler({
               onChange,
               data,
               values: formHelpers?.values,
@@ -319,7 +324,9 @@ function DataManager({
             return;
         }
 
-        return await formHelpers.submitForm();
+        if (response) {
+          return await formHelpers.submitForm();
+        }
       },
       fullscreen: true,
     };
@@ -340,12 +347,20 @@ function DataManager({
     };
   }
 
+  function getDatatableContextState() {
+    if (isChild) {
+      return dataTableContext;
+    }
+    return dataTableContextState;
+  }
+
   function renderActionColumn(item: ShippingMethod, index: number) {
     const editFormComponentData = getFormComponentData();
     if (!editFormComponentData?.component) {
       console.warn("editFormComponent is required");
       return null;
     }
+
     const EditForm = editFormComponentData.component;
     return (
       <div className="d-flex align-items-center list-action">
@@ -356,12 +371,12 @@ function DataManager({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            dataTableContextState.modal.show(
+            getDatatableContextState().modal.show(
               {
                 title: "Edit shipping method",
                 component: (
                   <EditForm
-                    dataTable={dataTableContextState}
+                    dataTable={getDatatableContextState()}
                     data={item}
                     operation={"edit"}
                     inModal={true}
@@ -582,15 +597,6 @@ function DataManager({
 
   function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
-    let modalState;
-    if (mode === "selector") {
-      modalState = dataTableContextState.modal;
-    } else if (mode === "edit") {
-      modalState = dataTableContextState.modal;
-    } else {
-      console.warn("Invalid mode");
-      return;
-    }
 
     const editFormComponentData = getFormComponentData();
     if (!editFormComponentData?.component) {
@@ -598,12 +604,12 @@ function DataManager({
       return null;
     }
     const EditForm = editFormComponentData.component;
-    modalState.show(
+    getDatatableContextState().modal.show(
       {
         title: "Create shipping method",
         component: (
           <EditForm
-            dataTable={dataTableContextState}
+            dataTable={getDatatableContextState()}
             operation={"create"}
             inModal={true}
             modalId={DataManagerService.getId(id, "create")}

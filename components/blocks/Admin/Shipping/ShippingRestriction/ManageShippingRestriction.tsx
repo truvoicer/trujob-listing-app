@@ -24,6 +24,7 @@ export interface ManageShippingRestrictionProps
 }
 
 function ManageShippingRestriction({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -37,6 +38,7 @@ function ManageShippingRestriction({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingRestriction}/bulk/destroy`,

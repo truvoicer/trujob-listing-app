@@ -19,6 +19,7 @@ export const DELETE_PRODUCT_REVIEW_MODAL_ID = "delete-product-review-modal";
 export const MANAGE_PRODUCT_REVIEW_ID = "manage-product-review-modal";
 
 function ManageProductReview({
+  isChild = false,
   mode = "selector",
   data,
   operation,
@@ -34,6 +35,7 @@ function ManageProductReview({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

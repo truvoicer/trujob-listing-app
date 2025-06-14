@@ -32,6 +32,7 @@ function EditProductColorFields({
             ]}
         >
             <ManageColor
+                isChild={true}
                 operation={operation}
                 rowSelection={true}
                 multiRowSelection={true}

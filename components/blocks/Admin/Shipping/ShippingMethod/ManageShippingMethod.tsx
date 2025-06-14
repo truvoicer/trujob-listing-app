@@ -19,6 +19,7 @@ export interface ManageShippingMethodProps extends DataManageComponentProps {
 }
 
 function ManageShippingMethod({
+  isChild = false,
   mode = "selector",
   data,
   operation = "create",
@@ -32,6 +33,7 @@ function ManageShippingMethod({
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <DataManager
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingMethod}/bulk/destroy`,

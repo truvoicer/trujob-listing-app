@@ -29,6 +29,7 @@ function EditProductCategoryFields({
             ]}
         >
             <ManageCategory
+                isChild={true}
                 operation={operation}
                 rowSelection={true}
                 multiRowSelection={true}
