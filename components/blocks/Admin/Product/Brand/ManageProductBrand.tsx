@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Brand } from "@/types/Brand";
+import Loader from "@/components/Loader";
 
 export interface ManageProductBrandProps extends DataManageComponentProps {
   data?: Array<Brand>;
@@ -19,7 +20,9 @@ export const CREATE_PRODUCT_BRAND_MODAL_ID = "create-product-brand-modal";
 export const MANAGE_PRODUCT_BRAND_ID = "manage-product-brand-modal";
 
 function ManageProductBrand({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation,
@@ -33,9 +36,9 @@ function ManageProductBrand({
 }: ManageProductBrandProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { ShippingZone } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_SHIPPING_ZONE_MODAL_ID = "create-shipping-zone-modal";
 export const EDIT_SHIPPING_ZONE_MODAL_ID = "edit-shipping-zone-modal";
@@ -20,7 +21,9 @@ export interface ManageShippingZoneProps extends DataManageComponentProps {
 }
 
 function ManageShippingZone({
+  columnHandler,
   isChild = false,
+  
   values,
   mode = "selector",
   data,
@@ -33,9 +36,9 @@ function ManageShippingZone({
   enableEdit = true,
 }: ManageShippingZoneProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingZone}/bulk/destroy`,

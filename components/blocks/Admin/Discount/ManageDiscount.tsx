@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { Discount } from "@/types/Discount";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_DISCOUNT_MODAL_ID = "create-discount-modal";
 export const EDIT_DISCOUNT_MODAL_ID = "edit-discount-modal";
@@ -19,7 +20,9 @@ export interface ManageDiscountProps extends DataManageComponentProps {
 }
 
 function ManageDiscount({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -32,9 +35,9 @@ function ManageDiscount({
 }: ManageDiscountProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

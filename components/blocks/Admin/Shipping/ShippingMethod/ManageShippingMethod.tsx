@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { ShippingMethod } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_SHIPPING_METHOD_MODAL_ID = "create-shipping-method-modal";
 export const EDIT_SHIPPING_METHOD_MODAL_ID = "edit-shipping-method-modal";
@@ -19,7 +20,9 @@ export interface ManageShippingMethodProps extends DataManageComponentProps {
 }
 
 function ManageShippingMethod({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -31,9 +34,9 @@ function ManageShippingMethod({
   enableEdit = true,
 }: ManageShippingMethodProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingMethod}/bulk/destroy`,

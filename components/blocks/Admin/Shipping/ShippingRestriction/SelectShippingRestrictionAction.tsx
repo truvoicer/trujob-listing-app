@@ -1,40 +1,35 @@
-import truJobApiConfig from "@/config/api/truJobApiConfig";
-
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { ShippingProviderContext } from "@/components/Provider/Shipping/context/ShippingProviderContext";
+import { ShippingService } from "@/library/services/cashier/shipping/ShippingService";
 import { FormikValues, useFormikContext } from "formik";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useMemo, useState } from "react";
 
 export type SelectShippingRestrictionActionProps = {
     name?: string;
     value?: string | null;
+    onChange?: (value: string | null) => void;
+    hideLabel?: boolean;
 }
 function SelectShippingRestrictionAction({
     name = 'action',
     value,
+    onChange,
+    hideLabel = false,
 }: SelectShippingRestrictionActionProps) {
-    const [shippingRestrictionActions, setShippingRestrictionActions] = useState<Array<string>>([]);
+    
     const [selectedShippingRestrictionAction, setSelectedShippingRestrictionAction] = useState<string | null>(null);
 
     const formContext = useFormikContext<FormikValues>() || {};
+    const { refresh, restrictionActions} = useContext(ShippingProviderContext);
 
-    async function fetchShippingRestrictionActions() {
-        // Fetch shippingRestrictionActions from the API or any other source
-        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.shipping}/restriction/action`,
-            method: ApiMiddleware.METHOD.GET,
-            protectedReq: true
-        });
-        if (!response) {
-            console.warn('No response from API when fetching shipping restriction actions');
-            return;
-        }
-        setShippingRestrictionActions(response?.data || []);
-    }
-
+    const shippingRestrictionActions = useMemo(
+        () => (Array.isArray(restrictionActions) ? restrictionActions : []),
+        [restrictionActions]
+    );
     useEffect(() => {
-        fetchShippingRestrictionActions();
-    }, []);
+        if (!Array.isArray(shippingRestrictionActions) || shippingRestrictionActions.length === 0) {
+            refresh(ShippingService.REFRESH.TYPE.RESTRICTION_ACTIONS);
+        }
+    }, [shippingRestrictionActions]);
 
     useEffect(() => {
         if (value) {
@@ -45,9 +40,13 @@ function SelectShippingRestrictionAction({
             }
         }
     }, [value, shippingRestrictionActions]);
+    
     useEffect(() => {
         if (!selectedShippingRestrictionAction) {
             return;
+        }
+        if (typeof onChange === 'function') {
+            onChange(selectedShippingRestrictionAction);
         }
         if (!formContext) {
             console.warn('Form context not found');
@@ -90,7 +89,7 @@ function SelectShippingRestrictionAction({
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={name}>Shipping Restriction Action</label>
+            {!hideLabel && <label className="form-label" htmlFor={name}>Shipping Restriction Action</label>}
         </div>
     );
 }

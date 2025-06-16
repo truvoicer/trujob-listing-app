@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { TaxRate } from "@/types/Tax";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_TAX_RATE_MODAL_ID = "create-tax-rate-modal";
 export const EDIT_TAX_RATE_MODAL_ID = "edit-tax-rate-modal";
@@ -19,7 +20,9 @@ export interface ManageTaxRateProps extends DataManageComponentProps {
 }
 
 function ManageTaxRate({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -31,9 +34,9 @@ function ManageTaxRate({
   enableEdit = true,
 }: ManageTaxRateProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.taxRate}/bulk/destroy`,

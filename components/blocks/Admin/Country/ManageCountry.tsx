@@ -8,6 +8,7 @@ import DataManager, {
 import { Country } from "@/types/Country";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import EditCountry from "./EditCountry";
+import Loader from "@/components/Loader";
 
 export const CREATE_COUNTRY_MODAL_ID = "create-country-modal";
 export const EDIT_COUNTRY_MODAL_ID = "edit-country-modal";
@@ -19,7 +20,9 @@ export interface ManageCountryProps extends DataManageComponentProps {
 }
 
 function ManageCountry({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -32,9 +35,9 @@ function ManageCountry({
 }: ManageCountryProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.country}/bulk/destroy`,

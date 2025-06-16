@@ -8,6 +8,7 @@ import DataManager, {
 import EditSidebarWidget from "./EditSidebarWidget";
 import { Widget } from "@/types/Widget";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const EDIT_SIDEBAR_WIDGET_MODAL_ID = "edit-sidebar-widget-modal";
 export const CREATE_SIDEBAR_WIDGET_MODAL_ID = "create-sidebar-widget-modal";
@@ -19,7 +20,9 @@ export interface ManageSidebarWidgetProps extends DataManageComponentProps {
   sidebarId?: number;
 }
 function ManageSidebarWidget({
+  columnHandler,
   isChild = false,
+  
   operation = "create",
   data,
   mode = "selector",
@@ -32,9 +35,9 @@ function ManageSidebarWidget({
   sidebarId,
 }: ManageSidebarWidgetProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           if (!sidebarId) {
             throw new Error("Sidebar ID is required for bulk delete.");

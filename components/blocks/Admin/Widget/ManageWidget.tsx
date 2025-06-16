@@ -8,6 +8,7 @@ import DataManager, {
 import EditWidget from "./EditWidget";
 import { Widget } from "@/types/Widget";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const EDIT_SIDEBAR_MODAL_ID = "edit-widget-modal";
 export const MANAGE_WIDGET_ID = "manage-widget-modal";
@@ -16,7 +17,9 @@ export interface ManageWidgetProps extends DataManageComponentProps {
 }
 
 function ManageWidget({
+  columnHandler,
   isChild = false,
+  
   operation = "create",
   data,
   mode = "selector",
@@ -28,9 +31,9 @@ function ManageWidget({
   enableEdit = true,
 }: ManageWidgetProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

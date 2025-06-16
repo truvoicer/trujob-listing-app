@@ -19,7 +19,9 @@ export interface ManagePaymentMethodProps extends DataManageComponentProps {
 }
 
 function ManagePaymentMethod({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -31,9 +33,9 @@ function ManagePaymentMethod({
   enableEdit = true,
 }: ManagePaymentMethodProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.paymentMethod}/bulk/destroy`,

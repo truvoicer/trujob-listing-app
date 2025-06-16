@@ -1,26 +1,29 @@
-import { Dispatch, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { FormikValues, useFormikContext } from "formik";
-import {
-  LocalModal,
-  ModalService,
-} from "@/library/services/modal/ModalService";
-import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DataTableContext } from "@/contexts/DataTableContext";
+import { ModalService } from "@/library/services/modal/ModalService";
 import QuantityInput from "@/components/QuantityInput";
 import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageShippingRate from "../ShippingRate/ManageShippingRate";
-import SelectedDisplay from "@/components/Elements/SelectedDisplay";
 import SelectedListDisplay from "@/components/Elements/SelectedListDisplay";
-import { ShippingRate, ShippingRestriction } from "@/types/Shipping";
 import ManageShippingRestriction from "../ShippingRestriction/ManageShippingRestriction";
+import EntityBrowser from "@/components/EntityBrowser/EntityBrowser";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import truJobApiConfig from "@/config/api/truJobApiConfig";
+import { ShippingProviderContext } from "@/components/Provider/Shipping/context/ShippingProviderContext";
+import { ShippingService } from "@/library/services/cashier/shipping/ShippingService";
+import { DataTableColumn } from "@/components/Table/DataTable";
+import SelectShippingRestrictionAction from "../ShippingRestriction/SelectShippingRestrictionAction";
 
 type EditShippingMethodFields = {
   operation: "edit" | "update" | "add" | "create";
 };
 function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
   const modalService = new ModalService();
+  const { refresh } = useContext(ShippingProviderContext);
 
   const { values, setFieldValue, handleChange } =
     useFormikContext<FormikValues>() || {};
@@ -78,16 +81,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
           </AccessControlComponent>
         );
       },
-      onOk: (
-        {
-          state,
-        }: {
-          state: LocalModal;
-          setState: Dispatch<React.SetStateAction<LocalModal>>;
-          configItem: any;
-        },
-        e?: React.MouseEvent | null
-      ) => {
+      onOk: () => {
         return true;
       },
       onCancel: () => {
@@ -95,7 +89,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
       },
     },
     {
-      id: "restrictions",
+      id: "manageRestrictions",
       title: "Select Restrictions",
       size: "lg",
       fullscreen: true,
@@ -133,24 +127,129 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
           </AccessControlComponent>
         );
       },
-      onOk: (
-        {
-          state,
-        }: {
-          state: LocalModal;
-          setState: Dispatch<React.SetStateAction<LocalModal>>;
-          configItem: any;
-        },
-        e?: React.MouseEvent | null
-      ) => {
+      onOk: () => {
         return true;
       },
       onCancel: () => {
         return true;
       },
     },
+    {
+      id: "restrictionBrowser",
+      title: "Select Shipping Restriction Entity",
+      footer: true,
+      size: "md",
+      fullscreen: true,
+      component: () => {
+        if (!Array.isArray(values?.restrictions)) {
+          console.warn("Restrictions should be an array");
+          return null;
+        }
+        const buildValue = values.restrictions
+          .filter(
+            (restriction: Record<string, unknown>) =>
+              restriction?.type && restriction?.restriction_id
+          )
+          .map((restriction: Record<string, unknown>) => ({
+            id: restriction.restriction_id,
+            type: restriction.type,
+          }));
+        return (
+          <AccessControlComponent>
+            <EntityBrowser
+              value={buildValue}
+              multiple={true}
+              entityListRequest={async () => {
+                return await TruJobApiMiddleware.getInstance().resourceRequest({
+                  endpoint: UrlHelpers.urlFromArray([
+                    truJobApiConfig.endpoints.shipping,
+                    "restriction",
+                    "type",
+                  ]),
+                  method: ApiMiddleware.METHOD.GET,
+                  protectedReq: true,
+                });
+              }}
+              onChange={(entity: string, value: Record<string, unknown>[]) => {
+                const existingRestrictions = values?.restrictions || [];
+                if (!Array.isArray(existingRestrictions)) {
+                  console.warn("Existing restrictions should be an array");
+                  return;
+                }
+                const newRestrictions = [
+                  ...existingRestrictions,
+                  ...value
+                    .filter(
+                      (item: Record<string, unknown>) =>
+                        !existingRestrictions.some(
+                          (existing: Record<string, unknown>) =>
+                            existing?.[entity]?.id === item.id
+                        )
+                    )
+                    .map((item: Record<string, unknown>) => ({
+                      [entity]: item,
+                      restriction_id: item.id,
+                      type: entity,
+                      action: "allow", // Default action, can be changed later
+                    })),
+                ];
+                setFieldValue("restrictions", newRestrictions);
+              }}
+              columnHandler={(columns: string[]) => {
+                return [
+                  {
+                    label: "Restriction Action",
+                    render: (
+                      column: DataTableColumn,
+                      item: Record<string, unknown>
+                    ) => {
+                      const findInFilteredValue = buildValue.find(
+                        (value) => value.id === item.id
+                      );
+                      if (!findInFilteredValue) {
+                        return null;
+                      }
+                      return (
+                        <SelectShippingRestrictionAction
+                          hideLabel={true}
+                          onChange={(action: string | null) => {
+                            const findIndexInRestrictions =
+                              values?.restrictions?.findIndex(
+                                (restriction: Record<string, unknown>) =>
+                                  restriction?.restriction_id === item.id &&
+                                  restriction?.type === findInFilteredValue.type
+                              );
+                            if (findIndexInRestrictions !== -1) {
+                              const updatedRestrictions = [
+                                ...values.restrictions,
+                              ];
+                              updatedRestrictions[findIndexInRestrictions] = {
+                                ...updatedRestrictions[findIndexInRestrictions],
+                                action: action,
+                              };
+                              setFieldValue(
+                                "restrictions",
+                                updatedRestrictions
+                              );
+                            }
+                          }}
+                        />
+                      );
+                    },
+                  },
+                  ...columns,
+                ];
+              }}
+            />
+          </AccessControlComponent>
+        );
+      },
+      onOk: () => {
+        return true;
+      },
+    },
   ]);
-
+  console.log("EditShippingMethodFields values", values);
   return (
     <div className="row justify-content-center align-items-center">
       <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -241,12 +340,26 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
                 direction="vertical"
                 data={values?.restrictions}
                 render={(restriction: Record<string, any>) => (
-                  <>{[`Action: ${restriction?.action || "N/A"}`].join(" | ")}</>
+                  <>
+                    {[
+                      `Type: ${restriction?.type || "N/A"}`,
+                      `restriction_id: ${restriction?.restriction_id || "N/A"}`,
+                      `Action: ${restriction?.action || "N/A"}`,
+                    ].join(" | ")}
+                  </>
                 )}
               />
               {modalService.renderLocalTriggerButton(
-                "restrictions",
+                "manageRestrictions",
                 "Select Restrictions"
+              )}
+              {modalService.renderLocalTriggerButton(
+                "restrictionBrowser",
+                "Select Bulk Restrictions",
+                {},
+                () => {
+                  refresh(ShippingService.REFRESH.TYPE.RESTRICTION_ACTIONS);
+                }
               )}
             </div>
           </div>

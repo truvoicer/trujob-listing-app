@@ -23,7 +23,12 @@ import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { min } from "underscore";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
-import { buildShippingRate, buildShippingRates } from "../ShippingRate/EditShippingRate";
+import {
+  buildShippingRate,
+  buildShippingRates,
+} from "../ShippingRate/EditShippingRate";
+import { buildBulkRestrictionRequestData } from "../ShippingRestriction/EditShippingRestriction";
+import ShippingProvider from "@/components/Provider/Shipping/ShippingProvider";
 
 export type EditShippingMethodProps = {
   data?: ShippingMethod;
@@ -76,10 +81,14 @@ function EditShippingMethod({
     if (Array.isArray(values?.rates)) {
       requestData.rates = buildShippingRates(values?.rates || []);
     }
+    if (Array.isArray(values?.restrictions)) {
+      requestData.restrictions = buildBulkRestrictionRequestData(
+        values.restrictions || []
+      );
+    }
 
     return requestData;
   }
-
 
   function buildCreateData(values: ShippingMethod) {
     const requestData: CreateShippingMethod = {
@@ -205,31 +214,33 @@ function EditShippingMethod({
 
   const dataTableContext = useContext(DataTableContext);
   return (
-    <div className="row justify-content-center align-items-center">
-      <div className="col-md-12 col-sm-12 col-12 align-self-center">
-        {alert && (
-          <div className={`alert alert-${alert.type}`} role="alert">
-            {alert.message}
-          </div>
-        )}
-        {inModal &&
-          ModalService.modalItemHasFormProps(
-            dataTableContext?.modal,
-            modalId
-          ) && <EditShippingMethodFields operation={operation} />}
-        {!inModal && (
-          <Form
-            operation={operation}
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-          >
-            {() => {
-              return <EditShippingMethodFields operation={operation} />;
-            }}
-          </Form>
-        )}
+    <ShippingProvider>
+      <div className="row justify-content-center align-items-center">
+        <div className="col-md-12 col-sm-12 col-12 align-self-center">
+          {alert && (
+            <div className={`alert alert-${alert.type}`} role="alert">
+              {alert.message}
+            </div>
+          )}
+          {inModal &&
+            ModalService.modalItemHasFormProps(
+              dataTableContext?.modal,
+              modalId
+            ) && <EditShippingMethodFields operation={operation} />}
+          {!inModal && (
+            <Form
+              operation={operation}
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+            >
+              {() => {
+                return <EditShippingMethodFields operation={operation} />;
+              }}
+            </Form>
+          )}
+        </div>
       </div>
-    </div>
+    </ShippingProvider>
   );
 }
 export default EditShippingMethod;

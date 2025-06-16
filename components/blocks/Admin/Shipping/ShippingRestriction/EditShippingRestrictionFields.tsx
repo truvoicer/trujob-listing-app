@@ -3,17 +3,19 @@ import SelectShippingRestrictionAction from "./SelectShippingRestrictionAction";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { useState } from "react";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import EntityBrowser from "@/components/EntityBrowser/EntityBrowser";
+import EntityBrowser, { EntityBrowserItem } from "@/components/EntityBrowser/EntityBrowser";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import SelectedListDisplay from "@/components/Elements/SelectedListDisplay";
+import SelectedDisplay from "@/components/Elements/SelectedDisplay";
 
 type EditShippingRestrictionFields = {
   operation: "edit" | "update" | "add" | "create";
 };
 function EditShippingRestrictionFields() {
+  const [selectedRestrictions, setSelectedRestrictions] = useState<
+    Record<string, unknown>[]>([]);
   const { values, setFieldValue } = useFormikContext<FormikValues>() || {};
 
   const modalService = new ModalService();
@@ -26,79 +28,67 @@ function EditShippingRestrictionFields() {
       footer: true,
       size: "md",
       fullscreen: true,
-      component: (
-        <AccessControlComponent>
-          <EntityBrowser
-            entityListRequest={async () => {
-              return await TruJobApiMiddleware.getInstance().resourceRequest({
-                endpoint: UrlHelpers.urlFromArray([
-                  truJobApiConfig.endpoints.shipping,
-                  "restriction",
-                  "type",
-                ]),
-                method: ApiMiddleware.METHOD.GET,
-                protectedReq: true,
-              });
-            }}
-            onChange={(entity: string, value: Record<string, unknown>[]) => {
-              console.log("Entity Browser onChange", entity, value);
-              const existingRestrictions = Array.isArray(values?.restrictions)
-                ? [...values.restrictions]
-                : [];
-              const findEntityIndex = existingRestrictions.findIndex(
-                (restriction: Record<string, unknown>) =>
-                  restriction?.entity === entity
-              );
-              if (findEntityIndex > -1) {
-                if (
-                  !Array.isArray(existingRestrictions[findEntityIndex]?.ids)
-                ) {
-                  existingRestrictions[findEntityIndex].ids = [];
-                }
-                const newValues = value
-                  .filter(
-                    (item: Record<string, unknown>) =>
-                      !existingRestrictions[findEntityIndex].ids.includes(
-                        item.id
-                      )
-                  )
-                  .map((item: Record<string, unknown>) => item.id);
-                  
-                existingRestrictions[findEntityIndex].ids = [
-                  ...existingRestrictions[findEntityIndex].ids,
-                  ...newValues,
-                ];
-              } else {
-                existingRestrictions.push({
-                  entity,
-                  ids: value.map((item: Record<string, unknown>) => item.id),
+      component: () => {
+        let entityValue: EntityBrowserItem[] = [];
+        if (values?.restriction_id && values?.type) {
+          entityValue = [{
+            id: values.restriction_id,
+            type: values.type,
+          }];
+        }
+        return (
+          <AccessControlComponent>
+            <EntityBrowser
+              value={entityValue}
+              entityListRequest={async () => {
+                return await TruJobApiMiddleware.getInstance().resourceRequest({
+                  endpoint: UrlHelpers.urlFromArray([
+                    truJobApiConfig.endpoints.shipping,
+                    "restriction",
+                    "type",
+                  ]),
+                  method: ApiMiddleware.METHOD.GET,
+                  protectedReq: true,
                 });
-              }
-              setFieldValue("restrictions", existingRestrictions);
-            }}
-          />
-        </AccessControlComponent>
-      ),
+              }}
+              onChange={(entity: string, value: Record<string, unknown>[]) => {
+                setSelectedRestrictions(value);
+                const firstItem = value?.[0] || {};
+                if (!firstItem?.id) {
+                  console.warn("No item selected in Entity Browser");
+                  return;
+                }
+                setFieldValue("restriction_id", firstItem.id);
+                setFieldValue("type", entity);
+              }}
+            />
+          </AccessControlComponent>
+        );
+      },
       onOk: () => {
-        console.log("Entity Browser OK clicked");
+        console.log("Entity Browser OK clicked", { selectedRestrictions });
         return true;
       },
     },
   ]);
+
   return (
     <div className="row justify-content-center align-items-center">
       <div className="col-md-12 col-sm-12 col-12 align-self-center">
         <div className="row">
-          {/* restrictionable_type: data?.restrictionable_type || '',
-        restrictionable_id: data?.restrictionable_id || 0, */}
           <div className="col-12 col-lg-6">
             <div className="floating-input">
-              <SelectedListDisplay
-                label="Restrictions"
-                direction="vertical"
-                data={values?.restrictions}
+              <SelectedDisplay
+                label="Restriction"
+                data={values}
                 render={(restriction: Record<string, unknown>) => (
-                  <>{[`Action: ${restriction?.action || "N/A"}`].join(" | ")}</>
+                  <>
+                    {[
+                      `Type: ${restriction?.type || "N/A"}`,
+                      `restriction_id: ${restriction?.restriction_id || "N/A"}`,
+                      `Action: ${restriction?.action || "N/A"}`,
+                    ].join(" | ")}
+                  </>
                 )}
               />
               {modalService.renderLocalTriggerButton(

@@ -8,6 +8,7 @@ import DataManager, {
 import EditMenu from "./EditMenu";
 import { Menu } from "@/types/Menu";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const EDIT_MENU_MODAL_ID = "edit-menu-modal";
 export const CREATE_MENU_MODAL_ID = "create-menu-modal";
@@ -18,7 +19,9 @@ export interface ManageMenuProps extends DataManageComponentProps {
   data?: Array<Menu>;
 }
 function ManageMenu({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -30,9 +33,9 @@ function ManageMenu({
   enableEdit = true,
 }: ManageMenuProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

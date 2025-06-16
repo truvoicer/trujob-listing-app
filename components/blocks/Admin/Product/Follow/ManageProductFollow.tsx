@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { User } from "@/types/User";
+import Loader from "@/components/Loader";
 
 export interface ManageProductFollowProps extends DataManageComponentProps {
   data?: Array<User>;
@@ -19,7 +20,9 @@ export const DELETE_PRODUCT_FOLLOW_MODAL_ID = "delete-product-follow-modal";
 export const MANAGE_PRODUCT_FOLLOW_ID = "manage-product-follow-modal";
 
 function ManageProductFollow({
+  columnHandler,
   isChild = false,
+  
   data,
   mode = "selector",
   operation,
@@ -33,9 +36,9 @@ function ManageProductFollow({
 }: ManageProductFollowProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

@@ -1,33 +1,20 @@
-import { AppModalContext } from "@/contexts/AppModalContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import Link from "next/link";
-import { Suspense, useContext, useEffect, useState } from "react";
+import { Suspense } from "react";
 import EditProduct from "./EditProduct";
-import BadgeDropDown from "@/components/BadgeDropDown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, {
   DataManageComponentProps,
-  DataTableContextType,
-  DatatableSearchParams,
-  DMOnRowSelectActionClick,
 } from "@/components/Table/DataManager";
-import { isNotEmpty } from "@/helpers/utils";
-import {
-  SORT_BY,
-  SORT_ORDER,
-} from "@/library/redux/constants/search-constants";
 import { Product } from "@/types/Product";
-import { FormikProps, FormikValues } from "formik";
-import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DataTableContext } from "@/contexts/DataTableContext";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 import ProductTestCheckout from "./Checkout/ProductTestCheckout";
+import Loader from "@/components/Loader";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
+  values?: Product[];
 }
 export const TEST_TRANSACTION_MODAL_ID = "test-transaction-modal";
 export const EDIT_PRODUCT_MODAL_ID = "edit-product-modal";
@@ -36,11 +23,13 @@ export const DELETE_PRODUCT_MODAL_ID = "delete-product-modal";
 export const MANAGE_PRODUCT_ID = "manage-product-modal";
 
 function ManageProduct({
+  columnHandler,
   isChild = false,
   onRowSelect,
   mode = "selector",
   operation,
   data,
+  values,
   rowSelection = true,
   multiRowSelection = true,
   onChange,
@@ -48,43 +37,45 @@ function ManageProduct({
   enablePagination = true,
   enableEdit = true,
 }: ManageProductProps) {
-function renderCheckoutButton() {
+  function renderCheckoutButton() {
     return (
       <Link
         href={`/admin/product/checkout`}
         className="btn btn-primary"
-       onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  dataTableContextState.modal.show(
-                    {
-                      title: "Edit Product",
-                      fullscreen: true,
-                      size: "xl",
-                      formProps: {
-                        operation: operation,
-                        initialValues: {},
-                      },
-                      showFooter: false,
-                      component: (
-                        <ProductTestCheckout
-                          productId={item?.id}
-                          modalId={TEST_TRANSACTION_MODAL_ID}
-                        />
-                      ),
-                    },
-                    TEST_TRANSACTION_MODAL_ID
-                  );
-                }
-            }
-        >
-          Checkout
-        </Link>
-      );
-    }
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dataTableContextState.modal.show(
+            {
+              title: "Edit Product",
+              fullscreen: true,
+              size: "xl",
+              formProps: {
+                operation: operation,
+                initialValues: {},
+              },
+              showFooter: false,
+              component: (
+                <ProductTestCheckout
+                  productId={item?.id}
+                  modalId={TEST_TRANSACTION_MODAL_ID}
+                />
+              ),
+            },
+            TEST_TRANSACTION_MODAL_ID
+          );
+        }}
+      >
+        Checkout
+      </Link>
+    );
+  }
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
+        columnHandler={columnHandler}
+        data={data}
+        values={values}
         isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

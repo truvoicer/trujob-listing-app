@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { PriceType } from "@/types/Price";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_PRICE_TYPE_MODAL_ID = "create-price-type-modal";
 export const EDIT_PRICE_TYPE_MODAL_ID = "edit-price-type-modal";
@@ -20,7 +21,9 @@ export interface ManagePriceTypeProps extends DataManageComponentProps {
 }
 
 function ManagePriceType({
+  columnHandler,
   isChild = false,
+  
   values,
   mode = "selector",
   data,
@@ -34,9 +37,9 @@ function ManagePriceType({
 }: ManagePriceTypeProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/destroy`,

@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Color } from "react-bootstrap/esm/types";
+import Loader from "@/components/Loader";
 
 export interface ManageProductColorProps extends DataManageComponentProps {
   data?: Array<Color>;
@@ -19,7 +20,9 @@ export const DELETE_PRODUCT_COLOR_MODAL_ID = "delete-product-color-modal";
 export const MANAGE_PRODUCT_COLOR_ID = "manage-product-color-modal";
 
 function ManageProductColor({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation,
@@ -33,9 +36,9 @@ function ManageProductColor({
 }: ManageProductColorProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader/>}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

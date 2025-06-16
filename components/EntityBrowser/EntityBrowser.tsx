@@ -1,16 +1,30 @@
 import { useEffect, useState } from "react";
 import { EntityFactory } from "../factories/entity/EntityFactory";
 import { EntityItem } from "../factories/entity/Entity";
-
+import { Accordion } from "react-bootstrap";
+import DynamicAccordion from "../Accordion/DynamicAccordion/DynamicAccordion";
+import { DataTableColumn } from "../Table/DataTable";
+export type EntityBrowserItem = {
+  id: number;
+  type: string;
+};
 export type EntityBrowserProps = {
   entityListRequest: () => Promise<{
     data: string[];
   }>;
   onChange?: (entity: string, value: unknown) => void;
+  multiple?: boolean;
+  value?: EntityBrowserItem[];
+  columnHandler?: (columns: DataTableColumn[]) => DataTableColumn[];
 };
-function EntityBrowser({ entityListRequest, onChange }: EntityBrowserProps) {
+function EntityBrowser({
+  entityListRequest,
+  value = [],
+  onChange,
+  multiple = false,
+  columnHandler = (columns: DataTableColumn[]) => columns,
+}: EntityBrowserProps) {
   const [entityList, setEntityList] = useState<string[]>([]);
-  const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
 
   async function makeEntityListRequest() {
     if (typeof entityListRequest !== "function") {
@@ -22,7 +36,12 @@ function EntityBrowser({ entityListRequest, onChange }: EntityBrowserProps) {
     }
     setEntityList(response.data);
   }
-
+  function filterValueByType(
+    entity: string,
+    values: EntityBrowserItem[]
+  ): EntityBrowserItem[] {
+    return values.filter((item) => item.type === entity);
+  }
   function renderEntityComponent(entity: string) {
     const entityConfig: EntityItem | null =
       EntityFactory.getInstance().renderEntity(entity);
@@ -30,17 +49,39 @@ function EntityBrowser({ entityListRequest, onChange }: EntityBrowserProps) {
       console.warn(`Entity component for ${entity} not found`);
       return null;
     }
+    const filterValue = filterValueByType(entity, value);
     const EntityComponent = entityConfig.component;
+
     return (
       <EntityComponent
         onChange={(value: unknown) => {
-            const checked: Record<string, unknown>[] = value.filter((item: Record<string, unknown>) => item?.checked);
+          if (!Array.isArray(value)) {
+            console.warn("Value must be an array");
+            return;
+          }
+          const checked: EntityBrowserItem[] = value.filter(
+            (item: EntityBrowserItem) => item?.checked
+          );
+          console.log("Checked items:", { checked });
           if (typeof onChange === "function") {
             onChange(entity, checked);
           }
         }}
+        rowSelection={true}
+        multiRowSelection={multiple}
+        values={filterValue}
+        columnHandler={columnHandler}
       />
     );
+  }
+
+  function buildItems() {
+    return entityList.map((entity, index) => ({
+      key: index.toString(),
+      header: entity,
+      body: renderEntityComponent(entity),
+      open: value.some((item) => item.type === entity),
+    }));
   }
 
   useEffect(() => {
@@ -51,41 +92,7 @@ function EntityBrowser({ entityListRequest, onChange }: EntityBrowserProps) {
     <div>
       <div className="row">
         <div className="col-12">
-          <div className="floating-input form-group">
-            <select
-              id={"entityList"}
-              name={"entityList"}
-              className="form-control"
-              onChange={(e) => {
-                if (!e.target.value) {
-                  setSelectedEntity(null);
-                  return;
-                }
-                const findEntity = entityList.find(
-                  (entity) => entity === e.target.value
-                );
-                if (!findEntity) {
-                  console.warn("Selected entity not found");
-                  return;
-                }
-                setSelectedEntity(findEntity);
-              }}
-              value={selectedEntity || ""}
-            >
-              <option value="">Select entity</option>
-              {entityList.map((entity, index) => (
-                <option key={index} value={entity}>
-                  {`${entity}`}
-                </option>
-              ))}
-            </select>
-            <label className="form-label bold" htmlFor={"entityList"}>
-              Select Entity
-            </label>
-          </div>
-
-          {typeof selectedEntity === "string" &&
-            renderEntityComponent(selectedEntity)}
+          <DynamicAccordion items={buildItems()} />
         </div>
       </div>
     </div>

@@ -152,7 +152,7 @@ export class DataManagerService {
   }): Promise<boolean> {
     
     if (!Array.isArray(data)) {
-      return false;
+      return true;
     }
     const origData = [...data];
 
@@ -164,6 +164,6 @@ export class DataManagerService {
     if (typeof onChange === "function") {
       onChange(origData);
     }
-    return true;
+    return false;
   }
 }

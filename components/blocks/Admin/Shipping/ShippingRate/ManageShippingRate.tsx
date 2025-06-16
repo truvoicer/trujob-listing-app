@@ -20,7 +20,9 @@ export interface ManageShippingRateProps extends DataManageComponentProps {
 }
 
 function ManageShippingRate({
+  columnHandler,
   isChild = false,
+  
   shippingMethodId,
   mode = "selector",
   data,
@@ -32,10 +34,11 @@ function ManageShippingRate({
   enablePagination = true,
   enableEdit = true,
 }: ManageShippingRateProps) {
+  
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

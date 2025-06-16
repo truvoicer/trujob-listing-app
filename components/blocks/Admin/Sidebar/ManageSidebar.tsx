@@ -8,6 +8,7 @@ import DataManager, {
 import EditSidebar from "./EditSidebar";
 import { Sidebar } from "@/types/Sidebar";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const EDIT_SIDEBAR_MODAL_ID = "edit-sidebar-modal";
 export const CREATE_SIDEBAR_MODAL_ID = "create-sidebar-modal";
@@ -17,7 +18,9 @@ export interface ManageSidebarProps extends DataManageComponentProps {
   data?: Array<Sidebar>;
 }
 function ManageSidebar({
+  columnHandler,
   isChild = false,
+  
   operation = "create",
   data,
   mode = "selector",
@@ -29,9 +32,9 @@ function ManageSidebar({
   enableEdit = true,
 }: ManageSidebarProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

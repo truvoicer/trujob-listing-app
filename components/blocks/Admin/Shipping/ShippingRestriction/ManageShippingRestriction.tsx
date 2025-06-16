@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { ShippingRestriction } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_SHIPPING_RESTRICTION_MODAL_ID =
   "create-shipping-restriction-modal";
@@ -26,7 +27,9 @@ export interface ManageShippingRestrictionProps
 
 function ManageShippingRestriction({
   shippingMethodId,
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -38,9 +41,9 @@ function ManageShippingRestriction({
   enableEdit = true,
 }: ManageShippingRestrictionProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingRestriction}/bulk/destroy`,
@@ -100,11 +103,9 @@ function ManageShippingRestriction({
         enablePagination={enablePagination}
         title={"Manage Shipping restrictions"}
         columns={[
-          { label: "Name", key: "name" },
-          { label: "Description", key: "description" },
-          { label: "Icon", key: "icon" },
-          { label: "Is Active", key: "is_active" },
-          { label: "Is Default", key: "is_default" },
+          { label: "Type", key: "type" },
+          { label: "Restriction ID", key: "restriction_id" },
+          { label: "Action", key: "action" },
           { label: "Created At", key: "created_at" },
           { label: "Updated At", key: "updated_at" },
         ]}

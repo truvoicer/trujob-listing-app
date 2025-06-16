@@ -187,7 +187,8 @@ function EditShippingRate({
       return false;
     }
     if (!shippingMethodId) {
-      throw new Error("Shipping method ID is required");
+      console.log("Shipping method ID is required", {values});
+      return false;
     }
     let response = null;
     switch (operation) {

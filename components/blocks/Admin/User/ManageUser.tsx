@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { User } from "@/types/User";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export interface ManageUserProps extends DataManageComponentProps {
   data?: Array<User>;
@@ -18,7 +19,9 @@ export const EDIT_USER_MODAL_ID = "edit-user-modal";
 export const MANAGE_USER_ID = "manage-user-modal";
 
 function ManageUser({
+  columnHandler,
   isChild = false,
+  
   data,
   fixSessionUser = false,
   operation = "create",
@@ -32,7 +35,7 @@ function ManageUser({
   enableEdit = true,
 }: ManageUserProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       {mode === "selector" && (
         <div className="d-flex justify-content-between align-items-center mb-3">
           Selected:
@@ -49,7 +52,7 @@ function ManageUser({
       )}
 
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

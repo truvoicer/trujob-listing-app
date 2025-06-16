@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Price } from "@/types/Price";
+import Loader from "@/components/Loader";
 
 export interface ManageProductPriceProps extends DataManageComponentProps {
   data?: Array<Price>;
@@ -19,7 +20,9 @@ export const CREATE_PRODUCT_PRICE_MODAL_ID = "create-product-price-modal";
 export const MANAGE_PRODUCT_PRICE_ID = "manage-product-price-modal";
 
 function ManageProductPrice({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation,
@@ -33,9 +36,9 @@ function ManageProductPrice({
 }: ManageProductPriceProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

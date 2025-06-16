@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { Page } from "@/types/Page";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export interface ManagePageProps extends DataManageComponentProps {
   data?: Array<Page>;
@@ -18,7 +19,9 @@ export const DELETE_PAGE_MODAL_ID = "delete-page-modal";
 export const MANAGE_PAGE_ID = "manage-page-modal";
 
 function ManagePage({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   operation = "edit",
   data,
@@ -30,9 +33,9 @@ function ManagePage({
   enableEdit = true,
 }: ManagePageProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

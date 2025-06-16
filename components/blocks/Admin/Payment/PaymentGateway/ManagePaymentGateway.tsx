@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_PAYMENT_METHOD_MODAL_ID = "create-payment-gateway-modal";
 export const EDIT_PAYMENT_METHOD_MODAL_ID = "edit-payment-gateway-modal";
@@ -18,7 +19,9 @@ export interface ManagePaymentGatewayProps extends DataManageComponentProps {
 }
 
 function ManagePaymentGateway({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -30,9 +33,9 @@ function ManagePaymentGateway({
   enableEdit = true,
 }: ManagePaymentGatewayProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.paymentGateway}/bulk/destroy`,

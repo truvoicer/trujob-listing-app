@@ -24,6 +24,7 @@ export type ShippingMethodRequest = {
     processing_time_days?: number;
     display_order?: number;
     rates?: ShippingRateRequest[];
+    restrictions?: ShippingRestrictionRequest[];
 }
 export interface CreateShippingMethod extends ShippingMethodRequest {
     carrier: string;
@@ -136,15 +137,22 @@ export type ShippingRestriction = {
     updated_at: string;
 }
 
-export type ShippingRestrictionRequest = {
-    restrictionable_type?: string;
-    restrictionable_id?: number;
+export type BulkShippingRestriction = {
+    restrictions?: {
+        type: string;
+        ids: number[];
+    }[];
+}
+
+export interface ShippingRestrictionRequest extends BulkShippingRestriction {
     action?: 'allow' | 'deny';
 }
 
 export interface CreateShippingRestriction extends ShippingRestrictionRequest {
-    restrictionable_id: number;
-    restrictionable_type: string;
+    restrictions: {
+        type: string;
+        ids: number[];
+    }[];
     action: 'allow' | 'deny';
 }
 

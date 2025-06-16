@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Category } from "@/types/Category";
+import Loader from "@/components/Loader";
 
 export interface ManageProductCategoryProps extends DataManageComponentProps {
   data?: Array<Category>;
@@ -19,7 +20,9 @@ export const DELETE_PRODUCT_CATEGORY_MODAL_ID = "delete-product-category-modal";
 export const MANAGE_PRODUCT_CATEGORY_ID = "manage-product-category-modal";
 
 function ManageProductCategory({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation,
@@ -33,9 +36,9 @@ function ManageProductCategory({
 }: ManageProductCategoryProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

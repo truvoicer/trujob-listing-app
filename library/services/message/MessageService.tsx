@@ -263,7 +263,8 @@ export class MessageService {
   renderLocalTriggerButton(
     id: string,
     label: string | null = null,
-    props: any = {}
+    props: any = {},
+    onClick: ((e: React.MouseEvent<HTMLButtonElement>) => void) | null = null
   ) {
     const findLocalMessageConfig = this.findLocalMessageConfigById(id);
     if (!findLocalMessageConfig) {
@@ -286,6 +287,9 @@ export class MessageService {
         type="button"
         className="btn btn-primary mr-2"
         onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+          if (typeof onClick === "function") {
+            onClick(e);
+          }
           MessageService.updateLocalItemState(
             {
               id: id,

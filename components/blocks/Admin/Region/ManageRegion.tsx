@@ -8,6 +8,7 @@ import DataManager, {
 import { Region } from "@/types/Region";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import EditRegion from "./EditRegion";
+import Loader from "@/components/Loader";
 
 export const CREATE_REGION_MODAL_ID = "create-region-modal";
 export const EDIT_REGION_MODAL_ID = "edit-region-modal";
@@ -19,7 +20,9 @@ export interface ManageRegionProps extends DataManageComponentProps {
 }
 
 function ManageRegion({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -32,9 +35,9 @@ function ManageRegion({
 }: ManageRegionProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.region}/bulk/destroy`,

@@ -1,4 +1,5 @@
 import DataTable, {
+  DataTableColumn,
   DataTableItem,
   OnRowSelectActionClick,
 } from "@/components/Table/DataTable";
@@ -24,10 +25,6 @@ import {
   SORT_ORDER,
 } from "@/library/redux/constants/search-constants";
 import BadgeDropDown from "../BadgeDropDown";
-import EntityBrowser from "../EntityBrowser/EntityBrowser";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 export type DataManageComponentProps = {
   isChild?: boolean;
@@ -45,6 +42,7 @@ export type DataManageComponentProps = {
     index: number,
     dataTableContextState: unknown
   ) => boolean | Promise<boolean>;
+  columnHandler?: (columns: DataTableColumn[]) => Array<DataTableColumn>;
 };
 export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
   data: Array<unknown>;
@@ -71,7 +69,7 @@ export type DataManagerProps = {
   ) => boolean | Promise<boolean>;
   multiRowSelection?: boolean;
   rowSelection?: boolean;
-  columns?: Array<unknown>;
+  columns?: Array<DataTableColumn>;
   deleteItemRequest?: ({ item }: { item: unknown }) => Promise<boolean>;
   deleteBulkItemsRequest?: ({ ids }: { ids: unknown }) => Promise<boolean>;
   fetchItemsRequest?: ({
@@ -91,6 +89,8 @@ export type DataManagerProps = {
         component: React.ComponentType<unknown>;
         props?: Record<string, unknown>;
       };
+
+  columnHandler?: (columns: DataTableColumn[]) => Array<DataTableColumn>;
 };
 
 export type DataTableContextType = {
@@ -116,6 +116,7 @@ export type DatatableSearchParams = {
 };
 
 function DataManager({
+  columnHandler,
   isChild = false,
   id,
   operation,
@@ -282,7 +283,7 @@ function DataManager({
     }
   }
 
-  function getShippingMethodFormModalProps(index?: number) {
+  async function getShippingMethodFormModalProps(index?: number) {
     return {
       formProps: {
         operation: operation,
@@ -309,7 +310,7 @@ function DataManager({
         let response: boolean | Promise<boolean> = false;
         switch (mode) {
           case "selector":
-            DataManagerService.selectorModeHandler({
+            await DataManagerService.selectorModeHandler({
               onChange,
               data,
               values: formHelpers?.values,
@@ -317,7 +318,7 @@ function DataManager({
             });
             break;
           case "edit":
-            response = DataManagerService.editModeCreateHandler({
+            response = await DataManagerService.editModeCreateHandler({
               onChange,
               data,
               values: formHelpers?.values,
@@ -328,14 +329,6 @@ function DataManager({
             console.warn("Invalid mode");
             return;
         }
-
-        console.log(
-          "DataManager onOk",
-          formHelpers?.values,
-          operation,
-          mode,
-          response
-        );
         if (response) {
           return await formHelpers.submitForm();
         }
@@ -366,7 +359,7 @@ function DataManager({
     return dataTableContextState;
   }
 
-  function renderActionColumn(item: ShippingMethod, index: number) {
+  async function renderActionColumn(item: ShippingMethod, index: number) {
     const editFormComponentData = getFormComponentData();
     if (!editFormComponentData?.component) {
       console.warn("editFormComponent is required");
@@ -374,6 +367,7 @@ function DataManager({
     }
 
     const EditForm = editFormComponentData.component;
+    const modalProps = await getShippingMethodFormModalProps(index);
     return (
       <div className="d-flex align-items-center list-action">
         <Link
@@ -396,7 +390,7 @@ function DataManager({
                     {...(editFormComponentData?.props || {})}
                   />
                 ),
-                ...getShippingMethodFormModalProps(index),
+                ...modalProps,
               },
               DataManagerService.getId(id, "edit")
             );
@@ -499,7 +493,7 @@ function DataManager({
                           {...(editFormComponentData?.props || {})}
                         />
                       ),
-                      ...getShippingMethodFormModalProps(index),
+                      ...modalProps,
                     },
                     DataManagerService.getId(id, "edit")
                   );
@@ -607,7 +601,7 @@ function DataManager({
     });
   }
 
-  function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  async function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.preventDefault();
 
     const editFormComponentData = getFormComponentData();
@@ -616,19 +610,20 @@ function DataManager({
       return null;
     }
     const EditForm = editFormComponentData.component;
+    const modalProps = await getShippingMethodFormModalProps();
     getDatatableContextState().modal.show(
       {
         title: "Create shipping method",
         component: (
           <EditForm
-            dataTable={getDatatableContextState()}
+            dataTable={dataTableContextState}
             operation={"create"}
             inModal={true}
             modalId={DataManagerService.getId(id, "create")}
             {...(editFormComponentData?.props || {})}
           />
         ),
-        ...getShippingMethodFormModalProps(),
+        ...modalProps,
       },
       DataManagerService.getId(id, "create")
     );
@@ -824,10 +819,7 @@ function DataManager({
                     ) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      renderAddNew(e, {
-                        dataTableContextState,
-                        setDataTableContextState,
-                      });
+                      renderAddNew(e);
                     }}
                   >
                     Add New
@@ -849,7 +841,7 @@ function DataManager({
                       onRowSelectActionClick={handleRowSelectActionClick}
                       rowSelectActions={getRowSelectActions()}
                       multiRowSelection={multiRowSelection}
-                      columns={columns}
+                      columns={(typeof columnHandler === "function") ? columnHandler(columns) : columns}
                       data={dataTableContextState.data}
                       actionColumn={(item, index) => {
                         return renderActionColumn(

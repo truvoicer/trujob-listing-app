@@ -8,6 +8,7 @@ import DataManager, {
 import { Currency } from "@/types/Currency";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import EditCurrency from "./EditCurrency";
+import Loader from "@/components/Loader";
 
 export const CREATE_CURRENCY_MODAL_ID = "create-currency-modal";
 export const EDIT_CURRENCY_MODAL_ID = "edit-currency-modal";
@@ -16,10 +17,14 @@ export const MANAGE_CURRENCY_ID = "manage-currency-modal";
 
 export interface ManageCurrencyProps extends DataManageComponentProps {
   data?: Array<Currency>;
+  values?: Currency[];
 }
 
 function ManageCurrency({
+  values,
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -30,11 +35,10 @@ function ManageCurrency({
   enablePagination = true,
   enableEdit = true,
 }: ManageCurrencyProps) {
-
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader/>}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.currency}/bulk/destroy`,
@@ -73,6 +77,7 @@ function ManageCurrency({
             data: post,
           });
         }}
+        values={values}
         mode={mode}
         operation={operation}
         id={MANAGE_CURRENCY_ID}

@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { Color } from "@/types/Color";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export interface ManageColorProps extends DataManageComponentProps {
   data?: Array<Color>;
@@ -18,7 +19,9 @@ export const DELETE_COLOR_MODAL_ID = "delete-color-modal";
 export const MANAGE_COLOR_ID = "manage-color-modal";
 
 function ManageColor({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -31,9 +34,9 @@ function ManageColor({
 }: ManageColorProps) {
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

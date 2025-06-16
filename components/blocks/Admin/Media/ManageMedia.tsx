@@ -9,6 +9,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Media } from "@/types/Media";
+import Loader from "@/components/Loader";
 
 export interface ManageMediaProps extends DataManageComponentProps {
   data?: Array<Media>;
@@ -19,7 +20,9 @@ export const DELETE_MEDIA_MODAL_ID = "delete-media-modal";
 export const MANAGE_MEDIA_ID = "manage-media-modal";
 
 function ManageMedia({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   operation = "edit",
   data,
@@ -31,9 +34,9 @@ function ManageMedia({
   enableEdit = true,
 }: ManageMediaProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

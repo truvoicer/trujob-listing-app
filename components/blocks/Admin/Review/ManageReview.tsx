@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { Review } from "@/types/Review";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export interface ManageReviewProps extends DataManageComponentProps {
   data?: Array<Review>;
@@ -18,7 +19,9 @@ export const DELETE_REVIEW_MODAL_ID = "delete-review-modal";
 export const MANAGE_REVIEW_ID = "manage-review-modal";
 
 function ManageReview({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data,
   operation = "create",
@@ -30,9 +33,9 @@ function ManageReview({
   enableEdit = true,
 }: ManageReviewProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         data={data}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({

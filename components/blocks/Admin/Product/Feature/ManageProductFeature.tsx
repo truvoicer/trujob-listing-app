@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { Feature } from "@/types/Feature";
+import Loader from "@/components/Loader";
 
 export const CREATE_PRODUCT_FEATURE_MODAL_ID = "create-features-modal";
 export const DELETE_PRODUCT_FEATURE_MODAL_ID = "delete-product-feature-modal";
@@ -20,7 +21,9 @@ export interface ManageProductFeatureProps extends DataManageComponentProps {
 }
 
 function ManageProductFeature({
+  columnHandler,
   isChild = false,
+  
   mode = "selector",
   data = [],
   operation,
@@ -33,9 +36,9 @@ function ManageProductFeature({
   enableEdit = true,
 }: ManageProductFeatureProps) {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<Loader />}>
       <DataManager
-        isChild={isChild}
+        columnHandler={columnHandler}        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
