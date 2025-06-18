@@ -43,7 +43,8 @@ function ManageShippingRestriction({
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        isChild={isChild}
+        columnHandler={columnHandler}        
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.shippingRestriction}/bulk/destroy`,

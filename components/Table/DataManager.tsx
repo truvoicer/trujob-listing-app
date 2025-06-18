@@ -190,6 +190,33 @@ function DataManager({
   modalService.setKey("modal");
   confirmationService.setKey("confirmation");
 
+  function isChecked(
+    item: Record<string, unknown>,
+    values: Array<Record<string, unknown>>
+  ): boolean {
+    let checked: boolean = false;
+    if (Array.isArray(values)) {
+      checked = values.some((value: Record<string, unknown>) => {
+        if (typeof value === "object") {
+          return value?.id === item?.id;
+        }
+        return value === item.id;
+      });
+    }
+    return checked;
+  }
+
+  function applyValuesToData(
+    data: Array<Record<string, unknown>>,
+    values: Array<Record<string, unknown>>
+  ): Array<Record<string, unknown>> {
+    return data.map((item: Record<string, unknown>) => {
+      const cloneItem: Record<string, unknown> = { ...item };
+      cloneItem.checked = isChecked(cloneItem, values);
+      return cloneItem;
+    });
+  }
+  
   async function makeRequest() {
     if (dataTableContextState?.requestStatus !== "loading") {
       setDataTableContextState((prevState) => {
@@ -209,23 +236,14 @@ function DataManager({
         response?.links &&
         response?.meta
       ) {
+        console.log("DataManager response", values);
         const data = response?.data || [];
         setDataTableContextState((prevState) => {
-          let newState = { ...prevState };
-          newState.data = data.map((item: unknown, index: number) => {
-            let cloneItem = { ...item };
-            let isChecked = false;
-            if (Array.isArray(values)) {
-              isChecked = values.some((value: unknown) => {
-                if (typeof value === "object") {
-                  return value.id === item.id;
-                }
-                return value === item.id;
-              });
-            }
-            cloneItem.checked = isChecked;
-            return cloneItem;
-          });
+          const newState: Record<string, unknown> = { ...prevState };
+          newState.data = applyValuesToData(
+            data,
+            (values as Array<Record<string, unknown>>) || []
+          );
           newState.links = response.links;
           newState.meta = response.meta;
           newState.requestStatus = "idle";
@@ -329,7 +347,7 @@ function DataManager({
             console.warn("Invalid mode");
             return;
         }
-        if (response) {
+        if (enableEdit) {
           return await formHelpers.submitForm();
         }
       },
@@ -601,7 +619,9 @@ function DataManager({
     });
   }
 
-  async function renderAddNew(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
+  async function renderAddNew(
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) {
     e.preventDefault();
 
     const editFormComponentData = getFormComponentData();
@@ -798,7 +818,17 @@ function DataManager({
       requestStatus: "idle",
     });
   }, [data]);
-
+  useEffect(() => {
+    // setDataTableContextState((prevState) => {
+    //   const newState: Record<string, unknown> = { ...prevState };
+    //   const data = newState?.data || [];
+    //   newState.data = applyValuesToData(
+    //     data,
+    //     (values as Array<Record<string, unknown>>) || []
+    //   );
+    //   return newState;
+    // });
+  }, [values]);
   return (
     <DataTableContext.Provider value={dataTableContextState}>
       <div className="row">
@@ -841,7 +871,11 @@ function DataManager({
                       onRowSelectActionClick={handleRowSelectActionClick}
                       rowSelectActions={getRowSelectActions()}
                       multiRowSelection={multiRowSelection}
-                      columns={(typeof columnHandler === "function") ? columnHandler(columns) : columns}
+                      columns={
+                        typeof columnHandler === "function"
+                          ? columnHandler(columns)
+                          : columns
+                      }
                       data={dataTableContextState.data}
                       actionColumn={(item, index) => {
                         return renderActionColumn(

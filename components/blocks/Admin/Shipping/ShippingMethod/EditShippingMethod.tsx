@@ -86,6 +86,7 @@ function EditShippingMethod({
         values.restrictions || []
       );
     }
+    console.log("Request Data:", {requestData, values});
 
     return requestData;
   }
@@ -113,6 +114,7 @@ function EditShippingMethod({
     return requestData;
   }
   async function handleSubmit(values: ShippingMethod) {
+    console.log("Submitting values:", values);
     if (["edit", "update"].includes(operation) && isObjectEmpty(values)) {
       console.log("No data to update");
       return false;
@@ -191,6 +193,11 @@ function EditShippingMethod({
     if (operation === "edit" || operation === "update") {
       requiredFields = {
         id: true,
+        restrictions: {
+          action: true,
+          type: true,
+          restriction_id: true,
+        },
       };
     }
     return requiredFields;

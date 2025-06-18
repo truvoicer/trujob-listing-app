@@ -10,10 +10,12 @@ export interface AccordionItem {
 
 interface DynamicAccordionProps {
   items: AccordionItem[];
+  alwaysOpen?: boolean;
 }
 
 export const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
   items,
+  alwaysOpen = false,
 }) => {
   const [activeKey, setActiveKey] = useState<string | null | string[]>(null);
 
@@ -40,6 +42,7 @@ export const DynamicAccordion: React.FC<DynamicAccordionProps> = ({
   }, [items]);
   return (
     <Accordion
+      alwaysOpen={alwaysOpen}
       activeKey={activeKey}
       onSelect={(key) => handleToggle(key as string)}
     >

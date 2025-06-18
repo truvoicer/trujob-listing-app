@@ -1,7 +1,7 @@
 
 import { ObjectDifference } from "@/helpers/ObjectDfference";
 import { compareValues, isObject, isObjectEmpty } from "@/helpers/utils";
-import { Formik, FormikValues } from "formik";
+import { Formik, FormikProps, FormikValues } from "formik";
 import React, { useState, useEffect } from 'react';
 
 export type FormProps = {
@@ -201,7 +201,7 @@ function Form({
             requiredFields
         );
     }
-    function handleSubmit(values: FormikValues, formikHelpers: any) {
+    function handleSubmit(values: FormikValues, formikHelpers: FormikProps<FormikValues>) {
         if (typeof operation !== 'string') {
             console.log(`Form operation is not a string`);
             return;

@@ -51,7 +51,9 @@ function EntityBrowser({
     }
     const filterValue = filterValueByType(entity, value);
     const EntityComponent = entityConfig.component;
-
+    console.log(`Rendering entity component for ${entity}`, {
+      filterValue,
+    });
     return (
       <EntityComponent
         onChange={(value: unknown) => {
@@ -62,7 +64,6 @@ function EntityBrowser({
           const checked: EntityBrowserItem[] = value.filter(
             (item: EntityBrowserItem) => item?.checked
           );
-          console.log("Checked items:", { checked });
           if (typeof onChange === "function") {
             onChange(entity, checked);
           }
@@ -87,12 +88,12 @@ function EntityBrowser({
   useEffect(() => {
     makeEntityListRequest();
   }, []);
-
+  
   return (
     <div>
       <div className="row">
         <div className="col-12">
-          <DynamicAccordion items={buildItems()} />
+          <DynamicAccordion items={buildItems()} alwaysOpen={true} />
         </div>
       </div>
     </div>

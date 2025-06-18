@@ -153,6 +153,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
           .map((restriction: Record<string, unknown>) => ({
             id: restriction.restriction_id,
             type: restriction.type,
+            action: restriction.action || "allow", // Default action if not set
           }));
         return (
           <AccessControlComponent>
@@ -171,11 +172,24 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
                 });
               }}
               onChange={(entity: string, value: Record<string, unknown>[]) => {
-                const existingRestrictions = values?.restrictions || [];
+                let existingRestrictions = values?.restrictions || [];
                 if (!Array.isArray(existingRestrictions)) {
                   console.warn("Existing restrictions should be an array");
                   return;
                 }
+
+                // Filter existing restrictions to keep only those that exist in value
+                existingRestrictions = existingRestrictions.filter(
+                  (restriction: Record<string, unknown>) => {
+                    if (restriction?.type !== entity) {
+                      return true; // Keep existing restrictions that don't match the entity
+                    }
+                    return value.some(
+                      (item: Record<string, unknown>) =>
+                        item.id === restriction?.restriction_id
+                    );
+                });
+
                 const newRestrictions = [
                   ...existingRestrictions,
                   ...value
@@ -211,6 +225,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
                       }
                       return (
                         <SelectShippingRestrictionAction
+                          value={findInFilteredValue?.action || "allow"}
                           hideLabel={true}
                           onChange={(action: string | null) => {
                             const findIndexInRestrictions =
@@ -249,7 +264,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
       },
     },
   ]);
-  console.log("EditShippingMethodFields values", values);
+  
   return (
     <div className="row justify-content-center align-items-center">
       <div className="col-md-12 col-sm-12 col-12 align-self-center">

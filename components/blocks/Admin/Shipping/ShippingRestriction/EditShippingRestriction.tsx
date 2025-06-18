@@ -21,22 +21,23 @@ import {
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import ShippingProvider from "@/components/Provider/Shipping/ShippingProvider";
 
 export function buildBulkRestrictionRequestData(values: ShippingRestriction[]) {
   if (!Array.isArray(values)) {
     return [];
   }
   return values
-  .filter((value) => {
-    return value?.restriction_id && value?.type;
-  })
-  .map((value) => {
-    return {
-      action: value?.action || "allow",
-      type: value?.type || "",
-      restriction_id: value?.restriction_id || 0,
-    };
-  });
+    .filter((value) => {
+      return value?.restriction_id && value?.type;
+    })
+    .map((value) => {
+      return {
+        action: value?.action || "allow",
+        type: value?.type || "",
+        restriction_id: value?.restriction_id || 0,
+      };
+    });
 }
 
 export type EditShippingRestrictionProps = {
@@ -227,31 +228,33 @@ function EditShippingRestriction({
 
   const dataTableContext = useContext(DataTableContext);
   return (
-    <div className="row justify-content-center align-items-center">
-      <div className="col-md-12 col-sm-12 col-12 align-self-center">
-        {alert && (
-          <div className={`alert alert-${alert.type}`} role="alert">
-            {alert.message}
-          </div>
-        )}
-        {inModal &&
-          ModalService.modalItemHasFormProps(
-            dataTableContext?.modal,
-            modalId
-          ) && <EditShippingRestrictionFields operation={operation} />}
-        {!inModal && (
-          <Form
-            operation={operation}
-            initialValues={initialValues}
-            onSubmit={handleSubmit}
-          >
-            {() => {
-              return <EditShippingRestrictionFields operation={operation} />;
-            }}
-          </Form>
-        )}
+    <ShippingProvider>
+      <div className="row justify-content-center align-items-center">
+        <div className="col-md-12 col-sm-12 col-12 align-self-center">
+          {alert && (
+            <div className={`alert alert-${alert.type}`} role="alert">
+              {alert.message}
+            </div>
+          )}
+          {inModal &&
+            ModalService.modalItemHasFormProps(
+              dataTableContext?.modal,
+              modalId
+            ) && <EditShippingRestrictionFields operation={operation} />}
+          {!inModal && (
+            <Form
+              operation={operation}
+              initialValues={initialValues}
+              onSubmit={handleSubmit}
+            >
+              {() => {
+                return <EditShippingRestrictionFields operation={operation} />;
+              }}
+            </Form>
+          )}
+        </div>
       </div>
-    </div>
+    </ShippingProvider>
   );
 }
 export default EditShippingRestriction;

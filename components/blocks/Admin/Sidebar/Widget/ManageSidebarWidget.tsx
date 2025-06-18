@@ -37,7 +37,8 @@ function ManageSidebarWidget({
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        isChild={isChild}
+        columnHandler={columnHandler}        
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           if (!sidebarId) {
             throw new Error("Sidebar ID is required for bulk delete.");

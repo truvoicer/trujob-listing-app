@@ -8,6 +8,7 @@ import DataManager, {
 } from "@/components/Table/DataManager";
 import { ShippingRate } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
+import Loader from "@/components/Loader";
 
 export const CREATE_SHIPPING_RATE_MODAL_ID = "create-shipping-rate-modal";
 export const EDIT_SHIPPING_RATE_MODAL_ID = "edit-shipping-rate-modal";
@@ -38,7 +39,8 @@ function ManageShippingRate({
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        isChild={isChild}
+        columnHandler={columnHandler}        
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

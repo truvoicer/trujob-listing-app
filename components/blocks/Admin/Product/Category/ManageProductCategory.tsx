@@ -38,7 +38,8 @@ function ManageProductCategory({
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        isChild={isChild}
+        columnHandler={columnHandler}        
+        isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([

@@ -177,7 +177,7 @@ function DataTable({
             });
         }
     }, [selectedAction]);
-
+    // console.log('DataTable rendered with data:', tableData);
     return (
         <>
             <div className="row">
