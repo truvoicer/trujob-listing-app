@@ -90,7 +90,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
     },
     {
       id: "manageRestrictions",
-      title: "Select Restrictions",
+      title: "Manage Restrictions",
       size: "lg",
       fullscreen: true,
       component: () => {
@@ -136,7 +136,7 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
     },
     {
       id: "restrictionBrowser",
-      title: "Select Shipping Restriction Entity",
+      title: "Manage Shipping Restrictions",
       footer: true,
       size: "md",
       fullscreen: true,
@@ -271,10 +271,10 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
         <div className="row">
           <div className="col-12 col-lg-6">
             <TextInput
-              value={values?.carrier || ""}
+              value={values?.name || ""}
               onChange={handleChange}
-              placeholder="Enter carrier"
-              name="carrier"
+              placeholder="Enter name"
+              name="name"
               type="text"
               label="Carrier"
             />
@@ -349,24 +349,11 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
           </div>
 
           <div className="col-12 col-lg-6 mt-4">
+            <label className="d-block fw-bold">Restrictions</label>
             <div className="floating-input">
-              <SelectedListDisplay
-                label="Restrictions"
-                direction="vertical"
-                data={values?.restrictions}
-                render={(restriction: Record<string, any>) => (
-                  <>
-                    {[
-                      `Type: ${restriction?.type || "N/A"}`,
-                      `restriction_id: ${restriction?.restriction_id || "N/A"}`,
-                      `Action: ${restriction?.action || "N/A"}`,
-                    ].join(" | ")}
-                  </>
-                )}
-              />
               {modalService.renderLocalTriggerButton(
                 "manageRestrictions",
-                "Select Restrictions"
+                "Manage Restrictions"
               )}
               {modalService.renderLocalTriggerButton(
                 "restrictionBrowser",

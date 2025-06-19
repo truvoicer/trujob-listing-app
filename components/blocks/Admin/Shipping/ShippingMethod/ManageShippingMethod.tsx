@@ -98,13 +98,13 @@ function ManageShippingMethod({
         enablePagination={enablePagination}
         title={"Manage Shipping methods"}
         columns={[
-          { label: "Carrier", key: "carrier" },
+          { label: "Carrier", key: "name" },
           { label: "Description", key: "description" },
           { label: "Processing Time (Days)", key: "processing_time_days" },
           { label: "Display Order", key: "display_order" },
           { label: "Is Active", key: "is_active", type: "boolean" },
-          { label: "Created At", key: "created_at", type: "date" },
-          { label: "Updated At", key: "updated_at", type: "date" },
+          { label: "Created At", key: "created_at", type: "date", date_format: "Do MMMM YYYY h:mm:ss a" },
+          { label: "Updated At", key: "updated_at", type: "date", date_format: "Do MMMM YYYY h:mm:ss a" },
         ]}
       />
     </Suspense>

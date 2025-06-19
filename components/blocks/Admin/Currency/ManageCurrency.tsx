@@ -24,7 +24,6 @@ function ManageCurrency({
   values,
   columnHandler,
   isChild = false,
-  
   mode = "selector",
   data,
   operation = "create",

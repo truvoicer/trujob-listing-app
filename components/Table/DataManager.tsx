@@ -236,7 +236,6 @@ function DataManager({
         response?.links &&
         response?.meta
       ) {
-        console.log("DataManager response", values);
         const data = response?.data || [];
         setDataTableContextState((prevState) => {
           const newState: Record<string, unknown> = { ...prevState };
@@ -818,17 +817,6 @@ function DataManager({
       requestStatus: "idle",
     });
   }, [data]);
-  useEffect(() => {
-    // setDataTableContextState((prevState) => {
-    //   const newState: Record<string, unknown> = { ...prevState };
-    //   const data = newState?.data || [];
-    //   newState.data = applyValuesToData(
-    //     data,
-    //     (values as Array<Record<string, unknown>>) || []
-    //   );
-    //   return newState;
-    // });
-  }, [values]);
   return (
     <DataTableContext.Provider value={dataTableContextState}>
       <div className="row">

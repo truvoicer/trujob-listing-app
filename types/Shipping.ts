@@ -6,7 +6,7 @@ import { Region } from "./Region";
 
 export type ShippingMethod = {
     id: number;
-    carrier: string;
+    name: string;
     description: string;
     is_active: boolean;
     processing_time_days: number;
@@ -18,7 +18,7 @@ export type ShippingMethod = {
 }
 
 export type ShippingMethodRequest = {
-    carrier?: string;
+    name?: string;
     description?: string;
     is_active?: boolean;
     processing_time_days?: number;
@@ -27,7 +27,7 @@ export type ShippingMethodRequest = {
     restrictions?: ShippingRestrictionRequest[];
 }
 export interface CreateShippingMethod extends ShippingMethodRequest {
-    carrier: string;
+    name: string;
     description: string;
     is_active?: boolean;
     processing_time_days?: number;

@@ -17,12 +17,13 @@ export const MANAGE_COUNTRY_ID = "manage-country-modal";
 
 export interface ManageCountryProps extends DataManageComponentProps {
   data?: Array<Country>;
+  values?: Country[];
 }
 
 function ManageCountry({
   columnHandler,
   isChild = false,
-  
+  values = [],
   mode = "selector",
   data,
   operation = "create",
@@ -39,6 +40,7 @@ function ManageCountry({
       <DataManager
         columnHandler={columnHandler}        
         isChild={isChild}
+        values={values}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.country}/bulk/destroy`,

@@ -12,6 +12,7 @@ import Loader from "@/components/Loader";
 
 export interface ManageCategoryProps extends DataManageComponentProps {
   data?: Array<Category>;
+  values?: Category[];
 }
 export const EDIT_CATEGORY_MODAL_ID = "edit-category-modal";
 export const CREATE_CATEGORY_MODAL_ID = "create-category-modal";
@@ -21,7 +22,7 @@ export const MANAGE_CATEGORY_ID = "manage-category-modal";
 function ManageCategory({
   columnHandler,
   isChild = false,
-  
+  values = [],
   mode = "selector",
   data,
   operation = "create",
@@ -38,6 +39,7 @@ function ManageCategory({
         columnHandler={columnHandler}        
         isChild={isChild}
         data={data}
+        values={values}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,

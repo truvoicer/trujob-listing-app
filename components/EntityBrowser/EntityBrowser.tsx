@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { EntityFactory } from "../factories/entity/EntityFactory";
 import { EntityItem } from "../factories/entity/Entity";
-import { Accordion } from "react-bootstrap";
 import DynamicAccordion from "../Accordion/DynamicAccordion/DynamicAccordion";
 import { DataTableColumn } from "../Table/DataTable";
 export type EntityBrowserItem = {
@@ -51,9 +50,7 @@ function EntityBrowser({
     }
     const filterValue = filterValueByType(entity, value);
     const EntityComponent = entityConfig.component;
-    console.log(`Rendering entity component for ${entity}`, {
-      filterValue,
-    });
+    
     return (
       <EntityComponent
         onChange={(value: unknown) => {

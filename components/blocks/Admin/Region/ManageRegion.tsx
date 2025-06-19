@@ -17,12 +17,13 @@ export const MANAGE_REGION_ID = "manage-region-modal";
 
 export interface ManageRegionProps extends DataManageComponentProps {
   data?: Array<Region>;
+  values?: Array<Region>;
 }
 
 function ManageRegion({
   columnHandler,
   isChild = false,
-  
+  values = [],
   mode = "selector",
   data,
   operation = "create",
@@ -77,6 +78,7 @@ function ManageRegion({
             data: post,
           });
         }}
+        values={values}
         mode={mode}
         operation={operation}
         id={MANAGE_REGION_ID}

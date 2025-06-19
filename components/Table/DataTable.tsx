@@ -2,33 +2,36 @@ import { findInObject, isNotEmpty } from "@/helpers/utils";
 import { useContext, useEffect, useState } from "react";
 import Pagination from "../products/Pagination";
 import { DataTableContext } from "@/contexts/DataTableContext";
+import moment from "moment";
 
 
 export type DataTableColumn = {
+    type?: 'string' | 'number' | 'date' | 'boolean' | 'object';
+    date_format?: string; // e.g. 'YYYY-MM-DD HH:mm:ss'
     label?: string;
     key?: string;
-    render?: null | ((column: any, item: any) => React.ReactNode | React.Component | string | number | boolean | null);
+    render?: null | ((column: DataTableColumn, item: Record<string, unknown>) => React.ReactNode | React.Component | string | number | boolean | null);
 }
 export type DataTableItem = {
-    [key: string]: any;
+    [key: string]: unknown;
 }
 export type OnRowSelectActionClick = ({
-    action: any,
-    data: Array<any>
+    action: unknown,
+    data: Array<unknown>
 });
 export type DataTableProps = {
-    onChange: (tableData: Array<any>) => void;
+    onChange: (tableData: Array<Record<string, unknown>>) => void;
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
     enableEdit?: boolean;
     onRowSelectActionClick?: ({ action, data }: OnRowSelectActionClick) => void;
-    rowSelectActions?: Array<any>
+    rowSelectActions?: Array<unknown>
     onRowSelect?: (item: DataTableItem, index: number) => boolean | Promise<boolean>;
     multiRowSelection?: boolean;
     rowSelection?: boolean;
     columns?: Array<DataTableColumn>;
-    data?: Array<any>;
-    actionColumn?: null | ((item: any, index: number) => React.ReactNode | React.Component | string | number | boolean | null);
+    data?: Array<Record<string, unknown>>;
+    actionColumn?: null | ((item: Record<string, unknown>, index: number) => React.ReactNode | React.Component | string | number | boolean | null);
 }
 function DataTable({
     onChange,
@@ -44,11 +47,53 @@ function DataTable({
     data = [],
     actionColumn
 }: DataTableProps) {
-    const [tableData, setTableData] = useState<Array<any>>(data);
+    const [tableData, setTableData] = useState<Array<Record<string, unknown>>>(data);
 
     const [selectedAction, setSelectedAction] = useState<string | null>(null);
 
     const dataTableContext = useContext(DataTableContext);
+
+    function getValueByColumnType(column: DataTableColumn, value: unknown) {
+        switch (column?.type) {
+            case 'date':
+                let format = 'YYYY-MM-DD HH:mm:ss';
+                if (column?.date_format && typeof column.date_format === 'string') {
+                    format = column.date_format;
+                }
+                if (typeof value === 'string' || typeof value === 'number') {
+                    return moment(value).format(format);
+                }
+                return '';
+            case 'boolean':
+                if (typeof value === 'boolean') {
+                    return value ? 'Yes' : 'No';
+                }
+                return '';
+            case 'object':
+                if (typeof value === 'object' && value !== null) {
+                    return JSON.stringify(value);
+                }
+                return '';
+            case 'string':
+            case 'number':
+                return value || '';
+            default:
+                return formatValue(column, value);
+        }
+    }
+
+    function formatValue(column: DataTableColumn, value: unknown) {
+        if (typeof value === 'string' || typeof value === 'number') {
+            return value;
+        }
+        if (typeof value === 'boolean') {
+            return value ? 'Yes' : 'No';
+        }
+        if (typeof value === 'object') {
+            return JSON.stringify(value);
+        }
+        return '';
+    }
 
     function getValue(column: DataTableColumn, item: DataTableItem) {
         if (typeof column?.render === 'function') {
@@ -67,16 +112,10 @@ function DataTable({
         if (item.hasOwnProperty(column.key)) {
             value = item[column.key];
         }
-        if (typeof value === 'string' || typeof value === 'number') {
-            return value;
-        }
-        if (typeof value === 'boolean') {
-            return value ? 'Yes' : 'No';
-        }
-        if (typeof value === 'object') {
-            return JSON.stringify(value);
-        }
-        return '';
+        if (column?.type) {
+            return getValueByColumnType(column, value);
+        }   
+        return formatValue(column, value);
     }
     function renderActionColumn(item: DataTableItem, index: number) {
         if (actionColumn && typeof actionColumn === 'function') {
@@ -177,7 +216,7 @@ function DataTable({
             });
         }
     }, [selectedAction]);
-    // console.log('DataTable rendered with data:', tableData);
+    
     return (
         <>
             <div className="row">

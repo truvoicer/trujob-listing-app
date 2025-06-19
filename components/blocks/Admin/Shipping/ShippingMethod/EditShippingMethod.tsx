@@ -53,7 +53,7 @@ function EditShippingMethod({
   const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
   const initialValues: ShippingMethod = {
     id: data?.id || 0,
-    carrier: data?.carrier || "",
+    name: data?.name || "",
     description: data?.description || "",
     processing_time_days: data?.processing_time_days || 0,
     display_order: data?.display_order || 0,
@@ -66,8 +66,8 @@ function EditShippingMethod({
 
   function buildRequestData(values: ShippingMethod) {
     let requestData: CreateShippingMethod | UpdateShippingMethod = {};
-    if (values?.carrier) {
-      requestData.carrier = values?.carrier || "";
+    if (values?.name) {
+      requestData.name = values?.name || "";
     }
     if (values?.description) {
       requestData.description = values?.description || "";
@@ -93,7 +93,7 @@ function EditShippingMethod({
 
   function buildCreateData(values: ShippingMethod) {
     const requestData: CreateShippingMethod = {
-      carrier: values?.carrier || "",
+      name: values?.name || "",
       description: values?.description || "",
       processing_time_days: values?.processing_time_days || 0,
       is_active: values?.is_active || false,
