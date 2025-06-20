@@ -182,41 +182,44 @@ export class ModalService extends MessageService {
     } else if (modal?.component) {
       component = modal.component;
     }
-    // console.log('Modal component', modal);
     return (
-      <Modal
-        show={modal.show}
-        size={modal?.size || "lg"}
-        fullscreen={modal?.fullscreen || undefined}
-        onHide={() => this.handleCancel(index, { formHelpers })}
-      >
-        <Modal.Header closeButton>
-          <Modal.Title>{modal?.title || ""}</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{component || ""}</Modal.Body>
-        {modal?.showFooter && (
-          <Modal.Footer>
-            {modal?.buttons ? (
-              <>{modal.buttons}</>
-            ) : (
-              <>
-                <Button
-                  variant="secondary"
-                  onClick={() => this.handleCancel(index, { formHelpers })}
-                >
-                  {modal?.onCancelButtonText || "Cancel"}
-                </Button>
-                <Button
-                  variant="primary"
-                  onClick={() => this.handleOk(index, { formHelpers })}
-                >
-                  {modal?.onOkButtonText || "Ok"}
-                </Button>
-              </>
+      <>
+        {component && (
+          <Modal
+            show={modal.show}
+            size={modal?.size || "lg"}
+            fullscreen={modal?.fullscreen || undefined}
+            onHide={() => this.handleCancel(index, { formHelpers })}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>{modal?.title || ""}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{component || ""}</Modal.Body>
+            {modal?.showFooter && (
+              <Modal.Footer>
+                {modal?.buttons ? (
+                  <>{modal.buttons}</>
+                ) : (
+                  <>
+                    <Button
+                      variant="secondary"
+                      onClick={() => this.handleCancel(index, { formHelpers })}
+                    >
+                      {modal?.onCancelButtonText || "Cancel"}
+                    </Button>
+                    <Button
+                      variant="primary"
+                      onClick={() => this.handleOk(index, { formHelpers })}
+                    >
+                      {modal?.onOkButtonText || "Ok"}
+                    </Button>
+                  </>
+                )}
+              </Modal.Footer>
             )}
-          </Modal.Footer>
+          </Modal>
         )}
-      </Modal>
+      </>
     );
   }
 
@@ -245,40 +248,44 @@ export class ModalService extends MessageService {
               return null;
             }
             return (
-              <Modal
-                show={state.show}
-                key={index}
-                size={state?.size || "md"}
-                fullscreen={state?.fullscreen || false}
-                onHide={() => {
-                  this.onLocalModalCancel(configItem);
-                }}
-              >
-                <Modal.Header closeButton>
-                  <Modal.Title>{state?.title || ""}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>{component}</Modal.Body>
-                {state.footer && (
-                  <Modal.Footer>
-                    <Button
-                      variant="secondary"
-                      onClick={(e: React.MouseEvent) => {
-                        this.onLocalModalCancel(configItem, e);
-                      }}
-                    >
-                      Close
-                    </Button>
-                    <Button
-                      variant="primary"
-                      onClick={(e: React.MouseEvent) => {
-                        this.onLocalModalOk(configItem, e);
-                      }}
-                    >
-                      Save Changes
-                    </Button>
-                  </Modal.Footer>
+              <>
+                {component && (
+                  <Modal
+                    show={state.show}
+                    key={index}
+                    size={state?.size || "md"}
+                    fullscreen={state?.fullscreen || false}
+                    onHide={() => {
+                      this.onLocalModalCancel(configItem);
+                    }}
+                  >
+                    <Modal.Header closeButton>
+                      <Modal.Title>{state?.title || ""}</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>{component}</Modal.Body>
+                    {state.footer && (
+                      <Modal.Footer>
+                        <Button
+                          variant="secondary"
+                          onClick={(e: React.MouseEvent) => {
+                            this.onLocalModalCancel(configItem, e);
+                          }}
+                        >
+                          Close
+                        </Button>
+                        <Button
+                          variant="primary"
+                          onClick={(e: React.MouseEvent) => {
+                            this.onLocalModalOk(configItem, e);
+                          }}
+                        >
+                          Save Changes
+                        </Button>
+                      </Modal.Footer>
+                    )}
+                  </Modal>
                 )}
-              </Modal>
+              </>
             );
           }
         )}

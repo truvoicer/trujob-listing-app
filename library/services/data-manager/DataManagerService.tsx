@@ -33,7 +33,7 @@ export class DataManagerService {
     }
   }
 
-  static async selectorModeHandler({
+  static selectorModeHandler({
     onChange,
     data,
     values = [],
@@ -91,7 +91,7 @@ export class DataManagerService {
     }
   }
 
-  static async selectorModeEditHandler({
+  static selectorModeEditHandler({
     onChange,
     data,
     values = [],
@@ -120,7 +120,7 @@ export class DataManagerService {
     }
   }
 
-  static async selectorModeCreateHandler({
+  static selectorModeCreateHandler({
     onChange,
     data,
     values = [],
@@ -139,7 +139,7 @@ export class DataManagerService {
     }
   }
 
-  static async editModeCreateHandler({
+  static editModeCreateHandler({
     onChange,
     data,
     values = [],
@@ -149,7 +149,7 @@ export class DataManagerService {
     values: FormikValues;
     onChange: (values: unknown) => void;
     index?: number;
-  }): Promise<boolean> {
+  }): boolean {
     
     if (!Array.isArray(data)) {
       return true;

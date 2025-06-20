@@ -4,7 +4,7 @@ import Pagination from "../products/Pagination";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import moment from "moment";
 
-
+export const DEFAULT_DATE_FORMAT = 'Do MMMM YYYY h:mm:ss a';
 export type DataTableColumn = {
     type?: 'string' | 'number' | 'date' | 'boolean' | 'object';
     date_format?: string; // e.g. 'YYYY-MM-DD HH:mm:ss'
@@ -56,7 +56,7 @@ function DataTable({
     function getValueByColumnType(column: DataTableColumn, value: unknown) {
         switch (column?.type) {
             case 'date':
-                let format = 'YYYY-MM-DD HH:mm:ss';
+                let format = DEFAULT_DATE_FORMAT;
                 if (column?.date_format && typeof column.date_format === 'string') {
                     format = column.date_format;
                 }

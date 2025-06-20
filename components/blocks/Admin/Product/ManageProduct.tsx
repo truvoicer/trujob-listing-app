@@ -5,12 +5,12 @@ import EditProduct from "./EditProduct";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, {
+  ActionColumnBadgeDropdownItems,
   DataManageComponentProps,
 } from "@/components/Table/DataManager";
 import { Product } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import ProductTestCheckout from "./Checkout/ProductTestCheckout";
-import Loader from "@/components/Loader";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
@@ -37,46 +37,59 @@ function ManageProduct({
   enablePagination = true,
   enableEdit = true,
 }: ManageProductProps) {
-  function renderCheckoutButton() {
-    return (
-      <Link
-        href={`/admin/product/checkout`}
-        className="btn btn-primary"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dataTableContextState.modal.show(
-            {
-              title: "Edit Product",
-              fullscreen: true,
-              size: "xl",
-              formProps: {
-                operation: operation,
-                initialValues: {},
+  function getActionColumnBadgeDropdownItems({
+    item,
+    index,
+    dataTableContextState,
+    dropdownItems,
+  }: ActionColumnBadgeDropdownItems) {
+    const checkoutItem = {
+        text: "Checkout",
+        linkProps: {
+          href: `#`,
+          onClick: (e: any) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dataTableContextState.modal.show(
+              {
+                title: "Edit Product",
+                fullscreen: true,
+                size: "xl",
+                formProps: {
+                  operation: operation,
+                  initialValues: {},
+                },
+                showFooter: false,
+                component: (
+                  <ProductTestCheckout
+                    productId={item?.id}
+                    modalId={TEST_TRANSACTION_MODAL_ID}
+                  />
+                ),
               },
-              showFooter: false,
-              component: (
-                <ProductTestCheckout
-                  productId={item?.id}
-                  modalId={TEST_TRANSACTION_MODAL_ID}
-                />
-              ),
-            },
-            TEST_TRANSACTION_MODAL_ID
-          );
-        }}
-      >
-        Checkout
-      </Link>
-    );
+              TEST_TRANSACTION_MODAL_ID
+            );
+          },
+        },
+      };
+    if (Array.isArray(dropdownItems)) {
+      return [
+        ...dropdownItems,
+        checkoutItem,
+      ];
+    }
+    console.warn("Action column badge dropdown items are not an array, returning default item");
+    return [
+      checkoutItem,
+    ];
   }
   return (
-    <Suspense fallback={<Loader />}>
       <DataManager
         columnHandler={columnHandler}
         data={data}
         values={values}
         isChild={isChild}
+        actionColumnBadgeDropdownItems={getActionColumnBadgeDropdownItems}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.product}/bulk/destroy`,
@@ -132,7 +145,6 @@ function ManageProduct({
           { label: "Permalink", key: "permalink" },
         ]}
       />
-    </Suspense>
   );
 }
 export default ManageProduct;

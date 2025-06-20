@@ -96,8 +96,8 @@ function ManageDiscount({
           { label: "Icon", key: "icon" },
           { label: "Is Active", key: "is_active" },
           { label: "Is Default", key: "is_default" },
-          { label: "Created At", key: "created_at" },
-          { label: "Updated At", key: "updated_at" },
+          { label: "Created At", key: "created_at", type: "date" },
+          { label: "Updated At", key: "updated_at", type: "date" },
         ]}
       />
     </Suspense>

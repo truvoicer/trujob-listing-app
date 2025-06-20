@@ -107,8 +107,8 @@ function ManageShippingRestriction({
           { label: "Type", key: "type" },
           { label: "Restriction ID", key: "restriction_id" },
           { label: "Action", key: "action" },
-          { label: "Created At", key: "created_at" },
-          { label: "Updated At", key: "updated_at" },
+          { label: "Created At", key: "created_at", type: "date" },
+          { label: "Updated At", key: "updated_at", type: "date" },
         ]}
       />
     </Suspense>

@@ -119,8 +119,8 @@ function ManageProductPrice({
           { label: "Valid To", key: "valid_to" },
           { label: "Is Active", key: "is_active" },
           { label: "Is Default", key: "is_default" },
-          { label: "Created At", key: "created_at" },
-          { label: "Updated At", key: "updated_at" },
+          { label: "Created At", key: "created_at", type: "date" },
+          { label: "Updated At", key: "updated_at", type: "date" },
         ]}
       />
     </Suspense>
