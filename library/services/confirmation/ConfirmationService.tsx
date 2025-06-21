@@ -12,7 +12,7 @@ export type ConfirmationItem = {
     id?: string | null;
     title: string | null;
     size: "sm" | "md" | "lg" | "xl";
-    message: any;
+    message: string | React.ReactNode | null;
     show: boolean;
     onOk: () => boolean;
     onCancel: () => boolean;

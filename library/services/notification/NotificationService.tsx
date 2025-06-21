@@ -1,5 +1,6 @@
 import { Toast, ToastContainer } from "react-bootstrap";
 import { MessageService, MessageState } from "../message/MessageService";
+import React from "react";
 
 
 
@@ -7,13 +8,13 @@ export interface NotificationState extends MessageState {
     items: Array<NotificationItem>;
 }
 export type NotificationItem = {
-    [key: string]: string | number | boolean | null | Function | undefined;
+    [key: string]: string | number | boolean | null | React.ReactNode | undefined | (() => void);
     variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
     type: string;
     position: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' |  'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
     id?: string | null;
     title: string | null;
-    component?: any;
+    component?: React.ReactNode | null;
     message?: string | null;
     show: boolean;
     onOk: () => void;

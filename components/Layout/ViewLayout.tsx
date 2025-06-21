@@ -93,6 +93,7 @@ function ViewLayout({ page }: ViewLayoutProps) {
 
                     {modalService.render()}
                     {notificationService.render()}
+                    {confirmationService.render()}
                 </AppConfirmationContext>
             </AppModalContext.Provider>
         </AppNotificationContext.Provider>
