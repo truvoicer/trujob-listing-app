@@ -52,24 +52,25 @@ function EntityBrowser({
     const EntityComponent = entityConfig.component;
     
     return (
-      <EntityComponent
-        onChange={(value: unknown) => {
-          if (!Array.isArray(value)) {
-            console.warn("Value must be an array");
-            return;
-          }
-          const checked: EntityBrowserItem[] = value.filter(
-            (item: EntityBrowserItem) => item?.checked
-          );
-          if (typeof onChange === "function") {
-            onChange(entity, checked);
-          }
-        }}
-        rowSelection={true}
-        multiRowSelection={multiple}
-        values={filterValue}
-        columnHandler={columnHandler}
-      />
+      <h1>s</h1>
+      // <EntityComponent
+      //   onChange={(value: unknown) => {
+      //     if (!Array.isArray(value)) {
+      //       console.warn("Value must be an array");
+      //       return;
+      //     }
+      //     const checked: EntityBrowserItem[] = value.filter(
+      //       (item: EntityBrowserItem) => item?.checked
+      //     );
+      //     if (typeof onChange === "function") {
+      //       onChange(entity, checked);
+      //     }
+      //   }}
+      //   rowSelection={true}
+      //   multiRowSelection={multiple}
+      //   values={filterValue}
+      //   columnHandler={columnHandler}
+      // />
     );
   }
 

@@ -1,31 +1,39 @@
 import store from "../store"
 import {
+    SessionUserSettings,
+    SessionUserState,
     setAuthenticated, setIsAuthenticating,
     setPasswordResetKey,
     setSessionError,
     setShowLoginModal,
-    setUser, setUserId
+    setUser, setUserId,
+    setUserSettings
 } from "../reducers/session-reducer";
 import { produce } from "immer";
 import {
+    SESSION_STATE,
+    SESSION_USER,
     SESSION_USER_TOKEN,
     SESSION_USER_TOKEN_EXPIRY,
 } from "../constants/session-constants";
 import { isSet } from "@/helpers/utils";
-import { SessionService } from "@/library/services/session/SessionService";
-import { User } from "@/types/User";
-import { strict } from "assert";
 
-export function setSessionUserAction(data: User, token: string, tokenExpiry: number, authenticated: boolean = false) {
-    let sessionUserState = { ...store.getState().session.user };
+export function setSessionUserAction(
+    data: SessionUserState, 
+    token?: string, 
+    tokenExpiry?: number, 
+    authenticated: boolean = false
+) {
+    const sessionUserState: SessionUserState = { ...store.getState()[SESSION_STATE][SESSION_USER] };
     const nextState = produce(sessionUserState, (draftState) => {
-        const extractedUserData = SessionService.extractUserData(data);
-        Object.keys(extractedUserData).forEach((key) => {
+        const extractedUserData = data;
+        Object.keys(data).forEach((key) => {
             draftState[key] = extractedUserData[key];
         });
         draftState[SESSION_USER_TOKEN] = token;
         draftState[SESSION_USER_TOKEN_EXPIRY] = tokenExpiry;
-    })
+    });
+    
     store.dispatch(setUser(nextState))
     store.dispatch(setAuthenticated(authenticated))
 }
@@ -62,6 +70,9 @@ export function getSessionAction() {
     return { ...store.getState().session };
 }
 
+export function setSessionUserSettingsAction(settings: SessionUserSettings) {
+    store.dispatch(setUserSettings(settings));
+}
 export function setSessionUserIdAction(userId: number) {
     store.dispatch(setUserId(userId));
 }

@@ -43,6 +43,7 @@ function EditDiscount({
         name: data?.name || '',
         description: data?.description || '',
         type: data?.type || '',
+        amount_type: data?.amount_type || '',
         amount: data?.amount || 0,
         rate: data?.rate || 0,
         currency: data?.currency || '',

@@ -1,5 +1,4 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import Link from "next/link";
 import { Suspense } from "react";
 import EditProduct from "./EditProduct";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
@@ -11,6 +10,10 @@ import DataManager, {
 import { Product } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import ProductTestCheckout from "./Checkout/ProductTestCheckout";
+import Loader from "@/components/Loader";
+import { connect } from "react-redux";
+import { SESSION_STATE } from "@/library/redux/constants/session-constants";
+import { RootState } from "@/library/redux/store";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
@@ -23,6 +26,7 @@ export const DELETE_PRODUCT_MODAL_ID = "delete-product-modal";
 export const MANAGE_PRODUCT_ID = "manage-product-modal";
 
 function ManageProduct({
+  session,
   columnHandler,
   isChild = false,
   onRowSelect,
@@ -44,46 +48,45 @@ function ManageProduct({
     dropdownItems,
   }: ActionColumnBadgeDropdownItems) {
     const checkoutItem = {
-        text: "Checkout",
-        linkProps: {
-          href: `#`,
-          onClick: (e: any) => {
-            e.preventDefault();
-            e.stopPropagation();
-            dataTableContextState.modal.show(
-              {
-                title: "Edit Product",
-                fullscreen: true,
-                size: "xl",
-                formProps: {
-                  operation: operation,
-                  initialValues: {},
-                },
-                showFooter: false,
-                component: (
-                  <ProductTestCheckout
-                    productId={item?.id}
-                    modalId={TEST_TRANSACTION_MODAL_ID}
-                  />
-                ),
+      text: "Checkout",
+      linkProps: {
+        href: `#`,
+        onClick: (e: any) => {
+          e.preventDefault();
+          e.stopPropagation();
+          dataTableContextState.modal.show(
+            {
+              title: "Edit Product",
+              fullscreen: true,
+              size: "xl",
+              formProps: {
+                operation: operation,
+                initialValues: {},
               },
-              TEST_TRANSACTION_MODAL_ID
-            );
-          },
+              showFooter: false,
+              component: (
+                <ProductTestCheckout
+                  productId={item?.id}
+                  modalId={TEST_TRANSACTION_MODAL_ID}
+                />
+              ),
+            },
+            TEST_TRANSACTION_MODAL_ID
+          );
         },
-      };
+      },
+    };
     if (Array.isArray(dropdownItems)) {
-      return [
-        ...dropdownItems,
-        checkoutItem,
-      ];
+      return [...dropdownItems, checkoutItem];
     }
-    console.warn("Action column badge dropdown items are not an array, returning default item");
-    return [
-      checkoutItem,
-    ];
+    console.warn(
+      "Action column badge dropdown items are not an array, returning default item"
+    );
+    return [checkoutItem];
   }
+  
   return (
+    <Suspense fallback={<Loader />}>
       <DataManager
         columnHandler={columnHandler}
         data={data}
@@ -145,6 +148,13 @@ function ManageProduct({
           { label: "Permalink", key: "permalink" },
         ]}
       />
+    </Suspense>
   );
 }
-export default ManageProduct;
+export default connect(
+  (state: RootState) => {
+    return {
+      session: state[SESSION_STATE],
+    };
+  },
+)(ManageProduct);

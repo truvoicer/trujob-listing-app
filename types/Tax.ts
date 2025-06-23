@@ -6,6 +6,7 @@ export type TaxRate = {
     id: number;
     name: string;
     type: 'vat' | 'duty' |'service' | 'excise' | 'sales_tax' | 'other';
+    amount_type: 'fixed' | 'percentage';
     amount: number | null;
     rate: number | null;
     country: Country;

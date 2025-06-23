@@ -4,7 +4,8 @@ export type Discount = {
     id: number;
     name: string;
     description: string;
-    type: 'fixed' | 'percentage';
+    type: 'buy_x_get_y' | 'free_shipping' | 'bulk_purchase';
+    amount_type: 'fixed' | 'percentage';
     amount: number;
     rate: number;
     currency: Currency;

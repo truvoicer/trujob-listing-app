@@ -6,12 +6,12 @@ import React, { useEffect } from "react";
 
 export type CurrencySelect = {
   onChange?: (selected: Currency | Currency[]) => void;
+  displayText?: (data: Record<string, unknown>) => string;
   isMulti?: boolean;
   placeholder?: string;
   enableSearch?: boolean;
   allowNewOptions?: boolean;
   loadMoreLimit?: number;
-  onLoadMore?: () => void;
   addNewOptionPosition?: "top" | "bottom" | "both";
   loadingMore?: boolean;
   loadingMessage?: string;
@@ -20,12 +20,12 @@ export type CurrencySelect = {
 }
 function CurrencySelect({
   onChange,
+  displayText,
   isMulti = false,
   placeholder = "Select a currency",
   enableSearch = true,
   allowNewOptions = true,
   loadMoreLimit = 10,
-  onLoadMore,
   addNewOptionPosition = "bottom",
   loadingMore = false,
   loadingMessage = "Loading more...",
@@ -83,7 +83,7 @@ function CurrencySelect({
       allowNewOptions={allowNewOptions}
       loadMoreLimit={loadMoreLimit}
       onLoadMore={async (page: number, searchTerm: string) => {
-        let response = await fetchCurrencies({ 
+        const response = await fetchCurrencies({ 
           page, 
           query: searchTerm,
           page_size: loadMoreLimit
@@ -99,11 +99,17 @@ function CurrencySelect({
       showLoadingSpinner={showLoadingSpinner}
       options={currencies}
       parseOptions={
-        (data: Record<string, any>) => {
+        (data: Record<string, unknown>) => {
           if (data.hasOwnProperty('value') && data.hasOwnProperty('label')) {
             return {
               value: data.value,
               label: data.label,
+            };
+          }
+          if (typeof displayText === 'function') {
+            return {
+              value: data.id,
+              label: displayText(data),
             };
           }
           return {

@@ -2,7 +2,6 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { DiscountType } from "@/types/Discount";
 import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 

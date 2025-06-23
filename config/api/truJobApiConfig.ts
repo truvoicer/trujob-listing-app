@@ -1,7 +1,3 @@
-//Api config and endpoints
-import {setIsAuthenticatingAction, setSessionUserAction} from "@/library/redux/actions/session-actions";
-import { SessionService } from "@/library/services/session/SessionService";
-import { features } from "process";
 
 const config = {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
@@ -71,16 +67,16 @@ const config = {
         },
         user: '/user',
     },
-    tokenResponseHandler: async (response) => {
-            const responseData = await response.json();
-            setSessionUserAction(
-                SessionService.extractUserData(responseData?.data?.user),
-                responseData?.data?.token?.plainTextToken,
-                responseData?.data?.token?.accessToken?.expires_at_timestamp,
-                true
-            )
-            setIsAuthenticatingAction(false)
-    },
+    // tokenResponseHandler: async (response) => {
+    //         const responseData = await response.json();
+    //         setSessionUserAction(
+    //             SessionService.extractUserData(responseData?.data?.user),
+    //             responseData?.data?.token?.plainTextToken,
+    //             responseData?.data?.token?.accessToken?.expires_at_timestamp,
+    //             true
+    //         )
+    //         setIsAuthenticatingAction(false)
+    // },
     headers: {
         default: {
             'Content-Type': 'application/json',
