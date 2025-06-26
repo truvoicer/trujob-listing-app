@@ -1,30 +1,30 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Suspense } from "react";
-import EditProductProductType from "./EditProductProductType";
+import EditProductProductCategory from "./EditProductProductCategory";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, {
   DataManageComponentProps,
 } from "@/components/Table/DataManager";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { ProductType } from "@/types/Product";
+import { ProductCategory } from "@/types/Product";
 import Loader from "@/components/Loader";
 
-export interface ManageProductProductTypeProps
+export interface ManageProductProductCategoryProps
   extends DataManageComponentProps {
-  data?: Array<ProductType>;
+  data?: Array<ProductCategory>;
   productId?: number;
 }
-export const EDIT_PRODUCT_PRODUCT_TYPE_MODAL_ID =
+export const EDIT_PRODUCT_PRODUCT_CATEGORY_MODAL_ID =
   "edit-product-product-type-modal";
-export const DELETE_PRODUCT_PRODUCT_TYPE_MODAL_ID =
+export const DELETE_PRODUCT_PRODUCT_CATEGORY_MODAL_ID =
   "delete-product-product-type-modal";
-export const CREATE_PRODUCT_PRODUCT_TYPE_MODAL_ID =
+export const CREATE_PRODUCT_PRODUCT_CATEGORY_MODAL_ID =
   "create-product-product-type-modal";
-export const MANAGE_PRODUCT_PRODUCT_TYPE_ID =
+export const MANAGE_PRODUCT_PRODUCT_CATEGORY_ID =
   "manage-product-product-type-modal";
 
-function ManageProductProductType({
+function ManageProductProductCategory({
   columnHandler,
   isChild = false,
   
@@ -38,7 +38,7 @@ function ManageProductProductType({
   paginationMode = "router",
   enablePagination = true,
   enableEdit = true,
-}: ManageProductProductTypeProps) {
+}: ManageProductProductCategoryProps) {
 
   return (
     <Suspense fallback={<Loader />}>
@@ -48,7 +48,7 @@ function ManageProductProductType({
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-              truJobApiConfig.endpoints.productProductType.replace(
+              truJobApiConfig.endpoints.productProductCategory.replace(
                 ":productId",
                 productId.toString()
               ),
@@ -65,7 +65,7 @@ function ManageProductProductType({
         deleteItemRequest={async ({ item }: { item: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-              truJobApiConfig.endpoints.productProductType.replace(
+              truJobApiConfig.endpoints.productProductCategory.replace(
                 ":productId",
                 productId.toString()
               ),
@@ -85,7 +85,7 @@ function ManageProductProductType({
         }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
-              truJobApiConfig.endpoints.productProductType.replace(
+              truJobApiConfig.endpoints.productProductCategory.replace(
                 ":productId",
                 productId.toString()
               ),
@@ -98,9 +98,9 @@ function ManageProductProductType({
         }}
         mode={mode}
         operation={operation}
-        id={MANAGE_PRODUCT_PRODUCT_TYPE_ID}
+        id={MANAGE_PRODUCT_PRODUCT_CATEGORY_ID}
         editFormComponent={{
-          component: EditProductProductType,
+          component: EditProductProductCategory,
           props: {
             productId: productId,
           },
@@ -122,4 +122,4 @@ function ManageProductProductType({
     </Suspense>
   );
 }
-export default ManageProductProductType;
+export default ManageProductProductCategory;

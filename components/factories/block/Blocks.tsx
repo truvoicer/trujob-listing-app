@@ -13,7 +13,7 @@ import ManageUser from "@/components/blocks/Admin/User/ManageUser";
 import ManageBrand from "@/components/blocks/Admin/Brand/ManageBrand";
 import ManageCategory from "@/components/blocks/Admin/Category/ManageCategory";
 import ManageColor from "@/components/blocks/Admin/Color/ManageColor";
-import ManageProductType from "@/components/blocks/Admin/ProductType/ManageProductType";
+import ManageProductCategory from "@/components/blocks/Admin/ProductCategory/ManageProductCategory";
 import ManageFeature from "@/components/blocks/Admin/Feature/ManageFeature";
 import ManageReview from "@/components/blocks/Admin/Review/ManageReview";
 import { ComponentHelpers } from "@/helpers/ComponentHelpers";
@@ -41,7 +41,7 @@ export class Blocks {
     static MANAGE_BRANDS_BLOCK = 'manage-brands-block';
     static MANAGE_CATEGORIES_BLOCK = 'manage-categories-block';
     static MANAGE_COLORS_BLOCK = 'manage-colors-block';
-    static MANAGE_PRODUCT_TYPES_BLOCK = 'manage-product-types-block';
+    static MANAGE_PRODUCT_CATEGORIES_BLOCK = 'manage-product-categories-block';
     static MANAGE_FEATURES_BLOCK = 'manage-features-block';
     static MANAGE_REVIEWS_BLOCK = 'manage-reviews-block';
     static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
@@ -190,12 +190,12 @@ export class Blocks {
                     }
                 ),
             },
-            [Blocks.MANAGE_PRODUCT_TYPES_BLOCK]: {
-                title: 'Manage Product Types Block',
-                description: 'This is the manage product types block',
-                icon: 'manage-product-types-block-icon',
+            [Blocks.MANAGE_PRODUCT_CATEGORIES_BLOCK]: {
+                title: 'Manage Product Categories Block',
+                description: 'This is the manage product categories block',
+                icon: 'manage-product-categories-block-icon',
                 component: ComponentHelpers.buildComponent(
-                    ManageProductType,
+                    ManageProductCategory,
                     {
                         mode: 'edit',
                     }

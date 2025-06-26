@@ -15,7 +15,7 @@ export type Product = {
     active: boolean;
     allow_offers: boolean;
     quantity: number;
-    type: ProductType;
+    type: 'digital' | 'physical' | 'service';
     user: User;
     follows: Array<ProductFollow>;
     features: Array<ProductFeature>;
@@ -23,7 +23,7 @@ export type Product = {
     categories: Array<ProductCategory>;
     brands: Array<ProductBrand>;
     colors: Array<ProductColor>;
-    product_types: Array<ProductProductType>;
+    product_types: Array<ProductProductCategory>;
     prices: Array<Price>;
     media: Array<Media>;
     created_at: string;
@@ -58,10 +58,11 @@ export interface CreateProduct extends ProductRequest {
 export interface UpdateProduct extends ProductRequest {
     id: number;
 }
-export type ProductType = {
+export type ProductCategory = {
     id: number;
     name: string;
     label: string;
+    active: boolean;
     created_at: string;
     updated_at: string;
 }
@@ -94,11 +95,7 @@ export type ProductReview = {
     created_at: string;
     updated_at: string;
 }
-export type ProductCategory = {
-    id: number;
-    product: Product;
-    category: Category;
-}
+
 export type ProductBrand = {
     id: number;
     product: Product;
@@ -109,10 +106,10 @@ export type ProductColor = {
     product: Product;
     color: Color;
 }
-export type ProductProductType = {
+export type ProductProductCategory = {
     id: number;
     product: Product;
-    product_type: ProductType;
+    product_category: ProductCategory;
 }   
 
 export type ProductReviewRequest = {

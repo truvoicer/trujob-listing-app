@@ -30,8 +30,8 @@ export type Order = {
 
 export type OrderItem = {
     id: number;
-    productable_id: number;
-    productable_type: 'product';
+    order_itemable_id: number;
+    order_itemable_type: 'product';
     entity: Product;
     default_discounts: Discount[];
     default_tax_rates: TaxRate[];

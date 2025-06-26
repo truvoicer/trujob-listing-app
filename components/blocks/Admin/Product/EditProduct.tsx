@@ -122,7 +122,7 @@ function EditProduct({
 
     function buildCreateData(values: Product) {
         console.log('buildCreateData', { values });
-        if (!values?.type?.id) {
+        if (!values?.type) {
             console.warn('Product type is required');
             return;
         }
@@ -130,7 +130,7 @@ function EditProduct({
             name: values.name,
             title: values.title,
             active: values?.active || false,
-            type: values.type.id
+            type: values.type
         };
         requestData = {
             ...requestData,

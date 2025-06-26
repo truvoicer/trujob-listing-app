@@ -11,10 +11,10 @@ import ManageProductFollow from "./Follow/ManageProductFollow";
 import ManageMedia from "../Media/ManageMedia";
 
 import ManageProductBrand from "./Brand/ManageProductBrand";
-import ManageProductCategory from "./Category/ManageProductCategory";
+import ManageCategoryProduct from "./Category/ManageCategoryProduct";
 import ManageProductFeature from "./Feature/ManageProductFeature";
 import ManageProductColor from "./Color/ManageProductColor";
-import ManageProductProductType from "./ProductType/ManageProductProductType";
+import ManageProductProductCategory from "./ProductCategory/ManageProductProductCategory";
 import { Price } from "@/types/Price";
 import ManageProductPrice from "./Price/ManageProductPrice";
 import TextInput from "@/components/Elements/TextInput";
@@ -274,20 +274,20 @@ function EditProductFields({
             }
         },
         {
-            id: 'productCategory',
+            id: 'categoryProduct',
             title: 'Manage Category',
             size: 'lg',
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                    id="productCategory"
+                    id="categoryProduct"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
                         { name: 'user' },
                     ]}
                 >
-                    <ManageProductCategory
+                    <ManageCategoryProduct
                         {...getProductComponentProps()}
                         data={values?.categories || []}
                         rowSelection={true}
@@ -296,7 +296,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(categories: Array<any>) => {
                             if (!Array.isArray(categories)) {
-                                console.warn('Invalid values received from ManageProductCategory component');
+                                console.warn('Invalid values received from ManageCategoryProduct component');
                                 return;
                             }
                             if (values?.id) {
@@ -428,20 +428,20 @@ function EditProductFields({
             }
         },
         {
-            id: 'productProductType',
-            title: 'Manage Product Type',
+            id: 'productProductCategory',
+            title: 'Manage Product Category',
             size: 'lg',
             fullscreen: true,
             component: (
                 <AccessControlComponent
-                    id="productProductType"
+                    id="productProductCategory"
                     roles={[
                         { name: 'admin' },
                         { name: 'superuser' },
                         { name: 'user' },
                     ]}
                 >
-                    <ManageProductProductType
+                    <ManageProductProductCategory
                         {...getProductComponentProps()}
                         data={values?.product_types || []}
                         rowSelection={true}
@@ -450,7 +450,7 @@ function EditProductFields({
                         paginationMode="state"
                         onChange={(productTypes: Array<any>) => {
                             if (!Array.isArray(productTypes)) {
-                                console.warn('Invalid values received from ManageProductProductType component');
+                                console.warn('Invalid values received from ManageProductProductCategory component');
                                 return;
                             }
                             if (values?.id) {
@@ -693,7 +693,7 @@ function EditProductFields({
                     <div className="col-12 my-3">
                         <h4>Manage Categories</h4>
                         {modalService.renderLocalTriggerButton(
-                            'productCategory',
+                            'categoryProduct',
                             'Manage Category',
                         )}
                     </div>
@@ -712,10 +712,10 @@ function EditProductFields({
                         )}
                     </div>
                     <div className="col-12 my-3">
-                        <h4>Manage Product Types</h4>
+                        <h4>Manage Product Categories</h4>
                         {modalService.renderLocalTriggerButton(
-                            'productProductType',
-                            'Manage Product Type',
+                            'productProductCategory',
+                            'Manage Product Category',
                         )}
                     </div>
                     <div className="col-12 my-3">

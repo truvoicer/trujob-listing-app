@@ -1,10 +1,7 @@
-import { useContext, useState } from "react";
 import { FormikValues, useFormikContext } from "formik";
-import { ModalService } from "@/library/services/modal/ModalService";
-import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DataTableContext } from "@/contexts/DataTableContext";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageCategory from "../../Category/ManageCategory";
+import { Category } from "@/types/Category";
 
 type EditProductCategoryFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -12,10 +9,6 @@ type EditProductCategoryFields = {
 function EditProductCategoryFields({
     operation
 }: EditProductCategoryFields) {
-
-    const modalService = new ModalService();
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
 
     const formHelpers = useFormikContext<FormikValues>() || {};
 
@@ -35,7 +28,7 @@ function EditProductCategoryFields({
                 multiRowSelection={true}
                 enableEdit={false}
                 paginationMode="state"
-                onChange={async (items: Array<any>) => {
+                onChange={async (items: Array<Category>) => {
                     if (!Array.isArray(items)) {
                         console.log('Invalid values received from ManageUser component');
                         return;

@@ -3,11 +3,11 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { MANAGE_PRODUCT_CATEGORY_ID } from "./ManageProductCategory";
+import { MANAGE_CATEGORY_PRODUCT_ID } from "./ManageCategoryProduct";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import { Product } from "@/types/Product";
-import EditProductCategoryFields from "./EditProductCategoryFields";
+import EditCategoryProductFields from "./EditCategoryProductFields";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
@@ -15,7 +15,7 @@ import { Category } from "@/types/Category";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type EditProductCategoryProps = {
+export type EditCategoryProductProps = {
     productId?: number;
     data?: Product;
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -23,14 +23,14 @@ export type EditProductCategoryProps = {
     modalId?: string;
     dataTable?: DataTableContextType;
 }
-function EditProductCategory({
+function EditCategoryProduct({
     dataTable,
     productId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditProductCategoryProps) {
+}: EditCategoryProductProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -71,7 +71,7 @@ function EditProductCategory({
                 console.log('create requestData', requestData);
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.productCategory.replace(
+                        truJobApiConfig.endpoints.categoryProduct.replace(
                             ':productId',
                             productId.toString(),
                         ),
@@ -109,8 +109,8 @@ function EditProductCategory({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_CATEGORY_ID, 'edit'));
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_CATEGORY_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_CATEGORY_PRODUCT_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_CATEGORY_PRODUCT_ID, 'create'));
 
     }
 
@@ -158,7 +158,7 @@ function EditProductCategory({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditProductCategoryFields operation={operation} />
+                        <EditCategoryProductFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -169,7 +169,7 @@ function EditProductCategory({
                     >
                         {() => {
                             return (
-                                <EditProductCategoryFields operation={operation} />
+                                <EditCategoryProductFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -178,4 +178,4 @@ function EditProductCategory({
         </div>
     );
 }
-export default EditProductCategory;
+export default EditCategoryProduct;

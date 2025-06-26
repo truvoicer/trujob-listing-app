@@ -5,12 +5,12 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import TextInput from "@/components/Elements/TextInput";
 
-type EditProductTypeFields = {
+type EditProductCategoryFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
-function EditProductTypeFields({
+function EditProductCategoryFields({
     operation
-}: EditProductTypeFields) {
+}: EditProductCategoryFields) {
     const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
@@ -52,4 +52,4 @@ function EditProductTypeFields({
         </div>
     );
 }
-export default EditProductTypeFields;
+export default EditProductCategoryFields;

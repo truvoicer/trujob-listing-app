@@ -2,35 +2,32 @@ import Form from "@/components/form/Form";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { useContext, useEffect, useState } from "react";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
-import { MANAGE_PRODUCT_PRODUCT_TYPE_ID } from "./ManageProductProductType";
+import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
-import { Product } from "@/types/Product";
-import EditProductProductTypeFields from "./EditProductProductTypeFields";
+import EditProductCategoryFields from "./EditProductCategoryFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
+import { CreateProductCategory, ProductCategory, UpdateProductCategory } from "@/types/Product";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { ProductType } from "@/types/Product";
+import { MANAGE_PRODUCT_CATEGORY_ID } from "./ManageProductCategory";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
-export type EditProductProductTypeProps = {
-    data?: Product;
+
+export type EditProductCategoryProps = {
+    data?: ProductCategory;
     operation: 'edit' | 'update' | 'add' | 'create';
     inModal?: boolean;
     modalId?: string;
-    productId?: number;
     dataTable?: DataTableContextType;
 }
-function EditProductProductType({
+function EditProductCategory({
     dataTable,
-    productId,
     data,
     operation,
     inModal = false,
     modalId,
-}: EditProductProductTypeProps) {
+}: EditProductCategoryProps) {
 
     const [alert, setAlert] = useState<{
         show: boolean;
@@ -39,42 +36,69 @@ function EditProductProductType({
     } | null>(null);
 
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-    const initialValues: {
-        productTypes: Array<ProductType>;
-    } = {
-        productTypes: data?.productTypes || [],
+    const initialValues: ProductCategory = {
+        id: data?.id || 0,
+        name: data?.name || '',
+        label: data?.label || '',
+        created_at: data?.created_at || '',
+        updated_at: data?.updated_at || '',
     };
 
-    async function handleSubmit(values: { productTypes: Array<ProductType> }) {
+    function buildCreateData(values: ProductCategory) {
+
+        let requestData: CreateProductCategory = {
+            name: values?.name || '',
+            label: values?.label || '',
+        };
+        return requestData;
+    }
+    function buildUpdateData(values: ProductCategory) {
+
+        let requestData: UpdateProductCategory = {
+            id: values?.id || 0,
+            name: values?.name || '',
+            label: values?.label || '',
+        };
+
+        return requestData;
+    }
+    async function handleSubmit(values: ProductCategory) {
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
-            console.warn('No data to update');
+            console.log('No data to update');
             return;
         }
-        if (!productId) {
-            console.log('Product ID is required');
-            return;
-        }
-        if (!Array.isArray(values?.items)) {
-            console.warn('Invalid values received');
-            return;
-        }
+
         let response = null;
-        let requestData = {
-            ids: RequestHelpers.extractIdsFromArray(values?.items),
-        }
+        let requestData: CreateProductCategory | UpdateProductCategory;
         switch (operation) {
-            case 'add':
-            case 'create':
             case 'edit':
             case 'update':
-                console.log('create requestData', requestData);
+
+                if (!values?.id) {
+                    console.log('Product type ID is required');
+                    return;
+                }
                 response = await truJobApiMiddleware.resourceRequest({
                     endpoint: UrlHelpers.urlFromArray([
-                        truJobApiConfig.endpoints.productProductType.replace(
-                            ':productId',
-                            productId.toString(),
-                        ),
-                        'bulk',
+                        truJobApiConfig.endpoints.productType,
+                        values?.id,
+                        'update',
+                    ]),
+                    method: ApiMiddleware.METHOD.PATCH,
+                    protectedReq: true,
+                    data: buildUpdateData(values),
+                })
+                break;
+            case 'add':
+            case 'create':
+                if (Array.isArray(values?.productTypes)) {
+                    return;
+                } else {
+                    requestData = buildCreateData(values);
+                }
+                response = await truJobApiMiddleware.resourceRequest({
+                    endpoint: UrlHelpers.urlFromArray([
+                        truJobApiConfig.endpoints.productType,
                         'store',
                     ]),
                     method: ApiMiddleware.METHOD.POST,
@@ -83,23 +107,13 @@ function EditProductProductType({
                 })
                 break;
             default:
-                console.warn('Invalid operation');
+                console.log('Invalid operation');
                 break;
         }
-
         if (!response) {
             setAlert({
                 show: true,
-                message: (
-                    <div>
-                        <strong>Error:</strong>
-                        {truJobApiMiddleware.getErrors().map((error: ErrorItem, index: number) => {
-                            return (
-                                <div key={index}>{error.message}</div>
-                            )
-                        })}
-                    </div>
-                ),
+                message: 'Error occurred while processing the request',
                 type: 'danger',
             });
             return;
@@ -108,8 +122,8 @@ function EditProductProductType({
             dataTable.refresh();
         }
         dataTableContext.refresh();
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_PRODUCT_TYPE_ID, 'edit'));
-        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_PRODUCT_TYPE_ID, 'create'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_CATEGORY_ID, 'edit'));
+        dataTableContext.modal.close(DataManagerService.getId(MANAGE_PRODUCT_CATEGORY_ID, 'create'));
     }
 
     function getRequiredFields() {
@@ -130,17 +144,14 @@ function EditProductProductType({
             return;
         }
 
-        dataTableContext.modal.update(
-            {
-                formProps: {
-                    operation: operation,
-                    initialValues: initialValues,
-                    requiredFields: getRequiredFields(),
-                    onSubmit: handleSubmit,
-                }
-            },
-            modalId
-        );
+        ModalService.initializeModalWithForm({
+            modalState: dataTableContext?.modal,
+            id: modalId,
+            operation: operation,
+            initialValues: initialValues,
+            requiredFields: getRequiredFields(),
+            handleSubmit: handleSubmit,
+        });
     }, [inModal, modalId]);
 
 
@@ -156,7 +167,7 @@ function EditProductProductType({
                 {inModal &&
                     ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
                     (
-                        <EditProductProductTypeFields operation={operation} />
+                        <EditProductCategoryFields operation={operation} />
                     )
                 }
                 {!inModal && (
@@ -167,7 +178,7 @@ function EditProductProductType({
                     >
                         {() => {
                             return (
-                                <EditProductProductTypeFields operation={operation} />
+                                <EditProductCategoryFields operation={operation} />
                             )
                         }}
                     </Form>
@@ -176,4 +187,4 @@ function EditProductProductType({
         </div>
     );
 }
-export default EditProductProductType;
+export default EditProductCategory;

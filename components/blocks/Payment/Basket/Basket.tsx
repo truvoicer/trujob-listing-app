@@ -20,9 +20,6 @@ function Basket({
     session,
 }: Checkout) {
     const [show, setShow] = useState(false);
-    const [billingAddress, setBillingAddress] = useState<Address | null>(null);
-    const [shippingAddress, setShippingAddress] = useState<Address | null>(null);
-
     const checkoutContext = useContext(CheckoutContext);
     const order = checkoutContext.order;
     const price = checkoutContext.price;
@@ -39,85 +36,6 @@ function Basket({
 
     const user = session[SESSION_USER];
 
-    function renderManageAddressModal(type: 'billing' | 'shipping') {
-        return (
-            <button
-                type="button"
-                className="btn btn-primary"
-                onClick={() => {
-                    modalContext.show({
-                        title: 'Add Address',
-                        component: ({
-                            formHelpers
-                        }: {
-                            onClose: () => void;
-                            formHelpers: FormikProps<FormikValues>;
-                        }) => {
-                            return (
-                                <ManageAddress
-                                    onSelect={(values: Address) => {
-                                        formHelpers.setValues(values);
-                                    }}
-                                />
-                            );
-                        },
-                        formProps: {
-                            initialValues: {},
-                            onSubmit: (values: Address) => {
-                                switch (type) {
-                                    case 'billing':
-                                        setBillingAddress(values);
-                                        break;
-                                    case 'shipping':
-                                        setShippingAddress(values);
-                                        break;
-                                    default:
-                                        console.warn('Unknown address type:', type);
-                                        break;
-                                }
-                            }
-                        },
-                        size: 'lg',
-                        backdrop: 'static',
-                        keyboard: false,
-                        showFooter: true,
-                        fullscreen: true,
-                        onOk: async ({ formHelpers }: { formHelpers: FormikProps<FormikValues> }) => {
-                            return await formHelpers.submitForm();
-                        }
-                    }, MANAGE_ADDRESS_MODAL_ID);
-                }}>
-                Add Address
-            </button>
-        );
-    }
-    function renderAddress(address: Address | null, type: 'billing' | 'shipping') {
-        if (!address) {
-            return (
-                <>
-                    <p className="mb-0">No address provided</p>
-                    {renderManageAddressModal(type)}
-                </>
-            );
-        }
-        return (
-            <div className="">
-                <h5 className="mb-0">
-                    {address.label}
-                </h5>
-                <p className="card-description">
-                    {address.address_line_1}, {address.address_line_2}, {address.city}, {address.state}, {address.postal_code}
-                </p>
-                <p className="card-description">
-                    {address.phone}
-                </p>
-                <p className="card-description">
-                    {address.country?.name}
-                </p>
-                {renderManageAddressModal(type)}
-            </div>
-        );
-    }
     useEffect(() => {
         if (!order || !price || !paymentMethod) {
             return;
@@ -127,19 +45,6 @@ function Basket({
         }
     }, [order, price, paymentMethod]);
 
-    useEffect(() => {
-        if (!user || !user.addresses || user.addresses.length === 0) {
-            return;
-        }
-        const billing = LocaleHelpers.getDefaultAddress(user.addresses, 'billing');
-        const shipping = LocaleHelpers.getDefaultAddress(user.addresses, 'shipping');
-        if (billing) {
-            setBillingAddress(billing);
-        }
-        if (shipping) {
-            setShippingAddress(shipping);
-        }
-    }, [user]);
 
     // console.log('Billing Address:', billingAddress);
     // console.log('Shipping Address:', shippingAddress);
@@ -172,34 +77,7 @@ function Basket({
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        <div className="row">
-                                            <div className="col-lg-12">
-                                                <div className="table-responsive-sm">
-                                                    <table className="table">
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col">Order Date</th>
-                                                                <th scope="col">Order ID</th>
-                                                                <th scope="col">Billing Address</th>
-                                                                <th scope="col">Shipping Address</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            <tr>
-                                                                <td>{order.created_at}</td>
-                                                                <td>{order.id}</td>
-                                                                <td>
-                                                                    {renderAddress(billingAddress, 'billing')}
-                                                                </td>
-                                                                <td>
-                                                                    {renderAddress(shippingAddress, 'shipping')}
-                                                                </td>
-                                                            </tr>
-                                                        </tbody>
-                                                    </table>
-                                                </div>
-                                            </div>
-                                        </div>
+                                        
 
                                         <OrderSummary 
                                             order={order}
