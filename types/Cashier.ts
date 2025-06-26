@@ -3,24 +3,48 @@ import { Product } from "./Product";
 import { PaymentGateway } from "./PaymentGateway";
 import { Price } from "./Price";
 import { User } from "./User";
+import { Discount } from "./Discount";
+import { TaxRate } from "./Tax";
 
 export type Order = {
     id: number;
-    user: User;
     status: 'pending' | 'processing' | 'completed' | 'cancelled';
     items: OrderItem[];
+    total_price: number;
+    total_quantity: number;
+    total_tax: number;
+    total_discount: number;
+    final_total: number;
+    total_items: number;
+    average_price_per_item: number;
+    total_shipping_cost: number;
+    total_price_with_shipping: number;
+    total_price_after_discounts: number;
+    total_price_after_tax: number;
+    total_price_after_tax_and_discounts: number;
+    default_discounts: Discount[];
+    default_tax_rates: TaxRate[];
     created_at: string;
     updated_at: string;
 }
 
 export type OrderItem = {
     id: number;
-    quantity: number;
     productable_id: number;
-    productable_type: string;
+    productable_type: 'product';
     entity: Product;
-    created_at: string;
-    updated_at: string;
+    default_discounts: Discount[];
+    default_tax_rates: TaxRate[];
+    discounts: Discount[];
+    tax_rates: TaxRate[];
+    total_price: number;
+    quantity: number;
+    tax_without_price: number;
+    total_price_with_tax: number;
+    discount: number;
+    total_tax: number;
+    total_price_after_discount: number;
+    total_price_after_tax_and_discount: number;
 }
 
 export type Transaction = {

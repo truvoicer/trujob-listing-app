@@ -1,5 +1,6 @@
 import { CheckoutContext } from "@/components/blocks/Payment/Checkout/context/CheckoutContext";
 import QuantityInput from "@/components/QuantityInput";
+import { OrderItemService } from "@/library/services/cashier/order/item/OrderItemService";
 import { OrderItem } from "@/types/Cashier";
 import { Product } from "@/types/Product";
 import Link from "next/link";
@@ -20,6 +21,9 @@ function ProductOrderItem({
     const product: Product = item.entity;
 
     const checkoutContext = useContext(CheckoutContext);
+
+    const orderItemService = new OrderItemService();
+
     function handleItemDelete(e: React.MouseEvent<HTMLAnchorElement>) {
         e.preventDefault();
         checkoutContext.removeOrderItem(item.id, checkoutContext);
@@ -45,8 +49,8 @@ function ProductOrderItem({
                     onChange={(val) => setQuantity(val)}
                 />
             </td>
-            <td className="text-center"></td>
-            <td className="text-center"></td>
+            <td className="text-center">{orderItemService.getPrice(item)}</td>
+            <td className="text-center">{orderItemService.getTotal(item)}</td>
             {editable && (
                 <td className="text-center">
                     <Link

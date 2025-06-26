@@ -2,22 +2,21 @@ import Loader from "@/components/Loader";
 import { LocaleHelpers } from "@/helpers/LocaleHelpers";
 import { SESSION_STATE, SESSION_USER } from "@/library/redux/constants/session-constants";
 import { PaymentGateway } from "@/types/PaymentGateway";
-import { Price } from "@/types/Price";
 import { useContext, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import ManageAddress, { Address } from "../../Admin/User/Address/ManageAddress";
 import { AppModalContext } from "@/contexts/AppModalContext";
-import { initial } from "underscore";
 import { FormikProps, FormikValues } from "formik";
 import OrderSummary from "@/components/Theme/Admin/Order/OrderSummary";
-import { CheckoutContext } from "./context/CheckoutContext";
+import { CheckoutContext } from "../Checkout/context/CheckoutContext";
 import { RootState } from "@/library/redux/store";
+import { SessionState } from "@/library/redux/reducers/session-reducer";
 
 export const MANAGE_ADDRESS_MODAL_ID = 'manage-address-modal';
 export type Checkout = {
-    session: any;
+    session: SessionState;
 }
-function Checkout({
+function Basket({
     session,
 }: Checkout) {
     const [show, setShow] = useState(false);
@@ -266,4 +265,4 @@ export default connect(
     (state: RootState) => ({
         session: state[SESSION_STATE],
     }),
-)(Checkout);
+)(Basket);

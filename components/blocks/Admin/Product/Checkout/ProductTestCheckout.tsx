@@ -20,6 +20,7 @@ import { PaymentMethod } from "@/types/PaymentMethod";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import CheckoutProvider from "@/components/blocks/Payment/Checkout/CheckoutProvider";
 import Loader from "@/components/Loader";
+import PaymentProcess from "@/components/blocks/Payment/PaymentProcess";
 
 export type ProductTestCheckoutProps = {
   productId: number;
@@ -351,7 +352,7 @@ function ProductTestCheckout({
           fetchPaymentMethod={async () => await fetchPaymentMethod()}
           fetchPrice={async () => await fetchProductPrice()}
         >
-          <Checkout />
+          <PaymentProcess />
         </CheckoutProvider>
         : (
           <Loader />

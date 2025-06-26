@@ -4,8 +4,9 @@ import { ProductOrderItemService } from "./product/ProductOrderItemService";
 export class OrderItemFactory {
     
     build(item: OrderItem, index: number, props: Record<string, any>): any {
+        console.log("Building order item", item, index, props);
         switch (item.productable_type) {
-            case 'App\\Models\\Product':
+            case 'product':
                 const productOrderItemService = new ProductOrderItemService();
                 return productOrderItemService.renderOrderItem(item, index, props);
             default:

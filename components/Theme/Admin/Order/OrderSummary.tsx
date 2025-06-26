@@ -12,6 +12,7 @@ function OrderSummary({
     const checkoutContext = useContext(CheckoutContext) as CheckoutContextType;
     const orderService = new OrderService(checkoutContext.order);
     const order: Order | null = checkoutContext.order;
+    console.log("Order Summary", order);
     return (
         <div className="row">
             <div className="col-sm-12">
@@ -33,7 +34,7 @@ function OrderSummary({
                                 return (
                                     <React.Fragment key={index}>
                                         {
-                                            orderService.getOrderItemFactory().build(
+                                            orderService.getOrderItemService().getOrderItemFactory().build(
                                                 item,
                                                 index,
                                                 {
@@ -45,6 +46,32 @@ function OrderSummary({
                                 )
                             })}
                         </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colSpan={5} className="text-right">
+                                    <strong>Total Discounts:</strong>
+                                </td>
+                                <td className="text-center">
+                                    {orderService.getTotalDiscountAmount(order)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan={5} className="text-right">
+                                    <strong>Total Tax:</strong>
+                                </td>
+                                <td className="text-center">
+                                    {orderService.getTotalTaxAmount(order)}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colSpan={5} className="text-right">
+                                    <strong>Total Amount:</strong>
+                                </td>
+                                <td className="text-center">
+                                    {orderService.getTotalAmount(order)}
+                                </td>
+                            </tr>
+                        </tfoot>    
                     </table>
                 </div>
             </div>
