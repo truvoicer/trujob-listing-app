@@ -75,7 +75,8 @@ function EditProfile({ session }: EditProfile) {
     console.log("Request data to be sent:", requestData);
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
         endpoint: UrlHelpers.urlFromArray([
-            TruJobApiMiddleware.getConfig().endpoints.profile
+            TruJobApiMiddleware.getConfig().endpoints.profile,
+            "update"
         ]),
         method: TruJobApiMiddleware.METHOD.PATCH,
         protectedReq: true,
