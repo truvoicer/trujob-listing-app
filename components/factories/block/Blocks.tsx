@@ -24,6 +24,7 @@ import ManageTaxRate from "@/components/blocks/Admin/Tax/TaxRate/ManageTaxRate";
 import ManageDiscount from "@/components/blocks/Admin/Discount/ManageDiscount";
 import ManageShippingMethod from "@/components/blocks/Admin/Shipping/ShippingMethod/ManageShippingMethod";
 import ManageShippingZone from "@/components/blocks/Admin/Shipping/ShippingZone/ManageShippingZone";
+import EditProfile from "@/components/blocks/Admin/User/Profile/EditProfile";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -52,6 +53,8 @@ export class Blocks {
     static MANAGE_DISCOUNTS_BLOCK = 'manage-discounts-block';
     static MANAGE_SHIPPING_METHODS_BLOCK = 'manage-shipping-methods-block';
     static MANAGE_SHIPPING_ZONES_BLOCK = 'manage-shipping-zones-block';
+    static EDIT_PROFILE_BLOCK = 'edit-profile-block';
+    static EDIT_ACCOUNT_SETTINGS_BLOCK = 'edit-account-settings-block';
 
     static getBlocks() {
         return {
@@ -301,6 +304,25 @@ export class Blocks {
                 icon: 'manage-shipping-zones-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManageShippingZone,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.EDIT_PROFILE_BLOCK]: {
+                title: 'Edit Profile Block',
+                description: 'This is the edit profile block',
+                icon: 'edit-profile-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    EditProfile,
+                ),
+            },
+            [Blocks.EDIT_ACCOUNT_SETTINGS_BLOCK]: {
+                title: 'Edit Account Settings Block',
+                description: 'This is the edit account settings block',
+                icon: 'edit-account-settings-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageSiteSettings,
                     {
                         mode: 'edit',
                     }

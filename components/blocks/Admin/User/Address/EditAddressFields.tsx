@@ -2,6 +2,7 @@ import { FormikValues, useFormikContext } from "formik";
 import CountrySelect from "@/components/blocks/Locale/Country/CountrySelect";
 import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
+import { LocaleService } from "@/library/services/locale/LocaleService";
 
 type EditAddressFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -114,11 +115,7 @@ function EditAddressFields({
                                 Country
                             </label>
                             <CountrySelect
-                                value={values?.country ?
-                                    {
-                                        value: values?.country?.id,
-                                        label: values?.country?.name,
-                                    } : null}
+                                value={LocaleService.getValueForCountrySelect(values?.country)}
                                 isMulti={false}
                                 showLoadingSpinner={true}
                                 onChange={(value) => {

@@ -2,6 +2,7 @@
 const config = {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
     endpoints: {
+        profile: '/user/profile',
         order: '/order',
         orderItem: '/order/:orderId/item',
         address: '/locale/address',

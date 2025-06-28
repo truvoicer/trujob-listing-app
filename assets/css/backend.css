@@ -2694,10 +2694,6 @@ textarea.form-control
   height: auto;
 }
 
-.form-group
-{
-  margin-bottom: 1rem;
-}
 
 .form-text
 {
@@ -17726,7 +17722,7 @@ body.tab-horizontal .iq-footer
   flex-direction: column;
   width: 100%;
   position: relative;
-  margin-bottom: 30px;
+  margin-top: 30px;
   border: unset !important;
 }
 

@@ -5,6 +5,9 @@ import { SessionService } from "@/library/services/session/SessionService";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 
 export class TruJobApiMiddleware extends ApiMiddleware {
+  static getConfig() {
+    return truJobApiConfig;
+  }
   static async handleTokenResponse(response: any) {
     if (!response) {
       setIsAuthenticatingAction(false);

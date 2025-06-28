@@ -34,7 +34,13 @@ import {
     SITE_SETTINGS_COUNTRY
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
+import { Country } from "@/types/Country";
+import { Currency } from "@/types/Currency";
 
+export type SiteSettingState = {
+    [SITE_SETTINGS_COUNTRY]: Country | null;
+    [SITE_SETTINGS_CURRENCY]: Currency | null;
+};
 export type SiteState = {
     [SITE_ID]: string | null;
     [SITE_NAME]: string | null;

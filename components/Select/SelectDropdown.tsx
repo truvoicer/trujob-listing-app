@@ -1,9 +1,8 @@
-import { parse } from 'path';
 import React, { useState, useEffect, useRef } from 'react';
 
 export interface Option {
-  label: string;
-  value: string;
+  label: string | number;
+  value: string | number;
 }
 
 export interface LaravelPaginatedResponse {
