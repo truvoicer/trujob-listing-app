@@ -91,10 +91,6 @@ export function buildShippingRate(rate: ShippingRate) {
   if (rate?.currency?.id) {
     shippingRate.currency_id = rate?.currency?.id;
   }
-  if (rate.hasOwnProperty("is_free_shipping_possible")) {
-    shippingRate.is_free_shipping_possible =
-      rate?.is_free_shipping_possible || false;
-  }
   return shippingRate;
 }
 function EditShippingRate({
@@ -134,8 +130,7 @@ function EditShippingRate({
     min_width: data?.min_width || 0,
     max_width: data?.max_width || 0,
     amount: data?.amount || 0,
-    currency: data?.currency || "",
-    is_free_shipping_possible: data?.is_free_shipping_possible || false,
+    currency: data?.currency || null,
     created_at: data?.created_at || "",
     updated_at: data?.updated_at || "",
   };

@@ -1,8 +1,6 @@
-import { Dispatch, useContext, useState } from "react";
+import { Dispatch, useState } from "react";
 import { FormikValues, useFormikContext } from "formik";
 import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
-import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { DataTableContext } from "@/contexts/DataTableContext";
 import SelectProductType from "./SelectProductType";
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
 import ManageUser from "../User/ManageUser";
@@ -19,8 +17,10 @@ import { Price } from "@/types/Price";
 import ManageProductPrice from "./Price/ManageProductPrice";
 import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
+import SelectProductUnit from "./SelectProductUnit";
+import SelectProductWeightUnit from "./SelectProductWeightUnit";
 
-type EditProductFields = {
+export type EditProductFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
 }
 function EditProductFields({
@@ -30,7 +30,7 @@ function EditProductFields({
     const [selectedBrands, setSelectedBrands] = useState<Array<any>>([]);
     const [selectedCategories, setSelectedCategories] = useState<Array<any>>([]);
     const [selectedColors, setSelectedColors] = useState<Array<any>>([]);
-    const [selectedProductTypes, setSelectedProductTypes] = useState<Array<any>>([]);
+    const [selectedProductCategories, setSelectedProductCategories] = useState<Array<any>>([]);
     const [selectedMedia, setSelectedMedia] = useState<Array<any>>([]);
     const [selectedReviews, setSelectedReviews] = useState<Array<any>>([]);
     const [selectedFeatures, setSelectedFeatures] = useState<Array<any>>([]);
@@ -38,8 +38,6 @@ function EditProductFields({
     const [selectedPrices, setSelectedPrices] = useState<Array<any>>([]);
 
     const modalService = new ModalService();
-    const notificationContext = useContext(AppNotificationContext);
-    const dataTableContext = useContext(DataTableContext);
 
     const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
 
@@ -443,33 +441,33 @@ function EditProductFields({
                 >
                     <ManageProductProductCategory
                         {...getProductComponentProps()}
-                        data={values?.product_types || []}
+                        data={values?.product_categories || []}
                         rowSelection={true}
                         multiRowSelection={true}
                         enableEdit={true}
                         paginationMode="state"
-                        onChange={(productTypes: Array<any>) => {
-                            if (!Array.isArray(productTypes)) {
+                        onChange={(productCategories: Array<unknown>) => {
+                            if (!Array.isArray(productCategories)) {
                                 console.warn('Invalid values received from ManageProductProductCategory component');
                                 return;
                             }
                             if (values?.id) {
-                                setSelectedProductTypes(
-                                    productTypes.filter((item) => item?.checked)
+                                setSelectedProductCategories(
+                                    productCategories.filter((item) => item?.checked)
                                 );
                                 return;
                             }
-                            setFieldValue('product_types', productTypes);
+                            setFieldValue('product_categories', productCategories);
                         }}
                     />
                 </AccessControlComponent>
             ),
             onOk: () => {
-                if (selectedProductTypes.length === 0) {
+                if (selectedProductCategories.length === 0) {
                     return true;
                 }
                 if (['add', 'create'].includes(operation)) {
-                    setFieldValue('product_types', selectedProductTypes);
+                    setFieldValue('product_categories', selectedProductCategories);
                     return true;
                 }
                 return true;
@@ -597,6 +595,7 @@ function EditProductFields({
                     <div className="col-12 col-lg-6">
                         <SelectProductType
                             name="type"
+                            value={values?.type || null}
                         />
                     </div>
 
@@ -660,6 +659,131 @@ function EditProductFields({
                             label="Quantity"
                         />
                     </div>
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="has_weight"
+                            value={values?.has_weight || false}
+                            onChange={handleChange}
+                            label="Has Weight?"
+                            placeholder="Has Weight?"
+                        />
+                    </div>
+                    {values?.has_weight && (
+                        <>
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.weight || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter weight"
+                                    name="weight"
+                                    type="number"
+                                    label="Weight"
+                                />
+                            </div>
+                            <div className="col-12 col-md-4">
+                                <SelectProductWeightUnit
+                                    name="weight_unit"
+                                    value={values?.weight_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="has_height"
+                            value={values?.has_height || false}
+                            onChange={handleChange}
+                            label="Has Height?"
+                            placeholder="Has Height?"
+                        />
+                    </div>
+                    {values?.has_height && (
+                        <>
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.height || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter height"
+                                    name="height"
+                                    type="number"
+                                    label="Height"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <SelectProductUnit
+                                    name="height_unit"
+                                    value={values?.height_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="has_length"
+                            value={values?.has_length || false}
+                            onChange={handleChange}
+                            label="Has Length?"
+                            placeholder="Has Length?"
+                        />
+                    </div>
+                    {values?.has_length && (
+                        <>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.length || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter length"
+                                    name="length"
+                                    type="number"
+                                    label="Length"
+                                />
+                            </div>
+                            
+                            <div className="col-12 col-md-4">
+                                <SelectProductUnit
+                                    name="length_unit"
+                                    value={values?.length_unit || ''} />
+                            </div>
+                        </>
+                    )}
+
+
+                    <div className="col-12 col-lg-6">
+                        <Checkbox
+                            name="has_width"
+                            value={values?.has_width || false}
+                            onChange={handleChange}
+                            label="Has Width?"
+                            placeholder="Has Width?"
+                        />
+                    </div>
+                    {values?.has_width && (
+                        <>
+
+                            <div className="col-12 col-md-4">
+                                <TextInput
+                                    value={values?.width || 0}
+                                    onChange={handleChange}
+                                    placeholder="Enter width"
+                                    name="width"
+                                    type="number"
+                                    label="Width"
+                                />
+                            </div>
+
+                            <div className="col-12 col-md-4">
+                                <SelectProductUnit
+                                    name="width_unit"
+                                    value={values?.width_unit || ''} />
+                            </div>
+                        </>
+                    )}
 
 
                     <div className="col-12 my-3">

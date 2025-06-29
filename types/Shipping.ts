@@ -88,7 +88,6 @@ export type ShippingRate = {
     max_length: number | null;
     amount: number;
     currency: Currency;
-    is_free_shipping_possible: boolean;
     zone?: ShippingZone | null;
     created_at: string;
     updated_at: string;
@@ -115,7 +114,6 @@ export type ShippingRateRequest = {
     min_length?: number | null;
     max_length?: number | null;
     currency_id?: number;
-    is_free_shipping_possible?: boolean;
 }
 export interface CreateShippingRate extends ShippingRateRequest {
     shipping_method_id: number;
@@ -123,7 +121,6 @@ export interface CreateShippingRate extends ShippingRateRequest {
     type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
     amount: number;
     currency_id: number;
-    is_free_shipping_possible?: boolean;
 }
 export interface UpdateShippingRate extends ShippingRateRequest {
     id: number;

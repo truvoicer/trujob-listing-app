@@ -27,7 +27,6 @@ export const MANAGE_PRODUCT_PRODUCT_CATEGORY_ID =
 function ManageProductProductCategory({
   columnHandler,
   isChild = false,
-  
   mode = "selector",
   data,
   operation,
@@ -39,7 +38,7 @@ function ManageProductProductCategory({
   enablePagination = true,
   enableEdit = true,
 }: ManageProductProductCategoryProps) {
-
+  
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
@@ -112,7 +111,7 @@ function ManageProductProductCategory({
         enableEdit={enableEdit}
         paginationMode={paginationMode}
         enablePagination={enablePagination}
-        title={"Manage Product Types"}
+        title={"Manage Product Categories"}
         columns={[
           { label: "ID", key: "id" },
           { label: "Label", key: "label" },

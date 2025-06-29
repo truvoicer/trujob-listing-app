@@ -87,7 +87,7 @@ function ManageProductCategory({
         enableEdit={enableEdit}
         paginationMode={paginationMode}
         enablePagination={enablePagination}
-        title={"Manage Product Types"}
+        title={"Manage Product Categories"}
         columns={[
           { label: "ID", key: "id" },
           { label: "Label", key: "label" },

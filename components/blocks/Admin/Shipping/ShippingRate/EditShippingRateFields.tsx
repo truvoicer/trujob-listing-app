@@ -296,16 +296,6 @@ function EditShippingRateFields({
                         </div>
                     </div>
 
-                    <div className="col-12 col-lg-6">
-                        <Checkbox
-                            name="is_free_shipping_possible"
-                            value={values?.is_free_shipping_possible || false}
-                            onChange={handleChange}
-                            label="Is Free Shipping Possible?"
-                            placeholder="Is Free Shipping Possible?"
-                        />
-                    </div>
-
 
                     <div className="col-12 col-lg-6">
                         <div className="floating-input">

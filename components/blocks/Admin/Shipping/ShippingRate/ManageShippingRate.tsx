@@ -252,10 +252,6 @@ function ManageShippingRate({
             key: "currency.name",
           },
           {
-            label: "Free Shipping Possible",
-            key: "is_free_shipping_possible",
-          },
-          {
             label: "Created At",
             key: "created_at",
             type: "date",

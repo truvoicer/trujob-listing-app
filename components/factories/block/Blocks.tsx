@@ -159,6 +159,7 @@ export class Blocks {
                     ManageProduct,
                     {
                         mode: 'edit',
+                        operation: 'edit',
                     }
                 ),
             },

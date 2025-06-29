@@ -370,6 +370,7 @@ function DataManager({
         if (!formHelpers) {
           return;
         }
+        console.log(operation)
         if (!operation) {
           console.warn("Operation is required");
           return;

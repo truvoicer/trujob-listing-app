@@ -8,14 +8,14 @@ import { useEffect, useState } from "react";
 
 export type SelectProductTypeProps = {
     name?: string;
-    value?: number | null;
+    value?: string | null;
 }
 function SelectProductType({
     name = 'type',
     value,
 }: SelectProductTypeProps) {
-    const [productTypes, setProductTypes] = useState<Array<ProductType>>([]);
-    const [selectedProductType, setSelectedProductType] = useState<ProductType | null>(null);
+    const [productTypes, setProductTypes] = useState<Array<string>>([]);
+    const [selectedProductType, setSelectedProductType] = useState<string | null>(null);
 
     const formContext = useFormikContext<FormikValues>() || {};
 
@@ -39,8 +39,8 @@ function SelectProductType({
 
     useEffect(() => {
         if (value) {
-            const findProductType = productTypes.find((productType: ProductType) => productType?.id === value);
-            
+            const findProductType = productTypes.find((productType: string) => productType === value);
+
             if (findProductType) {
                 setSelectedProductType(findProductType);
             }
@@ -73,25 +73,25 @@ function SelectProductType({
                         setSelectedProductType(null);
                         return;
                     }
-                    const findProductType = productTypes.find((productType: ProductType) => productType?.id === parseInt(e.target.value));
+                    const findProductType = productTypes.find((productType: string) => productType === e.target.value);
                     if (!findProductType) {
                         console.warn('Selected productType not found');
                         return;
                     }
                     setSelectedProductType(findProductType);
                 }}
-                value={selectedProductType?.id || ''}
+                value={selectedProductType || ''}
             >
-                <option value="">Select ProductType</option>
+                <option value="">Select Product Type</option>
                 {productTypes.map((productType, index) => (
                     <option
                         key={index}
-                        value={productType.id}>
-                        {`${productType.name} | id: (${productType.id})`}
+                        value={productType}>
+                        {`${productType}`}
                     </option>
                 ))}
             </select>
-            <label className="form-label" htmlFor={name}>ProductType</label>
+            <label className="form-label" htmlFor={name}>Product Type</label>
         </div>
     );
 }
