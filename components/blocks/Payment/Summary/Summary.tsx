@@ -1,21 +1,10 @@
 import Loader from "@/components/Loader";
-import { SESSION_STATE, SESSION_USER } from "@/library/redux/constants/session-constants";
-import { useContext, useEffect, useState } from "react";
-import { connect } from "react-redux";
-import { AppModalContext } from "@/contexts/AppModalContext";
 import OrderSummary from "@/components/Theme/Admin/Order/OrderSummary";
+import { useContext, useEffect, useState } from "react";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
-import { RootState } from "@/library/redux/store";
-import { SessionState } from "@/library/redux/reducers/session-reducer";
 
-export const MANAGE_ADDRESS_MODAL_ID = 'manage-address-modal';
-export type Checkout = {
-    session: SessionState;
-}
-function Basket({
-    session,
-}: Checkout) {
-    const [show, setShow] = useState(false);
+function Summary() {
+ const [show, setShow] = useState(false);
     const checkoutContext = useContext(CheckoutContext);
     const order = checkoutContext.order;
     const price = checkoutContext.price;
@@ -58,9 +47,9 @@ function Basket({
                                         </div>
                                     </div>
                                     <div className="card-body">
-                                        <OrderSummary 
+                                        <OrderSummary
                                             order={order}
-                                            editable={true}
+                                            editable={false}
                                         />
                                     </div>
                                 </div>
@@ -74,9 +63,4 @@ function Basket({
         </>
     );
 }
-
-export default connect(
-    (state: RootState) => ({
-        session: state[SESSION_STATE],
-    }),
-)(Basket);
+export default Summary;

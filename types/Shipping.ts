@@ -6,6 +6,7 @@ import { Region } from "./Region";
 
 export type ShippingMethod = {
     id: number;
+    label: string;
     name: string;
     description: string;
     is_active: boolean;
@@ -19,6 +20,7 @@ export type ShippingMethod = {
 
 export type ShippingMethodRequest = {
     name?: string;
+    label?: string;
     description?: string;
     is_active?: boolean;
     processing_time_days?: number;
@@ -28,6 +30,7 @@ export type ShippingMethodRequest = {
 }
 export interface CreateShippingMethod extends ShippingMethodRequest {
     name: string;
+    label: string;
     description: string;
     is_active?: boolean;
     processing_time_days?: number;
@@ -40,6 +43,7 @@ export interface UpdateShippingMethod extends ShippingMethodRequest {
 export type ShippingZone = {
     id: number;
     name: string;
+    label: string;
     countries: Country[];
     is_active: boolean;
     created_at: string;
@@ -47,11 +51,13 @@ export type ShippingZone = {
 }
 export type ShippingZoneRequest = {
     name?: string;
+    label?: string;
     country_ids?: number[];
     is_active?: boolean;
 }
 export interface CreateShippingZone extends ShippingZoneRequest {
     name: string;
+    label: string;
     country_ids: number[];
     is_active?: boolean;
 }

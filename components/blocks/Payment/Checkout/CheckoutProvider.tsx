@@ -12,13 +12,13 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 export type CheckoutProviderProps = {
     children: React.ReactNode;
     fetchOrder: () => Promise<Order | null>;
-    fetchPaymentMethod: () => Promise<PaymentGateway | null>;
+    fetchAvailablePaymentGateways: () => Promise<PaymentGateway | null>;
     fetchPrice: () => Promise<Price | null>;
 }
 function CheckoutProvider({
     children,
     fetchOrder,
-    fetchPaymentMethod,
+    fetchAvailablePaymentGateways,
     fetchPrice,
 }: CheckoutProviderProps) {
 
@@ -48,17 +48,17 @@ function CheckoutProvider({
         });
     }
 
-    async function handleFetchPaymentMethod() {
-        if (typeof fetchPaymentMethod !== 'function') {
-            console.error("fetchPaymentMethod is not a function");
+    async function handleFetchAvailablePaymentGateways() {
+        if (typeof fetchAvailablePaymentGateways !== 'function') {
+            console.error("fetchAvailablePaymentGateways is not a function");
             return;
         }
-        const response = await fetchPaymentMethod();
+        const response = await fetchAvailablePaymentGateways();
         if (!response) {
             return false;
         }
         updateCheckoutData({
-            paymentMethod: response,
+            availablePaymentGateways: response,
         });
     }
     async function fetchTransaction() {
@@ -78,7 +78,23 @@ function CheckoutProvider({
         });
     }
 
-    async function refreshEntity(entity: 'order' | 'transaction' | 'paymentMethod' | 'price') {
+
+    async function handleFetchAvailableShippingMethods() {
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+            endpoint: truJobApiConfig.endpoints.shippingMethod,
+            method: TruJobApiMiddleware.METHOD.GET,
+            protectedReq: true,
+        });
+        if (!response || !response.data) {
+            console.error("Failed to fetch shipping methods. No response or data received.");
+            return;
+        }
+        updateCheckoutData({
+            availableShippingMethods: response.data,
+        });
+    }
+
+    async function refreshEntity(entity: 'order' | 'transaction' | 'availablePaymentGateways' | 'price' | 'availableShippingMethods') {
         switch (entity) {
             case 'order':
                 await handleFetchOrder();
@@ -86,11 +102,14 @@ function CheckoutProvider({
             case 'transaction':
                 await fetchTransaction();
                 break;
-            case 'paymentMethod':
-                await handleFetchPaymentMethod();
+            case 'availablePaymentGateways':
+                await handleFetchAvailablePaymentGateways();
                 break;
             case 'price':
-                handleFetchPrice();
+                await handleFetchPrice();
+                break;
+            case 'availableShippingMethods':
+                await handleFetchAvailableShippingMethods();
                 break;
             default:
                 console.warn(`Unknown entity type: ${entity}`);
@@ -163,7 +182,7 @@ function CheckoutProvider({
 
     useEffect(() => {
         handleFetchOrder();
-        handleFetchPaymentMethod();
+        handleFetchAvailablePaymentGateways();
         handleFetchPrice();
     }, []);
 

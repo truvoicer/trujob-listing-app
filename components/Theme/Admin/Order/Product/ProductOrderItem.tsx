@@ -42,12 +42,16 @@ function ProductOrderItem({
                 <p className="mb-0">{product.description}</p>
             </td>
             <td className="text-center">
+                {editable ? (
                 <QuantityInput
                     value={quantity}
                     min={1}
                     max={10}
                     onChange={(val) => setQuantity(val)}
                 />
+                ) : (
+                    <span>{item.quantity}</span>
+                )}
             </td>
             <td className="text-center">{orderItemService.getPrice(item)}</td>
             <td className="text-center">{orderItemService.getTotal(item)}</td>

@@ -1,13 +1,16 @@
 import { SessionState } from "@/library/redux/reducers/session-reducer";
 import Basket from "./Basket/Basket";
-import { act, useState } from "react";
+import { useState } from "react";
 import { connect } from "react-redux";
 import { RootState } from "@/library/redux/store";
 import ButtonLink from "@/components/Elements/ButtonLink";
 import Shipping from "./Shipping/Shipping";
+import Summary from "./Summary/Summary";
+import PaymentGateways from "./PaymentGateways";
 
 export const STEP_BASKET = "basket";
 export const STEP_SHIPPING_DETAILS = "shipping_details";
+export const STEP_SUMMARY = "summary";
 export const STEP_PAYMENT_METHOD = "payment_method";
 export const STEP_PAYMENT_DETAILS = "payment_details";
 export const STEP_REVIEW_CONFIRM = "review_confirm";
@@ -39,11 +42,18 @@ function PaymentProcess({ session }: PaymentProcess) {
       component: Shipping, // Placeholder for future component
     },
     {
+      id: STEP_SUMMARY,
+      title: "Order Summary",
+      description:
+        "Review your order details before proceeding to payment.",
+      component: Summary, // Placeholder for future component
+    },
+    {
       id: STEP_PAYMENT_METHOD,
       title: "Select Payment Method",
       description:
         "Choose your preferred payment method to proceed with the transaction.",
-      component: undefined, // Placeholder for future component
+      component: PaymentGateways, // Placeholder for future component
     },
     {
       id: STEP_PAYMENT_DETAILS,
@@ -93,12 +103,6 @@ function PaymentProcess({ session }: PaymentProcess) {
           <h2 className="text-2xl font-bold mb-4">Payment Process</h2>
           <div className="w-full max-w-md">
             <div className={`p-4 mb-4 border rounded bg-gray-100`}>
-              <h3 className="text-lg font-semibold">
-                {activeStepConfig.title}
-              </h3>
-              <p className="text-sm text-gray-600">
-                {activeStepConfig.description}
-              </p>
               {renderStepComponent(activeStepConfig)}
               {!isFirstStep() && (
                 <ButtonLink

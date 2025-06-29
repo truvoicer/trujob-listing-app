@@ -70,11 +70,10 @@ function ProductTestCheckout({
     }
   }
 
-  async function fetchPaymentMethod() {
+  async function fetchAvailablePaymentGateways() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.paymentGateway,
-        1
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
@@ -91,7 +90,7 @@ function ProductTestCheckout({
   }
 
   async function updatePaymentMethod() {
-    const response = await fetchPaymentMethod();
+    const response = await fetchAvailablePaymentGateways();
     if (response) {
       setPaymentGateway(response);
     }
@@ -349,7 +348,7 @@ function ProductTestCheckout({
         ?
         <CheckoutProvider
           fetchOrder={async () => await fetchOrder()}
-          fetchPaymentMethod={async () => await fetchPaymentMethod()}
+          fetchAvailablePaymentGateways={async () => await fetchAvailablePaymentGateways()}
           fetchPrice={async () => await fetchProductPrice()}
         >
           <PaymentProcess />
