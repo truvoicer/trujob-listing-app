@@ -4,15 +4,16 @@ import Checkbox from "@/components/Elements/Checkbox";
 import DateInput from "@/components/Elements/DateInput";
 import TextInput from "@/components/Elements/TextInput";
 import Form, {
-    VALIDATION_ALLOW_SPACES,
+  VALIDATION_ALLOW_SPACES,
   VALIDATION_ALPHA_NUMERIC,
-  VALIDATION_ALPHA_NUMERIC_HYPHENS,
   VALIDATION_ALPHA_NUMERIC_SYMBOLS,
+  VALIDATION_DATE,
   VALIDATION_EMAIL,
   VALIDATION_MATCH,
-  VALIDATION_REQUIRED,
+  VALIDATION_PHONE,
   VALIDATION_REQUIRED_IF,
 } from "@/components/form/Form";
+import { AppModalContext } from "@/contexts/AppModalContext";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import {
@@ -22,6 +23,7 @@ import {
   SESSION_USER_LASTNAME,
   SESSION_USER_PROFILE,
   SESSION_USER_PROFILE_DOB,
+  SESSION_USER_PROFILE_PHONE,
   SESSION_USER_SETTINGS,
   SESSION_USER_SETTINGS_COUNTRY,
   SESSION_USER_SETTINGS_CURRENCY,
@@ -32,6 +34,7 @@ import { SessionState } from "@/library/redux/reducers/session-reducer";
 import { RootState } from "@/library/redux/store";
 import { LocaleService } from "@/library/services/locale/LocaleService";
 import { FormikProps, FormikValues } from "formik";
+import { useContext } from "react";
 import { Button } from "react-bootstrap";
 import { connect } from "react-redux";
 export type EditProfile = {
@@ -39,52 +42,72 @@ export type EditProfile = {
 };
 
 function EditProfile({ session }: EditProfile) {
-  async function formSubmitHandler(values: FormikValues) {
-    console.log("Form submitted with values:", values);
-    
-    let requestData = {};
-    if (values?.[SESSION_USER_FIRSTNAME]) {
-        requestData[SESSION_USER_FIRSTNAME] = values?.[SESSION_USER_FIRSTNAME];
-    }
-    if (values?.[SESSION_USER_LASTNAME]) {
-        requestData[SESSION_USER_LASTNAME] = values?.[SESSION_USER_LASTNAME];
-    }
-    if (values?.[SESSION_USER_USERNAME]) {
-        requestData[SESSION_USER_USERNAME] = values?.[SESSION_USER_USERNAME];
-    }
-    if (values?.[SESSION_USER_EMAIL]) {
-        requestData[SESSION_USER_EMAIL] = values?.[SESSION_USER_EMAIL];
-    }
-    if (values?.[SESSION_USER_PROFILE_DOB]) {
-        requestData[SESSION_USER_PROFILE] = values?.[SESSION_USER_PROFILE_DOB];
-    }
-    if (values?.[SESSION_USER_SETTINGS_COUNTRY]) {
-        requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.value;
-    }
-    if (values?.[SESSION_USER_SETTINGS_CURRENCY]) {
-        requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.value;
-    }
-    if (values?.[SESSION_USER_SETTINGS_LANGUAGE]) {
-        requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.value;
-    }
-    if (values?.change_password) {
-        requestData.change_password = true;
-        requestData.password = values?.password;
-        requestData.password_confirmation = values?.password_confirmation;
-    }
-    console.log("Request data to be sent:", requestData);
+  const notificationContext = useContext(AppModalContext);
+  async function handlePasswordReset() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-        endpoint: UrlHelpers.urlFromArray([
-            TruJobApiMiddleware.getConfig().endpoints.profile,
-            "update"
-        ]),
-        method: TruJobApiMiddleware.METHOD.PATCH,
-        protectedReq: true,
-        data: requestData,
+      endpoint: UrlHelpers.urlFromArray([
+        TruJobApiMiddleware.getConfig().endpoints.auth.password.reset.request,
+      ]),
+      method: TruJobApiMiddleware.METHOD.POST,
+      protectedReq: true,
+      data: {
+        email: session?.[SESSION_USER]?.[SESSION_USER_EMAIL],
+      },
     });
     if (!response) {
-        console.error("Failed to update profile. No response received.");
-        return;
+      console.error("Failed to reset password. No response received.");
+      return;
+    }
+    notificationContext.show({
+      variant: "success",
+      message: "Password reset email sent successfully.",
+    }, "password-reset-success");
+  }
+
+  async function formSubmitHandler(values: FormikValues) {
+    let requestData = {};
+    if (values?.[SESSION_USER_FIRSTNAME]) {
+      requestData[SESSION_USER_FIRSTNAME] = values?.[SESSION_USER_FIRSTNAME];
+    }
+    if (values?.[SESSION_USER_LASTNAME]) {
+      requestData[SESSION_USER_LASTNAME] = values?.[SESSION_USER_LASTNAME];
+    }
+    if (values?.[SESSION_USER_USERNAME]) {
+      requestData[SESSION_USER_USERNAME] = values?.[SESSION_USER_USERNAME];
+    }
+    if (values?.[SESSION_USER_EMAIL]) {
+      requestData[SESSION_USER_EMAIL] = values?.[SESSION_USER_EMAIL];
+    }
+    if (values?.[SESSION_USER_PROFILE_DOB]) {
+      requestData[SESSION_USER_PROFILE_DOB] =
+        values?.[SESSION_USER_PROFILE_DOB];
+    }
+    if (values?.[SESSION_USER_PROFILE_PHONE]) {
+      requestData[SESSION_USER_PROFILE_PHONE] =
+        values?.[SESSION_USER_PROFILE_PHONE];
+    }
+    if (values?.[SESSION_USER_SETTINGS_COUNTRY]) {
+      requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.id;
+    }
+    if (values?.[SESSION_USER_SETTINGS_CURRENCY]) {
+      requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.id;
+    }
+    if (values?.[SESSION_USER_SETTINGS_LANGUAGE]) {
+      requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.id;
+    }
+
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        TruJobApiMiddleware.getConfig().endpoints.profile,
+        "update",
+      ]),
+      method: TruJobApiMiddleware.METHOD.PATCH,
+      protectedReq: true,
+      data: requestData,
+    });
+    if (!response) {
+      console.error("Failed to update profile. No response received.");
+      return;
     }
     TruJobApiMiddleware.getInstance().refreshSessionUser();
   }
@@ -103,6 +126,8 @@ function EditProfile({ session }: EditProfile) {
           [SESSION_USER_EMAIL]: user?.[SESSION_USER_EMAIL] || "",
           [SESSION_USER_PROFILE_DOB]:
             user?.[SESSION_USER_PROFILE]?.[SESSION_USER_PROFILE_DOB] || "",
+          [SESSION_USER_PROFILE_PHONE]:
+            user?.[SESSION_USER_PROFILE]?.[SESSION_USER_PROFILE_PHONE] || "",
           [SESSION_USER_SETTINGS_COUNTRY]:
             user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_COUNTRY] ||
             "",
@@ -112,44 +137,20 @@ function EditProfile({ session }: EditProfile) {
           [SESSION_USER_SETTINGS_LANGUAGE]:
             user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_LANGUAGE] ||
             "",
-          change_password: false,
-          password: "",
-          password_confirmation: "",
         }}
         validation={{
           [SESSION_USER_FIRSTNAME]: [
-            { type: VALIDATION_ALPHA_NUMERIC }, 
-            { type: VALIDATION_ALLOW_SPACES}
+            { type: VALIDATION_ALPHA_NUMERIC },
+            { type: VALIDATION_ALLOW_SPACES },
           ],
           [SESSION_USER_LASTNAME]: [
-            { type: VALIDATION_ALPHA_NUMERIC }, 
-            { type: VALIDATION_ALLOW_SPACES}
+            { type: VALIDATION_ALPHA_NUMERIC },
+            { type: VALIDATION_ALLOW_SPACES },
           ],
-          [SESSION_USER_USERNAME]: [
-            { type: VALIDATION_ALPHA_NUMERIC }
-          ],
-          [SESSION_USER_EMAIL]: [
-            { type: VALIDATION_EMAIL }
-          ],
-          password: [
-            { type: VALIDATION_ALPHA_NUMERIC_SYMBOLS },
-            { 
-                type: VALIDATION_REQUIRED_IF, 
-                field: {
-                    change_password: true
-                }
-            },
-          ],
-          password_confirmation: [
-            { type: VALIDATION_ALPHA_NUMERIC_SYMBOLS },
-            { 
-                type: VALIDATION_REQUIRED_IF, 
-                field: {
-                    change_password: true
-                }
-            },
-            { type: VALIDATION_MATCH, field: "password" },
-          ],
+          [SESSION_USER_USERNAME]: [{ type: VALIDATION_ALPHA_NUMERIC }],
+          [SESSION_USER_EMAIL]: [{ type: VALIDATION_EMAIL }],
+          [SESSION_USER_PROFILE_PHONE]: [{ type: VALIDATION_PHONE }],
+          [SESSION_USER_PROFILE_DOB]: [{ type: VALIDATION_DATE }],
         }}
       >
         {({
@@ -240,6 +241,22 @@ function EditProfile({ session }: EditProfile) {
                   )}
                 </div>
 
+                <div className="col-12 col-lg-6">
+                  <TextInput
+                    value={values?.[SESSION_USER_PROFILE_PHONE] || ""}
+                    onChange={handleChange}
+                    placeholder="Enter Phone Number"
+                    name="phone"
+                    type="text"
+                    label="Phone Number"
+                  />
+                  {errors?.[SESSION_USER_PROFILE_PHONE] && (
+                    <div className="text-danger">
+                      {errors?.[SESSION_USER_PROFILE_PHONE] || ""}
+                    </div>
+                  )}
+                </div>
+
                 <div className="col-12 col-lg-6 mt-2">
                   <div className="floating-input">
                     <label className="fw-bold" htmlFor="country">
@@ -266,7 +283,9 @@ function EditProfile({ session }: EditProfile) {
                 </div>
 
                 <div className="col-12 col-lg-6">
-                  <label className="title">Select Currency</label>
+                  <label className="fw-bold" htmlFor="currency">
+                    Select Currency
+                  </label>
                   <CurrencySelect
                     value={LocaleService.getValueForCurrencySelect(
                       values?.[SESSION_USER_SETTINGS_CURRENCY]
@@ -299,41 +318,15 @@ function EditProfile({ session }: EditProfile) {
                     }}
                   />
                 </div>
-                {values?.change_password && (
-                  <>
-                    <div className="col-12 col-lg-6">
-                      <TextInput
-                        value={values?.password || ""}
-                        onChange={handleChange}
-                        placeholder="Enter Password"
-                        name="password"
-                        type="password"
-                        label="Password"
-                      />
-                      {errors?.password && (
-                        <div className="text-danger">
-                          {errors?.password || ""}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="col-12 col-lg-6">
-                      <TextInput
-                        value={values?.password_confirmation || ""}
-                        onChange={handleChange}
-                        placeholder="Confirm Password"
-                        name="password_confirmation"
-                        type="password"
-                        label="Confirm Password"
-                      />
-                      {errors?.password_confirmation && (
-                        <div className="text-danger">
-                          {errors?.password_confirmation || ""}
-                        </div>
-                      )}
-                    </div>
-                  </>
-                )}
+                <div className="col-12 col-lg-6">
+                  <Button
+                    variant="secondary"
+                    type="button"
+                    onClick={handlePasswordReset}
+                  >
+                    Reset Password
+                  </Button>
+                </div>
               </div>
               <div className="row form-group">
                 <div className="col-12">

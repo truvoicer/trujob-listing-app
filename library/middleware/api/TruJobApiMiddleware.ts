@@ -22,13 +22,13 @@ export class TruJobApiMiddleware extends ApiMiddleware {
 
   async refreshSessionUser() {
     const response = await this.resourceRequest({
-      endpoint: UrlHelpers.urlFromArray([truJobApiConfig.endpoints.auth.view]),
+      endpoint: UrlHelpers.urlFromArray([truJobApiConfig.endpoints.session.user.show]),
       method: ApiMiddleware.METHOD.GET,
       protectedReq: true,
     });
-    const user = response?.data?.user;
-    const token = response?.data?.token;
-    if (!user || !token) {
+    console.log("refreshSessionUser response", response);
+    const user = response?.data;
+    if (!user) {
       throw new Error("Failed to fetch session user data");
     }
     setSessionUserAction(SessionService.extractUserData(user));

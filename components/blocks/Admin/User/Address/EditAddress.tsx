@@ -118,7 +118,7 @@ function EditAddress({
     }
 
     async function handleSubmit(values: Address) {
-
+        console.log('handleSubmit called with values:', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
             return;

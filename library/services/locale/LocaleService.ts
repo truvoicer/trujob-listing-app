@@ -5,11 +5,13 @@ import {
   SESSION_USER_SETTINGS,
   SESSION_USER_SETTINGS_COUNTRY,
   SESSION_USER_SETTINGS_CURRENCY,
+  SESSION_USER_SETTINGS_LANGUAGE,
 } from "@/library/redux/constants/session-constants";
 import {
   SITE_SETTINGS,
   SITE_SETTINGS_COUNTRY,
   SITE_SETTINGS_CURRENCY,
+  SITE_SETTINGS_LANGUAGE,
   SITE_STATE,
 } from "@/library/redux/constants/site-constants";
 import { SessionState } from "@/library/redux/reducers/session-reducer";
@@ -17,6 +19,7 @@ import { SiteState } from "@/library/redux/reducers/site-reducer";
 import store from "@/library/redux/store";
 import { Country } from "@/types/Country";
 import { Currency } from "@/types/Currency";
+import { Language } from "@/types/Language";
 
 export class LocaleService {
   static getCurrency(): Currency | null {
@@ -36,7 +39,7 @@ export class LocaleService {
     }
     return null;
   }
-  static getDefaultCountry(): Country | null {
+  static getCountry(): Country | null {
     const sessionState: SessionState = store.getState()[SESSION_STATE];
     const siteState: SiteState = store.getState()[SITE_STATE];
     if (
@@ -53,11 +56,28 @@ export class LocaleService {
     }
     return null;
   }
+  static getLanguage(): Language | null {
+    const sessionState: SessionState = store.getState()[SESSION_STATE];
+    const siteState: SiteState = store.getState()[SITE_STATE];
+    if (
+      sessionState?.[SESSION_USER]?.[SESSION_USER_SETTINGS]?.[
+        SESSION_USER_SETTINGS_LANGUAGE
+      ]
+    ) {
+      return sessionState[SESSION_USER][SESSION_USER_SETTINGS][
+        SESSION_USER_SETTINGS_LANGUAGE
+      ];
+    }
+    if (siteState?.[SITE_SETTINGS]?.[SITE_SETTINGS_LANGUAGE]) {
+      return siteState[SITE_SETTINGS][SITE_SETTINGS_LANGUAGE] as Language;
+    }
+    return null;
+  }
 
   static getValueForCountrySelect(
     value: Country | null,
   ): Option | null {
-    const country: Country | null = LocaleService.getDefaultCountry();
+    const country: Country | null = LocaleService.getCountry();
     if (value && value?.id && value?.name) {
       return {
         value: value.id,

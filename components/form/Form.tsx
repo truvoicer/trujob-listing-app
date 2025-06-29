@@ -50,6 +50,12 @@ export const VALIDATION_ALPHA_NUMERIC_HYPHENS = "alpha_numeric_hyphens";
 export const VALIDATION_ALPHA_NUMERIC_SYMBOLS = "alpha_numeric_symbols";
 export const VALIDATION_REGEX = "regex";
 export const VALIDATION_MATCH = "match";
+export const VALIDATION_DATE = "date";
+export const VALIDATION_DATE_TIME = "date_time";
+export const VALIDATION_TIME = "time";
+export const VALIDATION_URL = "url";
+
+export const VALIDATION_PHONE = "phone";
 
 export const VALIDATION_RULES = [
   VALIDATION_REQUIRED,
@@ -66,6 +72,12 @@ export const VALIDATION_RULES = [
   VALIDATION_ALPHA_NUMERIC_SYMBOLS,
   VALIDATION_REQUIRED_IF,
   VALIDATION_ALLOW_SPACES,
+  VALIDATION_ALPHA_NUMERIC_HYPHENS,
+  VALIDATION_DATE,
+  VALIDATION_PHONE,
+  VALIDATION_DATE_TIME,
+  VALIDATION_TIME,
+  VALIDATION_URL,
 ];
 
 function Form({
@@ -89,15 +101,13 @@ function Form({
   ): ValidationRule | undefined {
     return rules.find((rule) => rule.type === type);
   }
-  function hasRequiredIfRuleAndMatches(rules: ValidationRule[], values: FormikValues = {}): boolean {
-    const findRule = rules.find((rule) => rule.type === VALIDATION_REQUIRED_IF)
-    if (typeof findRule === "undefined") {
-      return true;
-    }
-    return validateRequiredIf(findRule, values);
-  }
-  
 
+  function validateRequired(
+    values: FormikValues,
+    key: string
+  ): boolean {
+    return values?.[key] !== undefined && values?.[key] !== null && values?.[key] !== "";
+  }
   function validateRequiredIf(
     rule: ValidationRule,
     values: FormikValues
@@ -164,11 +174,22 @@ function Form({
           console.log(`Validation rule ${rule.type} is not supported`);
           return;
         }
-        const findRule = findByRuleType(validation[key], VALIDATION_REQUIRED_IF);
-        if (findRule && !validateRequiredIf(findRule, values)) {
+        const findRequiredIfRule = findByRuleType(
+          validation[key],
+          VALIDATION_REQUIRED_IF
+        );
+        if (findRequiredIfRule && !validateRequiredIf(findRequiredIfRule, values)) {
           return; // Skip validation if required_if rule is not met
         }
+        const findRequiredRule = findByRuleType(
+          validation[key],
+          VALIDATION_REQUIRED
+        );
         
+        if (!findRequiredRule && !validateRequired(values, key)) {
+          return; // Skip validation if required rule is not met
+        }
+
         let expression;
         switch (rule.type) {
           case VALIDATION_REQUIRED:
@@ -262,6 +283,107 @@ function Form({
                 `Only alphanumeric and hyphens values are allowed`;
             }
             break;
+          case VALIDATION_DATE:
+            const dateRegex = /^\d{4}-\d{2}-\d{2}$/; // YYYY-MM-DD format
+            if (!values[key].match(dateRegex)) {
+              validationErrors[key] =
+                rule.message || `Invalid date format, expected YYYY-MM-DD`;
+            } else {
+              const dateParts = values[key].split("-");
+              const year = parseInt(dateParts[0], 10);
+              const month = parseInt(dateParts[1], 10) - 1; // Months are 0-indexed
+              const day = parseInt(dateParts[2], 10);
+              const date = new Date(year, month, day);
+              if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month ||
+                date.getDate() !== day
+              ) {
+                validationErrors[key] = rule.message || `Invalid date value`;
+              }
+            }
+            break;
+          case VALIDATION_DATE_TIME:
+            const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/; // YYYY-MM-DDTHH:MM:SS format
+            if (!values[key].match(dateTimeRegex)) {
+              validationErrors[key] =
+                rule.message ||
+                `Invalid date-time format, expected YYYY-MM-DDTHH:MM:SS`;
+            } else {
+              const dateTimeParts = values[key].split("T");
+              const dateParts = dateTimeParts[0].split("-");
+              const timeParts = dateTimeParts[1].split(":");
+              const year = parseInt(dateParts[0], 10);
+              const month = parseInt(dateParts[1], 10) - 1; // Months are 0-indexed
+              const day = parseInt(dateParts[2], 10);
+              const hours = parseInt(timeParts[0], 10);
+              const minutes = parseInt(timeParts[1], 10);
+              const seconds = parseInt(timeParts[2], 10);
+              const date = new Date(year, month, day, hours, minutes, seconds);
+              if (
+                date.getFullYear() !== year ||
+                date.getMonth() !== month ||
+                date.getDate() !== day ||
+                date.getHours() !== hours ||
+                date.getMinutes() !== minutes ||
+                date.getSeconds() !== seconds
+              ) {
+                validationErrors[key] =
+                  rule.message || `Invalid date-time value`;
+              }
+            }
+            break;
+          case VALIDATION_TIME:
+            const timeRegex = /^([01]\d|2[0-3]):([0-5]\d):([0-5]\d)$/; // HH:MM:SS format
+            if (!values[key].match(timeRegex)) {
+              validationErrors[key] =
+                rule.message || `Invalid time format, expected HH:MM:SS`;
+            } else {
+              const timeParts = values[key].split(":");
+              const hours = parseInt(timeParts[0], 10);
+              const minutes = parseInt(timeParts[1], 10);
+              const seconds = parseInt(timeParts[2], 10);
+              if (
+                hours < 0 ||
+                hours > 23 ||
+                minutes < 0 ||
+                minutes > 59 ||
+                seconds < 0 ||
+                seconds > 59
+              ) {
+                validationErrors[key] = rule.message || `Invalid time value`;
+              }
+            }
+            break;
+          case VALIDATION_URL:
+            // Regular expression for validating http and https URLs
+          
+            const urlRegex = /^(https?:\/\/)?([\w.-]+)(:[0-9]+)?(\/[\w.-]*)*\/?$/;
+            if (!values[key].match(urlRegex)) {
+              validationErrors[key] =
+                rule.message || `Invalid URL format, expected http(s)://...`;
+            }
+            break;
+          case VALIDATION_PHONE:
+            const phoneRegex = /^\+?[1-9]\d{1,14}$/; // E.164 format
+            if (!values[key].match(phoneRegex)) {
+              validationErrors[key] =
+                rule.message ||
+                `Invalid phone number format, expected E.164 format`;
+            }
+            break;
+          case VALIDATION_ALPHA_NUMERIC_HYPHENS:
+            if (allowSpaces(validation[key])) {
+              expression = /^[a-zA-Z0-9-_ ]+$/;
+            } else {
+              expression = /^[a-zA-Z0-9-_]+$/;
+            }
+            if (!values[key].match(expression)) {
+              validationErrors[key] =
+                rule.message ||
+                `Only alphanumeric and hyphens values are allowed`;
+            }
+            break;
           case VALIDATION_ALPHA_NUMERIC_SYMBOLS:
             if (allowSpaces(validation[key])) {
               expression = /^[a-zA-Z0-9!@#$%^&*()_\-\s]+$/;
@@ -295,7 +417,11 @@ function Form({
               return;
             }
             if (!validateRequiredIf(rule, values)) {
-              validationErrors[key] = rule.message || `This field is required if ${JSON.stringify(rule.field)} is set`;
+              validationErrors[key] =
+                rule.message ||
+                `This field is required if ${JSON.stringify(
+                  rule.field
+                )} is set`;
             }
             break;
         }

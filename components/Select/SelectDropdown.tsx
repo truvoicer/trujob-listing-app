@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 
 export interface Option {
   label: string | number;
@@ -16,14 +16,21 @@ export interface LaravelPaginatedResponse {
 export interface SelectDropdownProps {
   options: Record<string, any>[];
   parseOptions: (option: Record<string, any>) => Option;
-  onChange: (selected: Option | Option[], options: Option[], rawOptions: Array<any>) => void;
+  onChange: (
+    selected: Option | Option[],
+    options: Option[],
+    rawOptions: Array<any>
+  ) => void;
   enableSearch?: boolean;
   allowNewOptions?: boolean;
   placeholder?: string;
   isMulti?: boolean;
   loadMoreLimit?: number;
-  onLoadMore?: (nextPage: number, searchTerm: string) => Promise<LaravelPaginatedResponse>;
-  addNewOptionPosition?: 'top' | 'bottom' | 'both';
+  onLoadMore?: (
+    nextPage: number,
+    searchTerm: string
+  ) => Promise<LaravelPaginatedResponse>;
+  addNewOptionPosition?: "top" | "bottom" | "both";
   loadingMore?: boolean;
   loadingMessage?: string;
   showLoadingSpinner?: boolean;
@@ -39,16 +46,16 @@ function SelectDropdown({
   onChange,
   enableSearch = false,
   allowNewOptions = false,
-  placeholder = 'Select...',
+  placeholder = "Select...",
   isMulti = false,
   loadMoreLimit,
   onLoadMore,
-  addNewOptionPosition = 'bottom',
+  addNewOptionPosition = "bottom",
   loadingMore = false,
-  loadingMessage = 'Loading more...',
-  showLoadingSpinner = false
+  loadingMessage = "Loading more...",
+  showLoadingSpinner = false,
 }: SelectDropdownProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [filteredOptions, setFilteredOptions] = useState<Option[]>(options);
   const [isOpen, setIsOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<Option | null>(null);
@@ -61,12 +68,11 @@ function SelectDropdown({
   const listRef = useRef<HTMLUListElement>(null);
 
   function parseDataToOptions(data: Record<string, any>[]) {
-
-    return data.map(item => parseDataItemToOptions(item));
+    return data.map((item) => parseDataItemToOptions(item));
   }
   function parseDataItemToOptions(data: Record<string, any>) {
-    if (typeof parseOptions !== 'function') {
-      throw new Error('parseOptions function is required');
+    if (typeof parseOptions !== "function") {
+      throw new Error("parseOptions function is required");
     }
     return parseOptions(data);
   }
@@ -74,15 +80,20 @@ function SelectDropdown({
     if (value) {
       if (isMulti && Array.isArray(value)) {
         setSelectedOptions(
-          value.filter((val) => typeof val === 'object' &&
-            (val.hasOwnProperty('value') && typeof val.value !== 'undefined') &&
-            (val.hasOwnProperty('label') && typeof val.label !== 'undefined')
+          value.filter(
+            (val) =>
+              typeof val === "object" &&
+              val.hasOwnProperty("value") &&
+              typeof val.value !== "undefined" &&
+              val.hasOwnProperty("label") &&
+              typeof val.label !== "undefined"
           )
         );
       } else if (!isMulti && !Array.isArray(value)) {
-
-        if (typeof value === 'string' || typeof value === 'number') {
-          const findInOptions = parseDataToOptions(options).find(option => option?.value === value);
+        if (typeof value === "string" || typeof value === "number") {
+          const findInOptions = parseDataToOptions(options).find(
+            (option) => option?.value === value
+          );
           if (!findInOptions) {
             return;
           }
@@ -90,7 +101,11 @@ function SelectDropdown({
           return;
         }
 
-        if (typeof value === 'object' && value.hasOwnProperty('value') && value.hasOwnProperty('label')) {
+        if (
+          typeof value === "object" &&
+          value.hasOwnProperty("value") &&
+          value.hasOwnProperty("label")
+        ) {
           setSelectedOption(value);
         }
       }
@@ -103,14 +118,13 @@ function SelectDropdown({
       return;
     }
     let filtered;
-    if (typeof handleSearch === 'function') {
+    if (typeof handleSearch === "function") {
       filtered = await handleSearch(searchTerm);
     } else {
       const lowerSearch = searchTerm.toLowerCase();
-      filtered = internalOptions.filter(option =>
+      filtered = internalOptions.filter((option) =>
         parseDataItemToOptions(option).label.toLowerCase().includes(lowerSearch)
       );
-
     }
     setFilteredOptions(filtered);
   }
@@ -131,21 +145,27 @@ function SelectDropdown({
     if (isMulti && !Array.isArray(options)) {
       return [];
     }
-    if (!Array.isArray(optionData)) {
-      return optionData;
+
+    if (typeof optionData === "object") {
+      const find = findOptionByValue(optionData, internalOptions);
+      if (!find) {
+        return optionData;
+      }
+      return find;
     }
     if (Array.isArray(value)) {
-      const newFilteredOptions = optionData.map((option) => {
-        let findInOptions = findOptionByValue(option, internalOptions);
-        if (!findInOptions) {
-          findInOptions = findOptionByValue(option, filteredOptions);
+      const newFilteredOptions = optionData
+        .map((option) => {
+          let findInOptions = findOptionByValue(option, internalOptions);
           if (!findInOptions) {
-            return undefined;
+            findInOptions = findOptionByValue(option, filteredOptions);
+            if (!findInOptions) {
+              return undefined;
+            }
           }
-        }
-        return findInOptions;
-      })
-        .filter((option) => typeof option !== 'undefined');
+          return findInOptions;
+        })
+        .filter((option) => typeof option !== "undefined");
       return newFilteredOptions;
     } else {
       let findInOptions = findOptionByValue(optionData, internalOptions);
@@ -158,7 +178,6 @@ function SelectDropdown({
       return findInOptions;
     }
   }
-
   useEffect(() => {
     setInternalOptions(options);
     setFilteredOptions(parseDataToOptions(options));
@@ -168,76 +187,78 @@ function SelectDropdown({
     onSearch();
   }, [searchTerm, enableSearch]);
   useEffect(() => {
-
     setFilteredOptions(parseDataToOptions(internalOptions));
   }, [internalOptions]);
-
   const handleSelect = (option: Option) => {
     if (isMulti) {
-      const alreadySelected = selectedOptions.find(opt => opt.value === option.value);
+      const alreadySelected = selectedOptions.find(
+        (opt) => opt.value === option.value
+      );
       let newSelection;
       if (alreadySelected) {
-        newSelection = selectedOptions.filter(opt => opt.value !== option.value);
+        newSelection = selectedOptions.filter(
+          (opt) => opt.value !== option.value
+        );
       } else {
         newSelection = [...selectedOptions, option];
       }
       setSelectedOptions(newSelection);
+
       onChange(buildOnChangeData(newSelection));
     } else {
-
       setSelectedOption(option);
+
       onChange(buildOnChangeData(option));
       setIsOpen(false);
     }
-    setSearchTerm('');
+    setSearchTerm("");
   };
-  
+
   const handleAddNew = () => {
     const newOption: Option = {
       label: searchTerm,
-      value: searchTerm
+      value: searchTerm,
     };
     handleSelect(newOption);
   };
 
   const isOptionSelected = (option: Option) => {
     return isMulti
-      ? selectedOptions.some(selected => selected.value === option.value)
+      ? selectedOptions.some((selected) => selected.value === option.value)
       : selectedOption?.value === option.value;
   };
 
   const getDisplayText = () => {
     if (isMulti) {
       return selectedOptions.length > 0
-        ? selectedOptions.map(opt => opt.label).join(', ')
+        ? selectedOptions.map((opt) => opt.label).join(", ")
         : placeholder;
     } else {
-      return selectedOption ? selectedOption?.label || 'Error in display text' : placeholder;
+      return selectedOption
+        ? selectedOption?.label || "Error in display text"
+        : placeholder;
     }
   };
 
   const handleScroll = async () => {
-    if (!listRef.current || !loadMoreLimit || !onLoadMore || isLoadingMore) return;
+    if (!listRef.current || !loadMoreLimit || !onLoadMore || isLoadingMore)
+      return;
 
     const { scrollTop, scrollHeight, clientHeight } = listRef.current;
-    if (scrollHeight - scrollTop <= clientHeight + loadMoreLimit && (
-      initialLoad ||
-      (currentPage < lastPage)
-    )) {
-
+    if (
+      scrollHeight - scrollTop <= clientHeight + loadMoreLimit &&
+      (initialLoad || currentPage < lastPage)
+    ) {
       setIsLoadingMore(true);
       try {
         const response = await onLoadMore(currentPage + 1, searchTerm);
         const cloneInternalOptions = [...internalOptions];
-        const newOptions = [
-          ...cloneInternalOptions,
-          ...response.data
-        ];
+        const newOptions = [...cloneInternalOptions, ...response.data];
         setInternalOptions(newOptions);
         setCurrentPage(response.meta.current_page);
         setLastPage(response.meta.last_page);
       } catch (err) {
-        console.error('Load more failed', err);
+        console.error("Load more failed", err);
       } finally {
         setIsLoadingMore(false);
         setInitialLoad(false);
@@ -245,20 +266,19 @@ function SelectDropdown({
     }
   };
 
-  const renderAddNewOption = () => (
-    allowNewOptions && searchTerm &&
-    !parseDataToOptions(filteredOptions).find(opt => opt.label.toLowerCase() === searchTerm.toLowerCase()) && (
-      <li
-        className="dropdown-item text-primary"
-        onClick={handleAddNew}
-      >
+  const renderAddNewOption = () =>
+    allowNewOptions &&
+    searchTerm &&
+    !parseDataToOptions(filteredOptions).find(
+      (opt) => opt.label.toLowerCase() === searchTerm.toLowerCase()
+    ) && (
+      <li className="dropdown-item text-primary" onClick={handleAddNew}>
         Add "{searchTerm}"
       </li>
-    )
-  );
+    );
 
   return (
-    <div className="position-relative" style={{ width: '16rem' }}>
+    <div className="position-relative" style={{ width: "16rem" }}>
       <div
         className="form-control d-flex align-items-center justify-content-between"
         onClick={() => setIsOpen(!isOpen)}
@@ -280,25 +300,36 @@ function SelectDropdown({
           )}
           <ul
             className="list-unstyled mb-0"
-            style={{ maxHeight: '240px', overflowY: 'auto' }}
+            style={{ maxHeight: "240px", overflowY: "auto" }}
             onScroll={handleScroll}
             ref={listRef}
           >
-            {addNewOptionPosition === 'top' || addNewOptionPosition === 'both' ? renderAddNewOption() : null}
+            {addNewOptionPosition === "top" || addNewOptionPosition === "both"
+              ? renderAddNewOption()
+              : null}
             {parseDataToOptions(filteredOptions).map((option, index) => (
               <li
                 key={index}
-                className={`dropdown-item ${isOptionSelected(option) ? 'active' : ''}`}
+                className={`dropdown-item ${
+                  isOptionSelected(option) ? "active" : ""
+                }`}
                 onClick={() => handleSelect(option)}
               >
                 {option.label}
               </li>
             ))}
-            {addNewOptionPosition === 'bottom' || addNewOptionPosition === 'both' ? renderAddNewOption() : null}
+            {addNewOptionPosition === "bottom" ||
+            addNewOptionPosition === "both"
+              ? renderAddNewOption()
+              : null}
             {(loadingMore || isLoadingMore) && (
               <li className="dropdown-item text-muted d-flex align-items-center">
                 {showLoadingSpinner && (
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
                 )}
                 {loadingMessage}
               </li>

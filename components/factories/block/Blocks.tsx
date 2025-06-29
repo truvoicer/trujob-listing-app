@@ -25,6 +25,7 @@ import ManageDiscount from "@/components/blocks/Admin/Discount/ManageDiscount";
 import ManageShippingMethod from "@/components/blocks/Admin/Shipping/ShippingMethod/ManageShippingMethod";
 import ManageShippingZone from "@/components/blocks/Admin/Shipping/ShippingZone/ManageShippingZone";
 import EditProfile from "@/components/blocks/Admin/User/Profile/EditProfile";
+import ResetPasswordBlock from "@/components/blocks/Auth/ResetPasswordBlock";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -55,6 +56,7 @@ export class Blocks {
     static MANAGE_SHIPPING_ZONES_BLOCK = 'manage-shipping-zones-block';
     static EDIT_PROFILE_BLOCK = 'edit-profile-block';
     static EDIT_ACCOUNT_SETTINGS_BLOCK = 'edit-account-settings-block';
+    static RESET_PASSWORD_BLOCK = 'reset-password-block';
 
     static getBlocks() {
         return {
@@ -326,6 +328,14 @@ export class Blocks {
                     {
                         mode: 'edit',
                     }
+                ),
+            },
+            [Blocks.RESET_PASSWORD_BLOCK]: {
+                title: 'Reset Password Block',
+                description: 'This is the reset password block',
+                icon: 'reset-password-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ResetPasswordBlock,
                 ),
             },
         };

@@ -24,8 +24,11 @@ export const SITE_INSTAGRAM_FOLLOW_URL = "instagram_follow_url";
 export const SITE_TIKTOK_FOLLOW_URL = "tiktok_follow_url";
 export const SITE_PINTEREST_FOLLOW_URL = "pinterest_follow_url";
 export const SITE_X_FOLLOW_URL = "x_follow_url";
-export const SITE_TIMEZONE = "timezone";
 export const SITE_MEDIA = "media";
 export const SITE_SETTINGS = "settings";
 export const SITE_SETTINGS_CURRENCY = "currency";
 export const SITE_SETTINGS_COUNTRY = "country";
+export const SITE_SETTINGS_LANGUAGE = "language";
+export const SITE_SETTINGS_TIMEZONE = "timezone";
+export const SITE_SETTINGS_FRONTEND_URL = "frontend_url";
+

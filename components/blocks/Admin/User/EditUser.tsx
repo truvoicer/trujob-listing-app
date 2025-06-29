@@ -72,13 +72,13 @@ function EditUser({
             requestData[SESSION_USER_PROFILE] = values?.[SESSION_USER_PROFILE_DOB];
         }
         if (values?.[SESSION_USER_SETTINGS_COUNTRY]) {
-            requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.value;
+            requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.id;
         }
         if (values?.[SESSION_USER_SETTINGS_CURRENCY]) {
-            requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.value;
+            requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.id;
         }
         if (values?.[SESSION_USER_SETTINGS_LANGUAGE]) {
-            requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.value;
+            requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.id;
         }
         if (values?.change_password) {
             requestData.change_password = true;

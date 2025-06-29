@@ -26,20 +26,26 @@ import {
     SITE_TIKTOK_FOLLOW_URL,
     SITE_PINTEREST_FOLLOW_URL,
     SITE_X_FOLLOW_URL,
-    SITE_TIMEZONE,
     ERROR,
     SITE_SETTINGS,
     SITE_ID,
     SITE_SETTINGS_CURRENCY,
-    SITE_SETTINGS_COUNTRY
+    SITE_SETTINGS_COUNTRY,
+    SITE_SETTINGS_TIMEZONE,
+    SITE_SETTINGS_LANGUAGE,
+    SITE_SETTINGS_FRONTEND_URL
 } from "../constants/site-constants";
 import { ReduxHelpers } from "../helpers/ReduxHelpers";
 import { Country } from "@/types/Country";
 import { Currency } from "@/types/Currency";
+import { Language } from "@/types/Language";
 
 export type SiteSettingState = {
     [SITE_SETTINGS_COUNTRY]: Country | null;
     [SITE_SETTINGS_CURRENCY]: Currency | null;
+    [SITE_SETTINGS_LANGUAGE]: Language | null;
+    [SITE_SETTINGS_TIMEZONE]: string | null;
+    [SITE_SETTINGS_FRONTEND_URL]: string | null;
 };
 export type SiteState = {
     [SITE_ID]: string | null;
@@ -66,7 +72,6 @@ export type SiteState = {
     [SITE_TIKTOK_FOLLOW_URL]: string | null;
     [SITE_PINTEREST_FOLLOW_URL]: string | null;
     [SITE_X_FOLLOW_URL]: string | null;
-    [SITE_TIMEZONE]: string | null;
     [SITE_MEDIA]: Array<unknown>;
     [SITE_SETTINGS]: Record<string, unknown>;
     [ERROR]: {
@@ -101,7 +106,6 @@ export const siteStateData: SiteState = {
     [SITE_TIKTOK_FOLLOW_URL]: null,
     [SITE_PINTEREST_FOLLOW_URL]: null,
     [SITE_X_FOLLOW_URL]: null,
-    [SITE_TIMEZONE]: null,
     [SITE_MEDIA]: [],
     [SITE_SETTINGS]: {
         [SITE_SETTINGS_COUNTRY]: {
@@ -130,6 +134,16 @@ export const siteStateData: SiteState = {
                 updated_at: null,
             },
         },
+        [SITE_SETTINGS_LANGUAGE]: {
+            id: null,
+            name: null,
+            iso639_1: null,
+            iso639_2: null,
+            created_at: null,
+            updated_at: null,
+        },
+        [SITE_SETTINGS_TIMEZONE]: null,
+        [SITE_SETTINGS_FRONTEND_URL]: null,
     },
     [ERROR]: {
         show: false,

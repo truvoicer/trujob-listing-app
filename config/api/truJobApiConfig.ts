@@ -1,3 +1,4 @@
+import store from "@/library/redux/store";
 
 const config = {
     apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
@@ -57,13 +58,30 @@ const config = {
         checkToken: '/auth/token/user',
         tokenRefresh: '/auth/api-token/generate',
         enum: '/enum',
+        session: {
+            user: {
+                show: '/session/user/show',
+                update: '/session/user/update',
+                'api-token': {
+                    index: '/session/user/api-token',
+                    show: '/session/user/api-token/show',
+                    store: '/session/user/api-token/store',
+                    delete: '/session/user/api-token/delete',
+                },
+            }
+        },
         auth: {
             view: '/auth/show',
             login: '/auth/login',
             logout: '/auth/logout',
             register: '/auth/register',
-            forgotPassword: '/auth/forgot-password',
-            resetPassword: '/auth/reset-password',
+            password: {
+                reset: {
+                    tokenCheck: '/auth/password/reset/token-check',
+                    request: '/auth/password/reset/request',
+                    confirmation: '/auth/password/reset/confirmation',
+                }
+            },
             verifyEmail: '/auth/verify-email',
             resendVerificationEmail: '/auth/resend-verification-email',
         },
