@@ -9,34 +9,7 @@ export class ObjectDifference {
                 continue;
             }
             if (Array.isArray(obj1?.[key]) && Array.isArray(obj2?.[key])) {
-                obj1[key].forEach((item, index) => {
-                    if (typeof item === 'object' && item !== null) {
-                        const nestedDiff = this.getDifference(
-                            item, 
-                            obj2[key][index], 
-                            requiredFields?.[key]
-                        );
-                        if (!Object.keys(nestedDiff).length) {
-                            return;
-                        }
-                        if (!Array.isArray(diff[key])) {
-                            diff[key] = [];
-                        }
-                        
-                        diff[key].push(nestedDiff);
-                        
-                    } else {
-                        if (
-                            !compareValues(item, obj2[key][index])
-                        ) {
-                            if (!Array.isArray(diff?.[key])) {
-                                diff[key] = [];
-                            }
-
-                            diff[key].push(item);
-                        }
-                    }
-                });
+               diff[key] = obj1[key];
             } else if (
                 typeof obj1[key] === 'object' &&
                 obj1[key] !== null

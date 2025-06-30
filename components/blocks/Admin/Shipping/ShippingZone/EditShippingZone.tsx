@@ -8,9 +8,8 @@ import { DataTableContext } from "@/contexts/DataTableContext";
 import { isObjectEmpty } from "@/helpers/utils";
 import EditShippingZoneFields from "./EditShippingZoneFields";
 import { ModalService } from "@/library/services/modal/ModalService";
-import { ShippingZone, CreateShippingZone, UpdateShippingZone } from "@/types/ShippingZone";
+import { ShippingZone, CreateShippingZone, UpdateShippingZone, ShippingZoneAble, ShippingZoneAbleRequest } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 
@@ -39,22 +38,26 @@ function EditShippingZone({
     const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
     const initialValues: ShippingZone = {
         id: data?.id || 0,
-        description: data?.description || '',
-        name: data?.name || '',
-        countries: data?.countries || [],
+        label: data?.label || '',
+        shipping_zoneables: data?.shipping_zoneables || [],
         is_active: data?.is_active || false,
         all: data?.all || false,
         created_at: data?.created_at || '',
         updated_at: data?.updated_at || '',
     };
 
+    function buildShippingZoneables(zoneables: ShippingZoneAble[]): ShippingZoneAbleRequest[] {
+        return zoneables.map((zoneable) => ({
+            shipping_zoneable_id: zoneable?.shipping_zoneable_id || 0,
+            shipping_zoneable_type: zoneable?.shipping_zoneable_type || '',
+        }));
+    }
 
     function buildCreateData(values: ShippingZone) {
 
-        let requestData: CreateShippingZone = {
-            name: values?.name || '',
-            description: values?.description || '',
-            country_ids: RequestHelpers.extractIdsFromArray(values?.countries || []),
+        const requestData: CreateShippingZone = {
+            label: values?.label || '',
+            shipping_zoneables: buildShippingZoneables(values?.shipping_zoneables || []),
             is_active: values?.is_active || false,
             all: values?.all || false,
         };
@@ -64,18 +67,16 @@ function EditShippingZone({
 
     function buildUpdateData(values: ShippingZone) {
 
-        let requestData: UpdateShippingZone = {
+        const requestData: UpdateShippingZone = {
             id: values?.id || 0,
         };
-        if (values?.name) {
-            requestData.name = values?.name || '';
+        if (values?.label) {
+            requestData.label = values?.label || '';
         }
-        if (values?.description) {
-            requestData.description = values?.description || '';
+        if (values.hasOwnProperty('shipping_zoneables') && Array.isArray(values?.shipping_zoneables)) {
+            requestData.shipping_zoneables = buildShippingZoneables(values?.shipping_zoneables || []);
         }
-        if (Array.isArray(values?.countries) && values?.countries.length > 0) {
-            requestData.country_ids = RequestHelpers.extractIdsFromArray(values?.countries || []);
-        }
+        // console.log('Update Shipping Zone Data:', values, requestData);
         if (values?.hasOwnProperty('is_active')) {
             requestData.is_active = values?.is_active || false;
         }
@@ -90,7 +91,7 @@ function EditShippingZone({
             console.log('No data to update');
             return false;
         }
-
+        
         let response = null;
 
         switch (operation) {

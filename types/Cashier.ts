@@ -17,8 +17,6 @@ export type Order = {
     final_total: number;
     total_items: number;
     average_price_per_item: number;
-    total_shipping_cost: number;
-    total_price_with_shipping: number;
     total_price_after_discounts: number;
     total_price_after_tax: number;
     total_price_after_tax_and_discounts: number;
@@ -26,6 +24,11 @@ export type Order = {
     default_tax_rates: TaxRate[];
     created_at: string;
     updated_at: string;
+}
+
+export interface OrderSummary extends Order {
+    total_shipping_cost: number;
+    total_price_with_shipping: number;
 }
 
 export type OrderItem = {

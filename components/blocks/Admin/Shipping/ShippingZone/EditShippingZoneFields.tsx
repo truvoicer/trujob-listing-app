@@ -14,209 +14,150 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 
 type EditShippingZoneFields = {
-    operation: 'edit' | 'update' | 'add' | 'create';
-}
-function EditShippingZoneFields({
-    operation
-}: EditShippingZoneFields) {
-    const [selectedTableRows, setSelectedTableRows] = useState<Array<any>>([]);
+  operation: "edit" | "update" | "add" | "create";
+};
+function EditShippingZoneFields({ operation }: EditShippingZoneFields) {
+  const { values, setFieldValue, handleChange } =
+    useFormikContext<FormikValues>() || {};
 
-    const modalService = new ModalService();
-
-    const { values, setFieldValue, handleChange } = useFormikContext<FormikValues>() || {};
-
-
-      function getComponentProps() {
-        let componentProps: any = {
-          operation: "create",
-          isChild: true,
-          // mode: 'selector'
-        };
-        if (values?.id) {
-          componentProps.shippingMethodId = values.id;
-          componentProps.operation = "edit";
+  const modalService = new ModalService();
+  modalService.setUseStateHook(useState);
+  modalService.setConfig([
+    {
+      id: "zoneBrowser",
+      title: "Manage Shipping Zones",
+      footer: true,
+      size: "md",
+      fullscreen: true,
+      component: () => {
+        if (!Array.isArray(values?.shipping_zoneables)) {
+          console.warn("Zones should be an array");
+          return null;
         }
-        return componentProps;
-      }
-      modalService.setUseStateHook(useState);
-      modalService.setConfig([
-        {
-          id: "zoneBrowser",
-          title: "Manage Shipping Zones",
-          footer: true,
-          size: "md",
-          fullscreen: true,
-          component: () => {
-            if (!Array.isArray(values?.zones)) {
-              console.warn("Zones should be an array");
-              return null;
-            }
-            const buildValue = values.zones
-              .filter(
-                (zone: Record<string, unknown>) =>
-                  zone?.zoneable_id && zone?.zoneable_type
-              )
-              .map((zone: Record<string, unknown>) => ({
-                id: zone.zoneable_id,
-                type: zone.zoneable_type,
-              }));
-            return (
-              <AccessControlComponent>
-                <EntityBrowser
-                  value={buildValue}
-                  multiple={true}
-                  entityListRequest={async () => {
-                    return await TruJobApiMiddleware.getInstance().resourceRequest({
-                      endpoint: UrlHelpers.urlFromArray([
-                        TruJobApiMiddleware.getConfig().endpoints.shipping,
-                        "zone",
-                        "type",
-                      ]),
-                      method: ApiMiddleware.METHOD.GET,
-                      protectedReq: true,
-                    });
-                  }}
-                  onChange={(entity: string, value: Record<string, unknown>[]) => {
-                    let existingRestrictions = values?.restrictions || [];
-                    if (!Array.isArray(existingRestrictions)) {
-                      console.warn("Existing restrictions should be an array");
-                      return;
-                    }
-    
-                    // Filter existing restrictions to keep only those that exist in value
-                    existingRestrictions = existingRestrictions.filter(
-                      (restriction: Record<string, unknown>) => {
-                        if (restriction?.type !== entity) {
-                          return true; // Keep existing restrictions that don't match the entity
-                        }
-                        return value.some(
-                          (item: Record<string, unknown>) =>
-                            item.id === restriction?.restriction_id
-                        );
-                    });
-    
-                    const newRestrictions = [
-                      ...existingRestrictions,
-                      ...value
-                        .filter(
-                          (item: Record<string, unknown>) =>
-                            !existingRestrictions.some(
-                              (existing: Record<string, unknown>) =>
-                                existing?.[entity]?.id === item.id
-                            )
+        const buildValue = values.shipping_zoneables
+          .filter(
+            (zone: Record<string, unknown>) =>
+              zone?.shipping_zoneable_id && zone?.shipping_zoneable_type
+          )
+          .map((zone: Record<string, unknown>) => ({
+            id: zone.shipping_zoneable_id,
+            type: zone.shipping_zoneable_type,
+          }));
+        return (
+          <AccessControlComponent>
+            <EntityBrowser
+              value={buildValue}
+              multiple={true}
+              entityListRequest={async () => {
+                return await TruJobApiMiddleware.getInstance().resourceRequest({
+                  endpoint: UrlHelpers.urlFromArray([
+                    TruJobApiMiddleware.getConfig().endpoints.shipping,
+                    "zone",
+                    "type",
+                  ]),
+                  method: ApiMiddleware.METHOD.GET,
+                  protectedReq: true,
+                });
+              }}
+              onChange={(entity: string, value: Record<string, unknown>[]) => {
+                let existing = values?.shipping_zoneables || [];
+                if (!Array.isArray(existing)) {
+                  console.warn(
+                    "Existing shipping zoneables should be an array"
+                  );
+                  return;
+                }
+                if (value.length === 0) {
+                    // If no value is selected, clear the existing zoneables    
+                    setFieldValue("shipping_zoneables", existing.filter(
+                      (item: Record<string, unknown>) =>
+                        item.shipping_zoneable_type !== entity
+                    ));
+                    return;
+                }
+                const newZoneables = [
+                  ...existing,
+                  ...value
+                    .filter(
+                      (item: Record<string, unknown>) =>
+                        !existing.some(
+                          (existing: Record<string, unknown>) =>
+                            existing?.[entity]?.id === item.id
                         )
-                        .map((item: Record<string, unknown>) => ({
-                          [entity]: item,
-                          restriction_id: item.id,
-                          type: entity,
-                          action: "allow", // Default action, can be changed later
-                        })),
-                    ];
-                    setFieldValue("restrictions", newRestrictions);
-                  }}
-                  columnHandler={(columns: string[]) => {
-                    return [
-                      {
-                        label: "Restriction Action",
-                        render: (
-                          column: DataTableColumn,
-                          item: Record<string, unknown>
-                        ) => {
-                          const findInFilteredValue = buildValue.find(
-                            (value) => value.id === item.id
-                          );
-                          if (!findInFilteredValue) {
-                            return null;
-                          }
-                          return (
-                            <SelectShippingRestrictionAction
-                              value={findInFilteredValue?.action || "allow"}
-                              hideLabel={true}
-                              onChange={(action: string | null) => {
-                                const findIndexInRestrictions =
-                                  values?.restrictions?.findIndex(
-                                    (restriction: Record<string, unknown>) =>
-                                      restriction?.restriction_id === item.id &&
-                                      restriction?.type === findInFilteredValue.type
-                                  );
-                                if (findIndexInRestrictions !== -1) {
-                                  const updatedRestrictions = [
-                                    ...values.restrictions,
-                                  ];
-                                  updatedRestrictions[findIndexInRestrictions] = {
-                                    ...updatedRestrictions[findIndexInRestrictions],
-                                    action: action,
-                                  };
-                                  setFieldValue(
-                                    "restrictions",
-                                    updatedRestrictions
-                                  );
-                                }
-                              }}
-                            />
-                          );
-                        },
-                      },
-                      ...columns,
-                    ];
-                  }}
-                />
-              </AccessControlComponent>
-            );
-          },
-          onOk: () => {
-            return true;
-          },
-        },
-      ]);
-    return (
-        <div className="row justify-content-center align-items-center">
-            <div className="col-md-12 col-sm-12 col-12 align-self-center">
-                <div className="row">
+                    )
+                    .map((item: Record<string, unknown>) => ({
+                      [entity]: item,
+                      shipping_zoneable_id: item.id,
+                      shipping_zoneable_type: entity,
+                    })),
+                ];
+                setFieldValue("shipping_zoneables", newZoneables);
+              }}
+            />
+          </AccessControlComponent>
+        );
+      },
+      onOk: () => {
+        return true;
+      },
+    },
+  ]);
+  
+  return (
+    <div className="row justify-content-center align-items-center">
+      <div className="col-md-12 col-sm-12 col-12 align-self-center">
+        <div className="row">
+          <div className="col-12 col-lg-6">
+            {modalService.renderLocalTriggerButton(
+              "zoneBrowser",
+              "Manage Shipping Zones"
+            )}
+          </div>
 
-                    <div className="col-12 col-lg-6">
-                        <TextInput
-                            value={values?.name || ""}
-                            onChange={handleChange}
-                            placeholder="Enter name"
-                            name="name"
-                            type="text"
-                            label="Name"
-                        />
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <TextInput
-                            value={values?.description || ""}
-                            onChange={handleChange}
-                            placeholder="Enter description"
-                            name="description"
-                            type="text"
-                            label="Description"
-                        />
-                    </div>
-                    
-                    <div className="col-12 col-lg-6">
-                        <Checkbox
-                            name={'is_active'}
-                            placeholder="Is Active?"
-                            label="Is Active?"
-                            onChange={handleChange}
-                            value={values?.is_active || false}
-                        />
-                    </div>
-                    <div className="col-12 col-lg-6">
-                        <Checkbox
-                            name={'all'}
-                            placeholder="All Countries?"
-                            label="All Countries?"
-                            onChange={handleChange}
-                            value={values?.all || false}
-                        />
-                    </div>
-                    
-                </div>
-            </div>
+          <div className="col-12 col-lg-6">
+            <TextInput
+              value={values?.label || ""}
+              onChange={handleChange}
+              placeholder="Enter label"
+              name="label"
+              type="text"
+              label="Label"
+            />
+          </div>
+
+          <div className="col-12 col-lg-6">
+            <TextInput
+              value={values?.description || ""}
+              onChange={handleChange}
+              placeholder="Enter description"
+              name="description"
+              type="text"
+              label="Description"
+            />
+          </div>
+
+          <div className="col-12 col-lg-6">
+            <Checkbox
+              name={"is_active"}
+              placeholder="Is Active?"
+              label="Is Active?"
+              onChange={handleChange}
+              value={values?.is_active || false}
+            />
+          </div>
+          <div className="col-12 col-lg-6">
+            <Checkbox
+              name={"all"}
+              placeholder="All?"
+              label="All?"
+              onChange={handleChange}
+              value={values?.all || false}
+            />
+          </div>
         </div>
-    );
+        {modalService.renderLocalModals()}
+      </div>
+    </div>
+  );
 }
 export default EditShippingZoneFields;

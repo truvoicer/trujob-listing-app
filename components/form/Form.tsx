@@ -446,6 +446,7 @@ function Form({
       return;
     }
     let requestData = { ...values };
+    console.log(`Form operation: ${operation}`, {requestData, initialValues});
     const errors = validationHandler(requestData);
     if (preventSubmitOnErrors && Object.keys(errors).length > 0) {
       console.log(`Form has validation errors`, errors);
@@ -456,6 +457,7 @@ function Form({
       requestData = buildFinalValues(requestData);
     }
 
+    console.log(`Form operation 2: ${operation}`, {requestData, initialValues});
     return onSubmit(requestData, errors);
   }
 

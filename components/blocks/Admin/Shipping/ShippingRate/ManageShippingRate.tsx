@@ -9,6 +9,7 @@ import DataManager, {
 import { ShippingRate } from "@/types/Shipping";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import Loader from "@/components/Loader";
+import { DataTableColumn } from "@/components/Table/DataTable";
 
 export const CREATE_SHIPPING_RATE_MODAL_ID = "create-shipping-rate-modal";
 export const EDIT_SHIPPING_RATE_MODAL_ID = "edit-shipping-rate-modal";
@@ -23,7 +24,7 @@ export interface ManageShippingRateProps extends DataManageComponentProps {
 function ManageShippingRate({
   columnHandler,
   isChild = false,
-  
+
   shippingMethodId,
   mode = "selector",
   data,
@@ -35,11 +36,10 @@ function ManageShippingRate({
   enablePagination = true,
   enableEdit = true,
 }: ManageShippingRateProps) {
-  
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        
+        columnHandler={columnHandler}
         isChild={isChild}
         deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
           return await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -78,7 +78,7 @@ function ManageShippingRate({
           post?: Record<string, any>;
           query?: Record<string, any>;
         }) => {
-          if (['create', 'add'].includes(operation)) {
+          if (["create", "add"].includes(operation)) {
             return false;
           }
           return await TruJobApiMiddleware.getInstance().resourceRequest({
@@ -245,11 +245,35 @@ function ManageShippingRate({
           },
           {
             label: "Amount",
-            key: "amount",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.type === "free" ? (
+                    <span className="badge bg-success">Free</span>
+                  ) : (
+                    <span>
+                      {item?.amount ? item?.amount : "0.00"}{" "}
+                    </span>
+                  )}
+                </>
+              );
+            },
           },
           {
             label: "Currency",
-            key: "currency.name",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.type === "free" ? (
+                    <span className="badge bg-success">Free</span>
+                  ) : (
+                    <span>
+                      {item?.currency?.code || "Currency error"}
+                    </span>
+                  )}
+                </>
+              );
+            },
           },
           {
             label: "Created At",

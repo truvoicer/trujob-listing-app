@@ -1,15 +1,17 @@
 import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
-import { Order } from "@/types/Cashier";
+import { Order, OrderSummary } from "@/types/Cashier";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import { Price } from "@/types/Price";
 import { ShippingMethod } from "@/types/Shipping";
 import { createContext } from "react";
-import { select } from "underscore";
+
+export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary';
 
 export type CheckoutContextType = {
     [key: string]: any | PaymentGateway | null;
     order: Order | null;
+    orderSummary: OrderSummary | null; 
     price: Price | null;
     paymentMethod: PaymentGateway | null;
     transaction: any;
@@ -19,7 +21,7 @@ export type CheckoutContextType = {
     selectedShippingMethod: ShippingMethod | null;
     billingAddress: Address | null;
     shippingAddress: Address | null;
-    refresh: (entity: 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways') => Promise<void>;
+    refresh: (entity: RefreshEntities) => Promise<void>;
     update: (data: any) => void;
     updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => void;
     removeOrderItem?: (id: number, checkoutContext: CheckoutContextType) => void;
@@ -27,6 +29,7 @@ export type CheckoutContextType = {
 };
 export const checkoutData = {
     order: null,
+    orderSummary: null,
     price: null,
     transaction: null,
     availablePaymentGateways: null,
@@ -35,7 +38,7 @@ export const checkoutData = {
     selectedShippingMethod: null,
     billingAddress: null,
     shippingAddress: null,
-    refresh: async (entity: 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways') => {},
+    refresh: async (entity: RefreshEntities) => {},
     update: (data: CheckoutContextType, checkoutContext: CheckoutContextType) => {},
     updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => {},
     removeOrderItem: (id: number, checkoutContext: CheckoutContextType) => {},

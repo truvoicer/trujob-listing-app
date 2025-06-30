@@ -17,11 +17,17 @@ function TextInput({
     name
 }: TextInputProps) {
     const id = randomStr(5);
+    function getType() {
+         if (type === "number") {
+            return "text";
+        }
+        return type;
+    }
     return (
         <div className="floating-input form-group">
             <input
                 className="form-control"
-                type={type}
+                type={getType()}
                 name={name}
                 placeholder={placeholder}
                 id={id}

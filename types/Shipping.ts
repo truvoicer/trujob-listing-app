@@ -40,36 +40,52 @@ export interface UpdateShippingMethod extends ShippingMethodRequest {
     id: number;
 }
 
+export type ShippingZoneAbleType = 'country' | 'region' | 'currency' | 'category';
+export type ShippingZoneAble = {
+    id: number;
+    shipping_zoneable_id: number;
+    shipping_zoneable_type: ShippingZoneAbleType;
+    created_at: string;
+    updated_at: string;
+}
 export type ShippingZone = {
     id: number;
     name: string;
     label: string;
-    countries: Country[];
+    shipping_zoneables: ShippingZoneAble[];
+    all?: boolean;
     is_active: boolean;
     created_at: string;
     updated_at: string;
 }
+export type ShippingZoneAbleRequest = {
+    shipping_zoneable_id: number;
+    shipping_zoneable_type: ShippingZoneAbleType;
+}
 export type ShippingZoneRequest = {
     name?: string;
     label?: string;
-    country_ids?: number[];
+    shipping_zoneables?: ShippingZoneAbleRequest[];
     is_active?: boolean;
+    all?: boolean;
 }
 export interface CreateShippingZone extends ShippingZoneRequest {
     name: string;
     label: string;
-    country_ids: number[];
-    is_active?: boolean;
+    shipping_zoneables: ShippingZoneAbleRequest[];
+    is_active: boolean;
 }
 export interface UpdateShippingZone extends ShippingZoneRequest {
     id: number;
 }
 
+export type ShippingRateType = 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
+
 export type ShippingRate = {
     id: number;
     shipping_method: ShippingMethod;
     shipping_zone: ShippingZone;
-    type: 'flat_rate' | 'free' | 'weight_based' | 'price_based' | 'dimension_based' | 'custom';
+    type: ShippingRateType;
     weight_limit: boolean;
     height_limit: boolean;
     length_limit: boolean;

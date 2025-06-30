@@ -5,6 +5,7 @@ const config = {
     endpoints: {
         profile: '/user/profile',
         order: '/order',
+        orderSummary: '/order/:orderId/summary',
         orderItem: '/order/:orderId/item',
         address: '/locale/address',
         currency: '/locale/currency',
