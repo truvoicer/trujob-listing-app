@@ -26,29 +26,30 @@ import {
 } from "@/library/redux/constants/search-constants";
 import BadgeDropDown from "../BadgeDropDown";
 export type ActionColumnBadgeDropdownItems = {
-    item: Record<string, unknown>;
-    index: number;
-    dataTableContextState: DataTableContextType;
-    dropdownItems: Array<{
+  item: Record<string, unknown>;
+  index: number;
+  dataTableContextState: DataTableContextType;
+  dropdownItems: Array<{
     text: string;
     linkProps: {
       href: string;
       onClick: (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => void;
     };
   }>;
-}
+};
 export type ActionColumnItems = {
-    item: Record<string, unknown>;
-    index: number;
-    dataTableContextState: DataTableContextType;
-    dropdownItems: Array<React.ReactNode>;
-}
+  item: Record<string, unknown>;
+  index: number;
+  dataTableContextState: DataTableContextType;
+  dropdownItems: Array<React.ReactNode>;
+};
 
 export type DataManageComponentProps = {
   isChild?: boolean;
   mode?: "selector" | "edit";
   operation?: "edit" | "update" | "add" | "create";
   enableEdit?: boolean;
+  enableDelete?: boolean;
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
   onChange: (values: unknown[]) => void;
@@ -79,6 +80,7 @@ export type DataManagerProps = {
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
   enableEdit?: boolean;
+  enableDelete?: boolean;
   title?: string;
   onRowSelect?: (
     item: DataTableItem,
@@ -182,6 +184,7 @@ function DataManager({
   paginationMode = "router",
   enablePagination = true,
   enableEdit = true,
+  enableDelete = true,
   title,
   onRowSelect,
   multiRowSelection = false,
@@ -370,7 +373,7 @@ function DataManager({
         if (!formHelpers) {
           return;
         }
-        console.log(operation)
+        console.log(operation);
         if (!operation) {
           console.warn("Operation is required");
           return;
@@ -445,91 +448,95 @@ function DataManager({
     const modalProps = getShippingMethodFormModalProps(index);
 
     const items: Array<React.ReactNode> = [];
-    items.push({
-      text: "Edit",
-      linkProps: {
-        href: "#",
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          dataTableContextState.modal.show(
-            {
-              title: "Edit Shipping method",
-              component: (
-                <EditForm
-                  shippingMethodId={item?.id}
-                  dataTable={dataTableContextState}
-                  data={item}
-                  operation={"edit"}
-                  inModal={true}
-                  modalId={DataManagerService.getId(id, "edit")}
-                  {...(editFormComponentData?.props || {})}
-                />
-              ),
-              ...modalProps,
-            },
-            DataManagerService.getId(id, "edit")
-          );
-        },
-      },
-    });
-    items.push({
-      text: "Delete",
-      linkProps: {
-        href: "#",
-        onClick: (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          appModalContext.show(
-            {
-              title: "Delete shipping method",
-              component: (
-                <p>
-                  Are you sure you want to delete this item ({item?.title})?
-                </p>
-              ),
-              onOk: async () => {
-                if (!item?.id) {
-                  notificationContext.show(
-                    {
-                      variant: "danger",
-                      type: "toast",
-                      title: "Error",
-                      component: <p>Shipping method ID is required</p>,
-                    },
-                    "shipping-method-delete-error"
-                  );
-                  return;
-                }
-
-                if (typeof deleteItemRequest !== "function") {
-                  console.warn("deleteItemRequest is not a function");
-                  return;
-                }
-
-                const response = await deleteItemRequest({ item });
-                if (!response) {
-                  notificationContext.show(
-                    {
-                      variant: "danger",
-                      type: "toast",
-                      title: "Error",
-                      component: <p>Failed to delete item</p>,
-                    },
-                    "shipping-method-delete-error"
-                  );
-                  return;
-                }
-                dataTableContextState.refresh();
+    if (enableEdit) {
+      items.push({
+        text: "Edit",
+        linkProps: {
+          href: "#",
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dataTableContextState.modal.show(
+              {
+                title: "Edit Shipping method",
+                component: (
+                  <EditForm
+                    shippingMethodId={item?.id}
+                    dataTable={dataTableContextState}
+                    data={item}
+                    operation={"edit"}
+                    inModal={true}
+                    modalId={DataManagerService.getId(id, "edit")}
+                    {...(editFormComponentData?.props || {})}
+                  />
+                ),
+                ...modalProps,
               },
-              show: true,
-              showFooter: true,
-            },
-            DataManagerService.getId(id, "edit")
-          );
+              DataManagerService.getId(id, "edit")
+            );
+          },
         },
-      },
-    });
+      });
+    }
+    if (enableDelete) {
+      items.push({
+        text: "Delete",
+        linkProps: {
+          href: "#",
+          onClick: (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            appModalContext.show(
+              {
+                title: "Delete shipping method",
+                component: (
+                  <p>
+                    Are you sure you want to delete this item ({item?.title})?
+                  </p>
+                ),
+                onOk: async () => {
+                  if (!item?.id) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Shipping method ID is required</p>,
+                      },
+                      "shipping-method-delete-error"
+                    );
+                    return;
+                  }
+
+                  if (typeof deleteItemRequest !== "function") {
+                    console.warn("deleteItemRequest is not a function");
+                    return;
+                  }
+
+                  const response = await deleteItemRequest({ item });
+                  if (!response) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Failed to delete item</p>,
+                      },
+                      "shipping-method-delete-error"
+                    );
+                    return;
+                  }
+                  dataTableContextState.refresh();
+                },
+                show: true,
+                showFooter: true,
+              },
+              DataManagerService.getId(id, "edit")
+            );
+          },
+        },
+      });
+    }
     return items;
   }
   function getDefaultActionColumnItems(
@@ -545,110 +552,114 @@ function DataManager({
     const EditForm = editFormComponentData.component;
     const modalProps = getShippingMethodFormModalProps(index);
     const items: Array<React.ReactNode> = [];
-    items.push(
-      <Link
-        className="badge bg-success-light mr-2"
-        target="_blank"
-        href="http://google.com"
-        onClick={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          getDatatableContextState().modal.show(
-            {
-              title: "Edit shipping method",
-              component: (
-                <EditForm
-                  dataTable={getDatatableContextState()}
-                  data={item}
-                  operation={"edit"}
-                  inModal={true}
-                  modalId={DataManagerService.getId(id, "edit")}
-                  {...(editFormComponentData?.props || {})}
-                />
-              ),
-              ...modalProps,
-            },
-            DataManagerService.getId(id, "edit")
-          );
-        }}
-      >
-        <i className="lar la-eye"></i>
-      </Link>
-    );
-    items.push(
-      <Link
-        className="badge bg-danger-light mr-2"
-        target="_blank"
-        href="#"
-        onClick={(e) => {
-          e.preventDefault();
-          dataTableContextState.modal.show(
-            {
-              title: "Delete shipping method",
-              component: (
-                <p>
-                  Are you sure you want to delete this shipping method (
-                  {item?.name} | {item?.label})?
-                </p>
-              ),
-              onOk: async () => {
-                console.log("Delete shipping method", { operation, item });
-                if (!operation) {
-                  console.warn("Operation is required");
-                  return;
-                }
-                if (Array.isArray(data) && data.length) {
-                  let cloneData = [...data];
-                  cloneData.splice(index, 1);
-                  if (typeof onChange === "function") {
-                    onChange(cloneData);
-                  }
-                  dataTableContextState.modal.close(
-                    DataManagerService.getId(id, "delete")
-                  );
-                  return;
-                }
-                if (!item?.id) {
-                  notificationContext.show(
-                    {
-                      variant: "danger",
-                      type: "toast",
-                      title: "Error",
-                      component: <p>Shipping method ID is required</p>,
-                    },
-                    "shipping-method-delete-error"
-                  );
-                  return;
-                }
-                if (typeof deleteItemRequest !== "function") {
-                  console.warn("deleteItemRequest is not a function");
-                  return;
-                }
-                const response = await deleteItemRequest({ item });
-                if (!response) {
-                  notificationContext.show(
-                    {
-                      variant: "danger",
-                      type: "toast",
-                      title: "Error",
-                      component: <p>Failed to delete shipping method</p>,
-                    },
-                    "shipping-method-delete-error"
-                  );
-                  return;
-                }
-                dataTableContextState.refresh();
+    if (enableEdit) {
+      items.push(
+        <Link
+          className="badge bg-success-light mr-2"
+          target="_blank"
+          href="http://google.com"
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            getDatatableContextState().modal.show(
+              {
+                title: "Edit shipping method",
+                component: (
+                  <EditForm
+                    dataTable={getDatatableContextState()}
+                    data={item}
+                    operation={"edit"}
+                    inModal={true}
+                    modalId={DataManagerService.getId(id, "edit")}
+                    {...(editFormComponentData?.props || {})}
+                  />
+                ),
+                ...modalProps,
               },
-              show: true,
-              showFooter: true,
-            },
-            DataManagerService.getId(id, "delete")
-          );
-        }}
-      >
-        <i className="lar la-eye"></i>
-      </Link>
-    );
+              DataManagerService.getId(id, "edit")
+            );
+          }}
+        >
+          <i className="lar la-eye"></i>
+        </Link>
+      );
+    }
+    if (enableDelete) {
+      items.push(
+        <Link
+          className="badge bg-danger-light mr-2"
+          target="_blank"
+          href="#"
+          onClick={(e) => {
+            e.preventDefault();
+            dataTableContextState.modal.show(
+              {
+                title: "Delete shipping method",
+                component: (
+                  <p>
+                    Are you sure you want to delete this shipping method (
+                    {item?.name} | {item?.label})?
+                  </p>
+                ),
+                onOk: async () => {
+                  console.log("Delete shipping method", { operation, item });
+                  if (!operation) {
+                    console.warn("Operation is required");
+                    return;
+                  }
+                  if (Array.isArray(data) && data.length) {
+                    let cloneData = [...data];
+                    cloneData.splice(index, 1);
+                    if (typeof onChange === "function") {
+                      onChange(cloneData);
+                    }
+                    dataTableContextState.modal.close(
+                      DataManagerService.getId(id, "delete")
+                    );
+                    return;
+                  }
+                  if (!item?.id) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Shipping method ID is required</p>,
+                      },
+                      "shipping-method-delete-error"
+                    );
+                    return;
+                  }
+                  if (typeof deleteItemRequest !== "function") {
+                    console.warn("deleteItemRequest is not a function");
+                    return;
+                  }
+                  const response = await deleteItemRequest({ item });
+                  if (!response) {
+                    notificationContext.show(
+                      {
+                        variant: "danger",
+                        type: "toast",
+                        title: "Error",
+                        component: <p>Failed to delete shipping method</p>,
+                      },
+                      "shipping-method-delete-error"
+                    );
+                    return;
+                  }
+                  dataTableContextState.refresh();
+                },
+                show: true,
+                showFooter: true,
+              },
+              DataManagerService.getId(id, "delete")
+            );
+          }}
+        >
+          <i className="lar la-eye"></i>
+        </Link>
+      );
+    }
     return items;
   }
 
@@ -663,7 +674,7 @@ function DataManager({
     }
     return getDefaultActionColumnItems(item, index);
   }
-   function getActionColumnBadgeDropdownItems(
+  function getActionColumnBadgeDropdownItems(
     item: Record<string, unknown>,
     index: number
   ) {
@@ -678,10 +689,7 @@ function DataManager({
     return getDefaultActionColumnBadgeDropdownItems(item, index);
   }
 
-   function buildActionColumn(
-    item: Record<string, unknown>,
-    index: number
-  ) {
+  function buildActionColumn(item: Record<string, unknown>, index: number) {
     if (typeof renderActionColumn === "function") {
       return renderActionColumn({ item, index, dataTableContextState });
     }
@@ -689,13 +697,12 @@ function DataManager({
     const actionBadgeColumns = getActionColumnBadgeDropdownItems(item, index);
     return (
       <div className="d-flex align-items-center list-action">
-        {Array.isArray(actionColumns) && actionColumns.map((actionItem, actionIndex) => {
-          return (
-            <React.Fragment key={actionIndex}>
-              {actionItem}
-            </React.Fragment>
-          )
-        })}
+        {Array.isArray(actionColumns) &&
+          actionColumns.map((actionItem, actionIndex) => {
+            return (
+              <React.Fragment key={actionIndex}>{actionItem}</React.Fragment>
+            );
+          })}
         {Array.isArray(actionBadgeColumns) && actionBadgeColumns.length > 0 && (
           <BadgeDropDown data={actionBadgeColumns} />
         )}
@@ -977,6 +984,7 @@ function DataManager({
                       paginationMode={paginationMode}
                       enablePagination={enablePagination}
                       enableEdit={enableEdit}
+                      enableDelete={enableDelete}
                       onRowSelect={handleRowSelect}
                       onRowSelectActionClick={handleRowSelectActionClick}
                       rowSelectActions={getRowSelectActions()}

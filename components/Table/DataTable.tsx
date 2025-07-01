@@ -24,6 +24,7 @@ export type DataTableProps = {
     paginationMode?: 'router' | 'state';
     enablePagination?: boolean;
     enableEdit?: boolean;
+    enableDelete?: boolean;
     onRowSelectActionClick?: ({ action, data }: OnRowSelectActionClick) => void;
     rowSelectActions?: Array<unknown>
     onRowSelect?: (item: DataTableItem, index: number) => boolean | Promise<boolean>;
@@ -38,6 +39,7 @@ function DataTable({
     paginationMode = 'router',
     enablePagination = true,
     enableEdit = true,
+    enableDelete = true,
     onRowSelect,
     onRowSelectActionClick,
     rowSelectActions = [],
@@ -220,7 +222,7 @@ function DataTable({
     return (
         <>
             <div className="row">
-                {enableEdit && (
+                {(Array.isArray(rowSelectActions) && rowSelectActions.length > 0) && (
                     <div className="col-sm-12 col-md-3">
                         {renderRowSelectActions()}
                     </div>
@@ -291,7 +293,7 @@ function DataTable({
                                     <th key={index} className="text-center">{column?.label || ''}</th>
                                 )
                             })}
-                            {enableEdit && typeof actionColumn === 'function' && (
+                            {(enableEdit || enableDelete) && typeof actionColumn === 'function' && (
                                 <th className="text-center">Actions</th>
                             )}
                         </tr>
@@ -363,7 +365,7 @@ function DataTable({
                                             </td>
                                         );
                                     })}
-                                    {enableEdit && typeof actionColumn === 'function' && (
+                                    {(enableEdit || enableDelete) && typeof actionColumn === 'function' && (
                                         <td>
                                             {renderActionColumn(item, index)}
                                         </td>
@@ -376,7 +378,7 @@ function DataTable({
                 </table>
             </div>
             <div className="row">
-                {enableEdit && (
+                {(Array.isArray(rowSelectActions) && rowSelectActions.length > 0) && (
                     <div className="col-sm-12 col-md-3">
                         {renderRowSelectActions()}
                     </div>

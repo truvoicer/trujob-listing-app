@@ -40,6 +40,86 @@ export interface UpdateShippingMethod extends ShippingMethodRequest {
     id: number;
 }
 
+export type ShippingMethodTier = {
+    id: number;
+    name: string;
+    label: string;
+    description: string;
+    is_active: boolean;
+    has_max_dimension: boolean;
+    max_dimension: number;
+    max_dimension_unit: 'cm' | 'm' | 'in' | 'ft';
+    has_weight: boolean;
+    has_height: boolean;
+    has_width: boolean;
+    has_length: boolean;
+    weight_unit: 'g' | 'kg' | 'lb' | 'oz';
+    height_unit: 'cm' | 'm' | 'in' | 'ft';
+    width_unit: 'cm' | 'm' | 'in' | 'ft';
+    length_unit: 'cm' | 'm' | 'in' | 'ft';
+    max_weight: number;
+    max_height: number;
+    max_width: number;
+    max_length: number;
+    base_amount: number;
+    dimensional_weight_divisor?: number;
+    currency: Currency;
+    created_at: string;
+    updated_at: string;
+}
+
+export type ShippingMethodTierRequest = {
+    name?: string;
+    label?: string;
+    description?: string;
+    is_active?: boolean;
+    has_max_dimension?: boolean;
+    max_dimension?: number;
+    max_dimension_unit?: 'cm' | 'm' | 'in' | 'ft';
+    has_weight?: boolean;
+    has_height?: boolean;
+    has_width?: boolean;
+    has_length?: boolean;
+    weight_unit?: 'g' | 'kg' | 'lb' | 'oz';
+    height_unit?: 'cm' | 'm' | 'in' | 'ft';
+    width_unit?: 'cm' | 'm' | 'in' | 'ft';
+    length_unit?: 'cm' | 'm' | 'in' | 'ft';
+    max_weight?: number;
+    max_height?: number;
+    max_width?: number;
+    max_length?: number;
+    base_amount?: number;
+    dimensional_weight_divisor?: number;
+    currency_id?: number;
+}
+export interface CreateShippingMethodTier extends ShippingMethodTierRequest {
+    name: string;
+    label: string;
+    description: string;
+    is_active: boolean;
+    has_weight?: boolean;
+    has_height?: boolean;
+    has_width?: boolean;
+    has_length?: boolean;
+    has_max_dimension?: boolean;
+    max_dimension?: number;
+    max_dimension_unit?: 'cm' | 'm' | 'in' | 'ft';
+    weight_unit: 'g' | 'kg' | 'lb' | 'oz';
+    height_unit: 'cm' | 'm' | 'in' | 'ft';
+    width_unit: 'cm' | 'm' | 'in' | 'ft';
+    length_unit: 'cm' | 'm' | 'in' | 'ft';
+    max_weight: number;
+    max_height: number;
+    max_width: number;
+    max_length: number;
+    base_amount: number;
+    dimensional_weight_divisor?: number;
+    currency_id: number;
+}
+export interface UpdateShippingMethodTier extends ShippingMethodTierRequest {
+    id: number;
+}
+
 export type ShippingZoneAbleType = 'country' | 'region' | 'currency' | 'category';
 export type ShippingZoneAble = {
     id: number;

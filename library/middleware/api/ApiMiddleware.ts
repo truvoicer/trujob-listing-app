@@ -342,11 +342,6 @@ export class ApiMiddleware {
     }
     const responsePromise = await response;
     const responseData = await responsePromise.json();
-    console.log("ApiMiddleware.handleResponse", {
-      requestUrl,
-      responsePromise,
-      responseData,
-    });
     switch (responsePromise?.status) {
       case 200:
       case 201:
@@ -355,13 +350,7 @@ export class ApiMiddleware {
       case 401:
         this.handleUnauthorizedResponse(responsePromise, responseData);
       default:
-        console.log({ responsePromise, responseData });
-        this.addError("api_error", responseData?.message || "API Error", {
-          statusCode: responsePromise?.status,
-          statusText: responsePromise?.statusText,
-          requestUrl,
-          response: responseData,
-        });
+
         return false;
     }
   }

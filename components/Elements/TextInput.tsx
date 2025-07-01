@@ -7,6 +7,7 @@ export type TextInputProps = {
     type?: string;
     name?: string;
     label?: string;
+    error?: string | null;
 };
 function TextInput({
     value = '',
@@ -14,7 +15,8 @@ function TextInput({
     placeholder = "Enter text",
     type = "text",
     label = '',
-    name
+    name,
+    error = null,
 }: TextInputProps) {
     const id = randomStr(5);
     function getType() {
@@ -36,6 +38,7 @@ function TextInput({
             <label className="form-label" htmlFor={id}>
                 {label}
             </label>
+            {error && <span className="text-danger">{error}</span>}
         </div>
     );
 }

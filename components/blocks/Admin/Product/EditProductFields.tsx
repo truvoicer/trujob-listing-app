@@ -19,6 +19,7 @@ import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
 import SelectProductUnit from "./SelectProductUnit";
 import SelectProductWeightUnit from "./SelectProductWeightUnit";
+import ManageProductShippingMethod from "./Shipping/Method/ManageProductShippingMethod";
 
 export type EditProductFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -27,6 +28,7 @@ function EditProductFields({
     operation
 }: EditProductFields) {
     const [selectedUsers, setSelectedUsers] = useState<Array<any>>([]);
+    const [selectedShippingMethods, setSelectedShippingMethods] = useState<Array<any>>([]);
     const [selectedBrands, setSelectedBrands] = useState<Array<any>>([]);
     const [selectedCategories, setSelectedCategories] = useState<Array<any>>([]);
     const [selectedColors, setSelectedColors] = useState<Array<any>>([]);
@@ -585,6 +587,57 @@ function EditProductFields({
                 return true;
             }
         },
+        {
+            id: 'productShippingMethod',
+            title: 'Manage Shipping Method',
+            size: 'lg',
+            fullscreen: true,
+            component: (
+                <AccessControlComponent
+                    id="productShippingMethod"
+                    roles={[
+                        { name: 'admin' },
+                        { name: 'superuser' },
+                        { name: 'user' },
+                    ]}
+                >
+                    <ManageProductShippingMethod
+                        {...getProductComponentProps()}
+                        // data={values?.shipping_methods || []}
+                        rowSelection={true}
+                        multiRowSelection={true}
+                        enableEdit={true}
+                        paginationMode="state"
+                        onChange={(shippingMethods: Array<any>) => {
+                            if (!Array.isArray(shippingMethods)) {
+                                console.warn('Invalid values received from ManageProductShippingMethod component');
+                                return;
+                            }
+                            if (values?.id) {
+                                setSelectedShippingMethods(
+                                    shippingMethods.filter((item) => item?.checked)
+                                );
+                                return;
+                            }
+                            setFieldValue('shipping_methods', shippingMethods);
+                        }}
+                    />
+                </AccessControlComponent>
+            ),
+            onOk: () => {
+                if (selectedShippingMethods.length === 0) {
+                    return true;
+                }
+                if (['add', 'create'].includes(operation)) {
+                    setFieldValue('shipping_methods', selectedShippingMethods);
+                    return true;
+                }
+                return true;
+            },
+            onCancel: () => {
+                return true;
+            }
+        },
     ]);
 
     return (
@@ -856,9 +909,15 @@ function EditProductFields({
                             'Manage Media',
                         )}
                     </div>
+                    <div className="col-12 my-3">
+                        <h4>Manage Shipping Methods</h4>
+                        {modalService.renderLocalTriggerButton(
+                            'productShippingMethod',
+                            'Manage Shipping Method',
+                        )}
+                    </div>
                 </div>
             </div>
-
             {modalService.renderLocalModals()}
         </div>
     );

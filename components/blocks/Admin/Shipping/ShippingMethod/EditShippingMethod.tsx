@@ -124,6 +124,7 @@ function EditShippingMethod({
 
     switch (operation) {
       case "edit":
+      case "update":
         if (!values?.id) {
           throw new Error("ShippingMethod ID is required");
         }
