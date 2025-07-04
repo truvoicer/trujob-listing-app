@@ -106,33 +106,50 @@ function EditProduct({
       requestData.type = values.type;
     }
 
-    if (values?.has_weight) {
-      requestData.has_weight = values?.has_weight || false;
-      requestData.weight_unit = values?.weight_unit || "kg";
+    if (values?.hasOwnProperty("weight_unit")) {
+      requestData.weight_unit = values.weight_unit || "kg";
+    }
+    if (values?.hasOwnProperty("height_unit")) {
+      requestData.height_unit = values.height_unit || "cm";
+    }
+    if (values?.hasOwnProperty("length_unit")) {
+      requestData.length_unit = values.length_unit || "cm";
+    }
+    if (values?.hasOwnProperty("width_unit")) {
+      requestData.width_unit = values.width_unit || "cm";
+    }
+    if (values?.hasOwnProperty("weight")) {
       requestData.weight = values?.weight
         ? parseFloat(values?.weight.toString())
         : 0;
     }
-    if (values?.has_height) {
-      requestData.has_height = values?.has_height || false;
-      requestData.height_unit = values?.height_unit || "cm";
+    if (values?.hasOwnProperty("height")) {
       requestData.height = values?.height
         ? parseFloat(values?.height.toString())
         : 0;
     }
-    if (values?.has_length) {
-      requestData.has_length = values?.has_length || false;
-      requestData.length_unit = values?.length_unit || "cm";
+    if (values?.hasOwnProperty("length")) {
       requestData.length = values?.length
         ? parseFloat(values?.length.toString())
         : 0;
     }
-    if (values?.has_width) {
-      requestData.has_width = values?.has_width || false;
-      requestData.width_unit = values?.width_unit || "cm";
+    if (values?.hasOwnProperty("width")) {
       requestData.width = values?.width
         ? parseFloat(values?.width.toString())
         : 0;
+    }
+
+    if (values?.has_weight) {
+      requestData.has_weight = values?.has_weight || false;
+    }
+    if (values?.has_height) {
+      requestData.has_height = values?.has_height || false;
+    }
+    if (values?.has_length) {
+      requestData.has_length = values?.has_length || false;
+    }
+    if (values?.has_width) {
+      requestData.has_width = values?.has_width || false;
     }
 
     if (values?.currency?.id) {
@@ -141,34 +158,34 @@ function EditProduct({
     if (values.hasOwnProperty("user")) {
       requestData.user = values.user.id;
     }
-    if (Array.isArray(values?.follows)) {
+    if (values.hasOwnProperty("follows") && Array.isArray(values?.follows)) {
       requestData.follows = RequestHelpers.extractIdsFromArray(values.follows);
     }
-    if (Array.isArray(values?.features)) {
+    if (values.hasOwnProperty("features") && Array.isArray(values?.features)) {
       requestData.features = RequestHelpers.extractIdsFromArray(
         values.features
       );
     }
-    if (Array.isArray(values?.reviews)) {
+    if (values.hasOwnProperty("reviews") && Array.isArray(values?.reviews)) {
       requestData.reviews = values.reviews;
     }
-    if (Array.isArray(values?.categories)) {
+    if (values.hasOwnProperty("categories") && Array.isArray(values?.categories)) {
       requestData.categories = RequestHelpers.extractIdsFromArray(
         values.categories
       );
     }
-    if (Array.isArray(values?.brands)) {
+    if (values.hasOwnProperty("brands") && Array.isArray(values?.brands)) {
       requestData.brands = RequestHelpers.extractIdsFromArray(values.brands);
     }
-    if (Array.isArray(values?.colors)) {
+    if (values.hasOwnProperty("colors") && Array.isArray(values?.colors)) {
       requestData.colors = RequestHelpers.extractIdsFromArray(values.colors);
     }
-    if (Array.isArray(values?.product_categories)) {
+    if (values.hasOwnProperty("product_categories") && Array.isArray(values?.product_categories)) {
       requestData.product_categories = RequestHelpers.extractIdsFromArray(
         values.product_categories
       );
     }
-    if (Array.isArray(values?.media)) {
+    if (values.hasOwnProperty("media") && Array.isArray(values?.media)) {
       requestData.media = [];
     }
     return requestData;
