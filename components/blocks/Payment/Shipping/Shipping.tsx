@@ -1,6 +1,6 @@
 import { SessionState } from "@/library/redux/reducers/session-reducer";
 import ManageAddress, { Address } from "../../Admin/User/Address/ManageAddress";
-import { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect } from "react";
 import { LocaleHelpers } from "@/helpers/LocaleHelpers";
 import { MANAGE_ADDRESS_MODAL_ID } from "../Checkout/Checkout";
 import { FormikProps, FormikValues } from "formik";
@@ -12,24 +12,17 @@ import {
 } from "@/library/redux/constants/session-constants";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
-import { PaymentGateway } from "@/types/PaymentGateway";
-import { ShippingMethod } from "@/types/Shipping";
+import AvailableShippingTable from "./AvailableShippingTable";
 
 export type ShippingProps = {
   session: SessionState;
 };
 function Shipping({ session }: ShippingProps) {
-
   const modalContext = useContext(AppModalContext);
   const checkoutContext = useContext(CheckoutContext);
   const order = checkoutContext.order;
-  const price = checkoutContext.price;
-  const paymentMethod = checkoutContext.paymentMethod as PaymentGateway | null;
   const user = session[SESSION_USER];
 
-  async function fetchShippingMethods() {
-    const response = await checkoutContext.fetchShippingMethods();
-  }
   useEffect(() => {
     if (!user || !user.addresses || user.addresses.length === 0) {
       return;
@@ -48,7 +41,7 @@ function Shipping({ session }: ShippingProps) {
   }, [user]);
 
   useEffect(() => {
-    checkoutContext.refresh("availableShippingMethods");
+    checkoutContext.refresh("availableShippingMethods", checkoutContext);
   }, [order]);
 
   function renderManageAddressModal(type: "billing" | "shipping") {
@@ -140,6 +133,7 @@ function Shipping({ session }: ShippingProps) {
       </div>
     );
   }
+  
   return (
     <div className="shipping-details">
       <h3 className="text-2xl font-bold mb-4">Shipping Details</h3>
@@ -163,8 +157,12 @@ function Shipping({ session }: ShippingProps) {
                 <tr>
                   <td>{order.created_at}</td>
                   <td>{order.id}</td>
-                  <td>{renderAddress(checkoutContext.billingAddress, "billing")}</td>
-                  <td>{renderAddress(checkoutContext.shippingAddress, "shipping")}</td>
+                  <td>
+                    {renderAddress(checkoutContext.billingAddress, "billing")}
+                  </td>
+                  <td>
+                    {renderAddress(checkoutContext.shippingAddress, "shipping")}
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -176,53 +174,7 @@ function Shipping({ session }: ShippingProps) {
         Please enter your shipping address to ensure the products are delivered
         to the correct location.
       </p>
-      <div className="row">
-        <div className="col-lg-12">
-          <div className="table-responsive-sm">
-            <table className="table">
-              <thead>
-                <tr>
-                    <th scope="col"></th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Rates</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Array.isArray(checkoutContext.availableShippingMethods) &&
-                  checkoutContext.availableShippingMethods.length > 0 &&
-                  checkoutContext.availableShippingMethods.map(
-                    (shippingMethod: ShippingMethod, index: number) => {
-                      return (
-                        <tr key={index}>
-                            <td>
-                                <input
-                                type="radio"
-                                name="shippingMethod"
-                                value={shippingMethod.id}
-                                checked={
-                                    checkoutContext.selectedShippingMethod?.id ===
-                                    shippingMethod.id
-                                }
-                                onChange={() => {
-                                    checkoutContext.update({
-                                        selectedShippingMethod: shippingMethod
-                                    });
-                                }}
-                                />
-                            </td>
-                          <td>{shippingMethod.label}</td>
-                          <td>{shippingMethod.description}</td>
-                          <td>{shippingMethod.rates.map(rate => rate.amount).join(", ")}</td>
-                        </tr>
-                      );
-                    }
-                  )}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
+      <AvailableShippingTable />
     </div>
   );
 }

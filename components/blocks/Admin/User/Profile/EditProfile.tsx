@@ -37,33 +37,13 @@ import { FormikProps, FormikValues } from "formik";
 import { useContext } from "react";
 import { Button } from "react-bootstrap";
 import { connect } from "react-redux";
+import PasswordReset from "./PasswordReset";
 export type EditProfile = {
   session: SessionState;
 };
 
 function EditProfile({ session }: EditProfile) {
   const notificationContext = useContext(AppModalContext);
-  async function handlePasswordReset() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-      endpoint: UrlHelpers.urlFromArray([
-        TruJobApiMiddleware.getConfig().endpoints.auth.password.reset.request,
-      ]),
-      method: TruJobApiMiddleware.METHOD.POST,
-      protectedReq: true,
-      data: {
-        email: session?.[SESSION_USER]?.[SESSION_USER_EMAIL],
-      },
-    });
-    if (!response) {
-      console.error("Failed to reset password. No response received.");
-      return;
-    }
-    notificationContext.show({
-      variant: "success",
-      message: "Password reset email sent successfully.",
-    }, "password-reset-success");
-  }
-
   async function formSubmitHandler(values: FormikValues) {
     let requestData = {};
     if (values?.[SESSION_USER_FIRSTNAME]) {
@@ -319,13 +299,29 @@ function EditProfile({ session }: EditProfile) {
                   />
                 </div>
                 <div className="col-12 col-lg-6">
-                  <Button
-                    variant="secondary"
-                    type="button"
-                    onClick={handlePasswordReset}
-                  >
-                    Reset Password
-                  </Button>
+                  <PasswordReset
+                    email={session?.[SESSION_USER]?.[SESSION_USER_EMAIL]}
+                    onError={(error) => {
+                      notificationContext.show(
+                        {
+                          variant: "error",
+                          message:
+                            error?.message ||
+                            "Failed to send password reset email.",
+                        },
+                        "password-reset-error"
+                      );
+                    }}
+                    onSuccess={() => {
+                      notificationContext.show(
+                        {
+                          variant: "success",
+                          message: "Password reset email sent successfully.",
+                        },
+                        "password-reset-success"
+                      );
+                    }}
+                  />
                 </div>
               </div>
               <div className="row form-group">

@@ -6,8 +6,6 @@ import { connect } from 'react-redux';
 import { PAGE_STATE } from '@/library/redux/constants/page-constants';
 import AdminLayout from '../Layouts/AdminLayout';
 import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
-import Loader from '@/components/Loader';
-import ErrorView from '../Error/ErrorView';
 import { useRouter, useSearchParams } from 'next/navigation';
 import TabLayout, { TabItem } from '@/components/Layout/TabLayout';
 import { Page } from '@/types/Page';

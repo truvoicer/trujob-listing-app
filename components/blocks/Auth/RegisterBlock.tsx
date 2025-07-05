@@ -6,17 +6,17 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import { FormikProps, FormikValues } from "formik";
 
 function RegisterBlock() {
-
-    const formSubmitHandler = (values, errors) => {
-        let requestData = { ...values };
+    
+  const truJobApiMiddleware = TruJobApiMiddleware.getInstance().setDisableLoginModal(true);
+    const formSubmitHandler = async (values: FormikValues) => {
+        const requestData: Record<string, unknown> = { ...values };
         requestData.auth_provider = "local";
-        const response = TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await truJobApiMiddleware.resourceRequest({
             endpoint: `${truJobApiConfig.endpoints.auth.register}`,
             method: ApiMiddleware.METHOD.POST,
-            query,
             data: requestData
         });
-        if (!TruJobApiMiddleware.handleTokenResponse(response)) {
+        if (!await truJobApiMiddleware.handleTokenResponse(response)) {
             return;
         }
         console.log({ response, requestData });

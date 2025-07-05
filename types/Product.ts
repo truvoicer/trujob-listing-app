@@ -8,13 +8,13 @@ import { Review } from "./Review";
 import { User } from "./User";
 export type ProductDimension = {
     has_height: boolean;
-    has_length: boolean;
+    has_depth: boolean;
     has_width: boolean;
     height_unit: 'cm' | 'in';
-    length_unit: 'cm' | 'in';
+    depth_unit: 'cm' | 'in';
     width_unit: 'cm' | 'in';
     height: number;
-    length: number;
+    depth: number;
     width: number;
 };
 export type ProductWeight = {
@@ -55,11 +55,11 @@ export interface ProductRequest extends ProductDimension, ProductWeight {
     user?: number;
     type: 'digital' | 'physical' | 'service';
     has_height?: boolean;
-    has_length?: boolean;
+    has_depth?: boolean;
     has_width?: boolean;
     has_weight?: boolean;
     height_unit?: 'cm' | 'in';
-    length_unit?: 'cm' | 'in';
+    depth_unit?: 'cm' | 'in';
     width_unit?: 'cm' | 'in';
     weight_unit?: 'kg' | 'lb';
     height?: number;

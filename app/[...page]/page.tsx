@@ -1,23 +1,25 @@
-
 import React, { Suspense } from "react";
 import App from "@/components/App";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import {
+  ApiMiddleware,
+  ErrorItem,
+} from "@/library/middleware/api/ApiMiddleware";
 import { Metadata, ResolvingMetadata } from "next";
 import ErrorView from "@/components/Theme/Product/Error/ErrorView";
+import { PageService } from "@/library/services/app/page/PageService";
 
 type Props = {
-  params: Promise<{ page: string }>
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>
-}
+  params: Promise<{ page: string }>;
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+};
 
 export async function generateMetadata(
   { params, searchParams }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-
   const routeParams = await params;
   let uri;
   if (Array.isArray(routeParams.page)) {
@@ -55,11 +57,12 @@ export async function generateMetadata(
     title.push(site.data.seo_title);
   }
   return {
-    title: title.join(' | '),
+    title: title.join(" | "),
   };
 }
 
 async function Home({ params }: Props) {
+  const pageService = new PageService();
   const routeParams = await params;
   let uri;
   if (Array.isArray(routeParams.page)) {
@@ -81,12 +84,23 @@ async function Home({ params }: Props) {
       permalink: `/${uri}`,
     },
   });
+
+  let errors: ErrorItem[] = [];
   if (truJobApiMiddleware.hasErrors()) {
-    return (
-      <ErrorView
-        message={`Page not found`}
-      />
-    );
+    errors = truJobApiMiddleware.getErrors();
+  }
+  
+  pageService.validatePageData({
+    page: page?.data,
+    settings: settings?.data,
+    site: site?.data,
+  });
+  
+  if (pageService.hasErrors()) {
+    errors = [...errors, ...pageService.getErrors()];
+  }
+  if (errors.length > 0) {
+    return <ErrorView errors={errors} />;
   }
 
   if (!settings?.data) {
@@ -102,8 +116,7 @@ async function Home({ params }: Props) {
     <Suspense>
       <App data={page.data} settings={settings.data} site={site.data} />
     </Suspense>
-  )
+  );
 }
 
 export default Home;
-

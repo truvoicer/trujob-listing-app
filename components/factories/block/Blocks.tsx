@@ -25,7 +25,8 @@ import ManageDiscount from "@/components/blocks/Admin/Discount/ManageDiscount";
 import ManageShippingMethod from "@/components/blocks/Admin/Shipping/ShippingMethod/ManageShippingMethod";
 import ManageShippingZone from "@/components/blocks/Admin/Shipping/ShippingZone/ManageShippingZone";
 import EditProfile from "@/components/blocks/Admin/User/Profile/EditProfile";
-import ResetPasswordBlock from "@/components/blocks/Auth/ResetPasswordBlock";
+import PasswordResetConfirmationBlock from "@/components/blocks/Auth/PasswordResetConfirmationBlock";
+import PasswordResetBlock from "@/components/blocks/Auth/PasswordResetBlock";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -56,7 +57,8 @@ export class Blocks {
     static MANAGE_SHIPPING_ZONES_BLOCK = 'manage-shipping-zones-block';
     static EDIT_PROFILE_BLOCK = 'edit-profile-block';
     static EDIT_ACCOUNT_SETTINGS_BLOCK = 'edit-account-settings-block';
-    static RESET_PASSWORD_BLOCK = 'reset-password-block';
+    static PASSWORD_RESET_BLOCK = 'password-reset-block';
+    static PASSWORD_RESET_CONFIRMATION_BLOCK = 'password-reset-confirmation-block';
 
     static getBlocks() {
         return {
@@ -331,12 +333,20 @@ export class Blocks {
                     }
                 ),
             },
-            [Blocks.RESET_PASSWORD_BLOCK]: {
-                title: 'Reset Password Block',
-                description: 'This is the reset password block',
-                icon: 'reset-password-block-icon',
+            [Blocks.PASSWORD_RESET_BLOCK]: {
+                title: 'Password Reset Block',
+                description: 'This is the password reset block',
+                icon: 'password-reset-block-icon',
                 component: ComponentHelpers.buildComponent(
-                    ResetPasswordBlock,
+                    PasswordResetBlock,
+                ),
+            },
+            [Blocks.PASSWORD_RESET_CONFIRMATION_BLOCK]: {
+                title: 'Password Reset Confirmation Block',
+                description: 'This is the password reset confirmation block',
+                icon: 'password-reset-confirmation-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    PasswordResetConfirmationBlock,
                 ),
             },
         };

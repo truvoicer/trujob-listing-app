@@ -20,6 +20,7 @@ import { ModalService } from "@/library/services/modal/ModalService";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 
 export type EditProductProps = {
   data?: Product;
@@ -42,6 +43,7 @@ function EditProduct({
   } | null>(null);
 
   const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+  const notificationContext = useContext(AppNotificationContext);
   const initialValues: Product = {
     id: data?.id || 0,
     name: data?.name || "",
@@ -53,15 +55,15 @@ function EditProduct({
     type: data?.type || null,
     has_weight: data?.has_weight || false,
     has_height: data?.has_height || false,
-    has_length: data?.has_length || false,
+    has_depth: data?.has_depth || false,
     has_width: data?.has_width || false,
     weight_unit: data?.weight_unit || "kg",
     height_unit: data?.height_unit || "cm",
-    length_unit: data?.length_unit || "cm",
+    depth_unit: data?.depth_unit || "cm",
     width_unit: data?.width_unit || "cm",
     weight: data?.weight || 0,
     height: data?.height || 0,
-    length: data?.length || 0,
+    depth: data?.depth || 0,
     width: data?.width || 0,
     user: data?.user || {
       id: data?.user?.id || 0,
@@ -112,8 +114,8 @@ function EditProduct({
     if (values?.hasOwnProperty("height_unit")) {
       requestData.height_unit = values.height_unit || "cm";
     }
-    if (values?.hasOwnProperty("length_unit")) {
-      requestData.length_unit = values.length_unit || "cm";
+    if (values?.hasOwnProperty("depth_unit")) {
+      requestData.depth_unit = values.depth_unit || "cm";
     }
     if (values?.hasOwnProperty("width_unit")) {
       requestData.width_unit = values.width_unit || "cm";
@@ -128,9 +130,9 @@ function EditProduct({
         ? parseFloat(values?.height.toString())
         : 0;
     }
-    if (values?.hasOwnProperty("length")) {
-      requestData.length = values?.length
-        ? parseFloat(values?.length.toString())
+    if (values?.hasOwnProperty("depth")) {
+      requestData.depth = values?.depth
+        ? parseFloat(values?.depth.toString())
         : 0;
     }
     if (values?.hasOwnProperty("width")) {
@@ -145,8 +147,8 @@ function EditProduct({
     if (values?.has_height) {
       requestData.has_height = values?.has_height || false;
     }
-    if (values?.has_length) {
-      requestData.has_length = values?.has_length || false;
+    if (values?.has_depth) {
+      requestData.has_depth = values?.has_depth || false;
     }
     if (values?.has_width) {
       requestData.has_width = values?.has_width || false;
@@ -169,7 +171,10 @@ function EditProduct({
     if (values.hasOwnProperty("reviews") && Array.isArray(values?.reviews)) {
       requestData.reviews = values.reviews;
     }
-    if (values.hasOwnProperty("categories") && Array.isArray(values?.categories)) {
+    if (
+      values.hasOwnProperty("categories") &&
+      Array.isArray(values?.categories)
+    ) {
       requestData.categories = RequestHelpers.extractIdsFromArray(
         values.categories
       );
@@ -180,7 +185,10 @@ function EditProduct({
     if (values.hasOwnProperty("colors") && Array.isArray(values?.colors)) {
       requestData.colors = RequestHelpers.extractIdsFromArray(values.colors);
     }
-    if (values.hasOwnProperty("product_categories") && Array.isArray(values?.product_categories)) {
+    if (
+      values.hasOwnProperty("product_categories") &&
+      Array.isArray(values?.product_categories)
+    ) {
       requestData.product_categories = RequestHelpers.extractIdsFromArray(
         values.product_categories
       );
@@ -191,17 +199,35 @@ function EditProduct({
     return requestData;
   }
 
-  function buildCreateData(values: Product) {
-    console.log("buildCreateData", { values });
+  function validateCreateData(values: Product, showAlert: boolean = true) {
     if (!values?.type) {
+      if (showAlert) {
+        setAlert({
+          show: true,
+          message: "Product type is required",
+          type: "danger",
+        });
+      }
       console.warn("Product type is required");
-      return;
+      return false;
     }
+    return true;
+  }
+
+  function buildCreateData(values: Product) {
+    if (!validateCreateData(values)) {
+      return false;
+    }
+
     let requestData: CreateProduct = {
       name: values.name,
       title: values.title,
       active: values?.active || false,
       type: values.type,
+      weight_unit: values?.weight_unit || "kg",
+      height_unit: values?.height_unit || "cm",
+      depth_unit: values?.depth_unit || "cm",
+      width_unit: values?.width_unit || "cm",
     };
     requestData = {
       ...requestData,

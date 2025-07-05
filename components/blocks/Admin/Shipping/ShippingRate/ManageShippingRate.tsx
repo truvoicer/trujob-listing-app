@@ -128,162 +128,126 @@ function ManageShippingRate({
             label: "Type",
             key: "type",
           },
+
+          { label: "Name", key: "label" },
+          { label: "Description", key: "description" },
+          { label: "Is Active", key: "is_active", type: "boolean" },
           {
-            label: "Weight",
-            render: (column: Record<string, any>, item: ShippingRate) => {
-              return (
-                <div>
-                  {item?.weight_limit ? (
-                    <>
-                      <span className="badge bg-success-light mr-2">
-                        Min: {item?.min_weight || 0} {item?.weight_unit || "kg"}
-                      </span>
-                      <span className="badge bg-danger-light">
-                        Max: {item?.max_weight || 0} {item?.weight_unit || "kg"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="badge bg-secondary-light">
-                      No weight limit
-                    </span>
-                  )}
-                </div>
-              );
-            },
-          },
-          {
-            label: "Height",
-            render: (column: Record<string, any>, item: ShippingRate) => {
-              return (
-                <div>
-                  {item?.height_limit ? (
-                    <>
-                      <span className="badge bg-success-light mr-2">
-                        Min: {item?.min_height || 0} {item?.height_unit || "cm"}
-                      </span>
-                      <span className="badge bg-danger-light">
-                        Max: {item?.max_height || 0} {item?.height_unit || "cm"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="badge bg-secondary-light">
-                      No height limit
-                    </span>
-                  )}
-                </div>
-              );
-            },
-          },
-          {
-            label: "Length",
-            render: (column: Record<string, any>, item: ShippingRate) => {
-              return (
-                <div>
-                  {item?.length_limit ? (
-                    <>
-                      <span className="badge bg-success-light mr-2">
-                        Min: {item?.min_length || 0} {item?.length_unit || "cm"}
-                      </span>
-                      <span className="badge bg-danger-light">
-                        Max: {item?.max_length || 0} {item?.length_unit || "cm"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="badge bg-secondary-light">
-                      No length limit
-                    </span>
-                  )}
-                </div>
-              );
-            },
-          },
-          {
-            label: "Width",
-            render: (column: Record<string, any>, item: ShippingRate) => {
-              return (
-                <div>
-                  {item?.width_limit ? (
-                    <>
-                      <span className="badge bg-success-light mr-2">
-                        Min: {item?.min_width || 0} {item?.width_unit || "cm"}
-                      </span>
-                      <span className="badge bg-danger-light">
-                        Max: {item?.max_width || 0} {item?.width_unit || "cm"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="badge bg-secondary-light">
-                      No width limit
-                    </span>
-                  )}
-                </div>
-              );
-            },
-          },
-          {
-            label: "Length",
-            render: (column: Record<string, any>, item: ShippingRate) => {
-              return (
-                <div>
-                  {item?.length_limit ? (
-                    <>
-                      <span className="badge bg-success-light mr-2">
-                        Min: {item?.min_length || 0} {item?.length_unit || "cm"}
-                      </span>
-                      <span className="badge bg-danger-light">
-                        Max: {item?.max_length || 0} {item?.length_unit || "cm"}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="badge bg-secondary-light">
-                      No length limit
-                    </span>
-                  )}
-                </div>
-              );
-            },
-          },
-          {
-            label: "Amount",
+            label: "Max Dimension",
             render: (column: DataTableColumn, item: ShippingRate) => {
               return (
                 <>
-                  {item?.type === "free" ? (
-                    <span className="badge bg-success">Free</span>
+                  {item?.has_max_dimension ? (
+                    <span className="badge bg-danger-light">
+                      {item?.max_dimension || 0}{" "}
+                      {item?.max_dimension_unit || "cm"}
+                    </span>
                   ) : (
-                    <span>
-                      {item?.amount ? item?.amount : "0.00"}{" "}
+                    <span className="badge bg-secondary-light">
+                      No Max Dimension
                     </span>
                   )}
                 </>
+              );
+            },
+          },
+          {
+            label: "Max weight",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.has_weight ? (
+                    <span className="badge bg-danger-light">
+                      {item?.max_weight || 0} {item?.weight_unit || "kg"}
+                    </span>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No Max Weight
+                    </span>
+                  )}
+                </>
+              );
+            },
+          },
+          {
+            label: "Max height",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.has_height ? (
+                    <span className="badge bg-danger-light">
+                      {item?.max_height || 0} {item?.height_unit || "cm"}
+                    </span>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No Max Height
+                    </span>
+                  )}
+                </>
+              );
+            },
+          },
+          {
+            label: "Max width",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.has_width ? (
+                    <span className="badge bg-danger-light">
+                      {item?.max_width || 0} {item?.width_unit || "cm"}
+                    </span>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No Max Width
+                    </span>
+                  )}
+                </>
+              );
+            },
+          },
+          {
+            label: "Max length",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <>
+                  {item?.has_depth ? (
+                    <span className="badge bg-danger-light">
+                      {item?.max_depth || 0} {item?.depth_unit || "cm"}
+                    </span>
+                  ) : (
+                    <span className="badge bg-secondary-light">
+                      No Max Depth
+                    </span>
+                  )}
+                </>
+              );
+            },
+          },
+          {
+            label: "Base Amount",
+            render: (column: DataTableColumn, item: ShippingRate) => {
+              return (
+                <span>{item?.amount ? item?.amount : "0.00"} </span>
               );
             },
           },
           {
             label: "Currency",
             render: (column: DataTableColumn, item: ShippingRate) => {
-              return (
-                <>
-                  {item?.type === "free" ? (
-                    <span className="badge bg-success">Free</span>
-                  ) : (
-                    <span>
-                      {item?.currency?.code || "Currency error"}
-                    </span>
-                  )}
-                </>
-              );
+              return <span>{item?.currency?.code || "Currency error"}</span>;
             },
           },
           {
             label: "Created At",
             key: "created_at",
             type: "date",
+            date_format: "Do MMMM YYYY h:mm:ss a",
           },
           {
             label: "Updated At",
             key: "updated_at",
             type: "date",
+            date_format: "Do MMMM YYYY h:mm:ss a",
           },
         ]}
       />

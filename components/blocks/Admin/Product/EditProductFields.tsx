@@ -777,31 +777,31 @@ function EditProductFields({
 
                     <div className="col-12 col-lg-6">
                         <Checkbox
-                            name="has_length"
-                            value={values?.has_length || false}
+                            name="has_depth"
+                            value={values?.has_depth || false}
                             onChange={handleChange}
-                            label="Has Length?"
-                            placeholder="Has Length?"
+                            label="Has Depth?"
+                            placeholder="Has Depth?"
                         />
                     </div>
-                    {values?.has_length && (
+                    {values?.has_depth && (
                         <>
 
                             <div className="col-12 col-md-4">
                                 <TextInput
-                                    value={values?.length || 0}
+                                    value={values?.depth || 0}
                                     onChange={handleChange}
-                                    placeholder="Enter length"
-                                    name="length"
+                                    placeholder="Enter depth"
+                                    name="depth"
                                     type="number"
-                                    label="Length"
+                                    label="Depth"
                                 />
                             </div>
                             
                             <div className="col-12 col-md-4">
                                 <SelectProductUnit
-                                    name="length_unit"
-                                    value={values?.length_unit || ''} />
+                                    name="depth_unit"
+                                    value={values?.depth_unit || ''} />
                             </div>
                         </>
                     )}

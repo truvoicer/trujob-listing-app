@@ -4,8 +4,10 @@ import App from "@/components/App";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import siteConfig from "@/config/site-config";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
-import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import { ApiMiddleware, ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import type { Metadata, ResolvingMetadata } from 'next'
+import ErrorView from "@/components/Theme/Product/Error/ErrorView";
+import { PageService } from "@/library/services/app/page/PageService";
 
 
 type Props = {
@@ -56,6 +58,8 @@ export async function generateMetadata(
 }
 
 async function Home({ params }: Props ) {
+  const pageService = new PageService();
+  
   const truJobApiMiddleware = new TruJobApiMiddleware();
   const site = await truJobApiMiddleware.resourceRequest({
     endpoint: `${truJobApiConfig.endpoints.site}/${siteConfig.site.name}`,
@@ -72,15 +76,24 @@ async function Home({ params }: Props ) {
       permalink: `/`,
     },
   });
-  console.log(site, settings, page);
-  if (!settings?.data) {
-    return;
+  
+  let errors: ErrorItem[] = [];
+  if (truJobApiMiddleware.hasErrors()) {
+    errors = truJobApiMiddleware.getErrors();
   }
-  if (!page?.data) {
-    return;
+  
+  pageService.validatePageData({
+    page: page?.data,
+    settings: settings?.data,
+    site: site?.data,
+  });
+
+  if (pageService.hasErrors()) {
+    errors = [...errors, ...pageService.getErrors()];
   }
-  if (!site?.data) {
-    return;
+  
+  if (errors.length > 0) {
+    return <ErrorView errors={errors} />;
   }
   return (
     <Suspense>

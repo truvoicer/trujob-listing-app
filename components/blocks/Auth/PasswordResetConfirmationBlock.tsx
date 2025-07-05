@@ -24,10 +24,10 @@ const RESET_STATUS_TOKEN_CHECKING = "RESET_STATUS_TOKEN_CHECKING";
 const RESET_STATUS_TOKEN_INVALID = "RESET_STATUS_TOKEN_INVALID";
 const RESET_STATUS_TOKEN_VALID = "RESET_STATUS_TOKEN_VALID";
 
-export type ResetPasswordBlockProps = {
+export type PasswordResetConfirmationBlockProps = {
   session: SessionState;
 };
-function ResetPasswordBlock() {
+function PasswordResetConfirmationBlock() {
   const [resetStatus, setResetStatus] = useState<
     | typeof RESET_STATUS_SUCCESS
     | typeof RESET_STATUS_FAILURE
@@ -199,4 +199,4 @@ function ResetPasswordBlock() {
 }
 export default connect((state: RootState) => ({
   session: state[SESSION_STATE],
-}))(ResetPasswordBlock);
+}))(PasswordResetConfirmationBlock);

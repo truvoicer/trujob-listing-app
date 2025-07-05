@@ -2,7 +2,10 @@ import AccessControlComponent from "@/components/AccessControl/AccessControlComp
 import Checkout from "@/components/blocks/Payment/Checkout/Checkout";
 import { Dispatch, useContext, useEffect, useState } from "react";
 import ManagePriceType from "../../PriceType/ManagePriceType";
-import { LocalModal, ModalService } from "@/library/services/modal/ModalService";
+import {
+  LocalModal,
+  ModalService,
+} from "@/library/services/modal/ModalService";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import { Price, PriceType } from "@/types/Price";
@@ -25,39 +28,41 @@ import PaymentProcess from "@/components/blocks/Payment/PaymentProcess";
 export type ProductTestCheckoutProps = {
   productId: number;
   modalId?: string;
-}
-function ProductTestCheckout({
-  productId,
-  modalId,
-}: ProductTestCheckoutProps) {
+};
+function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
   const [product, setProduct] = useState<Product | null>(null);
   const [price, setPrice] = useState<Price | null>(null);
-  const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(null);
+  const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(
+    null
+  );
   const [quantity, setQuantity] = useState<number>(1);
   const [order, setOrder] = useState<any>(null);
   const [orderCreated, setOrderCreated] = useState<boolean>(false);
-  const [orderIsBeingCreated, setOrderIsBeingCreated] = useState<boolean>(false);
+  const [orderIsBeingCreated, setOrderIsBeingCreated] =
+    useState<boolean>(false);
 
   const modalService = new ModalService();
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
 
-
   async function fetchOrder() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
-        order?.id
+        order?.id,
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
     });
     if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to create order',
-        title: 'Error',
-      }, 'order-create-error-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Failed to create order",
+          title: "Error",
+        },
+        "order-create-error-notification"
+      );
       return false;
     }
     return response?.data;
@@ -79,11 +84,14 @@ function ProductTestCheckout({
       protectedReq: true,
     });
     if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to fetch payment gateways',
-        title: 'Error',
-      }, 'payment-gateway-fetch-error-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Failed to fetch payment gateways",
+          title: "Error",
+        },
+        "payment-gateway-fetch-error-notification"
+      );
       return;
     }
     return response?.data;
@@ -99,19 +107,25 @@ function ProductTestCheckout({
   async function fetchProductPrice() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
-        truJobApiConfig.endpoints.productPrice.replace(':productId', productId.toString()),
-        1
+        truJobApiConfig.endpoints.productPrice.replace(
+          ":productId",
+          productId.toString()
+        ),
+        1,
       ]),
       method: ApiMiddleware.METHOD.GET,
       protectedReq: true,
     });
 
     if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to fetch product price',
-        title: 'Error',
-      }, 'product-price-fetch-error-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Failed to fetch product price",
+          title: "Error",
+        },
+        "product-price-fetch-error-notification"
+      );
       return;
     }
     return response?.data;
@@ -128,42 +142,46 @@ function ProductTestCheckout({
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.product,
-        productId
+        productId,
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
     });
     if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to fetch product',
-        title: 'Error',
-      }, 'product-fetch-error-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Failed to fetch product",
+          title: "Error",
+        },
+        "product-fetch-error-notification"
+      );
       return;
     }
 
     if (response?.data) {
       setProduct(response.data);
     }
-
   }
-
 
   function getProductComponentProps() {
     let componentProps: any = {
-      operation: 'create',
-      mode: 'selector'
+      operation: "create",
+      mode: "selector",
     };
     return componentProps;
   }
 
   function validateProduct() {
     if (!product) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Product not found',
-        title: 'Error',
-      }, 'product-not-found-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Product not found",
+          title: "Error",
+        },
+        "product-not-found-notification"
+      );
       return false;
     }
     return true;
@@ -171,11 +189,14 @@ function ProductTestCheckout({
 
   function validatePrice() {
     if (!price) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Please select a price type first',
-        title: 'Error',
-      }, 'price-type-not-selected-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Please select a price type first",
+          title: "Error",
+        },
+        "price-type-not-selected-notification"
+      );
       return false;
     }
     return true;
@@ -183,11 +204,14 @@ function ProductTestCheckout({
 
   function validatePaymentGateway() {
     if (!paymentGateway) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Please select a payment method',
-        title: 'Error',
-      }, 'payment-method-not-selected-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Please select a payment method",
+          title: "Error",
+        },
+        "payment-method-not-selected-notification"
+      );
       return false;
     }
     return true;
@@ -195,11 +219,14 @@ function ProductTestCheckout({
 
   function validateQuantity() {
     if (isNaN(quantity) || quantity <= 0) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Quantity must be greater than 0',
-        title: 'Error',
-      }, 'quantity-invalid-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Quantity must be greater than 0",
+          title: "Error",
+        },
+        "quantity-invalid-notification"
+      );
       return false;
     }
     return true;
@@ -208,28 +235,23 @@ function ProductTestCheckout({
   modalService.setUseStateHook(useState);
   modalService.setConfig([
     {
-      id: 'priceType',
-      title: 'Select Price Type',
-      size: 'lg',
+      id: "priceType",
+      title: "Select Price Type",
+      size: "lg",
       fullscreen: true,
       component: ({
         state,
         setState,
         configItem,
       }: {
-        state: LocalModal & StepActions,
-        setState: Dispatch<React.SetStateAction<LocalModal>>,
-        configItem: any,
-      }
-      ) => {
-
+        state: LocalModal & StepActions;
+        setState: Dispatch<React.SetStateAction<LocalModal>>;
+        configItem: any;
+      }) => {
         return (
           <AccessControlComponent
-          id="manage-product-price"
-            roles={[
-              { name: 'admin' },
-              { name: 'superuser' },
-            ]}
+            id="manage-product-price"
+            roles={[{ name: "admin" }, { name: "superuser" }]}
           >
             <ManageProductPrice
               {...getProductComponentProps()}
@@ -240,17 +262,19 @@ function ProductTestCheckout({
               paginationMode="state"
               onChange={(priceTypes: Array<any>) => {
                 if (!Array.isArray(priceTypes)) {
-                  console.warn('Invalid values received from ManageUser component');
+                  console.warn(
+                    "Invalid values received from ManageUser component"
+                  );
                   return;
                 }
 
                 if (priceTypes.length === 0) {
-                  console.warn('Price types is empty');
+                  console.warn("Price types is empty");
                   return true;
                 }
                 const checked = priceTypes.filter((item) => item?.checked);
                 if (checked.length === 0) {
-                  console.warn('No price type selected');
+                  console.warn("No price type selected");
                   return true;
                 }
                 const selected = checked[0];
@@ -264,19 +288,22 @@ function ProductTestCheckout({
           </AccessControlComponent>
         );
       },
-      onOk: ({ state }: {
-        state: LocalModal,
-        setState: Dispatch<React.SetStateAction<LocalModal>>,
-        configItem: any,
-      },
+      onOk: (
+        {
+          state,
+        }: {
+          state: LocalModal;
+          setState: Dispatch<React.SetStateAction<LocalModal>>;
+          configItem: any;
+        },
         e?: React.MouseEvent | null
       ) => {
-        console.log('onOk', price);
+        console.log("onOk", price);
         return true;
       },
       onCancel: () => {
         return true;
-      }
+      },
     },
   ]);
 
@@ -297,28 +324,31 @@ function ProductTestCheckout({
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
-        'store'
+        "store",
       ]),
       method: TruJobApiMiddleware.METHOD.POST,
       protectedReq: true,
       data: {
         items: [
           {
-            entity_type: 'product',
+            entity_type: "product",
             entity_id: productId,
             price_id: price?.id,
             payment_gateway_id: paymentGateway?.id,
             quantity: quantity,
-          }
-        ]
-      }
+          },
+        ],
+      },
     });
     if (!response) {
-      notificationContext.show({
-        variant: 'danger',
-        message: 'Failed to create order',
-        title: 'Error',
-      }, 'order-create-error-notification');
+      notificationContext.show(
+        {
+          variant: "danger",
+          message: "Failed to create order",
+          title: "Error",
+        },
+        "order-create-error-notification"
+      );
       return false;
     }
     setOrder(response.data);
@@ -334,29 +364,30 @@ function ProductTestCheckout({
   }, [productId]);
 
   useEffect(() => {
-    if (!product || !price || !paymentGateway || (isNaN(quantity) || quantity <= 0) || orderCreated || orderIsBeingCreated) {
+    if (
+      !product ||
+      !price ||
+      !paymentGateway ||
+      isNaN(quantity) ||
+      quantity <= 0 ||
+      orderCreated ||
+      orderIsBeingCreated
+    ) {
       return;
     }
     createOrder();
   }, [product, price, paymentGateway, quantity]);
   return (
     <>
-      {product &&
-        price &&
-       paymentGateway &&
-        quantity && order
-        ?
-        <CheckoutProvider
+      {product && price && paymentGateway && quantity && order ? (
+        <Checkout 
           fetchOrder={async () => await fetchOrder()}
           fetchAvailablePaymentGateways={async () => await fetchAvailablePaymentGateways()}
           fetchPrice={async () => await fetchProductPrice()}
-        >
-          <PaymentProcess />
-        </CheckoutProvider>
-        : (
-          <Loader />
-
-        )}
+        />
+      ) : (
+        <Loader />
+      )}
       {/* <Stepper
         title="Product Test Checkout"
         config={[

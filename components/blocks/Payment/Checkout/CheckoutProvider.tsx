@@ -12,6 +12,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { Order } from "@/types/Cashier";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { Price } from "@/types/Price";
+import PaymentProcess from "../PaymentProcess";
 
 export type CheckoutProviderProps = {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ function CheckoutProvider({
     removeOrderItem: removeOrderItem,
     addOrderItem: addOrderItem,
     refresh: refreshEntity,
+    fetchSelectedShippingMethod: fetchSelectedShippingMethod,
   });
 
   const notificationContext = useContext(AppNotificationContext);
@@ -79,9 +81,27 @@ function CheckoutProvider({
     });
   }
 
-  async function handleFetchAvailableShippingMethods() {
+  async function handleFetchAvailableShippingMethods(
+    checkoutContext: CheckoutContextType
+  ) {
+    let endpoint: string;
+    if (!checkoutContext.order || !checkoutContext.order.id) {
+      endpoint = UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.orderShippingMethod.replace(
+          ":orderId",
+          String(checkoutContext.order?.id)
+        ),
+      ]);
+    } else {
+      endpoint = UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.orderShippingMethod.replace(
+          ":orderId",
+          String(checkoutContext.order?.id)
+        ),
+      ]);
+    }
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-      endpoint: truJobApiConfig.endpoints.shippingMethod,
+      endpoint,
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
     });
@@ -93,6 +113,76 @@ function CheckoutProvider({
     }
     updateCheckoutData({
       availableShippingMethods: response.data,
+    });
+  }
+
+  async function shippingMethodRequest(
+    orderId: number,
+    shippingMethodId: number
+  ) {
+    return await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.orderShippingMethod.replace(
+          ":orderId",
+          String(orderId)
+        ),
+        shippingMethodId,
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+  }
+
+  async function fetchSelectedShippingMethod(
+    id: number,
+    checkoutContext: CheckoutContextType
+  ) {
+    if (!checkoutContext.order || !checkoutContext.order.id) {
+      return;
+    }
+    if (!id) {
+      return;
+    }
+
+    const response = await shippingMethodRequest(checkoutContext.order.id, id);
+
+    if (!response || !response.data) {
+      console.error(
+        "Failed to fetch shipping methods. No response or data received."
+      );
+      return;
+    }
+    updateCheckoutData({
+      selectedShippingMethod: response.data,
+    });
+  }
+
+  async function handleFetchSelectedShippingMethod(
+    checkoutContext: CheckoutContextType
+  ) {
+    if (!checkoutContext.order || !checkoutContext.order.id) {
+      return;
+    }
+    if (
+      !checkoutContext.selectedShippingMethod ||
+      !checkoutContext.selectedShippingMethod.id
+    ) {
+      return;
+    }
+
+    const response = await shippingMethodRequest(
+      checkoutContext.order.id,
+      checkoutContext.selectedShippingMethod.id
+    );
+
+    if (!response || !response.data) {
+      console.error(
+        "Failed to fetch shipping methods. No response or data received."
+      );
+      return;
+    }
+    updateCheckoutData({
+      selectedShippingMethod: response.data,
     });
   }
 
@@ -118,7 +208,10 @@ function CheckoutProvider({
     });
   }
 
-  async function refreshEntity(entity: RefreshEntities) {
+  async function refreshEntity(
+    entity: RefreshEntities,
+    checkoutContext: CheckoutContextType
+  ) {
     switch (entity) {
       case "order":
         await handleFetchOrder();
@@ -133,10 +226,13 @@ function CheckoutProvider({
         await handleFetchPrice();
         break;
       case "availableShippingMethods":
-        await handleFetchAvailableShippingMethods();
+        await handleFetchAvailableShippingMethods(checkoutContext);
         break;
       case "orderSummary":
         await handleFetchOrderSummary();
+        break;
+      case "selectedShippingMethod":
+        await handleFetchSelectedShippingMethod(checkoutContext);
         break;
       default:
         console.warn(`Unknown entity type: ${entity}`);

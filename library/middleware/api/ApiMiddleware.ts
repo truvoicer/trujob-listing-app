@@ -45,7 +45,19 @@ export class ApiMiddleware {
     DELETE: "DELETE",
   };
 
+  config?: Record<string, unknown>;
+  
   errors: Array<ErrorItem> = [];
+  private disableLoginModal: boolean = false;
+
+  getDisableLoginModal(): boolean {
+    return this.disableLoginModal;
+  }
+
+  setDisableLoginModal(value: boolean): ApiMiddleware {
+    this.disableLoginModal = value;
+    return this;
+  }
 
   buildQueryString(queryObject: any = false) {
     if (queryObject.length === 0) {
@@ -125,19 +137,11 @@ export class ApiMiddleware {
     };
   }
 
-  handleTokenResponse({
-    result,
-    config,
-    appKey,
-  }: {
-    result: Promise<any>;
-    config?: any | null;
-    appKey?: string;
-  }) {
-    if (typeof config?.tokenResponseHandler !== "function") {
+  handleTokenResponse(response: unknown): boolean {
+    if (typeof this.config?.tokenResponseHandler !== "function") {
       return false;
     }
-    return config.tokenResponseHandler(result, appKey);
+    return this.config.tokenResponseHandler(response);
   }
 
   async resourceRequest({
@@ -327,10 +331,17 @@ export class ApiMiddleware {
 
   handleUnauthorizedResponse(response: Response, data: any): void {
     console.log("handleUnauthorizedResponse", { response, data });
+    this.errors.push({
+      code: "unauthorized",
+      message: data?.message || "Unauthorized access",
+      data,
+    });
     SessionService.removeLocalSession();
     setAuthenticatedAction(false);
     setIsAuthenticatingAction(false);
-    setShowLoginModalAction(true);
+    if (!this.getDisableLoginModal()) {
+      setShowLoginModalAction(true);
+    }
   }
 
   async handleResponse(
@@ -350,11 +361,9 @@ export class ApiMiddleware {
       case 401:
         this.handleUnauthorizedResponse(responsePromise, responseData);
       default:
-
         return false;
     }
   }
-
 
   getErrors() {
     return this.errors;

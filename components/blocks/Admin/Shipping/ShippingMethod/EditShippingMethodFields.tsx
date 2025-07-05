@@ -17,7 +17,6 @@ import { ShippingProviderContext } from "@/components/Provider/Shipping/context/
 import { ShippingService } from "@/library/services/cashier/shipping/ShippingService";
 import { DataTableColumn } from "@/components/Table/DataTable";
 import SelectShippingRestrictionAction from "../ShippingRestriction/SelectShippingRestrictionAction";
-import ManageShippingMethodTier from "./Tier/ManageShippingMethodTier";
 
 type EditShippingMethodFields = {
   operation: "edit" | "update" | "add" | "create";
@@ -123,52 +122,6 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
                 }
 
                 setFieldValue("restrictions", restrictions);
-              }}
-            />
-          </AccessControlComponent>
-        );
-      },
-      onOk: () => {
-        return true;
-      },
-      onCancel: () => {
-        return true;
-      },
-    },
-    {
-      id: "manageTiers",
-      title: "Manage Tiers",
-      size: "lg",
-      fullscreen: true,
-      component: () => {
-        const extraProps: Record<string, unknown> = {};
-        if (operation === "create" || operation === "add") {
-          extraProps.data = values?.tiers || [];
-        }
-
-        return (
-          <AccessControlComponent
-            id="edit-shipping-method-tiers"
-            roles={[{ name: "admin" }, { name: "superuser" }]}
-          >
-            <ManageShippingMethodTier
-              {...getComponentProps()}
-              {...extraProps}
-              values={values?.tiers ? values?.tiers : []}
-              rowSelection={false}
-              mode={"edit"}
-              multiRowSelection={false}
-              enableEdit={true}
-              paginationMode="state"
-              onChange={(tiers: Array<any>) => {
-                if (!Array.isArray(tiers)) {
-                  console.warn(
-                    "Invalid values received from ManageShippingMethodTier component"
-                  );
-                  return;
-                }
-
-                setFieldValue("tiers", tiers);
               }}
             />
           </AccessControlComponent>
@@ -414,15 +367,6 @@ function EditShippingMethodFields({ operation }: EditShippingMethodFields) {
             </div>
           </div>
 
-          <div className="col-12 col-lg-6 mt-4">
-            <label className="d-block fw-bold">Tiers</label>
-            <div className="floating-input">
-              {modalService.renderLocalTriggerButton(
-                "manageTiers",
-                "Manage Tiers"
-              )}
-            </div>
-          </div>
         </div>
         {modalService.renderLocalModals()}
       </div>

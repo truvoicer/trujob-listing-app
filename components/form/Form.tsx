@@ -38,8 +38,8 @@ export type FormContextType = {
 export const VALIDATION_REQUIRED = "required";
 export const VALIDATION_REQUIRED_IF = "required_if";
 export const VALIDATION_EMAIL = "email";
-export const VALIDATION_MIN_LENGTH = "min_length";
-export const VALIDATION_MAX_LENGTH = "max_length";
+export const VALIDATION_MIN_DEPTH = "min_depth";
+export const VALIDATION_MAX_DEPTH = "max_depth";
 export const VALIDATION_MIN = "min";
 export const VALIDATION_MAX = "max";
 export const VALIDATION_NUMERIC = "numeric";
@@ -60,8 +60,8 @@ export const VALIDATION_PHONE = "phone";
 export const VALIDATION_RULES = [
   VALIDATION_REQUIRED,
   VALIDATION_EMAIL,
-  VALIDATION_MIN_LENGTH,
-  VALIDATION_MAX_LENGTH,
+  VALIDATION_MIN_DEPTH,
+  VALIDATION_MAX_DEPTH,
   VALIDATION_MIN,
   VALIDATION_MAX,
   VALIDATION_NUMERIC,
@@ -202,7 +202,7 @@ function Form({
               validationErrors[key] = rule.message || "Invalid email address";
             }
             break;
-          case VALIDATION_MIN_LENGTH:
+          case VALIDATION_MIN_DEPTH:
             if (!checkValidationRule(rule, ["value"])) {
               return;
             }
@@ -211,7 +211,7 @@ function Form({
                 rule.message || `Minimum length is ${rule.value}`;
             }
             break;
-          case VALIDATION_MAX_LENGTH:
+          case VALIDATION_MAX_DEPTH:
             if (!checkValidationRule(rule, ["value"])) {
               return;
             }

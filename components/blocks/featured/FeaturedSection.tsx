@@ -13,7 +13,7 @@ function FeaturedSection(props) {
                 <div className="row">
                     <div className="col-12  block-13">
                         <div className="owl-carousel nonloop-block-13 row">
-                            {Array.from({length: 4}).map((_, index) => {
+                            {Array.from({depth: 4}).map((_, index) => {
                                 return (
                                     <div key={index} className="col-lg-3 mb-4 mb-lg-0">
                                         <FeaturedCard/>

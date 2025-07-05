@@ -44,53 +44,83 @@ export function buildShippingRate(rate: ShippingRate) {
   if (rate?.type) {
     shippingRate.type = rate?.type || "";
   }
-  if (rate?.amount) {
-    shippingRate.amount = parseFloat(rate?.amount.toString()) || 0;
-  }
-  if (rate?.weight_limit) {
-    shippingRate.weight_limit = rate?.weight_limit || false;
-    shippingRate.weight_unit = rate?.weight_unit || "kg";
-    shippingRate.min_weight = rate?.min_weight
-      ? parseFloat(rate?.min_weight.toString())
-      : 0;
-    shippingRate.max_weight = rate?.max_weight
-      ? parseFloat(rate?.max_weight.toString())
-      : 0;
-  }
-  if (rate?.height_limit) {
-    shippingRate.height_limit = rate?.height_limit || false;
-    shippingRate.height_unit = rate?.height_unit || "cm";
-    shippingRate.min_height = rate?.min_height
-      ? parseFloat(rate?.min_height.toString())
-      : 0;
-    shippingRate.max_height = rate?.max_height
-      ? parseFloat(rate?.max_height.toString())
-      : 0;
-  }
-  if (rate?.length_limit) {
-    shippingRate.length_limit = rate?.length_limit || false;
-    shippingRate.length_unit = rate?.length_unit || "cm";
-    shippingRate.min_length = rate?.min_length
-      ? parseFloat(rate?.min_length.toString())
-      : 0;
-    shippingRate.max_length = rate?.max_length
-      ? parseFloat(rate?.max_length.toString())
-      : 0;
-  }
-  if (rate?.width_limit) {
-    shippingRate.width_limit = rate?.width_limit || false;
-    shippingRate.width_unit = rate?.width_unit || "cm";
-    shippingRate.min_width = rate?.min_width
-      ? parseFloat(rate?.min_width.toString())
-      : 0;
-    shippingRate.max_width = rate?.max_width
-      ? parseFloat(rate?.max_width.toString())
-      : 0;
-  }
+  
+  if (rate?.label) {
+      shippingRate.label = rate?.label || "";
+    }
+    if (rate?.description) {
+      shippingRate.description = rate?.description || "";
+    }
+    if (rate?.name) {
+      shippingRate.name = rate?.name || "";
+    }
+    if (rate.hasOwnProperty("max_dimension_unit")) {
+      shippingRate.max_dimension_unit =
+        rate?.max_dimension_unit || "cm"; // Default to cm if not provided
+    }
+    if (rate.hasOwnProperty("max_dimension")) {
+      shippingRate.max_dimension = rate?.max_dimension || 0;
+    }
+    if (rate.hasOwnProperty("has_max_dimension")) {
+      shippingRate.has_max_dimension = rate?.has_max_dimension || false;
+    }
 
-  if (rate?.currency?.id) {
-    shippingRate.currency_id = rate?.currency?.id;
-  }
+    if (rate.hasOwnProperty("weight_unit")) {
+      shippingRate.weight_unit = rate?.weight_unit || "kg";
+    }
+    if (rate.hasOwnProperty("max_weight")) {
+      shippingRate.max_weight = rate?.max_weight || 0;
+    }
+    if (rate.hasOwnProperty("has_weight")) {
+      shippingRate.has_weight = rate?.has_weight || false;
+    }
+
+    if (rate.hasOwnProperty("height_unit")) {
+      shippingRate.height_unit = rate?.height_unit || "cm";
+    }
+    if (rate.hasOwnProperty("max_height")) {
+      shippingRate.max_height = rate?.max_height || 0;
+    }
+    if (rate.hasOwnProperty("has_height")) {
+      shippingRate.has_height = rate?.has_height || false;
+    }
+    if (rate.hasOwnProperty("depth_unit")) {
+      shippingRate.depth_unit = rate?.depth_unit || "cm";
+    }
+    if (rate.hasOwnProperty("max_depth")) {
+      shippingRate.max_depth = rate?.max_depth || 0;
+    }
+    if (rate.hasOwnProperty("has_depth")) {
+      shippingRate.has_depth = rate?.has_depth || false;
+    }
+    if (rate.hasOwnProperty("has_max_dimension")) {
+      shippingRate.has_max_dimension = rate?.has_max_dimension || false;
+    }
+    if (rate.hasOwnProperty("max_width")) {
+      shippingRate.max_width = rate?.max_width || 0;
+    }
+    if (rate.hasOwnProperty("width_unit")) {
+      shippingRate.width_unit = rate?.width_unit || "cm";
+    }
+    if (rate.hasOwnProperty("has_width")) {
+      shippingRate.has_width = rate?.has_width || false;
+    }
+    
+    if (rate.hasOwnProperty("is_active")) {
+      shippingRate.is_active = rate?.is_active || false;
+    }
+    if (rate.hasOwnProperty("amount")) {
+      shippingRate.amount = rate?.amount || 0;
+    }
+    
+    if (rate.hasOwnProperty("dimensional_weight_divisor")) {
+      shippingRate.dimensional_weight_divisor =
+        rate?.dimensional_weight_divisor || 0;
+    }
+    if (rate?.currency?.id) {
+      shippingRate.currency_id = rate?.currency?.id || 0;
+    }
+
   return shippingRate;
 }
 function EditShippingRate({
@@ -113,23 +143,29 @@ function EditShippingRate({
     shipping_method: data?.shipping_method || "",
     shipping_zone: data?.shipping_zone || "",
     type: data?.type || "",
-    weight_limit: data?.weight_limit || false,
-    height_limit: data?.height_limit || false,
-    length_limit: data?.length_limit || false,
-    width_limit: data?.width_limit || false,
+    name: data?.name || "",
+    label: data?.label || "",
+    description: data?.description || "",
+    is_active: data?.is_active || false,
+    has_weight: data?.has_weight || false,
+    has_height: data?.has_height || false,
+    has_depth: data?.has_depth || false,
+    has_width: data?.has_width || false,
+    has_max_dimension: data?.has_max_dimension || false,
+    max_dimension: data?.max_dimension || 0,
+    max_dimension_unit: data?.max_dimension_unit || "cm",
+    max_weight: data?.max_weight || 0,
+    max_height: data?.max_height || 0,
+    max_depth: data?.max_depth || 0,
+    max_width: data?.max_width || 0,
     weight_unit: data?.weight_unit || "kg",
     height_unit: data?.height_unit || "cm",
-    length_unit: data?.length_unit || "cm",
+    depth_unit: data?.depth_unit || "cm",
     width_unit: data?.width_unit || "cm",
-    min_weight: data?.min_weight || 0,
-    max_weight: data?.max_weight || 0,
-    min_height: data?.min_height || 0,
-    max_height: data?.max_height || 0,
-    min_length: data?.min_length || 0,
-    max_length: data?.max_length || 0,
-    min_width: data?.min_width || 0,
-    max_width: data?.max_width || 0,
+    created_at: data?.created_at || "",
+    updated_at: data?.updated_at || "",
     amount: data?.amount || 0,
+    dimensional_weight_divisor: data?.dimensional_weight_divisor || 0,
     currency: data?.currency || null,
     created_at: data?.created_at || "",
     updated_at: data?.updated_at || "",
@@ -137,11 +173,7 @@ function EditShippingRate({
 
 
   function buildCreateData(values: ShippingRate) {
-    let requestData: CreateShippingRate = {
-      name: values?.name || "",
-      country_ids: RequestHelpers.extractIdsFromArray(values?.countries || []),
-      is_active: values?.is_active || false,
-    };
+    let requestData: CreateShippingRate = {};
     requestData = {
       ...requestData,
       ...buildShippingRate(values),
@@ -154,17 +186,6 @@ function EditShippingRate({
     let requestData: UpdateShippingRate = {
       id: values?.id || 0,
     };
-    if (values?.name) {
-      requestData.name = values?.name || "";
-    }
-    if (Array.isArray(values?.countries) && values?.countries.length > 0) {
-      requestData.country_ids = RequestHelpers.extractIdsFromArray(
-        values?.countries || []
-      );
-    }
-    if (values?.hasOwnProperty("is_active")) {
-      requestData.is_active = values?.is_active || false;
-    }
 
     requestData = {
       ...requestData,

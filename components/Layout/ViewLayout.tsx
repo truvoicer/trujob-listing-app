@@ -5,7 +5,6 @@ import { ViewFactory } from "@/library/view/ViewFactory";
 import Loader from "../Loader";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { AppModalContext } from "@/contexts/AppModalContext";
-import { Button, Modal } from "react-bootstrap";
 import { useEffect, useState } from "react";
 import { ModalService, ModalState } from "@/library/services/modal/ModalService";
 import { NotificationService, NotificationState } from "@/library/services/notification/NotificationService";
