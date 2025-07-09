@@ -30,6 +30,11 @@ export const CREATE_ADDRESS_MODAL_ID = "create-address-modal";
 export const UPDATE_ADDRESS_MODAL_ID = "update-address-modal";
 export const DELETE_ADDRESS_MODAL_ID = "delete-address-modal";
 
+export type AddressItem = {
+  address: Address;
+  type: AddressType;
+};
+export type AddressType = "billing" | "shipping";
 export type Address = {
   id: number;
   label: string;
@@ -41,7 +46,7 @@ export type Address = {
   phone: string;
   country: Country;
   user: User;
-  type: "billing" | "shipping";
+  type: AddressType;
   is_default: boolean;
   is_active: boolean;
   created_at: string;
@@ -56,7 +61,7 @@ export type AddressRequestData = {
   postal_code?: string;
   phone?: string;
   country_id?: number;
-  type?: "billing" | "shipping";
+  type?: AddressType;
   is_default?: boolean;
   is_active?: boolean;
 };
@@ -67,7 +72,7 @@ export interface CreateAddress extends AddressRequestData {
   postal_code: string;
   phone: string;
   country_id: number;
-  type: "billing" | "shipping";
+  type: AddressType;
 }
 export interface UpdateAddress extends AddressRequestData {}
 
@@ -78,7 +83,7 @@ export type ManageAddress = {
 function ManageAddress({ mode = "selector", onSelect }: ManageAddress) {
   const [billingAddresses, setBillingAddresses] = useState<Address[]>([]);
   const [shippingAddresses, setShippingAddresses] = useState<Address[]>([]);
-  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [selectedAddress, setSelectedAddress] = useState<AddressItem | null>(null);
 
   const notificationContext = useContext(AppNotificationContext);
   const modalContext = useContext(AppModalContext);
@@ -339,7 +344,10 @@ function ManageAddress({ mode = "selector", onSelect }: ManageAddress) {
     if (mode !== "selector") {
       return;
     }
-    setSelectedAddress(item);
+    setSelectedAddress({
+      address: item,
+      type,
+    });
     if (!item?.is_default) {
       handleUpdateAddress({
         e,
@@ -373,7 +381,7 @@ function ManageAddress({ mode = "selector", onSelect }: ManageAddress) {
           </div>
         </div>
         {addresses.map((address, index) => {
-          const isSelected = selectedAddress?.id === address.id;
+          const isSelected = selectedAddress?.address?.id === address.id;
           return (
             <div key={index} className="col-xl-3 col-lg-4 col-md-6">
               <div
@@ -452,7 +460,7 @@ function ManageAddress({ mode = "selector", onSelect }: ManageAddress) {
     fetchAddresses();
   }, []);
   useEffect(() => {
-    if (mode === "selector" && selectedAddress) {
+    if (mode === "selector" && selectedAddress && selectedAddress?.address) {
       if (typeof onSelect === "function") {
         onSelect(selectedAddress);
       }

@@ -12,6 +12,7 @@ import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContextType } from "@/components/Table/DataManager";
+import { LocaleService } from "@/library/services/locale/LocaleService";
 
 
 export type EditAddressProps = {
@@ -51,7 +52,7 @@ function EditAddress({
         state: data?.state || '',
         postal_code: data?.postal_code || '',
         phone: data?.phone || '',
-        country: data?.country,
+        country: data?.country || LocaleService.getCountry(),
         user: data?.user,
         type: data?.type || type,
         is_default: data?.is_default || false,
@@ -80,9 +81,7 @@ function EditAddress({
         if (values?.phone) {
             requestData.phone = values.phone;
         }
-        if (values?.country?.id) {
-            requestData.country_id = values.country.id;
-        }
+        requestData.country_id = values.country.id ;
         if (values.hasOwnProperty('is_default')) {
             requestData.is_default = values.is_default;
         }

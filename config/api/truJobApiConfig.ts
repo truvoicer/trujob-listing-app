@@ -1,9 +1,14 @@
+import { ApiMiddlewareConfig } from "@/library/middleware/api/ApiMiddleware";
 import { setIsAuthenticatingAction } from "@/library/redux/actions/session-actions";
-import store from "@/library/redux/store";
 import { SessionService } from "@/library/services/session/SessionService";
 
-const config = {
+const config: ApiMiddlewareConfig = {
   apiBaseUrl: process.env.NEXT_PUBLIC_TRU_JOB_API_URL,
+  request: {
+    post: {
+      encryptedPayloadSecret: process.env.NEXT_PUBLIC_ENCRYPTED_PAYLOAD_SECRET,
+    },
+  },
   endpoints: {
     profile: "/user/profile",
     order: "/order",

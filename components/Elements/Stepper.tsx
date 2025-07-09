@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ButtonLink from "@/components/Elements/ButtonLink";
+import { clone } from "underscore";
 
 export type StepperButton = {
   text: string;
@@ -11,19 +12,61 @@ export type StepperItem = {
   component?: React.ComponentType<any> | null;
   buttonNext: StepperButton;
   buttonPrevious?: StepperButton;
-  onNextClick?: (e: React.MouseEvent<HTMLButtonElement>) => boolean | Promise<boolean>;
-  onPreviousClick?: (e: React.MouseEvent<HTMLButtonElement>) => boolean | Promise<boolean>;
+  showNextButton?: boolean;
+  showPreviousButton?: boolean;
+  onNextClick?: (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => boolean | Promise<boolean>;
+  onPreviousClick?: (
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => boolean | Promise<boolean>;
 };
 export type Stepper = {
   steps: Array<StepperItem>;
+  currentStep?: string | null;
+  onStepChange?: (step: StepperItem) => void;
 };
 
-function Stepper({ steps = [] }: Stepper) {
+function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
+  const [stepsState, setStepsState] = useState<Array<StepperItem>>([]);
+
+  function showNextButton(): void {
+    setStepsState((prevSteps) => {
+      const clonedSteps = [...prevSteps];
+      const stepIndex = clonedSteps.findIndex((s) => s.id === currentStep);
+      if (stepIndex !== -1) {
+        clonedSteps[stepIndex] = {
+          ...clonedSteps[stepIndex],
+          showNextButton: true, // Default to true if not specified
+        };
+      }
+      return clonedSteps;
+    });
+  }
+  function showPreviousButton(): void {
+    setStepsState((prevSteps) => {
+      const clonedSteps = [...prevSteps];
+      const stepIndex = clonedSteps.findIndex((s) => s.id === currentStep);
+      if (stepIndex !== -1) {
+        clonedSteps[stepIndex] = {
+          ...clonedSteps[stepIndex],
+          showPreviousButton: true, // Default to true if not specified
+        };
+      }
+      return clonedSteps;
+    });
+  }
+
   function renderStepComponent(step: StepperItem): React.ReactNode | null {
     if (!step) return null;
     if (!step?.component) return null;
     const StepComponent = step.component;
-    return <StepComponent />;
+    return (
+      <StepComponent
+        showNext={showNextButton}
+        showPrevious={showPreviousButton}
+      />
+    );
   }
 
   function isStepActive(step: StepperItem): boolean {
@@ -31,19 +74,43 @@ function Stepper({ steps = [] }: Stepper) {
   }
 
   function getActiveStepperItem(): StepperItem | null {
-    const activeStep = steps.find((step) => isStepActive(step));
+    const activeStep = stepsState.find((step) => isStepActive(step));
     if (!activeStep) return null;
     return activeStep;
   }
 
   function isFirstStep(): boolean {
-    return currentStep === steps[0].id;
+    return currentStep === stepsState[0].id;
   }
 
-  const [currentStep, setCurrentStep] = useState<string>(steps[0].id);
+  function buildSteps(steps: Array<StepperItem>): Array<StepperItem> {
+    return steps.map((step) => {
+      let clonedStep = { ...step };
+      if (typeof clonedStep?.showPreviousButton === "undefined") {
+        clonedStep.showPreviousButton = true; // Default to true if not specified
+      } else {
+        clonedStep.showPreviousButton = clonedStep.showPreviousButton ?? true; // Default to true
+      }
+      clonedStep.showNextButton = clonedStep.showNextButton ?? false; // Default to false
+      return clonedStep;
+    });
+  }
+
+  function setCurrentStep(stepId: string): void {
+    if (typeof onStepChange === "function") {
+      const step = stepsState.find((s) => s.id === stepId);
+      if (step) {
+        onStepChange(step);
+      }
+    }
+  }
+
+  useEffect(() => {
+    setStepsState(buildSteps(steps));
+  }, [steps]);
 
   const activeStepperItem = getActiveStepperItem();
-
+  // console.log("Active Stepper Item:", activeStepperItem, stepsState);
   return (
     <div className="row">
       {activeStepperItem ? (
@@ -53,45 +120,59 @@ function Stepper({ steps = [] }: Stepper) {
           </div>
           <div className="col-12">
             {renderStepComponent(activeStepperItem)}
-            {!isFirstStep() && (
+            {!isFirstStep() && activeStepperItem?.showPreviousButton && (
               <ButtonLink
                 onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-                  if (typeof activeStepperItem?.onPreviousClick === "function") {
+                  if (
+                    typeof activeStepperItem?.onPreviousClick === "function"
+                  ) {
                     const response = await activeStepperItem.onPreviousClick(e);
                     if (response === false) {
                       return; // Prevent going back if the callback returns false
                     }
                   }
-                  const currentIndex = steps.findIndex(
+                  const currentIndex = stepsState.findIndex(
                     (step) => step.id === currentStep
                   );
                   if (currentIndex > 0) {
-                    setCurrentStep(steps[currentIndex - 1].id);
+                    setCurrentStep(stepsState[currentIndex - 1].id);
                   }
                 }}
               >
                 {activeStepperItem?.buttonPrevious?.text || "Previous Step"}
               </ButtonLink>
             )}
-            <ButtonLink
-              className={`btn-primary ${isFirstStep() ? "w-100" : ""}`}
-              onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-                if (typeof activeStepperItem?.onNextClick === "function") {
-                  const response = await activeStepperItem.onNextClick(e);
-                  if (response === false) {
-                    return; // Prevent going to next step if the callback returns false
+            {activeStepperItem?.showNextButton && (
+              <ButtonLink
+                className={`btn-primary ${isFirstStep() ? "w-100" : ""}`}
+                onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
+                  console.log(
+                    "Next button clicked for step:",
+                    activeStepperItem
+                  );
+                  e.preventDefault();
+                  if (typeof activeStepperItem?.onNextClick === "function") {
+                    const response = await activeStepperItem.onNextClick(e);
+                    if (response === false) {
+                      return; // Prevent going to next step if the callback returns false
+                    }
                   }
-                }
-                const currentIndex = steps.findIndex(
-                  (step) => step.id === currentStep
-                );
-                if (currentIndex < steps.length - 1) {
-                  setCurrentStep(steps[currentIndex + 1].id);
-                }
-              }}
-            >
-              {activeStepperItem?.buttonNext?.text || "Next Step"}
-            </ButtonLink>
+                  console.log("Current step before next:", currentStep);
+                  const currentIndex = stepsState.findIndex(
+                    (step) => step.id === currentStep
+                  );
+                  if (currentIndex < stepsState.length - 1) {
+                    console.log(
+                      "Moving to next step:",
+                      stepsState[currentIndex + 1].id
+                    );
+                    setCurrentStep(stepsState[currentIndex + 1].id);
+                  }
+                }}
+              >
+                {activeStepperItem?.buttonNext?.text || "Next Step"}
+              </ButtonLink>
+            )}
           </div>
         </>
       ) : (

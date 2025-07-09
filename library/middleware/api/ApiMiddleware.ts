@@ -7,11 +7,40 @@ import {
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { SessionService } from "@/library/services/session/SessionService";
 import { DebugHelpers } from "@/helpers/DebugHelpers";
+import { JWTHelpers } from "@/helpers/JWTHelpers";
+
+export type Encrypted = {
+  REQUEST: {
+    ENCRYPTED_REQUEST: string;
+    ENCRYPTED_REQUEST_DATA: string;
+    ENCRYPTED_REQUEST_PAYLOAD: string;
+  };
+  RESPONSE: {
+    ENCRYPTED_RESPONSE: string;
+    ENCRYPTED_RESPONSE_DATA: string;
+    ENCRYPTED_RESPONSE_PAYLOAD: string;
+  };
+};
+export type ApiMiddlewareConfig = {
+  apiBaseUrl: string;
+  request: {
+    post: {
+      encryptedPayloadSecret: string;
+    };
+  };
+  endpoints: Record<string, string>;
+  tokenResponseHandler?: (response: unknown) => boolean;
+  headers: {
+    default: Record<string, string>;
+    upload: Record<string, string>;
+  };
+  token: string | null;
+};
 
 export type ErrorItem = {
   code: string;
   message: string | null;
-  data: any;
+  data: Record<string, unknown> | null;
 };
 export type Method =
   | "GET"
@@ -30,14 +59,27 @@ export type MethodObject = {
 };
 export type ResourceRequest = {
   endpoint: string;
-  query?: any;
-  data?: any;
+  query?: Record<string, unknown> | null;
+  data?: Record<string, unknown> | null;
   method: Method;
   upload?: boolean;
   protectedReq?: boolean;
-  headers?: any;
+  encrypted?: boolean;
+  headers?: Record<string, unknown> | null;
 };
 export class ApiMiddleware {
+  static ENCRYPTED: Encrypted = {
+    REQUEST: {
+      ENCRYPTED_REQUEST: "encrypted_request",
+      ENCRYPTED_REQUEST_DATA: "encrypted_request_data",
+      ENCRYPTED_REQUEST_PAYLOAD: "payload",
+    },
+    RESPONSE: {
+      ENCRYPTED_RESPONSE: "encrypted_response",
+      ENCRYPTED_RESPONSE_DATA: "encrypted_response_data",
+      ENCRYPTED_RESPONSE_PAYLOAD: "payload",
+    },
+  }
   static METHOD: MethodObject = {
     GET: "GET",
     POST: "POST",
@@ -45,8 +87,8 @@ export class ApiMiddleware {
     DELETE: "DELETE",
   };
 
-  config?: Record<string, unknown>;
-  
+  config?: ApiMiddlewareConfig;
+
   errors: Array<ErrorItem> = [];
   private disableLoginModal: boolean = false;
 
@@ -104,7 +146,7 @@ export class ApiMiddleware {
     return {};
   }
 
-  getHeaders(config: any, upload: boolean = false) {
+  getHeaders(config: ApiMiddlewareConfig, upload: boolean = false) {
     if (upload) {
       return config.headers.upload;
     }
@@ -152,6 +194,7 @@ export class ApiMiddleware {
     upload = false,
     protectedReq = false,
     headers = null,
+    encrypted = false,
   }: ResourceRequest) {
     if (!method) {
       throw new Error("Method not set");
@@ -166,6 +209,7 @@ export class ApiMiddleware {
         upload,
         protectedReq,
         headers,
+        encrypted,
       });
     } catch (error) {
       console.log(error);
@@ -200,7 +244,7 @@ export class ApiMiddleware {
   }: {
     protectedReq?: boolean;
     upload?: boolean;
-    config: any;
+    config: ApiMiddlewareConfig;
     headers?: any | null;
   }) {
     let buildHeadersData =
@@ -220,6 +264,45 @@ export class ApiMiddleware {
     return buildHeadersData;
   }
 
+  private async buildEncryptedBodyData(
+    config: ApiMiddlewareConfig,
+    data: Record<string, unknown> | null
+  ) {
+    if (!data) {
+      return null;
+    }
+    if (typeof data !== "object" || isObjectEmpty(data)) {
+      return data;
+    }
+
+    const payloadSecret = config.request.post.encryptedPayloadSecret;
+
+    const encryptedData: string = await JWTHelpers.getSignedJwt({
+      secret: payloadSecret,
+      payload: data,
+    });
+    
+    return {
+      [ApiMiddleware.ENCRYPTED.REQUEST.ENCRYPTED_REQUEST]: true,
+      [ApiMiddleware.ENCRYPTED.REQUEST.ENCRYPTED_REQUEST_DATA]: encryptedData,
+    };
+  }
+
+  private async buildBodyData(
+    config: ApiMiddlewareConfig,
+    data: Record<string, unknown> | null,
+    upload: boolean,
+    encrypted: boolean = false
+  ): Promise<string | Record<string, unknown> | null> {
+    let newData = data;
+    if (encrypted) {
+      newData = await this.buildEncryptedBodyData(config, data);
+    }
+    if (upload) {
+      return newData;
+    }
+    return JSON.stringify(newData);
+  }
   async runRequest({
     config,
     method,
@@ -229,8 +312,9 @@ export class ApiMiddleware {
     headers = null,
     upload = false,
     protectedReq = false,
+    encrypted = false,
   }: {
-    config: any;
+    config: ApiMiddlewareConfig;
     method:
       | "GET"
       | "POST"
@@ -241,11 +325,12 @@ export class ApiMiddleware {
       | "patch"
       | "delete";
     endpoint: string;
-    query?: any;
-    data?: any;
-    headers?: any | null;
+    query?: Record<string, unknown> | null;
+    data?: Record<string, unknown> | null;
+    headers?: Record<string, unknown> | null;
     upload?: boolean;
     protectedReq?: boolean;
+    encrypted?: boolean;
   }) {
     const requestUrl = this.buildRequestUrl(
       `${config.apiBaseUrl}${endpoint}`,
@@ -262,18 +347,20 @@ export class ApiMiddleware {
     }
     let request: {
       method: string;
-      headers: any;
-      body?: any;
+      headers: Record<string, string>;
+      body?: Record<string, unknown> | null;
     } = {
       method,
       headers: buildHeadersData,
     };
-    let body: any = null;
-    if (upload) {
-      body = data;
-    } else {
-      body = JSON.stringify(data);
-    }
+
+    const body: string | Record<string, unknown> | null = await this.buildBodyData(
+      config,
+      data,
+      upload,
+      encrypted
+    );
+
     switch (method) {
       case ApiMiddleware.METHOD.GET.toUpperCase():
       case ApiMiddleware.METHOD.GET.toLowerCase():
@@ -316,6 +403,7 @@ export class ApiMiddleware {
     });
 
     return await this.handleResponse(
+      encrypted,
       requestUrl,
       await fetch(requestUrl, request)
     );
@@ -345,6 +433,7 @@ export class ApiMiddleware {
   }
 
   async handleResponse(
+    encrypted: boolean,
     requestUrl: string,
     response: Response | Promise<Response>
   ) {
@@ -353,16 +442,61 @@ export class ApiMiddleware {
     }
     const responsePromise = await response;
     const responseData = await responsePromise.json();
+
     switch (responsePromise?.status) {
       case 200:
       case 201:
       case 202:
+        if (encrypted) {
+          return await this.decryptResponseData(responseData);
+        }
         return responseData;
       case 401:
         this.handleUnauthorizedResponse(responsePromise, responseData);
       default:
         return false;
     }
+  }
+
+  async decryptResponseData(data: unknown): Promise<unknown> {
+    if (!data || typeof data !== "object" || isObjectEmpty(data)) {
+      throw new Error("Invalid data format for decryption");
+    }
+    if (!data?.data || typeof data?.data !== "object" || isObjectEmpty(data?.data)) {
+      throw new Error("Invalid data format for decryption");
+    }
+    const responseData = data.data;
+    if (!responseData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE)) {
+      throw new Error("Encrypted response flag not set in data");
+    }
+    if (responseData[ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE] !== true) {
+      throw new Error("Encrypted response flag is not true");
+    }
+    if (!responseData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_DATA)) {
+      throw new Error("Encrypted response data not set in data");
+    }
+    const payloadSecret = this.config?.request.post.encryptedPayloadSecret;
+    if (!payloadSecret) {
+      throw new Error("Payload secret not set in config");
+    }
+    const encryptedData = responseData[ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_DATA];
+    if (!encryptedData) {
+      throw new Error("Encrypted data not set in response data");
+    }
+    if (typeof encryptedData !== "string") {
+      throw new Error("Encrypted data is not a string");
+    }
+    if (encryptedData === "") {
+      throw new Error("Encrypted data is empty");
+    }
+    const decryptedData = await JWTHelpers.decodeJwt(encryptedData, payloadSecret);
+    if (!decryptedData) {
+      throw new Error("Decrypted data is empty");
+    }
+    if (!decryptedData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_PAYLOAD)) {
+      throw new Error("Decrypted data does not contain payload");
+    }
+    return { data: decryptedData[ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_PAYLOAD] };
   }
 
   getErrors() {

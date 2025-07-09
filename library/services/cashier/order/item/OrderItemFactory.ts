@@ -3,9 +3,6 @@ import { ProductOrderItemService } from "./product/ProductOrderItemService";
 
 export class OrderItemFactory {
     
-    constructor() {
-        console.log("OrderItemFactory initialized");
-    }
     make(type: string|null): ProductableOrderService|null {
         switch (type) {
             case 'product':

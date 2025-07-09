@@ -7,7 +7,7 @@ import Summary from "./Summary/Summary";
 import PaymentGateways from "./PaymentGateways";
 import Stepper from "@/components/Elements/Stepper";
 import { StepperItem } from "@/components/Stepper/Stepper";
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { CheckoutContext } from "./Checkout/context/CheckoutContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
@@ -32,6 +32,7 @@ export type StepConfig = {
 };
 
 function PaymentProcess({ session }: PaymentProcess) {
+  const [currentStep, setCurrentStep] = useState<string | null>(STEP_BASKET);
   const checkoutContext = useContext(CheckoutContext);
   const steps: Array<StepperItem> = [
     {
@@ -41,6 +42,7 @@ function PaymentProcess({ session }: PaymentProcess) {
       component: Basket,
       buttonNext: { text: "Continue to Shipping" },
       buttonPrevious: undefined, // No previous step for the first step
+      showNextButton: true,
     },
     {
       id: STEP_SHIPPING_DETAILS,
@@ -54,8 +56,7 @@ function PaymentProcess({ session }: PaymentProcess) {
     {
       id: STEP_SUMMARY,
       title: "Order Summary",
-      description:
-        "Review your order details before proceeding to payment.",
+      description: "Review your order details before proceeding to payment.",
       component: Summary, // Placeholder for future component
       buttonNext: { text: "Continue to Payment Method" },
       buttonPrevious: { text: "Back to Shipping" },
@@ -70,20 +71,24 @@ function PaymentProcess({ session }: PaymentProcess) {
       buttonPrevious: { text: "Back to Summary" },
       onNextClick: (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        console.log("Next button clicked for payment method", checkoutContext?.selectedPaymentGateway);
+        console.log(
+          "Next button clicked for payment method",
+          checkoutContext?.selectedPaymentGateway
+        );
         const response = TruJobApiMiddleware.getInstance().resourceRequest({
           endpoint: UrlHelpers.urlFromArray([
             TruJobApiMiddleware.getConfig().endpoints.orderTransaction.replace(
               ":orderId",
               checkoutContext?.order?.id || ""
             ),
-            'store'
+            "store",
           ]),
           method: ApiMiddleware.METHOD.POST,
           protectedReq: true,
+          encrypted: true,
           data: {
             payment_gateway_id: checkoutContext?.selectedPaymentGateway?.id,
-          }
+          },
         });
         if (!response) {
           console.error("Failed to proceed to payment details");
@@ -95,7 +100,7 @@ function PaymentProcess({ session }: PaymentProcess) {
       onPreviousClick: (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         console.log("Previous button clicked for payment method");
-        return false;
+        return true;
         // Handle previous button click
       },
     },
@@ -119,10 +124,16 @@ function PaymentProcess({ session }: PaymentProcess) {
     },
   ];
 
-
   return (
     <div className="container">
-      <Stepper steps={steps} />
+      <Stepper
+        steps={steps}
+        currentStep={currentStep}
+        onStepChange={(step: StepperItem) => {
+          console.log("Step changed to:", step);
+          setCurrentStep(step.id);
+        }}
+      />
     </div>
   );
 }

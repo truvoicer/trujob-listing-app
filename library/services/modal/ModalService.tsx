@@ -249,7 +249,8 @@ export class ModalService extends MessageService {
               return null;
             }
             return (
-              <>
+              <React.Fragment key={index}>
+                {/* Render the modal only if the component is defined */}
                 {component && (
                   <Modal
                     show={state.show}
@@ -286,7 +287,7 @@ export class ModalService extends MessageService {
                     )}
                   </Modal>
                 )}
-              </>
+              </React.Fragment>
             );
           }
         )}

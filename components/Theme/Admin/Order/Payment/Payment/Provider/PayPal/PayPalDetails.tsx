@@ -1,5 +1,12 @@
+import { PayPalButtons } from "@paypal/react-paypal-js/dist/types/components/PayPalButtons";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js/dist/types/components/PayPalScriptProvider";
+
 function PayPalDetails() {
-  return null; // Placeholder for PayPal details component
+  return (
+        <PayPalScriptProvider options={{ clientId: "test" }}>
+            <PayPalButtons style={{ layout: "horizontal" }} />
+        </PayPalScriptProvider>
+  );
 }
 
 export default PayPalDetails;

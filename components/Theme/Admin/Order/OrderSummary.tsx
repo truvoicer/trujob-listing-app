@@ -12,7 +12,7 @@ function OrderSummary({
     const checkoutContext = useContext(CheckoutContext) as CheckoutContextType;
     const orderService = new OrderService(checkoutContext.order);
     const order: Order | null = checkoutContext.order;
-    console.log("Order Summary", order);
+    // console.log("Order Summary", order);
     return (
         <div className="row">
             <div className="col-sm-12">

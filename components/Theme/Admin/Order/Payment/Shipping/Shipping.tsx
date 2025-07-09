@@ -1,5 +1,8 @@
 import { SessionState } from "@/library/redux/reducers/session-reducer";
-import ManageAddress, { Address } from "../../../../../blocks/Admin/User/Address/ManageAddress";
+import ManageAddress, {
+  Address,
+  AddressItem,
+} from "../../../../../blocks/Admin/User/Address/ManageAddress";
 import React, { useContext, useEffect } from "react";
 import { LocaleHelpers } from "@/helpers/LocaleHelpers";
 import { MANAGE_ADDRESS_MODAL_ID } from "../Checkout/Checkout";
@@ -18,7 +21,7 @@ import OrderShippingSummary from "./OrderShippingSummary";
 export type ShippingProps = {
   session: SessionState;
 };
-function Shipping({ session }: ShippingProps) {
+function Shipping({ session, showNext, showPrevious }: ShippingProps) {
   const modalContext = useContext(AppModalContext);
   const checkoutContext = useContext(CheckoutContext);
   const order = checkoutContext.order;
@@ -41,6 +44,19 @@ function Shipping({ session }: ShippingProps) {
     }
   }, [user]);
 
+  useEffect(() => {
+    console.log("Shipping useEffect called", {
+      shippingAddress: checkoutContext.shippingAddress,
+      billingAddress: checkoutContext.billingAddress,
+    });
+    // Check if both shipping and billing addresses are set
+    if (!checkoutContext.shippingAddress || !checkoutContext.billingAddress) {
+      return;
+    }
+    // If both addresses are set, we can enable the next button
+    showNext();
+  }, [checkoutContext.shippingAddress, checkoutContext.billingAddress]);
+
   function renderManageAddressModal(type: "billing" | "shipping") {
     return (
       <button
@@ -58,30 +74,30 @@ function Shipping({ session }: ShippingProps) {
               }) => {
                 return (
                   <ManageAddress
-                    onSelect={(values: Address) => {
-                      formHelpers.setValues(values);
+                    onSelect={(values: AddressItem) => {
+                      console.log("Selected address:", values);
+                      formHelpers.setFieldValue(values.type, values.address);
                     }}
                   />
                 );
               },
               formProps: {
-                initialValues: {},
-                onSubmit: (values: Address) => {
-                  switch (type) {
-                    case "billing":
-                      checkoutContext.update({
-                        billingAddress: values,
-                      });
-                      break;
-                    case "shipping":
-                      checkoutContext.update({
-                        shippingAddress: values,
-                      });
-                      break;
-                    default:
-                      console.warn("Unknown address type:", type);
-                      break;
+                initialValues: {
+                  billing: checkoutContext?.billingAddress || null,
+                  shipping: checkoutContext?.shippingAddress || null,
+                },
+                onSubmit: (values: FormikValues) => {
+                  if (values.billing) {
+                    checkoutContext.update({
+                      billingAddress: values.billing,
+                    });
                   }
+                  if (values.shipping) {
+                    checkoutContext.update({
+                      shippingAddress: values.shipping,
+                    });
+                  }
+                  return true;
                 },
               },
               size: "lg",
@@ -94,6 +110,7 @@ function Shipping({ session }: ShippingProps) {
               }: {
                 formHelpers: FormikProps<FormikValues>;
               }) => {
+                console.log("Form submitted with values:", formHelpers.values);
                 return await formHelpers.submitForm();
               },
             },
@@ -130,7 +147,7 @@ function Shipping({ session }: ShippingProps) {
       </div>
     );
   }
-  
+
   return (
     <div className="shipping-details">
       <h3 className="text-2xl font-bold mb-4">Shipping Details</h3>
