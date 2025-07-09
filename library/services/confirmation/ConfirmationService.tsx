@@ -6,16 +6,17 @@ import React from "react";
 
 export interface ConfirmationState extends MessageState {
     items: Array<ConfirmationItem>;
+    show: (data: ConfirmationItem, id?: null | string) => void;
 }
 export type ConfirmationItem = {
-    [key: string]: string | number | boolean | null | Function | undefined  | any;
+    [key: string]: string | number | boolean | null | undefined  | unknown;
     id?: string | null;
-    title: string | null;
-    size: "sm" | "md" | "lg" | "xl";
-    message: string | React.ReactNode | null;
-    show: boolean;
-    onOk: () => boolean;
-    onCancel: () => boolean;
+    title?: string | null;
+    size?: "sm" | "md" | "lg" | "xl";
+    message?: string | React.ReactNode | null;
+    show?: boolean;
+    onOk?: () => boolean;
+    onCancel?: () => boolean;
 }
 export class ConfirmationService extends MessageService {
     static INIT_DATA: ConfirmationState = {

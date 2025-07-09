@@ -5,6 +5,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { DataTableContext } from "@/contexts/DataTableContext";
 import TextInput from "@/components/Elements/TextInput";
 import Checkbox from "@/components/Elements/Checkbox";
+import RequiredFields, { RequiredFields as RequiredFieldsType } from "./RequiredFields";
 
 type EditPaymentGatewayFields = {
     operation: 'edit' | 'update' | 'add' | 'create';
@@ -74,6 +75,15 @@ function EditPaymentGatewayFields({
                             onChange={handleChange}
                             value={values?.is_default || false}
                         />
+                    </div>
+                    <div className="col-12 col-lg-6 mt-3">
+                        <h4 className="mb-0">Required Fields</h4>
+                        <RequiredFields
+                            data={values?.required_fields || []}
+                            onChange={(data: RequiredFieldsType[]) => {
+                                setFieldValue('required_fields', data);
+                            }}
+                        />  
                     </div>
 
                 </div>

@@ -9,25 +9,24 @@ import { createContext } from "react";
 export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary' | 'selectedShippingMethod' | 'billingAddress' | 'shippingAddress';
 
 export type CheckoutContextType = {
-    [key: string]: any | PaymentGateway | null;
+    [key: string]: unknown | PaymentGateway | null;
     order: Order | null;
     orderSummary: OrderSummary | null; 
     price: Price | null;
-    paymentMethod: PaymentGateway | null;
-    transaction: any;
-    availablePaymentGateways: PaymentMethod[] | null;
+    transaction: Record<string, unknown> | null;
+    availablePaymentGateways: PaymentGateway[] | null;
     selectedPaymentGateway: PaymentGateway | null;
     availableShippingMethods: ShippingMethod[];
     selectedShippingMethod: ShippingMethod | null;
     selectedShippingRate: ShippingRate | null;
     billingAddress: Address | null;
     shippingAddress: Address | null;
-    fetchSelectedShippingMethod: (id: number, checkoutContext: CheckoutContextType) => Promise<void>;
-    refresh: (entity: RefreshEntities) => Promise<void>;
-    update: (data: any) => void;
-    updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => void;
-    removeOrderItem?: (id: number, checkoutContext: CheckoutContextType) => void;
-    addOrderItem?: (data: Record<string, any>, checkoutContext: CheckoutContextType) => void;
+    fetchSelectedShippingMethod: (id: number) => Promise<void>;
+    refresh: (orderId: number, entity: RefreshEntities) => Promise<void>;
+    updateCheckoutData: (data: CheckoutContextType) => void;
+    updateOrderItem: (orderId: number, id: number, data: Record<string, unknown>) => void;
+    removeOrderItem?: (orderId: number, id: number) => void;
+    addOrderItem?: (data: Record<string, unknown>) => void;
 };
 export const checkoutData = {
     order: null,
@@ -41,11 +40,11 @@ export const checkoutData = {
     selectedShippingRate: null,
     billingAddress: null,
     shippingAddress: null,
-    fetchSelectedShippingMethod: async (id: number, checkoutContext: CheckoutContextType) => {},
-    refresh: async (entity: RefreshEntities, checkoutContext: CheckoutContextType) => {},
-    update: (data: CheckoutContextType, checkoutContext: CheckoutContextType) => {},
-    updateOrderItem: (id: number, data: Record<string, any>, checkoutContext: CheckoutContextType) => {},
-    removeOrderItem: (id: number, checkoutContext: CheckoutContextType) => {},
-    addOrderItem: (data: Record<string, any>, checkoutContext: CheckoutContextType) => {}
+    fetchSelectedShippingMethod: async (id: number) => {},
+    refresh: async (orderId: number, entity: RefreshEntities) => {},
+    updateCheckoutData: (data: CheckoutContextType) => {},
+    updateOrderItem: (orderId: number, id: number, data: Record<string, unknown>) => {},
+    removeOrderItem: (orderId: number, id: number) => {},
+    addOrderItem: (orderId: number, data: Record<string, unknown>) => {}
 };
 export const CheckoutContext = createContext(checkoutData);

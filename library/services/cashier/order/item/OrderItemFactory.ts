@@ -1,16 +1,17 @@
-import { OrderItem } from "@/types/Cashier";
+import { ProductableOrderService } from "./product/ProductableOrderService";
 import { ProductOrderItemService } from "./product/ProductOrderItemService";
 
 export class OrderItemFactory {
     
-    build(item: OrderItem, index: number, props: Record<string, any>): any {
-        console.log("Building order item", item, index, props);
-        switch (item.order_itemable_type) {
+    constructor() {
+        console.log("OrderItemFactory initialized");
+    }
+    make(type: string|null): ProductableOrderService|null {
+        switch (type) {
             case 'product':
-                const productOrderItemService = new ProductOrderItemService();
-                return productOrderItemService.renderOrderItem(item, index, props);
+                return ProductOrderItemService.getInstance();
             default:
-                console.warn(`No service found for order item type: ${item.order_itemable_type}`);
+                console.warn(`No service found for order item type: ${type}`);
                 return null;    
         }       
     }

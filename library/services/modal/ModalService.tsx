@@ -12,6 +12,7 @@ import { FormikProps, FormikValues } from "formik";
 export interface LocalModal extends LocalItem {}
 export interface ModalState extends MessageState {
   items: Array<ModalItem>;
+  show: (data: ModalItem, id?: null | string) => void;
 }
 export type ModalItem = {
   [key: string]:
@@ -24,12 +25,12 @@ export type ModalItem = {
     | FormProps
     | any;
   id?: string | null;
-  title: string | null;
-  size: "sm" | "lg" | "xl";
-  fullscreen: string | true | undefined;
-  component: any;
-  show: boolean;
-  showFooter: boolean;
+  title?: string | null;
+  size?: "sm" | "lg" | "xl";
+  fullscreen?: string | true | undefined;
+  component?: any;
+  show?: boolean;
+  showFooter?: boolean;
   formProps?: null | FormProps;
   onOkButtonText?: string;
   onCancelButtonText?: string;
@@ -39,8 +40,8 @@ export type ModalItem = {
     | React.ReactNode
     | React.ReactNode[]
     | null;
-  onOk: () => boolean;
-  onCancel: () => boolean;
+  onOk?: () => boolean;
+  onCancel?: () => boolean;
 };
 export class ModalService extends MessageService {
   static INIT_DATA: ModalState = {

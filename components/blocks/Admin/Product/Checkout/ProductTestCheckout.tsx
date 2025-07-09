@@ -1,5 +1,5 @@
 import AccessControlComponent from "@/components/AccessControl/AccessControlComponent";
-import Checkout from "@/components/blocks/Payment/Checkout/Checkout";
+import Checkout from "@/components/Theme/Admin/Order/Payment/Checkout/Checkout";
 import { Dispatch, useContext, useEffect, useState } from "react";
 import ManagePriceType from "../../PriceType/ManagePriceType";
 import {
@@ -21,9 +21,9 @@ import { PaymentGateway } from "@/types/PaymentGateway";
 import { Product } from "@/types/Product";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
-import CheckoutProvider from "@/components/blocks/Payment/Checkout/CheckoutProvider";
+import CheckoutProvider from "@/components/Theme/Admin/Order/Payment/Checkout/CheckoutProvider";
 import Loader from "@/components/Loader";
-import PaymentProcess from "@/components/blocks/Payment/PaymentProcess";
+import PaymentProcess from "@/components/Theme/Admin/Order/Payment/PaymentProcess";
 
 export type ProductTestCheckoutProps = {
   productId: number;
@@ -78,7 +78,8 @@ function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
   async function fetchAvailablePaymentGateways() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
-        truJobApiConfig.endpoints.paymentGateway,
+        truJobApiConfig.endpoints.sitePaymentGateway,
+        'available',
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
@@ -384,7 +385,9 @@ function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
           fetchOrder={async () => await fetchOrder()}
           fetchAvailablePaymentGateways={async () => await fetchAvailablePaymentGateways()}
           fetchPrice={async () => await fetchProductPrice()}
-        />
+        >
+          <PaymentProcess />
+          </Checkout>
       ) : (
         <Loader />
       )}

@@ -1,4 +1,4 @@
-import { CheckoutContext, CheckoutContextType } from "@/components/blocks/Payment/Checkout/context/CheckoutContext";
+import { CheckoutContext, CheckoutContextType } from "@/components/Theme/Admin/Order/Payment/Checkout/context/CheckoutContext";
 import { OrderService } from "@/library/services/cashier/OrderService";
 import { Order } from "@/types/Cashier";
 import React, { useContext } from "react";
@@ -34,7 +34,10 @@ function OrderSummary({
                                 return (
                                     <React.Fragment key={index}>
                                         {
-                                            orderService.getOrderItemService().getOrderItemFactory().build(
+                                            orderService.getOrderItemService()
+                                            .getOrderItemFactory()
+                                            .make(item?.order_itemable_type)
+                                            .renderOrderSummaryRow(
                                                 item,
                                                 index,
                                                 {

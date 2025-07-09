@@ -35,11 +35,11 @@ export type LocalItem = {
   fullscreen?: string | true | undefined;
 };
 export type MessageState = {
-  items: Array<any>;
-  show: (data: any, id: string) => void;
+  items: Array<Record<string, unknown>>;
+  show: (data: Record<string, unknown>, id: string) => void;
   close: (id: string) => void;
   hide: (id: string) => void;
-  update: (data: any, id: string) => void;
+  update: (data: Record<string, unknown>, id: string) => void;
 };
 export class MessageService {
   key: null | string = null;

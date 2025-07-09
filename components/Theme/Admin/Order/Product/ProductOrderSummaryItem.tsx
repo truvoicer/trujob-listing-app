@@ -6,12 +6,12 @@ import { Product } from "@/types/Product";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";
 
-export type ProductOrderItem = {
+export type ProductOrderSummaryItem = {
   editable?: boolean;
   item: OrderItem;
   index: number;
 };
-function ProductOrderItem({ editable = false, item, index }: ProductOrderItem) {
+function ProductOrderSummaryItem({ editable = false, item, index }: ProductOrderSummaryItem) {
   const [quantity, setQuantity] = useState(item.quantity);
   const product: Product = item.entity;
 
@@ -19,25 +19,10 @@ function ProductOrderItem({ editable = false, item, index }: ProductOrderItem) {
 
   const orderItemService = new OrderItemService();
 
-  function handleItemDelete(e: React.MouseEvent<HTMLAnchorElement>) {
-    e.preventDefault();
-    checkoutContext.removeOrderItem(
-      checkoutContext.order.id,
-      item.id,
-      checkoutContext
-    );
-  }
   useEffect(() => {
-    checkoutContext.updateOrderItem(
-      checkoutContext.order.id,
-      item.id,
-      {
-        quantity: quantity,
-      },
-      checkoutContext
-    );
-  }, [quantity]);
 
+  }, [quantity]);
+  console.log
   return (
     <tr>
       <th className="text-center" scope="row">
@@ -71,4 +56,4 @@ function ProductOrderItem({ editable = false, item, index }: ProductOrderItem) {
     </tr>
   );
 }
-export default ProductOrderItem;
+export default ProductOrderSummaryItem;

@@ -27,6 +27,7 @@ import ManageShippingZone from "@/components/blocks/Admin/Shipping/ShippingZone/
 import EditProfile from "@/components/blocks/Admin/User/Profile/EditProfile";
 import PasswordResetConfirmationBlock from "@/components/blocks/Auth/PasswordResetConfirmationBlock";
 import PasswordResetBlock from "@/components/blocks/Auth/PasswordResetBlock";
+import ManageSitePaymentGateway from "@/components/blocks/Admin/Payment/PaymentGateway/ManageSitePaymentGateway";
 
 export class Blocks {
     static HERO_BLOCK = 'hero-block';
@@ -49,6 +50,7 @@ export class Blocks {
     static MANAGE_REVIEWS_BLOCK = 'manage-reviews-block';
     static MANAGE_SITE_SETTINGS_BLOCK = 'manage-site-settings-block';
     static MANAGE_PAYMENT_GATEWAYS_BLOCK = 'manage-payment-gateways-block';
+    static MANAGE_SITE_PAYMENT_GATEWAYS_BLOCK = 'manage-site-payment-gateways-block';
     static MANAGE_PAYMENT_METHODS_BLOCK = 'manage-payment-methods-block';
     static MANAGE_ADDRESSES_BLOCK = 'manage-addresses-block';
     static MANAGE_TAX_RATES_BLOCK = 'manage-tax-rates-block';
@@ -254,6 +256,17 @@ export class Blocks {
                 icon: 'manage-payment-methods-block-icon',
                 component: ComponentHelpers.buildComponent(
                     ManagePaymentGateway,
+                    {
+                        mode: 'edit',
+                    }
+                ),
+            },
+            [Blocks.MANAGE_SITE_PAYMENT_GATEWAYS_BLOCK]: {
+                title: 'Manage Site Payment Gateways Block',
+                description: 'This is the manage site payment gateways block',
+                icon: 'manage-site-payment-gateways-block-icon',
+                component: ComponentHelpers.buildComponent(
+                    ManageSitePaymentGateway,
                     {
                         mode: 'edit',
                     }

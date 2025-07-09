@@ -3,6 +3,7 @@ import { PaymentGateway } from "@/types/PaymentGateway";
 import { CheckoutContext } from "./Checkout/context/CheckoutContext";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import IntegrationCard from "@/components/Elements/IntegrationCard";
+import { ThemeService } from "@/library/services/app/ThemeService";
 
 export const PAYMENT_METHODS_FETCH_ERROR_NOTIFICATION_ID =
   "payment-methods-fetch-error-notification";
@@ -19,7 +20,10 @@ function PaymentGateways({
   const checkoutContext = useContext(CheckoutContext);
 
   useEffect(() => {
-    checkoutContext.refresh("availablePaymentGateways");
+    checkoutContext.refresh(
+      checkoutContext.order?.id,
+      "availablePaymentGateways"
+    );
   }, []);
 
   console.log("Shipping component rendered with order:", checkoutContext);
@@ -48,9 +52,14 @@ function PaymentGateways({
                   }}
                 >
                   <IntegrationCard
+                    variant={ThemeService.getVariantByIndex(index)}
+                    icon={`fa-${paymentMethod.name}`}
                     isSelected={isSelected}
-                    title={paymentMethod.name}
+                    title={paymentMethod.label}
                     description={paymentMethod.description}
+                    buttonText={
+                      isSelected ? "Selected" : "Select Payment Method"
+                    }
                     onButtonClick={() => {
                       checkoutContext.update({ selectedPaymentGateway: paymentMethod });
                     }}

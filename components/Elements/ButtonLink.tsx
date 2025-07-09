@@ -2,7 +2,7 @@ export type ButtonLinkProps = {
   children: React.ReactNode;
   className?: string;
   href?: string;
-  onClick?: (e: React.MouseEventHandler<HTMLButtonElement>) => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 function ButtonLink({
   children,

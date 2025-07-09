@@ -9,27 +9,23 @@ import { Price } from "@/types/Price";
 import { PaymentGateway } from "@/types/PaymentGateway";
 
 export const MANAGE_ADDRESS_MODAL_ID = "manage-address-modal";
-
 export type Checkout = {
   session: SessionState;
   fetchOrder: () => Promise<Order | null>;
   fetchAvailablePaymentGateways: () => Promise<PaymentGateway | null>;
   fetchPrice: () => Promise<Price | null>;
 };
-
-function Checkout({ 
-    session, 
-    fetchOrder, 
-    fetchAvailablePaymentGateways, 
-    fetchPrice: fetchProductPrice
- }: Checkout) {
+function Checkout({
+  session,
+  fetchOrder,
+  fetchAvailablePaymentGateways,
+  fetchPrice,
+}: Checkout) {
   return (
     <CheckoutProvider
-      fetchOrder={async () => await fetchOrder()}
-      fetchAvailablePaymentGateways={async () =>
-        await fetchAvailablePaymentGateways()
-      }
-      fetchPrice={async () => await fetchProductPrice()}
+      fetchOrder={fetchOrder}
+      fetchAvailablePaymentGateways={fetchAvailablePaymentGateways}
+      fetchPrice={fetchPrice}
     >
       <PaymentProcess />
     </CheckoutProvider>

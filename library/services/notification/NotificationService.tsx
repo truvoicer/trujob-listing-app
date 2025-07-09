@@ -6,19 +6,20 @@ import React from "react";
 
 export interface NotificationState extends MessageState {
     items: Array<NotificationItem>;
+    show: (data: NotificationItem, id?: null | string) => void;
 }
 export type NotificationItem = {
     [key: string]: string | number | boolean | null | React.ReactNode | undefined | (() => void);
-    variant: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
-    type: string;
-    position: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' |  'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
+    variant?: 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'light' | 'dark';
+    type?: string;
+    position?: 'top-start' | 'top-center' | 'top-end' | 'middle-start' | 'middle-center' |  'middle-end' | 'bottom-start' | 'bottom-center' | 'bottom-end';
     id?: string | null;
-    title: string | null;
+    title?: string | null;
     component?: React.ReactNode | null;
     message?: string | null;
-    show: boolean;
-    onOk: () => void;
-    onCancel: () => void;
+    show?: boolean;
+    onOk?: () => void;
+    onCancel?: () => void;
 }
 export class NotificationService extends MessageService {
     static INIT_DATA: NotificationState = {

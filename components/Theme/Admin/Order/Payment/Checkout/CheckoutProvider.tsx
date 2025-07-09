@@ -12,7 +12,7 @@ import { AppNotificationContext } from "@/contexts/AppNotificationContext";
 import { Order } from "@/types/Cashier";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { Price } from "@/types/Price";
-import PaymentProcess from "../PaymentProcess";
+
 
 export type CheckoutProviderProps = {
   children: React.ReactNode;
@@ -81,22 +81,20 @@ function CheckoutProvider({
     });
   }
 
-  async function handleFetchAvailableShippingMethods(
-    checkoutContext: CheckoutContextType
-  ) {
+  async function handleFetchAvailableShippingMethods(orderId?: number) {
     let endpoint: string;
-    if (!checkoutContext.order || !checkoutContext.order.id) {
+    if (!orderId) {
       endpoint = UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderShippingMethod.replace(
           ":orderId",
-          String(checkoutContext.order?.id)
+          String(orderId)
         ),
       ]);
     } else {
       endpoint = UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderShippingMethod.replace(
           ":orderId",
-          String(checkoutContext.order?.id)
+          String(orderId)
         ),
       ]);
     }
@@ -135,16 +133,15 @@ function CheckoutProvider({
 
   async function fetchSelectedShippingMethod(
     id: number,
-    checkoutContext: CheckoutContextType
   ) {
-    if (!checkoutContext.order || !checkoutContext.order.id) {
+    if (!checkoutState.order || !checkoutState.order.id) {
       return;
     }
     if (!id) {
       return;
     }
 
-    const response = await shippingMethodRequest(checkoutContext.order.id, id);
+    const response = await shippingMethodRequest(checkoutState.order.id, id);
 
     if (!response || !response.data) {
       console.error(
@@ -157,22 +154,20 @@ function CheckoutProvider({
     });
   }
 
-  async function handleFetchSelectedShippingMethod(
-    checkoutContext: CheckoutContextType
-  ) {
-    if (!checkoutContext.order || !checkoutContext.order.id) {
+  async function handleFetchSelectedShippingMethod() {
+    if (!checkoutState.order || !checkoutState.order.id) {
       return;
     }
     if (
-      !checkoutContext.selectedShippingMethod ||
-      !checkoutContext.selectedShippingMethod.id
+      !checkoutState.selectedShippingMethod ||
+      !checkoutState.selectedShippingMethod.id
     ) {
       return;
     }
 
     const response = await shippingMethodRequest(
-      checkoutContext.order.id,
-      checkoutContext.selectedShippingMethod.id
+      checkoutState.order.id,
+      checkoutState.selectedShippingMethod.id
     );
 
     if (!response || !response.data) {
@@ -186,12 +181,12 @@ function CheckoutProvider({
     });
   }
 
-  async function handleFetchOrderSummary() {
+  async function handleFetchOrderSummary(orderId?: number) {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderSummary.replace(
           ":orderId",
-          String(checkoutState.order?.id)
+          String(orderId)
         ),
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
@@ -209,8 +204,8 @@ function CheckoutProvider({
   }
 
   async function refreshEntity(
+    orderId?: number,
     entity: RefreshEntities,
-    checkoutContext: CheckoutContextType
   ) {
     switch (entity) {
       case "order":
@@ -226,13 +221,13 @@ function CheckoutProvider({
         await handleFetchPrice();
         break;
       case "availableShippingMethods":
-        await handleFetchAvailableShippingMethods(checkoutContext);
+        await handleFetchAvailableShippingMethods(orderId);
         break;
       case "orderSummary":
-        await handleFetchOrderSummary();
+        await handleFetchOrderSummary(orderId);
         break;
       case "selectedShippingMethod":
-        await handleFetchSelectedShippingMethod(checkoutContext);
+        await handleFetchSelectedShippingMethod();
         break;
       default:
         console.warn(`Unknown entity type: ${entity}`);
@@ -240,14 +235,14 @@ function CheckoutProvider({
     }
   }
   async function addOrderItem(
-    data: Record<string, any>,
-    checkoutContext: CheckoutContextType
+    orderId?: number,
+    data: Record<string, unknown>,
   ) {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
-          String(checkoutContext.order?.id)
+          String(orderId)
         ),
         "store",
       ]),
@@ -259,15 +254,15 @@ function CheckoutProvider({
       console.error("Failed to add order item. No response or data received.");
       return;
     }
-    checkoutContext.refresh("order");
-    refreshEntity("order");
+    checkoutState.refresh(orderId, "order");
+    refreshEntity(orderId, "order");
   }
-  function removeOrderItem(id: number, checkoutContext: CheckoutContextType) {
+  function removeOrderItem(orderId?: number, id: number) {
     const response = TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
-          String(checkoutContext.order?.id)
+          String(orderId)
         ),
         id,
         "delete",
@@ -282,19 +277,19 @@ function CheckoutProvider({
       return;
     }
 
-    checkoutContext.refresh("order");
-    refreshEntity("order");
+    checkoutState.refresh(orderId, "order");
+    refreshEntity(orderId, "order");
   }
   function updateOrderItem(
+    orderId?: number,
     id: number,
-    data: Record<string, any>,
-    checkoutContext: CheckoutContextType
+    data: Record<string, unknown>,
   ) {
     const response = TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
-          String(checkoutContext.order?.id)
+          String(orderId)
         ),
         id,
         "update",
@@ -309,8 +304,8 @@ function CheckoutProvider({
       );
       return;
     }
-    checkoutContext.refresh("order");
-    refreshEntity("order");
+    checkoutState.refresh(orderId, "order");
+    refreshEntity(orderId, "order");
   }
   function updateCheckoutData(data: CheckoutContextType) {
     setCheckoutState((prevState: CheckoutContextType) => {

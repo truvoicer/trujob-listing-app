@@ -1,5 +1,5 @@
 import { SessionState } from "@/library/redux/reducers/session-reducer";
-import ManageAddress, { Address } from "../../Admin/User/Address/ManageAddress";
+import ManageAddress, { Address } from "../../../../../blocks/Admin/User/Address/ManageAddress";
 import React, { useContext, useEffect } from "react";
 import { LocaleHelpers } from "@/helpers/LocaleHelpers";
 import { MANAGE_ADDRESS_MODAL_ID } from "../Checkout/Checkout";
@@ -13,6 +13,7 @@ import {
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
 import AvailableShippingTable from "./AvailableShippingTable";
+import OrderShippingSummary from "./OrderShippingSummary";
 
 export type ShippingProps = {
   session: SessionState;
@@ -39,10 +40,6 @@ function Shipping({ session }: ShippingProps) {
       checkoutContext.update({ shippingAddress: shipping });
     }
   }, [user]);
-
-  useEffect(() => {
-    checkoutContext.refresh("availableShippingMethods", checkoutContext);
-  }, [order]);
 
   function renderManageAddressModal(type: "billing" | "shipping") {
     return (
@@ -169,12 +166,13 @@ function Shipping({ session }: ShippingProps) {
           </div>
         </div>
       </div>
-      <h3 className="text-2xl font-bold mt-4">Available Shipping Methods</h3>
+      {/* <h3 className="text-2xl font-bold mt-4">Available Shipping Methods</h3>
       <p className="mb-4">
         Please enter your shipping address to ensure the products are delivered
         to the correct location.
-      </p>
-      <AvailableShippingTable />
+      </p> */}
+      {/* <AvailableShippingTable /> */}
+      {/* <OrderShippingSummary /> */}
     </div>
   );
 }

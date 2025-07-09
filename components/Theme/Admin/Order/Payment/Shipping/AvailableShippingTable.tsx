@@ -19,7 +19,10 @@ function AvailableShippingTable({ session }: AvailableShippingTableProps) {
   const user = session[SESSION_USER];
 
   useEffect(() => {
-    checkoutContext.refresh("availableShippingMethods", checkoutContext);
+    checkoutContext.refresh(
+      checkoutContext.order?.id,
+      "availableShippingMethods"
+    );
   }, [order]);
 
   console.log("Shipping Component Rendered", {
@@ -31,9 +34,9 @@ function AvailableShippingTable({ session }: AvailableShippingTableProps) {
         <div className="table-responsive-sm">
           <table className="table">
             <tbody>
-              {Array.isArray(checkoutContext.availableShippingMethods) &&
-                checkoutContext.availableShippingMethods.length > 0 &&
-                checkoutContext.availableShippingMethods.map(
+              {Array.isArray(checkoutContext.availableShippingMethods?.shipping_methods) &&
+                checkoutContext.availableShippingMethods.shipping_methods.length > 0 &&
+                checkoutContext.availableShippingMethods.shipping_methods.map(
                   (shippingMethod: ShippingMethod, index: number) => {
                     return (
                       <AvailableShippingTableRow

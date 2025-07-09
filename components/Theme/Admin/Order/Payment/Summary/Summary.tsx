@@ -20,7 +20,10 @@ function Summary() {
     }, [order, price]);
 
     useEffect(() => {
-        checkoutContext.refresh('orderSummary');
+        checkoutContext.refresh(
+            checkoutContext.order?.id,
+            'orderSummary'
+        );
     }, []);
     console.log('Order Summary', checkoutContext?.orderSummary);
     return (

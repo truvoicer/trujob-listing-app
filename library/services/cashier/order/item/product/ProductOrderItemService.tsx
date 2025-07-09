@@ -1,9 +1,27 @@
 import ProductOrderItem from "@/components/Theme/Admin/Order/Product/ProductOrderItem";
 import { OrderItem } from "@/types/Cashier";
 import React from "react";
+import { ProductableOrderService } from "./ProductableOrderService";
+import ProductOrderSummaryItem from "@/components/Theme/Admin/Order/Product/ProductOrderSummaryItem";
 
-export class ProductOrderItemService {
-    renderOrderItem(item: OrderItem, index: number, props: Record<string, any>): React.Component | React.Component[] | React.ReactNode | React.ReactNode[] | null {
+export class ProductOrderItemService extends ProductableOrderService {
+    renderOrderSummaryRow(
+        item: OrderItem, 
+        index: number, 
+        props: Record<string, unknown>
+    ): React.Component | React.Component[] | React.ReactNode | React.ReactNode[] | null {
         return <ProductOrderItem item={item} index={index} {...props} />;
+    }
+
+    renderOrderShippingSummaryRow(
+        item: OrderItem, 
+        index: number, 
+        props: Record<string, unknown>
+    ): React.Component | React.Component[] | React.ReactNode | React.ReactNode[] | null {
+        return <ProductOrderSummaryItem item={item} index={index} {...props} />;
+    }
+
+    static getInstance(): ProductOrderItemService {
+        return new ProductOrderItemService();
     }
 }

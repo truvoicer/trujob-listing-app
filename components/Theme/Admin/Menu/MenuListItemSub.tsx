@@ -23,7 +23,7 @@ function MenuListItemSub({ data, session, settings }) {
                     className="collapsed">
                     <span>{data?.label || ''}</span>
                 </Link>
-                <ul className={`iq-submenu sub-scrll collapse ${isOpen ? 'show' : ''}`}>
+                <ul className={`iq-submenu sub-scrll collapse ${isOpen ? 'show' : ''} ps-3`}>
                     {Array.isArray(data?.menus) && data.menus.map((menu, index) => {
                         return (
                             <React.Fragment key={index}>
