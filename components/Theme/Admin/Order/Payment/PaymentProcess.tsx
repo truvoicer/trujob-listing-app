@@ -8,7 +8,7 @@ import PaymentGateways from "./PaymentGateways";
 import Stepper from "@/components/Elements/Stepper";
 import { StepperItem } from "@/components/Stepper/Stepper";
 import { useContext, useState } from "react";
-import { CheckoutContext } from "./Checkout/context/CheckoutContext";
+import { CheckoutContext, CheckoutContextType } from "./Checkout/context/CheckoutContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -32,8 +32,6 @@ export type StepConfig = {
 };
 
 function PaymentProcess({ session }: PaymentProcess) {
-  const [currentStep, setCurrentStep] = useState<string | null>(STEP_BASKET);
-  const checkoutContext = useContext(CheckoutContext);
   const steps: Array<StepperItem> = [
     {
       id: STEP_BASKET,
@@ -60,6 +58,8 @@ function PaymentProcess({ session }: PaymentProcess) {
       component: Summary, // Placeholder for future component
       buttonNext: { text: "Continue to Payment Method" },
       buttonPrevious: { text: "Back to Shipping" },
+      showNextButton: true,
+      showPreviousButton: true,
     },
     {
       id: STEP_PAYMENT_METHOD,
@@ -69,12 +69,12 @@ function PaymentProcess({ session }: PaymentProcess) {
       component: PaymentGateways, // Placeholder for future component
       buttonNext: { text: "Enter Payment Details" },
       buttonPrevious: { text: "Back to Summary" },
-      onNextClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+      onNextClick: (
+        e: React.MouseEvent<HTMLButtonElement>,
+        { checkoutContext }: { checkoutContext: CheckoutContextType }
+      ) => {
         e.preventDefault();
-        console.log(
-          "Next button clicked for payment method",
-          checkoutContext?.selectedPaymentGateway
-        );
+        console.log("Next button clicked for payment method", checkoutContext);
         const response = TruJobApiMiddleware.getInstance().resourceRequest({
           endpoint: UrlHelpers.urlFromArray([
             TruJobApiMiddleware.getConfig().endpoints.orderTransaction.replace(
@@ -97,7 +97,10 @@ function PaymentProcess({ session }: PaymentProcess) {
         return true;
         // Handle next button click
       },
-      onPreviousClick: (e: React.MouseEvent<HTMLButtonElement>) => {
+      onPreviousClick: (
+        e: React.MouseEvent<HTMLButtonElement>,
+        { checkoutContext }: { checkoutContext: CheckoutContextType }
+      ) => {
         e.preventDefault();
         console.log("Previous button clicked for payment method");
         return true;
@@ -124,14 +127,18 @@ function PaymentProcess({ session }: PaymentProcess) {
     },
   ];
 
+  const checkoutContext = useContext(CheckoutContext);
   return (
     <div className="container">
       <Stepper
+        functionProps={{ checkoutContext }}
         steps={steps}
-        currentStep={currentStep}
+        currentStep={checkoutContext.currentStep}
         onStepChange={(step: StepperItem) => {
-          console.log("Step changed to:", step);
-          setCurrentStep(step.id);
+          // console.log("Step changed to:", step);
+          checkoutContext.update({
+            currentStep: step.id,
+          });
         }}
       />
     </div>

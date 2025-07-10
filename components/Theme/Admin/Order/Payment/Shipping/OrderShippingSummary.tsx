@@ -3,7 +3,7 @@ import {
   CheckoutContextType,
 } from "@/components/Theme/Admin/Order/Payment/Checkout/context/CheckoutContext";
 import { OrderService } from "@/library/services/cashier/OrderService";
-import { Order } from "@/types/Cashier";
+import { Order } from "@/types/Order";
 import React, { useContext, useEffect } from "react";
 
 export type OrderShippingSummaryProps = {

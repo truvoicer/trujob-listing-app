@@ -56,7 +56,6 @@ function EditAddress({
         user: data?.user,
         type: data?.type || type,
         is_default: data?.is_default || false,
-        is_active: data?.is_active || false,
     };
     function buildRequestData(values: any) {
         let requestData: AddressRequestData = {};
@@ -84,9 +83,6 @@ function EditAddress({
         requestData.country_id = values.country.id ;
         if (values.hasOwnProperty('is_default')) {
             requestData.is_default = values.is_default;
-        }
-        if (values.hasOwnProperty('is_active')) {
-            requestData.is_active = values.is_active;
         }
         return requestData;
     }
@@ -120,7 +116,7 @@ function EditAddress({
         console.log('handleSubmit called with values:', values);
         if (['edit', 'update'].includes(operation) && isObjectEmpty(values)) {
             console.log('No data to update');
-            return;
+            return false;
         }
 
 
@@ -160,6 +156,7 @@ function EditAddress({
         }
 
         if (!response) {
+            console.log('No response from API', truJobApiMiddleware.getErrors());
             setAlert({
                 show: true,
                 message: (
@@ -174,7 +171,7 @@ function EditAddress({
                 ),
                 type: 'danger',
             });
-            return;
+            return false;
         }
         if (dataTable) {
             dataTable.refresh();
@@ -188,6 +185,7 @@ function EditAddress({
         if (typeof fetchAddresses === 'function') {
             fetchAddresses();
         }
+        return true;
     }
 
 
@@ -212,7 +210,6 @@ function EditAddress({
     }, [inModal, modalId]);
 
 
-    const dataTableContext = useContext(DataTableContext);
     return (
         <div className="row justify-content-center align-items-center">
             <div className="col-md-12 col-sm-12 col-12 align-self-center">
@@ -221,25 +218,7 @@ function EditAddress({
                         {alert.message}
                     </div>
                 )}
-                {inModal &&
-                    ModalService.modalItemHasFormProps(dataTableContext?.modal, modalId) &&
-                    (
-                        <EditAddressFields operation={operation} />
-                    )
-                }
-                {!inModal && (
-                    <Form
-                        operation={operation}
-                        initialValues={initialValues}
-                        onSubmit={handleSubmit}
-                    >
-                        {() => {
-                            return (
-                                <EditAddressFields operation={operation} />
-                            )
-                        }}
-                    </Form>
-                )}
+                <EditAddressFields operation={operation} />
             </div>
         </div>
     );

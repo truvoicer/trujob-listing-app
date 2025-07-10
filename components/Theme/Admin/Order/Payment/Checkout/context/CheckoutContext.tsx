@@ -1,15 +1,16 @@
 import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
-import { Order, OrderSummary } from "@/types/Cashier";
+import { Order, OrderSummary, UpdateOrderRequest } from "@/types/Order";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import { Price } from "@/types/Price";
 import { ShippingMethod, ShippingRate } from "@/types/Shipping";
 import { createContext } from "react";
 
-export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary' | 'selectedShippingMethod' | 'billingAddress' | 'shippingAddress';
+export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary' | 'selectedShippingMethod';
 
 export type CheckoutContextType = {
     [key: string]: unknown | PaymentGateway | null;
+    currentStep: string | null;
     order: Order | null;
     orderSummary: OrderSummary | null; 
     price: Price | null;
@@ -19,16 +20,28 @@ export type CheckoutContextType = {
     availableShippingMethods: ShippingMethod[];
     selectedShippingMethod: ShippingMethod | null;
     selectedShippingRate: ShippingRate | null;
-    billingAddress: Address | null;
-    shippingAddress: Address | null;
     fetchSelectedShippingMethod: (id: number) => Promise<void>;
     refresh: (orderId: number, entity: RefreshEntities) => Promise<void>;
-    updateCheckoutData: (data: CheckoutContextType) => void;
+    update: (data: UpdateCheckoutContext) => void;
+    updateOrder: (orderId: number, data: UpdateOrderRequest) => void;
     updateOrderItem: (orderId: number, id: number, data: Record<string, unknown>) => void;
     removeOrderItem?: (orderId: number, id: number) => void;
-    addOrderItem?: (data: Record<string, unknown>) => void;
+    addOrderItem?: (orderId: number, data: Record<string, unknown>) => void;
 };
+export interface UpdateCheckoutContext {
+    currentStep?: string | null;
+    order?: Order | null;
+    orderSummary?: OrderSummary | null; 
+    price?: Price | null;
+    transaction?: Record<string, unknown> | null;
+    availablePaymentGateways?: PaymentGateway[] | null;
+    selectedPaymentGateway?: PaymentGateway | null;
+    availableShippingMethods?: ShippingMethod[];
+    selectedShippingMethod?: ShippingMethod | null;
+    selectedShippingRate?: ShippingRate | null;
+}
 export const checkoutData = {
+    currentStep: null,
     order: null,
     orderSummary: null,
     price: null,
@@ -38,13 +51,19 @@ export const checkoutData = {
     availableShippingMethods: [],
     selectedShippingMethod: null,
     selectedShippingRate: null,
-    billingAddress: null,
-    shippingAddress: null,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetchSelectedShippingMethod: async (id: number) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     refresh: async (orderId: number, entity: RefreshEntities) => {},
-    updateCheckoutData: (data: CheckoutContextType) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    update: (data: UpdateCheckoutContext) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    updateOrder: (orderId: number, data: UpdateOrderRequest) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     updateOrderItem: (orderId: number, id: number, data: Record<string, unknown>) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     removeOrderItem: (orderId: number, id: number) => {},
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     addOrderItem: (orderId: number, data: Record<string, unknown>) => {}
 };
 export const CheckoutContext = createContext(checkoutData);

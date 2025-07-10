@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import ButtonLink from "@/components/Elements/ButtonLink";
 import { clone } from "underscore";
 
+export type StepperComponentProps = {
+  showNext: () => void;
+  showPrevious: () => void;
+};
 export type StepperButton = {
   text: string;
 };
@@ -15,20 +19,25 @@ export type StepperItem = {
   showNextButton?: boolean;
   showPreviousButton?: boolean;
   onNextClick?: (
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
+    functionProps?: Record<string, unknown>
   ) => boolean | Promise<boolean>;
   onPreviousClick?: (
-    e: React.MouseEvent<HTMLButtonElement>
+    e: React.MouseEvent<HTMLButtonElement>,
+    functionProps?: Record<string, unknown>
   ) => boolean | Promise<boolean>;
 };
 export type Stepper = {
   steps: Array<StepperItem>;
   currentStep?: string | null;
   onStepChange?: (step: StepperItem) => void;
+  functionProps?: Record<string, unknown>;
 };
 
-function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
-  const [stepsState, setStepsState] = useState<Array<StepperItem>>([]);
+function Stepper({ steps = [], currentStep, onStepChange, functionProps = {} }: Stepper) {
+  const [stepsState, setStepsState] = useState<Array<StepperItem>>(
+    buildSteps(steps)
+  );
 
   function showNextButton(): void {
     setStepsState((prevSteps) => {
@@ -70,6 +79,7 @@ function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
   }
 
   function isStepActive(step: StepperItem): boolean {
+    if (!currentStep || !step) return false;
     return currentStep === step.id;
   }
 
@@ -105,15 +115,13 @@ function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
     }
   }
 
-  useEffect(() => {
-    setStepsState(buildSteps(steps));
-  }, [steps]);
-
   const activeStepperItem = getActiveStepperItem();
-  // console.log("Active Stepper Item:", activeStepperItem, stepsState);
+
   return (
     <div className="row">
-      {activeStepperItem ? (
+      {Array.isArray(stepsState) &&
+      stepsState.length > 0 &&
+      activeStepperItem ? (
         <>
           <div className="col-12">
             <h2 className="text-2xl font-bold mb-4">Payment Process</h2>
@@ -126,7 +134,10 @@ function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
                   if (
                     typeof activeStepperItem?.onPreviousClick === "function"
                   ) {
-                    const response = await activeStepperItem.onPreviousClick(e);
+                    const response = await activeStepperItem.onPreviousClick(
+                      e,
+                      functionProps
+                    );
                     if (response === false) {
                       return; // Prevent going back if the callback returns false
                     }
@@ -146,26 +157,20 @@ function Stepper({ steps = [], currentStep, onStepChange }: Stepper) {
               <ButtonLink
                 className={`btn-primary ${isFirstStep() ? "w-100" : ""}`}
                 onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
-                  console.log(
-                    "Next button clicked for step:",
-                    activeStepperItem
-                  );
                   e.preventDefault();
                   if (typeof activeStepperItem?.onNextClick === "function") {
-                    const response = await activeStepperItem.onNextClick(e);
+                    const response = await activeStepperItem.onNextClick(
+                      e,
+                      functionProps
+                    );
                     if (response === false) {
                       return; // Prevent going to next step if the callback returns false
                     }
                   }
-                  console.log("Current step before next:", currentStep);
                   const currentIndex = stepsState.findIndex(
                     (step) => step.id === currentStep
                   );
                   if (currentIndex < stepsState.length - 1) {
-                    console.log(
-                      "Moving to next step:",
-                      stepsState[currentIndex + 1].id
-                    );
                     setCurrentStep(stepsState[currentIndex + 1].id);
                   }
                 }}

@@ -1,5 +1,5 @@
 import ProductOrderItem from "@/components/Theme/Admin/Order/Product/ProductOrderItem";
-import { OrderItem } from "@/types/Cashier";
+import { OrderItem } from "@/types/Order";
 import React from "react";
 import { ProductableOrderService } from "./ProductableOrderService";
 import ProductOrderSummaryItem from "@/components/Theme/Admin/Order/Product/ProductOrderSummaryItem";

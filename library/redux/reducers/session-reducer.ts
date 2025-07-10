@@ -31,6 +31,7 @@ import {
 import { Currency } from "@/types/Currency";
 import { Country } from "@/types/Country";
 import { Language } from "@/types/Language";
+import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
 
 export type SessionUserProfile = {
   [SESSION_USER_PROFILE_DOB]?: string | null;
@@ -52,7 +53,7 @@ export type SessionUserState = {
   [SESSION_USER_EMAIL]: string | null;
   [SESSION_USER_FIRSTNAME]: string | null;
   [SESSION_USER_LASTNAME]: string | null;
-  [SESSION_USER_ADDRESSES]: Array<unknown>;
+  [SESSION_USER_ADDRESSES]: Array<Address>;
   [SESSION_USER_TOKEN]: string | null;
   [SESSION_USER_ROLES]: Array<string>;
   [SESSION_USER_PROFILE]: SessionUserProfile;

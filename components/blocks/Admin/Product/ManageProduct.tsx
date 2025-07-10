@@ -1,5 +1,5 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import EditProduct from "./EditProduct";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
@@ -14,6 +14,7 @@ import Loader from "@/components/Loader";
 import { connect } from "react-redux";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { RootState } from "@/library/redux/store";
+import { Modal } from "react-bootstrap";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
@@ -41,6 +42,8 @@ function ManageProduct({
   enablePagination = true,
   enableEdit = true,
 }: ManageProductProps) {
+  const [showModal, setShowModal] = useState(false);
+  const [item, setItem] = useState<Product | null>(null);
   function getActionColumnBadgeDropdownItems({
     item,
     index,
@@ -54,25 +57,8 @@ function ManageProduct({
         onClick: (e: any) => {
           e.preventDefault();
           e.stopPropagation();
-          dataTableContextState.modal.show(
-            {
-              title: "Edit Product",
-              fullscreen: true,
-              size: "xl",
-              formProps: {
-                operation: operation,
-                initialValues: {},
-              },
-              showFooter: false,
-              component: (
-                <ProductTestCheckout
-                  productId={item?.id}
-                  modalId={TEST_TRANSACTION_MODAL_ID}
-                />
-              ),
-            },
-            TEST_TRANSACTION_MODAL_ID
-          );
+          setItem(item);
+          setShowModal(true);
         },
       },
     };
@@ -84,7 +70,7 @@ function ManageProduct({
     );
     return [checkoutItem];
   }
-  
+
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
@@ -148,13 +134,24 @@ function ManageProduct({
           { label: "Permalink", key: "permalink" },
         ]}
       />
+      <Modal fullscreen={true} show={showModal} onHide={() => setShowModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Edit Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {item ? (
+            <ProductTestCheckout
+              productId={item?.id}
+              modalId={TEST_TRANSACTION_MODAL_ID}
+            />
+          ) : null}
+        </Modal.Body>
+      </Modal>
     </Suspense>
   );
 }
-export default connect(
-  (state: RootState) => {
-    return {
-      session: state[SESSION_STATE],
-    };
-  },
-)(ManageProduct);
+export default connect((state: RootState) => {
+  return {
+    session: state[SESSION_STATE],
+  };
+})(ManageProduct);

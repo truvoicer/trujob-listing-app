@@ -28,16 +28,6 @@ function EditAddressFields({
                     </div>
 
                     <div className="col-12 col-lg-6">
-                        <Checkbox
-                            name={'is_active'}
-                            placeholder="Is Active?"
-                            label="Is Active?"
-                            onChange={handleChange}
-                            value={values?.is_active || false}
-                        />
-                    </div>
-
-                    <div className="col-12 col-lg-6">
                         <TextInput
                             value={values?.label || ""}
                             onChange={handleChange}

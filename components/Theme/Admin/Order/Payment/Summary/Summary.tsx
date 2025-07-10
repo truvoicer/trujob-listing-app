@@ -7,27 +7,38 @@ function Summary() {
  const [show, setShow] = useState(false);
     const checkoutContext = useContext(CheckoutContext);
     const order = checkoutContext.order;
-    const price = checkoutContext.price;
 
 
     useEffect(() => {
-        if (!order || !price) {
+        if (!order) {
             return;
         }
         if (!show) {
             setShow(true);
         }
-    }, [order, price]);
+    }, [order]);
 
     useEffect(() => {
+        if (!checkoutContext.order?.id) {
+            return;
+        }
+        checkoutContext.refresh(
+            checkoutContext.order?.id,
+            'orderSummary'
+        );
+    }, [checkoutContext.order]);
+    useEffect(() => {
+        if (!checkoutContext.order?.id) {
+            return;
+        }
         checkoutContext.refresh(
             checkoutContext.order?.id,
             'orderSummary'
         );
     }, []);
-    console.log('Order Summary', checkoutContext?.orderSummary);
+    // console.log('Order Summary', checkoutContext);
     return (
-        <>
+        <div className="whocares">
             {show
                 ? (
                     <div className="container-fluid container">
@@ -67,7 +78,7 @@ function Summary() {
                 : (
                     <Loader />
                 )}
-        </>
+        </div>
     );
 }
 export default Summary;

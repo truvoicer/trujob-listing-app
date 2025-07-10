@@ -18,20 +18,19 @@ function Basket({
     const [show, setShow] = useState(false);
     const checkoutContext = useContext(CheckoutContext);
     const order = checkoutContext.order;
-    const price = checkoutContext.price;
 
 
     useEffect(() => {
-        if (!order || !price) {
+        if (!order) {
             return;
         }
         if (!show) {
             setShow(true);
         }
-    }, [order, price]);
+    }, [order]);
 
     return (
-        <>
+        <div className="whatever">
             {show
                 ? (
                     <div className="container-fluid container">
@@ -71,7 +70,7 @@ function Basket({
                 : (
                     <Loader />
                 )}
-        </>
+        </div>
     );
 }
 

@@ -1,7 +1,7 @@
 import { CheckoutContext } from "@/components/Theme/Admin/Order/Payment/Checkout/context/CheckoutContext";
 import QuantityInput from "@/components/QuantityInput";
 import { OrderItemService } from "@/library/services/cashier/order/item/OrderItemService";
-import { OrderItem } from "@/types/Cashier";
+import { OrderItem } from "@/types/Order";
 import { Product } from "@/types/Product";
 import Link from "next/link";
 import { useContext, useEffect, useState } from "react";

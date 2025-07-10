@@ -1,4 +1,4 @@
-import { OrderItem } from "@/types/Cashier";
+import { OrderItem } from "@/types/Order";
 import { OrderItemFactory } from "./OrderItemFactory";
 
 export class OrderItemService {

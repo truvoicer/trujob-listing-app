@@ -4,6 +4,7 @@ import { CheckoutContext } from "./Checkout/context/CheckoutContext";
 import { PaymentMethod } from "@/types/PaymentMethod";
 import IntegrationCard from "@/components/Elements/IntegrationCard";
 import { ThemeService } from "@/library/services/app/ThemeService";
+import { StepperComponentProps } from "@/components/Elements/Stepper";
 
 export const PAYMENT_METHODS_FETCH_ERROR_NOTIFICATION_ID =
   "payment-methods-fetch-error-notification";
@@ -16,7 +17,9 @@ export type PaymentGatewaysProps = {
 };
 function PaymentGateways({
   title = "Payment Gateways",
-}: PaymentGatewaysProps) {
+  showNext,
+  showPrevious,
+}: PaymentGatewaysProps & StepperComponentProps) {
   const checkoutContext = useContext(CheckoutContext);
 
   useEffect(() => {
@@ -25,6 +28,11 @@ function PaymentGateways({
       "availablePaymentGateways"
     );
   }, []);
+  useEffect(() => {
+    if (checkoutContext?.selectedPaymentGateway) {
+      showNext();
+    }
+  }, [checkoutContext?.selectedPaymentGateway]);
 
   console.log("Shipping component rendered with order:", checkoutContext);
   return (

@@ -1,4 +1,4 @@
-import { Order } from "@/types/Cashier";
+import { Order } from "@/types/Order";
 import { TransactionService } from "./TransactionService";
 import { OrderItemService } from "./order/item/OrderItemService";
 import { Currency } from "@/types/Currency";

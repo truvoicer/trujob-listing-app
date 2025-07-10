@@ -4,31 +4,31 @@ import {
   CheckoutContextType,
   checkoutData,
   RefreshEntities,
+  UpdateCheckoutContext,
 } from "./context/CheckoutContext";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { Order } from "@/types/Cashier";
+import { Order, UpdateOrderRequest } from "@/types/Order";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { Price } from "@/types/Price";
 
 
 export type CheckoutProviderProps = {
   children: React.ReactNode;
-  fetchOrder: () => Promise<Order | null>;
-  fetchAvailablePaymentGateways: () => Promise<PaymentGateway | null>;
-  fetchPrice: () => Promise<Price | null>;
+  initialStep?: string;
+  orderId?: number;
 };
 function CheckoutProvider({
+  initialStep,
   children,
-  fetchOrder,
-  fetchAvailablePaymentGateways,
-  fetchPrice,
+  orderId,
 }: CheckoutProviderProps) {
   const [checkoutState, setCheckoutState] = useState<CheckoutContextType>({
     ...checkoutData,
     update: updateCheckoutData,
+    updateOrder: updateOrder,
     updateOrderItem: updateOrderItem,
     removeOrderItem: removeOrderItem,
     addOrderItem: addOrderItem,
@@ -39,31 +39,43 @@ function CheckoutProvider({
   const notificationContext = useContext(AppNotificationContext);
 
   async function handleFetchOrder() {
-    if (typeof fetchOrder !== "function") {
-      console.error("fetchOrder is not a function");
+    if (!orderId) {
+      console.error("Order ID is not provided");
       return;
     }
-    const response = await fetchOrder();
-
-    if (!response) {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.order,
+        orderId,
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+    if (!response?.data) {
       return false;
     }
     updateCheckoutData({
-      order: response,
+      order: response.data,
     });
   }
 
   async function handleFetchAvailablePaymentGateways() {
-    if (typeof fetchAvailablePaymentGateways !== "function") {
-      console.error("fetchAvailablePaymentGateways is not a function");
-      return;
-    }
-    const response = await fetchAvailablePaymentGateways();
-    if (!response) {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.sitePaymentGateway,
+        'available',
+      ]),
+      method: TruJobApiMiddleware.METHOD.GET,
+      protectedReq: true,
+    });
+    if (!response?.data) {
+      console.error(
+        "Failed to fetch available payment gateways. No response or data received."
+      );
       return false;
     }
     updateCheckoutData({
-      availablePaymentGateways: response,
+      availablePaymentGateways: response.data,
     });
   }
   async function fetchTransaction() {}
@@ -254,7 +266,6 @@ function CheckoutProvider({
       console.error("Failed to add order item. No response or data received.");
       return;
     }
-    checkoutState.refresh(orderId, "order");
     refreshEntity(orderId, "order");
   }
   function removeOrderItem(orderId?: number, id: number) {
@@ -276,8 +287,6 @@ function CheckoutProvider({
       );
       return;
     }
-
-    checkoutState.refresh(orderId, "order");
     refreshEntity(orderId, "order");
   }
   function updateOrderItem(
@@ -304,10 +313,31 @@ function CheckoutProvider({
       );
       return;
     }
-    checkoutState.refresh(orderId, "order");
     refreshEntity(orderId, "order");
   }
-  function updateCheckoutData(data: CheckoutContextType) {
+  async function updateOrder(
+    orderId: number,
+    data: UpdateOrderRequest,
+  ) {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        truJobApiConfig.endpoints.order,
+        orderId,
+        "update",
+      ]),
+      method: TruJobApiMiddleware.METHOD.PATCH,
+      protectedReq: true,
+      data: data,
+    });
+    if (!response) {
+      console.error(
+        `Failed to update order with id ${orderId}. No response or data received.`
+      );
+      return;
+    }
+    refreshEntity(orderId, "order");
+  }
+  function updateCheckoutData(data: UpdateCheckoutContext) {
     setCheckoutState((prevState: CheckoutContextType) => {
       let newState = { ...prevState };
       Object.keys(data).forEach((key) => {
@@ -320,8 +350,15 @@ function CheckoutProvider({
   useEffect(() => {
     handleFetchOrder();
     handleFetchAvailablePaymentGateways();
-    handleFetchPrice();
   }, []);
+
+  useEffect(() => {
+    if (initialStep) {
+      updateCheckoutData({
+        currentStep: initialStep,
+      });
+    }
+  }, [initialStep]);
 
   return (
     <CheckoutContext.Provider value={checkoutState}>

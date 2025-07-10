@@ -431,6 +431,14 @@ export class ApiMiddleware {
       setShowLoginModalAction(true);
     }
   }
+  handleUnProcessableResponse(response: Response, data: any): void {
+    console.log("handleUnProcessableResponse", { response, data });
+    this.errors.push({
+      code: "unprocessable_entity",
+      message: data?.message || "Unprocessable Entity",
+      data,
+    });
+  }
 
   async handleResponse(
     encrypted: boolean,
@@ -453,6 +461,8 @@ export class ApiMiddleware {
         return responseData;
       case 401:
         this.handleUnauthorizedResponse(responsePromise, responseData);
+      case 422:
+        this.handleUnProcessableResponse(responsePromise, responseData);
       default:
         return false;
     }
@@ -462,10 +472,7 @@ export class ApiMiddleware {
     if (!data || typeof data !== "object" || isObjectEmpty(data)) {
       throw new Error("Invalid data format for decryption");
     }
-    if (!data?.data || typeof data?.data !== "object" || isObjectEmpty(data?.data)) {
-      throw new Error("Invalid data format for decryption");
-    }
-    const responseData = data.data;
+    const responseData = data;
     if (!responseData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE)) {
       throw new Error("Encrypted response flag not set in data");
     }
@@ -489,6 +496,7 @@ export class ApiMiddleware {
     if (encryptedData === "") {
       throw new Error("Encrypted data is empty");
     }
+    console.log("Decrypting data", { encryptedData, payloadSecret });
     const decryptedData = await JWTHelpers.decodeJwt(encryptedData, payloadSecret);
     if (!decryptedData) {
       throw new Error("Decrypted data is empty");

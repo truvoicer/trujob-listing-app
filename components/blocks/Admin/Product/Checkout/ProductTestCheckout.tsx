@@ -44,8 +44,8 @@ function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
   const modalService = new ModalService();
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
-
-  async function fetchOrder() {
+  
+async function fetchOrder() {
     const response = await TruJobApiMiddleware.getInstance().resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
@@ -377,14 +377,12 @@ function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
       return;
     }
     createOrder();
-  }, [product, price, paymentGateway, quantity]);
+  }, [product, price, quantity]);
   return (
     <>
-      {product && price && paymentGateway && quantity && order ? (
+      {product && price && quantity && order ? (
         <Checkout 
-          fetchOrder={async () => await fetchOrder()}
-          fetchAvailablePaymentGateways={async () => await fetchAvailablePaymentGateways()}
-          fetchPrice={async () => await fetchProductPrice()}
+          orderId={order?.id}
         >
           <PaymentProcess />
           </Checkout>

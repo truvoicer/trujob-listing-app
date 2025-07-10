@@ -1,4 +1,4 @@
-import { Order } from "@/types/Cashier";
+import { Order } from "@/types/Order";
 import { PaymentGateway } from "@/types/PaymentGateway";
 import { Price } from "@/types/Price";
 import { OrderService } from "./OrderService";

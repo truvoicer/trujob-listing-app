@@ -48,7 +48,6 @@ export type Address = {
   user: User;
   type: AddressType;
   is_default: boolean;
-  is_active: boolean;
   created_at: string;
   updated_at: string;
 };
@@ -63,7 +62,6 @@ export type AddressRequestData = {
   country_id?: number;
   type?: AddressType;
   is_default?: boolean;
-  is_active?: boolean;
 };
 export interface CreateAddress extends AddressRequestData {
   label: string;
