@@ -21,6 +21,20 @@ export class JWTHelpers {
     return encodedSource;
   }
 
+  static base64urlDecode(encodedSource: string) {
+    // Replace characters according to base64url specifications
+    let decodedSource = encodedSource.replace(/-/g, "+");
+    decodedSource = decodedSource.replace(/_/g, "/");
+
+    // Add padding equal characters if missing
+    while (decodedSource.length % 4) {
+      decodedSource += "=";
+    }
+
+    // Decode in classical base64
+    return atob(decodedSource);
+  }
+
   static getDataString(data: Record<string, unknown> | string) {
     return JSON.stringify(data);
   }
@@ -81,19 +95,35 @@ export class JWTHelpers {
     return `${token}.${signature}`;
   }
 
-  static async decodeJwt(
-    jwt: string,
-    secret: string
-  ): Promise<Record<string, unknown>> {
-    const [header, payload, signature] = jwt.split(".");
-    const data = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
-    const expectedSignature = await JWTHelpers.buildSignature(
-      `${header}.${payload}`,
-      secret
-    );
-    if (expectedSignature !== signature) {
-      throw new Error("Invalid JWT signature");
+  /**
+   * Decodes a JWT token.
+   * @param token The JWT token string.
+   * @returns An object containing the decoded header, payload, and signature.
+   * @throws {Error} If the token format is invalid or decoding fails.
+   */
+  static decodeJwt(token: string) {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new Error('Invalid JWT token format. Expected 3 parts: header.payload.signature');
     }
-    return data;
+
+    const [encodedHeader, encodedPayload, signature] = parts;
+
+    try {
+      const decodedHeaderString = JWTHelpers.base64urlDecode(encodedHeader);
+      const header = JSON.parse(decodedHeaderString);
+
+      const decodedPayloadString = JWTHelpers.base64urlDecode(encodedPayload);
+      const payload = JSON.parse(decodedPayloadString);
+
+      return {
+        header,
+        payload,
+        signature
+      };
+    } catch (error) {
+      console.error("Error decoding JWT:", error);
+      throw new Error("Failed to decode JWT token. Check if it's a valid base64url encoded string or valid JSON.");
+    }
   }
 }

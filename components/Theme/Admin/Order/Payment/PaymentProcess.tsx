@@ -69,17 +69,21 @@ function PaymentProcess({ session }: PaymentProcess) {
       component: PaymentGateways, // Placeholder for future component
       buttonNext: { text: "Enter Payment Details" },
       buttonPrevious: { text: "Back to Summary" },
-      onNextClick: (
+      onNextClick: async (
         e: React.MouseEvent<HTMLButtonElement>,
         { checkoutContext }: { checkoutContext: CheckoutContextType }
       ) => {
         e.preventDefault();
+        if (!checkoutContext?.order?.id) {
+          console.error("Order ID is not available in checkout context");
+          return false;
+        }
         console.log("Next button clicked for payment method", checkoutContext);
-        const response = TruJobApiMiddleware.getInstance().resourceRequest({
+        const response = await TruJobApiMiddleware.getInstance().resourceRequest({
           endpoint: UrlHelpers.urlFromArray([
             TruJobApiMiddleware.getConfig().endpoints.orderTransaction.replace(
               ":orderId",
-              checkoutContext?.order?.id || ""
+              checkoutContext.order.id.toString()
             ),
             "store",
           ]),
@@ -94,6 +98,7 @@ function PaymentProcess({ session }: PaymentProcess) {
           console.error("Failed to proceed to payment details");
           return false;
         }
+        console.log("Payment method selected successfully", response);
         return true;
         // Handle next button click
       },
