@@ -87,11 +87,36 @@ export class ApiMiddleware {
     DELETE: "DELETE",
   };
 
+  request: unknown;
+  response: Response | Promise<Response> | null = null;
+  responseData: Record<string, unknown> | null = null;
+
   config?: ApiMiddlewareConfig;
 
   errors: Array<ErrorItem> = [];
   private disableLoginModal: boolean = false;
 
+  getRequest() {
+    return this.request;
+  }
+  getResponse() {
+    return this.response;
+  }
+  getResponseData() {
+    return this.responseData;
+  }
+  setRequest(request: unknown) {
+    this.request = request;
+    return this;
+  }
+  setResponse(response: Response | Promise<Response>) {
+    this.response = response;
+    return this;
+  }
+  setResponseData(responseData: Record<string, unknown> | null) {
+    this.responseData = responseData;
+    return this;
+  }
   getDisableLoginModal(): boolean {
     return this.disableLoginModal;
   }
@@ -401,7 +426,7 @@ export class ApiMiddleware {
       requestUrl,
       request,
     });
-
+    this.setRequest(request);
     return await this.handleResponse(
       encrypted,
       requestUrl,
@@ -448,8 +473,10 @@ export class ApiMiddleware {
     if (!response) {
       return false;
     }
+    this.setResponse(response);
     const responsePromise = await response;
     const responseData = await responsePromise.json();
+    this.setResponseData(responseData);
 
     switch (responsePromise?.status) {
       case 200:
@@ -461,8 +488,10 @@ export class ApiMiddleware {
         return responseData;
       case 401:
         this.handleUnauthorizedResponse(responsePromise, responseData);
+        return false;
       case 422:
         this.handleUnProcessableResponse(responsePromise, responseData);
+        return false;
       default:
         return false;
     }

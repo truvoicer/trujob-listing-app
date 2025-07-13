@@ -279,7 +279,7 @@ function DataTable({
                     <thead>
                         <tr>
                             {rowSelection && (
-                                <th className="text-center">
+                                <th className="text-left">
                                     {multiRowSelection && (
                                         <input
                                             type="checkbox"
@@ -290,11 +290,11 @@ function DataTable({
                             )}
                             {columns.map((column, index) => {
                                 return (
-                                    <th key={index} className="text-center">{column?.label || ''}</th>
+                                    <th key={index} className="text-left">{column?.label || ''}</th>
                                 )
                             })}
                             {(enableEdit || enableDelete) && typeof actionColumn === 'function' && (
-                                <th className="text-center">Actions</th>
+                                <th className="text-left">Actions</th>
                             )}
                         </tr>
                     </thead>
@@ -303,7 +303,7 @@ function DataTable({
                             return (
                                 <tr key={index}>
                                     {rowSelection && multiRowSelection && (
-                                        <td className="text-center">
+                                        <td className="text-left">
                                             <input
                                                 type="checkbox"
                                                 checked={item?.checked || false}
@@ -331,7 +331,7 @@ function DataTable({
                                         </td>
                                     )}
                                     {rowSelection && !multiRowSelection && (
-                                        <td className="text-center">
+                                        <td className="text-left">
                                             <input
                                                 type="radio"
                                                 checked={item?.checked || false}
@@ -360,7 +360,7 @@ function DataTable({
                                         return (
                                             <td
                                                 key={index}
-                                                className="text-center">
+                                                className="text-left">
                                                 {getValue(column, item)}
                                             </td>
                                         );

@@ -59,6 +59,11 @@ function ManageProduct({
   }: ActionColumnBadgeDropdownItems) {
     const checkoutItem = {
       text: "Checkout",
+      disabled: (
+        (item?.health_check?.unhealthy?.count || 0) > 0
+          ? true
+          : false
+      ),
       linkProps: {
         href: `#`,
         onClick: (e: any) => {
@@ -128,7 +133,7 @@ function ManageProduct({
         }) => {
           console.log("fetchItemsRequest", { post, query });
           return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.product}`,
+            endpoint: `${truJobApiConfig.endpoints.userProduct}`,
             method: ApiMiddleware.METHOD.GET,
             protectedReq: true,
             query: query,
@@ -159,6 +164,22 @@ function ManageProduct({
           setShowModal={setShowSkuModal}
         />
       </DataManager>
+      <Modal
+        fullscreen={true}
+        show={showModal}
+        onHide={() => setShowModal(false)}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Test Transaction</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {item ? (
+            <ProductTestCheckout productId={item.id} />
+          ) : (
+            <p>No product selected</p>
+          )}
+        </Modal.Body>
+      </Modal>
     </Suspense>
   );
 }

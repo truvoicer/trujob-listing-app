@@ -10,6 +10,7 @@ export type BadgeDropDownProps = {
 export type BadgeDropDownItem = {
     text: string;
     linkProps: LinkProps
+    disabled?: boolean;
 }
 export interface BadgeDropDownItemProps extends DropdownItemProps {
     linkProps: LinkProps;
@@ -23,7 +24,6 @@ const CustomDropdownItem = React.forwardRef(
             className, 
             'aria-labelledby': 
             labeledBy,
-             href, 
             linkProps 
         }: BadgeDropDownItemProps = atts;
         return (
@@ -40,6 +40,7 @@ const CustomDropdownItem = React.forwardRef(
         );
     },
 );
+CustomDropdownItem.displayName = "CustomDropdownItem";
 const CustomDropdown = React.forwardRef(
     ({ children, style, className, 'aria-labelledby': labeledBy }: DropdownProps, ref: React.Ref<HTMLDivElement>) => {
         if (typeof className === 'string') {
@@ -57,6 +58,7 @@ const CustomDropdown = React.forwardRef(
         );
     },
 );
+CustomDropdown.displayName = "CustomDropdown";
 
 
 function BadgeDropDown({
@@ -88,6 +90,7 @@ function BadgeDropDown({
                         }
                         return (
                             <Dropdown.Item
+                                disabled={item?.disabled}
                                 as={CustomDropdownItem}
                                 className={"dropdown-item"}
                                 linkProps={item.linkProps}

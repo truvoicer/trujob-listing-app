@@ -11,6 +11,7 @@ const config: ApiMiddlewareConfig = {
   },
   endpoints: {
     profile: "/user/profile",
+    userProduct: "/user/product",
     order: "/order",
     orderShippingMethod: "/order/:orderId/shipping/method",
     orderSummary: "/order/:orderId/summary",

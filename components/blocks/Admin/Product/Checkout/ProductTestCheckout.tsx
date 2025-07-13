@@ -24,12 +24,23 @@ import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import CheckoutProvider from "@/components/Theme/Admin/Order/Payment/Checkout/CheckoutProvider";
 import Loader from "@/components/Loader";
 import PaymentProcess from "@/components/Theme/Admin/Order/Payment/PaymentProcess";
+import { isObject, isObjectEmpty } from "@/helpers/utils";
 
+const STATUS_SUCCESS = "success";
+const STATUS_ERROR = "error";
+const STATUS_PENDING = "pending";
 export type ProductTestCheckoutProps = {
   productId: number;
-  modalId?: string;
+  setShowModal?: (show: boolean) => void;
 };
-function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
+function ProductTestCheckout({
+  productId,
+  setShowModal,
+}: ProductTestCheckoutProps) {
+  const [status, setStatus] = useState<string>(STATUS_PENDING);
+  const [errorComponent, setErrorComponent] = useState<React.ReactNode | null>(
+    null
+  );
   const [product, setProduct] = useState<Product | null>(null);
   const [price, setPrice] = useState<Price | null>(null);
   const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(
@@ -44,9 +55,11 @@ function ProductTestCheckout({ productId, modalId }: ProductTestCheckoutProps) {
   const modalService = new ModalService();
   const notificationContext = useContext(AppNotificationContext);
   const dataTableContext = useContext(DataTableContext);
-  
-async function fetchOrder() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+
+  const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
+
+  async function fetchOrder() {
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
         order?.id,
@@ -76,10 +89,10 @@ async function fetchOrder() {
   }
 
   async function fetchAvailablePaymentGateways() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.sitePaymentGateway,
-        'available',
+        "available",
       ]),
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
@@ -106,7 +119,7 @@ async function fetchOrder() {
   }
 
   async function fetchProductPrice() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.productPrice.replace(
           ":productId",
@@ -140,7 +153,7 @@ async function fetchOrder() {
   }
 
   async function fetchProduct() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.product,
         productId,
@@ -307,7 +320,42 @@ async function fetchOrder() {
       },
     },
   ]);
-
+  function renderErrorNotification(
+    responseData: Record<string, unknown> | null
+  ) {
+    if (responseData?.data?.health_check_data) {
+      const healthCheckData = responseData.data.health_check_data;
+      return (
+        <div>
+          <h3>{responseData?.message || "Health Check Failed"}</h3>
+          <ul>
+            {isObject(healthCheckData?.unhealthy?.items) &&
+              !isObjectEmpty(healthCheckData.unhealthy.items) &&
+              Object.keys(healthCheckData.unhealthy.items).map(
+                (key: string, index: number) => (
+                  <li key={index}>
+                    <strong>{key}</strong>:
+                    {healthCheckData.unhealthy.items[key]?.message}
+                  </li>
+                )
+              )}
+          </ul>
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <h3>Error creating order</h3>
+          <p>{responseData?.message || "An error occurred"}</p>
+        </div>
+      );
+    }
+  }
+  function closeModal() {
+    if (setShowModal) {
+      setShowModal(false);
+    }
+  }
   async function createOrder() {
     setOrderIsBeingCreated(true);
     if (!validateProduct()) {
@@ -322,7 +370,7 @@ async function fetchOrder() {
     if (!validateQuantity()) {
       return false;
     }
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
         "store",
@@ -342,19 +390,27 @@ async function fetchOrder() {
       },
     });
     if (!response) {
+      const errorComponent = renderErrorNotification(
+        truJobApiMiddleware.getResponseData()
+      );
       notificationContext.show(
         {
           variant: "danger",
-          message: "Failed to create order",
+          component: renderErrorNotification(
+            truJobApiMiddleware.getResponseData()
+          ),
           title: "Error",
         },
         "order-create-error-notification"
       );
+      setStatus(STATUS_ERROR);
+      setErrorComponent(errorComponent);
       return false;
     }
     setOrder(response.data);
     setOrderCreated(true);
     setOrderIsBeingCreated(false);
+    setStatus(STATUS_SUCCESS);
     return true;
   }
 
@@ -378,16 +434,20 @@ async function fetchOrder() {
     }
     createOrder();
   }, [product, price, quantity]);
+
+  
   return (
     <>
-      {product && price && quantity && order ? (
-        <Checkout 
-          orderId={order?.id}
-        >
+      {status === STATUS_SUCCESS && (
+        <Checkout orderId={order.id}>
           <PaymentProcess />
-          </Checkout>
-      ) : (
-        <Loader />
+        </Checkout>
+      )}
+      {status === STATUS_PENDING && <Loader />}
+      {status === STATUS_ERROR && (
+        <div className="alert alert-danger">
+          {errorComponent || null}
+        </div>
       )}
       {/* <Stepper
         title="Product Test Checkout"
