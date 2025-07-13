@@ -29,6 +29,7 @@ export interface Product extends ProductDimension, ProductWeight {
     description: string;
     active: boolean;
     allow_offers: boolean;
+    sku?: string;
     quantity: number;
     type: 'digital' | 'physical' | 'service';
     user: User;
@@ -51,6 +52,7 @@ export interface ProductRequest extends ProductDimension, ProductWeight {
     description?: string;
     active?: boolean;
     allow_offers?: boolean;
+    sku?: string;
     quantity?: number;
     user?: number;
     type: 'digital' | 'physical' | 'service';

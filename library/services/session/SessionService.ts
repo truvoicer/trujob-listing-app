@@ -1,14 +1,28 @@
-import { isSet } from "@/helpers/utils";
+import { COMPONENT_USER_CURRENCY_FORM } from "@/components/Theme/Constants/ComponentConstants";
+import { findInObject, isSet } from "@/helpers/utils";
 import {
+  addSessionModalAction,
+  closeSessionModalAction,
   setIsAuthenticatingAction,
   setSessionUserAction,
 } from "@/library/redux/actions/session-actions";
 import {
+  SESSION_MODAL_COMPONENT,
+  SESSION_MODAL_ID,
+  SESSION_MODAL_ON_OK,
+  SESSION_MODAL_PREVENT_CLOSE,
+  SESSION_MODAL_SHOW,
+  SESSION_MODAL_SHOW_CLOSE_BUTTON,
+  SESSION_MODAL_SHOW_FOOTER,
+  SESSION_MODAL_TITLE,
   SESSION_STATE,
   SESSION_USER,
   SESSION_USER_USERNAME,
 } from "@/library/redux/constants/session-constants";
-import { sessionUserData, SessionUserState } from "@/library/redux/reducers/session-reducer";
+import {
+  sessionUserData,
+  SessionUserState,
+} from "@/library/redux/reducers/session-reducer";
 import store from "@/library/redux/store";
 import { User } from "@/types/User";
 
@@ -22,10 +36,59 @@ export class SessionService {
     },
   };
 
+  static REQUIRED_FIELDS = [
+    {
+      field: "settings.country", 
+      onFail: () => {
+        console.error("Missing required field: settings.country");
+      },
+    },
+    {
+      field: "settings.currency",
+      onFail: () => {
+        console.error("Missing required field: settings.currency");
+        addSessionModalAction({
+          [SESSION_MODAL_ID]: "user-currency",
+          [SESSION_MODAL_TITLE]: "Currency Required",
+          [SESSION_MODAL_COMPONENT]: COMPONENT_USER_CURRENCY_FORM,
+          [SESSION_MODAL_SHOW_CLOSE_BUTTON]: false,
+          [SESSION_MODAL_SHOW_FOOTER]: true,
+          [SESSION_MODAL_PREVENT_CLOSE]: true,
+          [SESSION_MODAL_SHOW]: true,
+          [SESSION_MODAL_ON_OK]: () => {
+            console.log("User currency modal OK clicked");
+            closeSessionModalAction("user-currency");
+          }
+        });
+      },
+    },
+    {
+      field: "settings.timezone",
+      onFail: () => {
+        console.error("Missing required field: settings.timezone");
+      },
+    },
+  ];
+
+  static validateUser(data: User): boolean {
+
+    if (!data) {
+      console.error("User data is not available or empty.");
+      return false;
+    }
+    for (const field of SessionService.REQUIRED_FIELDS) {
+      const findField = findInObject(field.field, data);
+      if (!findField || findField === "") {
+        field.onFail();
+      }
+    }
+    return true;
+  }
+
   static initUserData() {
     return sessionUserData;
   }
-  
+
   static extractUserData(
     data: User | Record<string, unknown>
   ): SessionUserState {
@@ -62,6 +125,9 @@ export class SessionService {
       console.log("User not found");
       setIsAuthenticatingAction(false);
       return false;
+    }
+    if (!SessionService.validateUser(user)) {
+      console.error("Invalid user data", user);
     }
     SessionService.setSessionLocalStorage(token, tokenExpiry);
     setSessionUserAction(

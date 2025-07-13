@@ -443,7 +443,6 @@ async function fetchOrder() {
                                   <li><strong>Price:</strong> {price?.amount}</li>
                                   <li><strong>Valid From:</strong> {price?.valid_from}</li>
                                   <li><strong>Valid To:</strong> {price?.valid_to}</li>
-                                  <li><strong>Is Default:</strong> {price?.is_default ? 'Yes' : 'No'}</li>
                                   <li><strong>Is Active:</strong> {price?.is_active ? 'Yes' : 'No'}</li>
                                   <li><strong>Created At:</strong> {price?.created_at}</li>
                                   <li><strong>Updated At:</strong> {price?.updated_at}</li>

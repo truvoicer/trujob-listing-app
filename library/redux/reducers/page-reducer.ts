@@ -38,10 +38,11 @@ import {
 } from '../constants/page-constants';
 import { ReduxHelpers } from '../helpers/ReduxHelpers';
 
+export type PageView = 'page' | 'admin_page' | 'admin_tab_page';
 export type PageState = {
     [ERROR]: string | null;
     [PAGE_LOADED]: boolean;
-    [PAGE_VIEW]: string | null;
+    [PAGE_VIEW]: PageView | null;
     [PAGE_PERMALINK]: string | null;
     [PAGE_NAME]: string | null;
     [PAGE_TITLE]: string | null;
@@ -99,20 +100,20 @@ export const pageStateData: PageState = {
 
 };
 const defaultReducers = {
-    setPage: (state, action) => {
+    setPage: (state: PageState, action: { payload: Partial<PageState> }) => {
         state = ReduxHelpers.buildValidatedObject(action.payload, pageStateData, state);
     },
-    setPageIsLoaded: (state, action) => {
+    setPageIsLoaded: (state: PageState, action: { payload: boolean }) => {
         state[PAGE_LOADED] = action.payload;
     },
-    setPageError: (state, action) => {
+    setPageError: (state: PageState, action: { payload: string | null }) => {
         state[ERROR] = action.payload;
         console.log(state.error)
     },
 };
 
 export const pageSlice = createSlice({
-    name: [PAGE_STATE],
+    name: PAGE_STATE,
     initialState: pageStateData,
     reducers: defaultReducers
 });

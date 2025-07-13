@@ -443,16 +443,6 @@ function EditProductPriceFields({
                         </div>
                     </div>
 
-
-                    <div className="col-12 col-lg-6">
-                        <Checkbox
-                            name={'is_default'}
-                            placeholder="Is Default?"
-                            label="Is Default?"
-                            onChange={handleChange}
-                            value={values?.is_default || false}
-                        />
-                    </div>
                     <div className="col-12 col-lg-6">
                         <Checkbox
                             name={'is_active'}

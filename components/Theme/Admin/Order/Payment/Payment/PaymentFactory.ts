@@ -1,5 +1,5 @@
 import { PaymentService } from "./Service/PaymentService";
-import { PayPalService } from "./Service/PaypalService";
+import { PayPalService } from "./Service/PayPalService";
 import { StripeService } from "./Service/StripeService";
 
 
@@ -11,9 +11,9 @@ export class PaymentFactory {
     static make(provider: string|null): PaymentService|null {
         switch (provider) {
             case 'paypal':
-                return PayPalService.getInstance();
+                return new PayPalService();
             case 'stripe':
-                return StripeService.getInstance();
+                return new StripeService();
             default:
                 console.warn(`No service found for order item type: ${provider}`);
                 return null;    

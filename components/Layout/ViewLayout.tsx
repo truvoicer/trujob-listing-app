@@ -10,9 +10,11 @@ import { ModalService, ModalState } from "@/library/services/modal/ModalService"
 import { NotificationService, NotificationState } from "@/library/services/notification/NotificationService";
 import { ConfirmationService, ConfirmationState } from "@/library/services/confirmation/ConfirmationService";
 import { AppConfirmationContext } from "@/contexts/AppConfirmationContext";
+import { RootState } from "@/library/redux/store";
+import { Page } from "@/types/Page";
 
 export type ViewLayoutProps = {
-    page: any;
+    page: Page;
 }
 
 function ViewLayout({ page }: ViewLayoutProps) {
@@ -99,7 +101,7 @@ function ViewLayout({ page }: ViewLayoutProps) {
     );
 }
 export default connect(
-    (state: any) => ({
+    (state: RootState) => ({
         page: state[PAGE_STATE],
     })
 )(ViewLayout);

@@ -68,27 +68,6 @@ function AdminNavBar({ app, session }: AdminNavBarProps) {
     return classes.join(" ");
   }
 
-  async function handleCurrencyChange(value: Record<string, unknown> | null) {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-      endpoint: UrlHelpers.urlFromArray([
-        truJobApiConfig.endpoints.user,
-       'setting',
-        "update",
-      ]),
-      method: TruJobApiMiddleware.METHOD.PATCH,
-      protectedReq: true,
-      data: {
-        currency_id: value?.value,
-      },
-    });
-    if (!response) {
-      console.error("Failed to set currency");
-      return;
-    }
-    console.log("Currency set successfully:", response);
-    TruJobApiMiddleware.getInstance().refreshSessionUser();
-  }
-
   const currency = LocaleService.getCurrency();
   console.log("Currency in AdminNavBar:", session);
   return (
@@ -179,7 +158,9 @@ function AdminNavBar({ app, session }: AdminNavBarProps) {
                           }
                           isMulti={false}
                           showLoadingSpinner={true}
-                          onChange={handleCurrencyChange}
+                          onChange={async (value) => {
+                            await LocaleService.handleCurrencyChange(value.value);
+                          }}
                           loadingMore={true}
                           loadMoreLimit={10}
                         />

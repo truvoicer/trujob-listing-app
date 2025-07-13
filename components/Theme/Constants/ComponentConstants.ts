@@ -1,0 +1,1 @@
+export const COMPONENT_USER_CURRENCY_FORM = "UserCurrencyForm";

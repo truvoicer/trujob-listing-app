@@ -1,6 +1,9 @@
 export const PAGE_STATE = "page";
 export const PAGE_LOADED = "page_loaded";
 export const PAGE_VIEW = "view";
+export const PAGE_VIEW_PAGE = "page";
+export const PAGE_VIEW_ADMIN_PAGE = "admin_page";
+export const PAGE_VIEW_ADMIN_TAB_PAGE = "admin_tab_page";
 export const PAGE_NAME = "name";
 export const PAGE_TITLE = "title";
 export const PAGE_PERMALINK = "permalink";

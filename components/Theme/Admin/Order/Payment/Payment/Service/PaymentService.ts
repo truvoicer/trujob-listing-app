@@ -6,7 +6,4 @@ export class PaymentService {
         return null;
     }
 
-    public static getInstance(): PaymentService {
-        return new PaymentService();
-    }
 }

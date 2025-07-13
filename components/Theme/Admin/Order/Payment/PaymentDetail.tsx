@@ -19,12 +19,18 @@ function PaymentDetail({
   const checkoutContext = useContext(CheckoutContext);
 
 
-  console.log("Shipping component rendered with order:", checkoutContext);
+  console.log("Shipping component rendered with order:", checkoutContext?.transaction?.payment_gateway?.name, PaymentFactory.make(
+          checkoutContext?.transaction?.payment_gateway?.name
+        ), checkoutContext, PaymentFactory.make(
+          checkoutContext?.transaction?.payment_gateway?.name
+        )?.showDetails());
   return (
     <div className="container">
       <div className="row">
       {
-        PaymentFactory.make(checkoutContext?.selectedPaymentGateway?.name)?.showDetails()
+        PaymentFactory.make(
+          checkoutContext?.transaction?.payment_gateway?.name
+        )?.showDetails()
       }
       </div>
     </div>

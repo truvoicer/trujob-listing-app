@@ -12,6 +12,7 @@ import { CheckoutContext, CheckoutContextType } from "./Checkout/context/Checkou
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
+import PaymentDetail from "./PaymentDetail";
 
 export const STEP_BASKET = "basket";
 export const STEP_SHIPPING_DETAILS = "shipping_details";
@@ -78,7 +79,7 @@ function PaymentProcess({ session }: PaymentProcess) {
           console.error("Order ID is not available in checkout context");
           return false;
         }
-        console.log("Next button clicked for payment method", checkoutContext);
+
         const response = await TruJobApiMiddleware.getInstance().resourceRequest({
           endpoint: UrlHelpers.urlFromArray([
             TruJobApiMiddleware.getConfig().endpoints.orderTransaction.replace(
@@ -98,9 +99,11 @@ function PaymentProcess({ session }: PaymentProcess) {
           console.error("Failed to proceed to payment details");
           return false;
         }
-        console.log("Payment method selected successfully", response);
+
+        checkoutContext.update({
+          transaction: response.data,
+        });
         return true;
-        // Handle next button click
       },
       onPreviousClick: (
         e: React.MouseEvent<HTMLButtonElement>,
@@ -117,7 +120,7 @@ function PaymentProcess({ session }: PaymentProcess) {
       title: "Enter Payment Details",
       description:
         "Provide the necessary payment information such as card number, expiration date, and CVV.",
-      component: undefined, // Placeholder for future component
+      component: PaymentDetail,
       buttonNext: undefined,
       buttonPrevious: { text: "Back to Payment Method" },
     },

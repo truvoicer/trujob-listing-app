@@ -54,7 +54,6 @@ function EditProductPrice({
         valid_to: data?.valid_to || '',
         valid_from_timestamp: data?.valid_from_timestamp || 0,
         valid_to_timestamp: data?.valid_to_timestamp || 0,
-        is_default: data?.is_default || false,
         is_active: data?.is_active || false,
         tax_rates: data?.tax_rates || [],
         discounts: data?.discounts || [],
@@ -83,9 +82,6 @@ function EditProductPrice({
         }
         if (values?.valid_to) {
             requestData.valid_to = values?.valid_to;
-        }
-        if (values.hasOwnProperty('is_default')) {
-            requestData.is_default = values?.is_default;
         }
         if (values.hasOwnProperty('is_active')) {
             requestData.is_active = values?.is_active;

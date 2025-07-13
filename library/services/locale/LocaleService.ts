@@ -1,4 +1,6 @@
 import { Option } from "@/components/Select/SelectDropdown";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import {
   SESSION_STATE,
   SESSION_USER,
@@ -21,10 +23,10 @@ import { Country } from "@/types/Country";
 import { Currency } from "@/types/Currency";
 import { Language } from "@/types/Language";
 
+
 export class LocaleService {
-  static getCurrency(): Currency | null {
+  static getUserCurrency(): Currency | null {
     const sessionState: SessionState = store.getState()[SESSION_STATE];
-    const siteState: SiteState = store.getState()[SITE_STATE];
     if (
       sessionState?.[SESSION_USER]?.[SESSION_USER_SETTINGS]?.[
         SESSION_USER_SETTINGS_CURRENCY
@@ -33,6 +35,14 @@ export class LocaleService {
       return sessionState[SESSION_USER][SESSION_USER_SETTINGS][
         SESSION_USER_SETTINGS_CURRENCY
       ];
+    }
+    return null;
+  }
+  static getCurrency(): Currency | null {
+    const siteState: SiteState = store.getState()[SITE_STATE];
+    const userCurrency = LocaleService.getUserCurrency();
+    if (userCurrency) {
+      return userCurrency;
     }
     if (siteState?.[SITE_SETTINGS]?.[SITE_SETTINGS_CURRENCY]) {
       return siteState[SITE_SETTINGS][SITE_SETTINGS_CURRENCY] as Currency;
@@ -108,5 +118,26 @@ export class LocaleService {
       };
     }
     return null;
+  }
+
+  static async handleCurrencyChange(currencyId: number) {
+    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+      endpoint: UrlHelpers.urlFromArray([
+        TruJobApiMiddleware.getConfig().endpoints.user,
+       'setting',
+        "update",
+      ]),
+      method: TruJobApiMiddleware.METHOD.PATCH,
+      protectedReq: true,
+      data: {
+        currency_id: currencyId,
+      },
+    });
+    if (!response) {
+      console.error("Failed to set currency");
+      return false;
+    }
+    TruJobApiMiddleware.getInstance().refreshSessionUser();
+    return true;
   }
 }

@@ -70,6 +70,7 @@ export interface DMOnRowSelectActionClick extends OnRowSelectActionClick {
 }
 
 export type DataManagerProps = {
+  children?: React.ReactNode;
   isChild?: boolean;
   id: string;
   mode?: "selector" | "edit";
@@ -193,6 +194,7 @@ function DataManager({
   deleteItemRequest,
   deleteBulkItemsRequest,
   editFormComponent,
+  children,
 }: DataManagerProps) {
   const searchParamsUse = useSearchParams();
 
@@ -1011,6 +1013,7 @@ function DataManager({
       </div>
       {modalService.render()}
       {confirmationService.render()}
+      {children}
     </DataTableContext.Provider>
   );
 }

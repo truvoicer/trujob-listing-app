@@ -2,6 +2,7 @@ import { ErrorItem } from "@/library/middleware/api/ApiMiddleware";
 import { Page } from "@/types/Page";
 
 export class PageService {
+
   private errors: ErrorItem[] = [];
 
   getErrors(): ErrorItem[] {

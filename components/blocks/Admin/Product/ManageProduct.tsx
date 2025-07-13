@@ -14,7 +14,12 @@ import Loader from "@/components/Loader";
 import { connect } from "react-redux";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { RootState } from "@/library/redux/store";
-import { Modal } from "react-bootstrap";
+import { Button, Modal } from "react-bootstrap";
+import GenerateProductSku, {
+  GenerateProductSkuFormValues,
+} from "./GenerateProductSku";
+import Form from "@/components/form/Form";
+import { FormikProps } from "formik";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
@@ -43,7 +48,9 @@ function ManageProduct({
   enableEdit = true,
 }: ManageProductProps) {
   const [showModal, setShowModal] = useState(false);
+  const [showSkuModal, setShowSkuModal] = useState(false);
   const [item, setItem] = useState<Product | null>(null);
+
   function getActionColumnBadgeDropdownItems({
     item,
     index,
@@ -62,8 +69,20 @@ function ManageProduct({
         },
       },
     };
+    const skuItem = {
+      text: "Generate SKU",
+      linkProps: {
+        href: `#`,
+        onClick: (e: any) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setItem(item);
+          setShowSkuModal(true);
+        },
+      },
+    };
     if (Array.isArray(dropdownItems)) {
-      return [...dropdownItems, checkoutItem];
+      return [...dropdownItems, checkoutItem, skuItem];
     }
     console.warn(
       "Action column badge dropdown items are not an array, returning default item"
@@ -133,20 +152,13 @@ function ManageProduct({
           { label: "Title", key: "title" },
           { label: "Permalink", key: "permalink" },
         ]}
-      />
-      <Modal fullscreen={true} show={showModal} onHide={() => setShowModal(false)}>
-        <Modal.Header closeButton>
-          <Modal.Title>Edit Product</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          {item ? (
-            <ProductTestCheckout
-              productId={item?.id}
-              modalId={TEST_TRANSACTION_MODAL_ID}
-            />
-          ) : null}
-        </Modal.Body>
-      </Modal>
+      >
+        <GenerateProductSku
+          product={item}
+          showModal={showSkuModal}
+          setShowModal={setShowSkuModal}
+        />
+      </DataManager>
     </Suspense>
   );
 }

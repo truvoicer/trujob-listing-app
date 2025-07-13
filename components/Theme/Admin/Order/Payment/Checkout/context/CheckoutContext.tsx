@@ -1,7 +1,5 @@
-import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
 import { Order, OrderSummary, UpdateOrderRequest } from "@/types/Order";
 import { PaymentGateway } from "@/types/PaymentGateway";
-import { PaymentMethod } from "@/types/PaymentMethod";
 import { Price } from "@/types/Price";
 import { ShippingMethod, ShippingRate } from "@/types/Shipping";
 import { createContext } from "react";

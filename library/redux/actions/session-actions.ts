@@ -1,10 +1,14 @@
 import store from "../store"
 import {
+    addSessionModal,
+    closeSessionModal,
+    SessionModalItem,
     SessionUserSettings,
     SessionUserState,
     setAuthenticated, setIsAuthenticating,
     setPasswordResetKey,
     setSessionError,
+    setSessionModals,
     setShowLoginModal,
     setUser, setUserId,
     setUserSettings
@@ -89,4 +93,16 @@ export function setIsAuthenticatingAction(isAuthenticating: boolean) {
 }
 export function setShowLoginModalAction(showLoginModal: boolean) {
     store.dispatch(setShowLoginModal(showLoginModal));
+}
+
+export function setSessionModalsAction(modalItems: Array<SessionModalItem>) {
+    store.dispatch(setSessionModals(modalItems))
+}
+
+export function addSessionModalAction(modalItem: SessionModalItem) {
+    store.dispatch(addSessionModal(modalItem))
+}
+
+export function closeSessionModalAction(modalId: string) {
+    store.dispatch(closeSessionModal(modalId))
 }

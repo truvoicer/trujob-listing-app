@@ -31,7 +31,6 @@ export type Price = {
     valid_to: string;
     valid_from_timestamp: number;
     valid_to_timestamp: number;
-    is_default: boolean;
     is_active: boolean;
     amount: number;
     tax_rates?: TaxRate[];
@@ -47,7 +46,6 @@ export type PriceRequest = {
     created_by_user_id?: number;
     valid_from?: string;
     valid_to?: string;
-    is_default?: boolean;
     is_active?: boolean;
     amount?: number;
     tax_rate_ids?: number[];

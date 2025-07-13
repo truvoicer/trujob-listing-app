@@ -3,7 +3,7 @@ import React, { useContext, useEffect } from 'react';
 import { BlockFactory } from "@/components/factories/block/BlockFactory";
 import BlockComponent from '../../../blocks/BlockComponent';
 import { connect } from 'react-redux';
-import { PAGE_STATE } from '@/library/redux/constants/page-constants';
+import { PAGE_STATE, PAGE_VIEW_ADMIN_PAGE, PAGE_VIEW_ADMIN_TAB_PAGE } from '@/library/redux/constants/page-constants';
 import AdminLayout from '../Layouts/AdminLayout';
 import AccessControlComponent from '@/components/AccessControl/AccessControlComponent';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -118,12 +118,12 @@ function AdminPageView({ data, page, session, settings }: AdminPageViewProps) {
                     return null;
                 }}
             >
-                {data?.view === 'admin_page' && (
+                {data?.view === PAGE_VIEW_ADMIN_PAGE && (
                     <AdminLayout>
                         {renderBlocks(blocks)}
                     </AdminLayout>
                 )}
-                {data?.view === 'admin_tab_page' && (
+                {data?.view === PAGE_VIEW_ADMIN_TAB_PAGE && (
                     <AdminLayout>
                         <TabLayout
                             config={buildTabbedBlocks(blocks)}

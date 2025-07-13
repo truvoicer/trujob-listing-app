@@ -6,24 +6,24 @@ import React, { useState, useEffect } from "react";
 export type FormProps = {
   operation: string;
   className?: string | null;
-  initialValues?: any;
-  requiredFields?: any;
-  validation?: any;
-  onSubmit: (data: any, errors: any) => void;
+  initialValues?: Record<string, unknown>;
+  requiredFields?: Record<string, unknown>;
+  validation?: Record<string, Array<ValidationRule>>;
+  onSubmit: (data: FormikValues, errors: Record<string, unknown>) => void;
   preventSubmitOnErrors?: boolean;
-  children: any;
+  children: unknown;
 };
 export type ValidationRule = {
   [key: string]: string | number | boolean | null;
   type: string;
   message: string | null;
-  value: any;
+  value: unknown;
   field: string | null;
 };
 export type FormContextType = {
-  values: any;
-  setValues: (values: any) => void;
-  setFieldValue: (key: string, value: any) => void;
+  values: unknown;
+  setValues: (values: unknown) => void;
+  setFieldValue: (key: string, value: unknown) => void;
   onChange: (
     e:
       | React.ChangeEvent<HTMLInputElement>

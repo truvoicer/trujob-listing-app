@@ -472,7 +472,14 @@ export class ApiMiddleware {
     if (!data || typeof data !== "object" || isObjectEmpty(data)) {
       throw new Error("Invalid data format for decryption");
     }
-    const responseData = data;
+
+    let responseData: Record<string, unknown> = {};
+    if (!data?.data || typeof data?.data !== "object" || isObjectEmpty(data?.data)) {
+      responseData = data as Record<string, unknown>;
+    } else {
+      responseData = data.data as Record<string, unknown>;
+    }
+
     if (!responseData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE)) {
       throw new Error("Encrypted response flag not set in data");
     }
@@ -480,6 +487,7 @@ export class ApiMiddleware {
       throw new Error("Encrypted response flag is not true");
     }
     if (!responseData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_DATA)) {
+      console.log("Response data does not contain encrypted response data, returning as is", responseData);
       throw new Error("Encrypted response data not set in data");
     }
     const payloadSecret = this.config?.request.post.encryptedPayloadSecret;
@@ -496,7 +504,7 @@ export class ApiMiddleware {
     if (encryptedData === "") {
       throw new Error("Encrypted data is empty");
     }
-    console.log("Decrypting data", { encryptedData, payloadSecret });
+    
     const decryptedData = await JWTHelpers.decodeJwt(encryptedData, payloadSecret);
     if (!decryptedData) {
       throw new Error("Decrypted data is empty");

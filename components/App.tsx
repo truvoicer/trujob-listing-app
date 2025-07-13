@@ -10,12 +10,14 @@ import { setAppModeAction } from '@/library/redux/actions/app-actions';
 import ViewLayout from './Layout/ViewLayout';
 import { isObject, isObjectEmpty } from '@/helpers/utils';
 import { usePathname } from 'next/navigation';
+import { RootState } from '@/library/redux/store';
+import { Page } from '@/types/Page';
 
 type Props = {
-    data: any;
-    settings: any;
-    site: any;
-    page: any;
+    data: Page;
+    settings: Record<string, unknown>;
+    site: Record<string, unknown>;
+    page: Page;
 }
 function App({ data, settings, site, page }: Props) {
 
@@ -37,7 +39,7 @@ function App({ data, settings, site, page }: Props) {
     }
 
     useEffect(() => {
-        let pageData = { ...data };
+        const pageData: Page = { ...data };
         setPageAction(pageData);
     }, [data]);
 
@@ -65,7 +67,7 @@ function App({ data, settings, site, page }: Props) {
 }
 
 export default connect(
-    (state: any) => ({
+    (state: RootState) => ({
         page: state[PAGE_STATE],
     })
 )(App);
