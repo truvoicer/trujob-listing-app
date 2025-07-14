@@ -184,9 +184,14 @@ function EditUserFields({ operation }: EditUserFields) {
           <div className="col-12 col-lg-6">
             <label className="title">Select Currency</label>
             <CurrencySelect
-              value={LocaleService.getValueForCurrencySelect(
+              value={
                 values?.[SESSION_USER_SETTINGS_CURRENCY]
-              )}
+                  ? {
+                      value: values[SESSION_USER_SETTINGS_CURRENCY]?.value,
+                      label: values[SESSION_USER_SETTINGS_CURRENCY]?.label,
+                    }
+                  : null
+              }
               isMulti={false}
               showLoadingSpinner={true}
               onChange={(value) => {

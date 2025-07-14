@@ -204,11 +204,11 @@ function SelectDropdown({
       }
       setSelectedOptions(newSelection);
 
-      onChange(buildOnChangeData(newSelection));
+      onChange(newSelection);
     } else {
       setSelectedOption(option);
 
-      onChange(buildOnChangeData(option));
+      onChange(option);
       setIsOpen(false);
     }
     setSearchTerm("");
@@ -273,10 +273,9 @@ function SelectDropdown({
       (opt) => opt.label.toLowerCase() === searchTerm.toLowerCase()
     ) && (
       <li className="dropdown-item text-primary" onClick={handleAddNew}>
-        Add "{searchTerm}"
+        Add &quot;{searchTerm}&quot;
       </li>
     );
-
   return (
     <div className="position-relative" style={{ width: "16rem" }}>
       <div

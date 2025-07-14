@@ -1,6 +1,7 @@
 import SelectDropdown, { Option, SelectDropdownProps } from "@/components/Select/SelectDropdown";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { LocaleService } from "@/library/services/locale/LocaleService";
 import { Currency } from "@/types/Currency";
 import React, { useEffect } from "react";
 
@@ -114,7 +115,7 @@ function CurrencySelect({
           }
           return {
             value: data.id,
-            label: `${data.name} (${data?.country?.name})`,
+            label: LocaleService.getDefaultLabelForCurrencySelect(data as Currency),
           };
         }
 

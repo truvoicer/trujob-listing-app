@@ -14,12 +14,16 @@ import Loader from "@/components/Loader";
 import { connect } from "react-redux";
 import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { RootState } from "@/library/redux/store";
-import { Button, Modal } from "react-bootstrap";
+import { Badge, Button, Modal } from "react-bootstrap";
 import GenerateProductSku, {
   GenerateProductSkuFormValues,
 } from "./GenerateProductSku";
 import Form from "@/components/form/Form";
 import { FormikProps } from "formik";
+import { DataTableColumn } from "@/components/Table/DataTable";
+import Tooltip from "@/components/Elements/Tooltip";
+import BadgeWithCount from "@/components/Elements/Badge/BadgeWithCount";
+import ProductHealthCheckDisplay from "@/components/Elements/ProductHealthCheckDisplay";
 
 export interface ManageProductProps extends DataManageComponentProps {
   data?: Array<Product>;
@@ -59,11 +63,7 @@ function ManageProduct({
   }: ActionColumnBadgeDropdownItems) {
     const checkoutItem = {
       text: "Checkout",
-      disabled: (
-        (item?.health_check?.unhealthy?.count || 0) > 0
-          ? true
-          : false
-      ),
+      disabled: (item?.health_check?.unhealthy?.count || 0) > 0 ? true : false,
       linkProps: {
         href: `#`,
         onClick: (e: any) => {
@@ -94,6 +94,13 @@ function ManageProduct({
     );
     return [checkoutItem];
   }
+  const itemd = {
+    health_check: {
+      unhealthy: {
+        count: 1,
+      },
+    },
+  };
 
   return (
     <Suspense fallback={<Loader />}>
@@ -153,7 +160,31 @@ function ManageProduct({
         enablePagination={enablePagination}
         title={"Manage Products"}
         columns={[
-          { label: "ID", key: "id" },
+          {
+            label: "Status",
+            render: (col: DataTableColumn, item: Record<string, unknown>) => {
+              const unhealthyCount = item?.health_check?.unhealthy?.count || 0;
+              const isUnhealthy = unhealthyCount > 0;
+              return (
+                <Tooltip
+                  tooltipContent={
+                    <ProductHealthCheckDisplay data={item?.health_check || {}} />
+                  }
+                >
+                  <div>
+                    <BadgeWithCount
+                      count={item?.health_check?.unhealthy?.count || null}
+                      text={`${isUnhealthy ? "Unhealthy" : "Healthy"}`}
+                      bgColor={`${isUnhealthy ? "danger-light" : "success-light"}`}
+                      textColor="#000"
+                      badgeBgColor={`${isUnhealthy ? "danger" : "success"}`}
+                      badgeTextColor="#000"
+                    />
+                  </div>
+                </Tooltip>
+              );
+            },
+          },
           { label: "Title", key: "title" },
           { label: "Permalink", key: "permalink" },
         ]}

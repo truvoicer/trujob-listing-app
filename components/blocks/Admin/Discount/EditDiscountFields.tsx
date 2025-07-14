@@ -192,8 +192,8 @@ function EditDiscountFields({ operation }: EditDiscountFields) {
               value={
                 values?.currency
                   ? {
-                      value: values?.currency?.id,
-                      label: values?.currency?.name,
+                      value: values?.currency?.value,
+                      label: values?.currency?.label,
                     }
                   : null
               }

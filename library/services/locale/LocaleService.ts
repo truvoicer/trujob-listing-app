@@ -1,6 +1,4 @@
 import { Option } from "@/components/Select/SelectDropdown";
-import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import {
   SESSION_STATE,
   SESSION_USER,
@@ -120,24 +118,14 @@ export class LocaleService {
     return null;
   }
 
-  static async handleCurrencyChange(currencyId: number) {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
-      endpoint: UrlHelpers.urlFromArray([
-        TruJobApiMiddleware.getConfig().endpoints.user,
-       'setting',
-        "update",
-      ]),
-      method: TruJobApiMiddleware.METHOD.PATCH,
-      protectedReq: true,
-      data: {
-        currency_id: currencyId,
-      },
-    });
-    if (!response) {
-      console.error("Failed to set currency");
-      return false;
+  static getDefaultLabelForCurrencySelect(
+    currency: Currency | null,
+  ): string {
+    if (currency && currency?.name && currency?.code) {
+      return `${currency.name} (${currency.code})`;
     }
-    TruJobApiMiddleware.getInstance().refreshSessionUser();
-    return true;
+    return "";
   }
+
 }
+

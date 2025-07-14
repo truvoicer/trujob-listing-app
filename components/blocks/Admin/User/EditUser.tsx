@@ -48,8 +48,16 @@ function EditUser({
         updated_at: data?.updated_at || '',
         phone: data?.phone || '',
         dob: data?.dob || '',
-        country: data?.country || null,
-        currency: data?.currency || null,
+        country: data?.country
+        ? {
+            value: data.country.id,
+            label: data.country.name,
+        } : null,
+        currency: data?.currency
+        ? {
+            value: data.currency.id,
+            label: data.currency.name,
+        } : null,
         language: data?.language || null,
         roles: data?.roles || [],
     };
@@ -72,10 +80,10 @@ function EditUser({
             requestData[SESSION_USER_PROFILE] = values?.[SESSION_USER_PROFILE_DOB];
         }
         if (values?.[SESSION_USER_SETTINGS_COUNTRY]) {
-            requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.id;
+            requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.value;
         }
         if (values?.[SESSION_USER_SETTINGS_CURRENCY]) {
-            requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.id;
+            requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.value;
         }
         if (values?.[SESSION_USER_SETTINGS_LANGUAGE]) {
             requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.id;

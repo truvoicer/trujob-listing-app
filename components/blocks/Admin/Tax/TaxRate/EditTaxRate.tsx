@@ -44,8 +44,16 @@ function EditTaxRate({
         amount_type: data?.amount_type || 'fixed',
         amount: data?.amount || null,
         rate: data?.rate || null,
-        country: data?.country || 0,
-        currency: data?.currency || 0,
+        country: data?.country
+        ? {
+            value: data.country.id,
+            label: data.country.name,
+        } : null,
+        currency: data?.currency
+        ? {
+            value: data.currency.id,
+            label: data.currency.name,
+        } : null,
         has_region: data?.has_region || false,
         region: data?.region || 0,
         is_default: data?.is_default || false,
@@ -80,11 +88,11 @@ function EditTaxRate({
         if (values?.rate !== undefined) {
             requestData.rate = values.rate;
         }
-        if (values?.country?.id) {
-            requestData.country_id = values.country.id;
+        if (values?.country?.value) {
+            requestData.country_id = values.country.value;
         }
-        if (values?.currency?.id) {
-            requestData.currency_id = values.currency.id;
+        if (values?.currency?.value) {
+            requestData.currency_id = values.currency.value;
         }
         if (values.hasOwnProperty('has_region')) {
             requestData.has_region = values.has_region;

@@ -146,6 +146,9 @@ function SessionLayout({ children, session }: SessionLayoutProps) {
                   modal?.[SESSION_MODAL_ON_CANCEL]();
                   return;
                 }
+                if (modal?.[SESSION_MODAL_PREVENT_CLOSE] === true) {
+                  return;
+                }
                 closeSessionModalAction(modal[SESSION_MODAL_ID]);
               }}
             >
@@ -164,6 +167,9 @@ function SessionLayout({ children, session }: SessionLayoutProps) {
                 }
                 if (typeof modal?.[SESSION_MODAL_ON_OK] === "function") {
                   modal?.[SESSION_MODAL_ON_OK]();
+                }
+                if (modal?.[SESSION_MODAL_PREVENT_CLOSE] === true) {
+                  return;
                 }
                 closeSessionModal(modal[SESSION_MODAL_ID]);
               }}
@@ -212,7 +218,7 @@ function SessionLayout({ children, session }: SessionLayoutProps) {
                 {...otherProps}
                 onSubmit={async (values) => {
                   if (typeof onSubmit === "function") {
-                    const result = await onSubmit(values);
+                    const result = await onSubmit(values, modal);
                     if (!result) {
                       return false;
                     }

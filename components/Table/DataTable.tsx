@@ -274,7 +274,7 @@ function DataTable({
                     </div>
                 </div>
             </div>
-            <div className="table-responsive data-table">
+            <div className="table-responsive data-table position-relative overflow-visible">
                 <table className="data-tables table w-100">
                     <thead>
                         <tr>

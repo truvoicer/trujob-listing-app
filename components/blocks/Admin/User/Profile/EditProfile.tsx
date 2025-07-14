@@ -67,10 +67,10 @@ function EditProfile({ session }: EditProfile) {
         values?.[SESSION_USER_PROFILE_PHONE];
     }
     if (values?.[SESSION_USER_SETTINGS_COUNTRY]) {
-      requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.id;
+      requestData.country_id = values?.[SESSION_USER_SETTINGS_COUNTRY]?.value;
     }
     if (values?.[SESSION_USER_SETTINGS_CURRENCY]) {
-      requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.id;
+      requestData.currency_id = values?.[SESSION_USER_SETTINGS_CURRENCY]?.value;
     }
     if (values?.[SESSION_USER_SETTINGS_LANGUAGE]) {
       requestData.language_id = values?.[SESSION_USER_SETTINGS_LANGUAGE]?.id;
@@ -92,6 +92,8 @@ function EditProfile({ session }: EditProfile) {
     TruJobApiMiddleware.getInstance().refreshSessionUser();
   }
   const user = session?.[SESSION_USER];
+  const userCountry = user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_COUNTRY];
+  const userCurrency = user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_CURRENCY];
   return (
     <div>
       <h1>Edit Profile</h1>
@@ -108,12 +110,14 @@ function EditProfile({ session }: EditProfile) {
             user?.[SESSION_USER_PROFILE]?.[SESSION_USER_PROFILE_DOB] || "",
           [SESSION_USER_PROFILE_PHONE]:
             user?.[SESSION_USER_PROFILE]?.[SESSION_USER_PROFILE_PHONE] || "",
-          [SESSION_USER_SETTINGS_COUNTRY]:
-            user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_COUNTRY] ||
-            "",
-          [SESSION_USER_SETTINGS_CURRENCY]:
-            user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_CURRENCY] ||
-            "",
+          [SESSION_USER_SETTINGS_COUNTRY]: userCountry ? {
+            value: userCountry?.id,
+            label: userCountry?.name,
+          } : null,
+          [SESSION_USER_SETTINGS_CURRENCY]: userCurrency ? {
+            value: userCurrency?.id,
+            label: userCurrency?.name,
+          } : null,
           [SESSION_USER_SETTINGS_LANGUAGE]:
             user?.[SESSION_USER_SETTINGS]?.[SESSION_USER_SETTINGS_LANGUAGE] ||
             "",
@@ -267,9 +271,14 @@ function EditProfile({ session }: EditProfile) {
                     Select Currency
                   </label>
                   <CurrencySelect
-                    value={LocaleService.getValueForCurrencySelect(
+                    value={
                       values?.[SESSION_USER_SETTINGS_CURRENCY]
-                    )}
+                        ? {
+                            value: values[SESSION_USER_SETTINGS_CURRENCY]?.value,
+                            label: values[SESSION_USER_SETTINGS_CURRENCY]?.label,
+                          }
+                        : null
+                    }
                     isMulti={false}
                     showLoadingSpinner={true}
                     onChange={(value) => {

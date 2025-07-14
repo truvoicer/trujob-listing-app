@@ -16,16 +16,18 @@ function UserCurrencyForm() {
       </p>
 
       <CurrencySelect
-        displayText={(data: Record<string, unknown>) => {
-          return `${data?.country?.name} | ${data?.code}`;
-        }}
         value={
           values?.currency
             ? {
-                value: values.currency?.id,
-                label: values.currency?.name,
+                value: values.currency?.value,
+                label: values.currency?.label,
               }
-            : userCurrency || null
+            : userCurrency
+            ? {
+                value: userCurrency?.value,
+                label: userCurrency?.label,
+              }
+            : null
         }
         isMulti={false}
         showLoadingSpinner={true}

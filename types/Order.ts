@@ -5,6 +5,8 @@ import { Price } from "./Price";
 import { User } from "./User";
 import { Discount } from "./Discount";
 import { TaxRate } from "./Tax";
+import { Country } from "./Country";
+import { Currency } from "./Currency";
 
 export type OrderStatus =
   | "pending"
@@ -18,6 +20,8 @@ export type Order = {
   id: number;
   status: "pending" | "processing" | "completed" | "cancelled";
   items: OrderItem[];
+  country: Country;
+  currency: Currency;
   total_price: number;
   total_quantity: number;
   total_tax: number;

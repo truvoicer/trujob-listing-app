@@ -16,15 +16,11 @@ import { SESSION_STATE } from "@/library/redux/constants/session-constants";
 import { SessionService } from "@/library/services/session/SessionService";
 import Branding from "./Branding/Branding";
 import CurrencySelect from "@/components/blocks/Locale/Currency/CurrencySelect";
-import { getSiteCurrencyAction, refreshSiteAction } from "@/library/redux/actions/site-actions";
 import { SiteState } from "@/library/redux/reducers/site-reducer";
 import { SessionState } from "@/library/redux/reducers/session-reducer";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { UrlHelpers } from "@/helpers/UrlHelpers";
-import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { LocaleService } from "@/library/services/locale/LocaleService";
-import { refreshSessionUserAction } from "@/library/redux/actions/session-actions";
 import { RootState } from "@/library/redux/store";
+import { UserService } from "@/library/services/user/UserService";
 
 export type AdminNavBarProps = {
   app: SiteState;
@@ -145,9 +141,6 @@ function AdminNavBar({ app, session }: AdminNavBarProps) {
                     <ul className="navbar-nav ml-auto navbar-list align-items-center">
                       <li className="nav-item nav-icon dropdown ml-3">
                         <CurrencySelect
-                          displayText={(data: Record<string, unknown>) => {
-                            return `${data?.country?.name} | ${data?.code}`;
-                          }}
                           value={
                             currency
                               ? {
@@ -159,7 +152,9 @@ function AdminNavBar({ app, session }: AdminNavBarProps) {
                           isMulti={false}
                           showLoadingSpinner={true}
                           onChange={async (value) => {
-                            await LocaleService.handleCurrencyChange(value.value);
+                            await UserService.updateUserSettings({
+                              currency_id: value.value,
+                            });
                           }}
                           loadingMore={true}
                           loadMoreLimit={10}

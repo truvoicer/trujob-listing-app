@@ -39,11 +39,11 @@ function ManageSiteSettings({ settings, site }: ManageSiteSettingsProps) {
     let requestData = { ...values };
 
     if (values?.country) {
-      requestData.country_id = values?.country?.id;
+      requestData.country_id = values?.country?.value;
       delete requestData.country;
     }
     if (values?.currency) {
-      requestData.currency_id = values?.currency?.id;
+      requestData.currency_id = values?.currency?.value;
       delete requestData.currency;
     }
 
@@ -98,8 +98,18 @@ function ManageSiteSettings({ settings, site }: ManageSiteSettingsProps) {
               <Form
                 operation="edit"
                 initialValues={{
-                  country: site?.settings?.country,
-                  currency: site?.settings?.currency,
+                  country: site?.settings?.country
+                    ? {
+                        value: site?.settings?.country?.id,
+                        label: site?.settings?.country?.name,
+                    }
+                    : null,
+                  currency: site?.settings?.currency
+                    ? {
+                        value: site?.settings?.currency?.id,
+                        label: site?.settings?.currency?.name,
+                    }
+                    : null,
                   timezone: site?.settings?.timezone || "",
                   frontend_url: site?.settings?.frontend_url || "",
                 }}
@@ -148,8 +158,8 @@ function ManageSiteSettings({ settings, site }: ManageSiteSettingsProps) {
                           value={
                             values?.currency
                               ? {
-                                  value: values?.currency?.id,
-                                  label: values?.currency?.name,
+                                  value: values?.currency?.value,
+                                  label: values?.currency?.label,
                                 }
                               : null
                           }

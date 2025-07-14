@@ -46,6 +46,20 @@ export interface Product extends ProductDimension, ProductWeight {
     updated_at: string;
 }
 
+export type ProductHealthCheckItem = {
+    is_healthy: boolean;
+    message: string;
+}
+export type ProductHealthCheck = {
+    unhealthy: {
+        count: number;
+        items: Array<ProductHealthCheckItem>;
+    };
+    healthy: {
+        count: number;
+        items: Array<ProductHealthCheckItem>;
+    };
+};
 export interface ProductRequest extends ProductDimension, ProductWeight {
     name?: string;
     title?: string;

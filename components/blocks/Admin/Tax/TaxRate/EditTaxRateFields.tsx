@@ -85,8 +85,8 @@ function EditTaxRateFields({
                         <CurrencySelect
                             value={values?.currency ?
                                 {
-                                    value: values?.currency?.id,
-                                    label: values?.currency?.name,
+                                    value: values?.currency?.value,
+                                    label: values?.currency?.label,
                                 } : null}
                             isMulti={false}
                             showLoadingSpinner={true}

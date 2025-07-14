@@ -46,7 +46,11 @@ function EditDiscount({
         amount_type: data?.amount_type || '',
         amount: data?.amount || 0,
         rate: data?.rate || 0,
-        currency: data?.currency || '',
+        currency: data?.currency
+        ? {
+            value: data.currency.id,
+            label: data.currency.name,
+        } : null,
         starts_at: data?.starts_at || '',
         ends_at: data?.ends_at || '',
         is_active: data?.is_active || false,
@@ -106,8 +110,8 @@ function EditDiscount({
         if (values?.rate) {
             requestData.rate = values?.rate || 0;
         }
-        if (values?.currency?.id) {
-            requestData.currency_id = values?.currency.id;
+        if (values?.currency?.value) {
+            requestData.currency_id = values?.currency.value;
         }
         if (values?.starts_at) {
             requestData.starts_at = values?.starts_at || '';

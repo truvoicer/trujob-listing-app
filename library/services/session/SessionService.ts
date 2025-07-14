@@ -1,4 +1,4 @@
-import { COMPONENT_USER_CURRENCY_FORM } from "@/components/Theme/Constants/ComponentConstants";
+import { COMPONENT_USER_CURRENCY_FORM, COMPONENT_USER_LOCALE_FORM } from "@/components/Theme/Constants/ComponentConstants";
 import { findInObject, isSet } from "@/helpers/utils";
 import {
   addSessionModalAction,
@@ -38,9 +38,21 @@ export class SessionService {
 
   static REQUIRED_FIELDS = [
     {
-      field: "settings.country", 
+      field: ["settings.currency", "settings.country"],
       onFail: () => {
-        console.error("Missing required field: settings.country");
+        console.error("Missing required field: settings.currency");
+        addSessionModalAction({
+          [SESSION_MODAL_ID]: "user-currency",
+          [SESSION_MODAL_TITLE]: "Currency & Country Required",
+          [SESSION_MODAL_COMPONENT]: COMPONENT_USER_LOCALE_FORM,
+          [SESSION_MODAL_SHOW_CLOSE_BUTTON]: false,
+          [SESSION_MODAL_SHOW_FOOTER]: true,
+          [SESSION_MODAL_PREVENT_CLOSE]: true,
+          [SESSION_MODAL_SHOW]: true,
+          // [SESSION_MODAL_ON_OK]: () => {
+          //   closeSessionModalAction("user-locale");
+          // },
+        });
       },
     },
     {
@@ -55,10 +67,27 @@ export class SessionService {
           [SESSION_MODAL_SHOW_FOOTER]: true,
           [SESSION_MODAL_PREVENT_CLOSE]: true,
           [SESSION_MODAL_SHOW]: true,
-          [SESSION_MODAL_ON_OK]: () => {
-            console.log("User currency modal OK clicked");
-            closeSessionModalAction("user-currency");
-          }
+          // [SESSION_MODAL_ON_OK]: () => {
+          //   closeSessionModalAction("user-currency");
+          // },
+        });
+      },
+    },
+    {
+      field: "settings.country",
+      onFail: () => {
+        console.error("Missing required field: settings.country");
+        addSessionModalAction({
+          [SESSION_MODAL_ID]: "user-currency",
+          [SESSION_MODAL_TITLE]: "Currency Required",
+          [SESSION_MODAL_COMPONENT]: COMPONENT_USER_CURRENCY_FORM,
+          [SESSION_MODAL_SHOW_CLOSE_BUTTON]: false,
+          [SESSION_MODAL_SHOW_FOOTER]: true,
+          [SESSION_MODAL_PREVENT_CLOSE]: true,
+          [SESSION_MODAL_SHOW]: true,
+          // [SESSION_MODAL_ON_OK]: () => {
+          //   closeSessionModalAction("user-currency");
+          // },
         });
       },
     },
@@ -71,15 +100,26 @@ export class SessionService {
   ];
 
   static validateUser(data: User): boolean {
-
     if (!data) {
       console.error("User data is not available or empty.");
       return false;
     }
     for (const field of SessionService.REQUIRED_FIELDS) {
-      const findField = findInObject(field.field, data);
-      if (!findField || findField === "") {
-        field.onFail();
+      if (Array.isArray(field.field)) {
+        const findField = field.field
+          .map((f) => findInObject(f, data))
+          .find((f) => f !== undefined && f !== null);
+
+        if (!findField || findField === "") {
+          field.onFail();
+          return false;
+        }
+      } else if (typeof field.field === "string") {
+        const findField = findInObject(field.field, data);
+        if (!findField || findField === "") {
+          field.onFail();
+        }
+        return false;
       }
     }
     return true;
