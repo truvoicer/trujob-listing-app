@@ -36,6 +36,21 @@ export class LocaleService {
     }
     return null;
   }
+  static getUserCountry(): Country | null {
+   
+    const sessionState: SessionState = store.getState()[SESSION_STATE];
+    if (
+      sessionState?.[SESSION_USER]?.[SESSION_USER_SETTINGS]?.[
+        SESSION_USER_SETTINGS_COUNTRY
+      ]
+    ) {
+      return sessionState[SESSION_USER][SESSION_USER_SETTINGS][
+        SESSION_USER_SETTINGS_COUNTRY
+      ];
+    }
+    return null;
+    
+  }
   static getCurrency(): Currency | null {
     const siteState: SiteState = store.getState()[SITE_STATE];
     const userCurrency = LocaleService.getUserCurrency();

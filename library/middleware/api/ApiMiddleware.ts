@@ -541,7 +541,8 @@ export class ApiMiddleware {
     if (!decryptedData.hasOwnProperty(ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_PAYLOAD)) {
       throw new Error("Decrypted data does not contain payload");
     }
-    return { data: decryptedData[ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_PAYLOAD] };
+
+    return decryptedData[ApiMiddleware.ENCRYPTED.RESPONSE.ENCRYPTED_RESPONSE_PAYLOAD];
   }
 
   getErrors() {

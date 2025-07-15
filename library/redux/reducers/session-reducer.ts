@@ -44,7 +44,7 @@ import { Country } from "@/types/Country";
 import { Language } from "@/types/Language";
 import { Address } from "@/components/blocks/Admin/User/Address/ManageAddress";
 
-export type SessionModalComponents = "UserCurrencyForm" | "UserLocaleForm";
+export type SessionModalComponents = "UserCurrencyForm" | "UserLocaleForm" | "UserCountryForm";
 export type SessionModalItem = {
   [SESSION_MODAL_ID]: string;
   [SESSION_MODAL_TITLE]?: string;

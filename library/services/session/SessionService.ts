@@ -1,4 +1,8 @@
-import { COMPONENT_USER_CURRENCY_FORM, COMPONENT_USER_LOCALE_FORM } from "@/components/Theme/Constants/ComponentConstants";
+import {
+  COMPONENT_USER_COUNTRY_FORM,
+  COMPONENT_USER_CURRENCY_FORM,
+  COMPONENT_USER_LOCALE_FORM,
+} from "@/components/Theme/Constants/ComponentConstants";
 import { findInObject, isSet } from "@/helpers/utils";
 import {
   addSessionModalAction,
@@ -78,9 +82,9 @@ export class SessionService {
       onFail: () => {
         console.error("Missing required field: settings.country");
         addSessionModalAction({
-          [SESSION_MODAL_ID]: "user-currency",
-          [SESSION_MODAL_TITLE]: "Currency Required",
-          [SESSION_MODAL_COMPONENT]: COMPONENT_USER_CURRENCY_FORM,
+          [SESSION_MODAL_ID]: "user-country",
+          [SESSION_MODAL_TITLE]: "Country Required",
+          [SESSION_MODAL_COMPONENT]: COMPONENT_USER_COUNTRY_FORM,
           [SESSION_MODAL_SHOW_CLOSE_BUTTON]: false,
           [SESSION_MODAL_SHOW_FOOTER]: true,
           [SESSION_MODAL_PREVENT_CLOSE]: true,
@@ -111,15 +115,17 @@ export class SessionService {
           .find((f) => f !== undefined && f !== null);
 
         if (!findField || findField === "") {
+          console.error(`Missing required field: ${field.field.join(", ")}`);
           field.onFail();
           return false;
         }
       } else if (typeof field.field === "string") {
         const findField = findInObject(field.field, data);
         if (!findField || findField === "") {
+          console.error(`Missing required field: ${field.field}`);
           field.onFail();
+          return false;
         }
-        return false;
       }
     }
     return true;
