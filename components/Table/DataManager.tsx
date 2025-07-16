@@ -56,6 +56,10 @@ export type DataManageComponentProps = {
   rowSelection?: boolean;
   multiRowSelection?: boolean;
   data?: Array<unknown>;
+  isCheckedHandler?: (
+    item: Record<string, unknown>,
+    values: Array<Record<string, unknown>>
+  ) => boolean | Promise<boolean>;
   onRowSelect?: (
     item: DataTableItem,
     index: number,
@@ -77,6 +81,10 @@ export type DataManagerProps = {
   operation?: "edit" | "update" | "add" | "create";
   values?: Array<unknown>;
   data?: Array<unknown>;
+  isCheckedHandler?: (
+    item: Record<string, unknown>,
+    values: Array<Record<string, unknown>>
+  ) => boolean | Promise<boolean>;
   onChange: (tableData: Array<unknown>) => void;
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
@@ -179,6 +187,7 @@ function DataManager({
   operation,
   mode = "selector",
   values = [],
+  isCheckedHandler,
   data,
   rowSelection = false,
   onChange,
@@ -255,7 +264,10 @@ function DataManager({
   ): boolean {
     let checked: boolean = false;
     if (Array.isArray(values)) {
-      checked = values.some((value: Record<string, unknown>) => {
+      checked = values.some(async (value: Record<string, unknown>, index: number) => {
+        if (typeof isCheckedHandler === "function") {
+          return await isCheckedHandler(item, values);
+        }
         if (typeof value === "object") {
           return value?.id === item?.id;
         }
@@ -288,12 +300,10 @@ function DataManager({
       const response = await request({
         searchParams,
       });
-
+      
       if (
         typeof response === "object" &&
-        response?.data &&
-        response?.links &&
-        response?.meta
+        response?.data
       ) {
         const data = response?.data || [];
         setDataTableContextState((prevState) => {
@@ -302,8 +312,8 @@ function DataManager({
             data,
             (values as Array<Record<string, unknown>>) || []
           );
-          newState.links = response.links;
-          newState.meta = response.meta;
+          newState.links = response?.links || [];
+          newState.meta = response?.meta || {};
           newState.requestStatus = "idle";
           return newState;
         });
@@ -442,7 +452,6 @@ function DataManager({
   ) {
     const editFormComponentData = getFormComponentData();
     if (!editFormComponentData?.component) {
-      console.warn("editFormComponent is required");
       return null;
     }
 
@@ -463,7 +472,6 @@ function DataManager({
                 title: "Edit Shipping method",
                 component: (
                   <EditForm
-                    shippingMethodId={item?.id}
                     dataTable={dataTableContextState}
                     data={item}
                     operation={"edit"}
@@ -547,7 +555,6 @@ function DataManager({
   ) {
     const editFormComponentData = getFormComponentData();
     if (!editFormComponentData?.component) {
-      console.warn("editFormComponent is required");
       return null;
     }
 
@@ -948,6 +955,7 @@ function DataManager({
       requestStatus: "idle",
     });
   }, [data]);
+
   return (
     <DataTableContext.Provider value={dataTableContextState}>
       <div className="row">

@@ -5,15 +5,21 @@ import { clone } from "underscore";
 export type StepperComponentProps = {
   showNext: () => void;
   showPrevious: () => void;
+  goToNext?: () => void;
+  goToPrevious?: () => void;
 };
 export type StepperButton = {
   text: string;
+};
+export type StepperItemComponent = {
+  node: React.ReactNode | React.ComponentType<any> | null;
+  props?: Record<string, unknown>;
 };
 export type StepperItem = {
   id: string;
   title: string;
   description: string;
-  component?: React.ComponentType<any> | null;
+  component?: StepperItemComponent;
   buttonNext: StepperButton;
   buttonPrevious?: StepperButton;
   showNextButton?: boolean;
@@ -34,10 +40,34 @@ export type Stepper = {
   functionProps?: Record<string, unknown>;
 };
 
-function Stepper({ steps = [], currentStep, onStepChange, functionProps = {} }: Stepper) {
+function Stepper({
+  steps = [],
+  currentStep,
+  onStepChange,
+  functionProps = {},
+}: Stepper) {
   const [stepsState, setStepsState] = useState<Array<StepperItem>>(
     buildSteps(steps)
   );
+
+  function goToNextStep(): void {
+    console.log("Going to next step");
+    const stepIndex = stepsState.findIndex((s) => s.id === currentStep);
+    if (stepIndex !== -1 && stepIndex < stepsState.length - 1) {
+      if (typeof onStepChange === "function") {
+        onStepChange(stepsState[stepIndex + 1]);
+      }
+    }
+  }
+  function goToPreviousStep(): void {
+    console.log("Going to previous step");
+    const stepIndex = stepsState.findIndex((s) => s.id === currentStep);
+    if (stepIndex !== -1 && stepIndex > 0) {
+      if (typeof onStepChange === "function") {
+        onStepChange(stepsState[stepIndex - 1]);
+      }
+    }
+  }
 
   function showNextButton(): void {
     setStepsState((prevSteps) => {
@@ -66,14 +96,21 @@ function Stepper({ steps = [], currentStep, onStepChange, functionProps = {} }: 
     });
   }
 
-  function renderStepComponent(step: StepperItem): React.ReactNode | null {
-    if (!step) return null;
-    if (!step?.component) return null;
-    const StepComponent = step.component;
+  function renderStepComponent(item: StepperItem) {
+    if (!item?.component?.node) {
+      console.error("Stepper component node is missing", item);
+      return null;
+    }
+
+    const NodeComponent = item.component.node;
+    const nodeProps = item?.component?.props || {};
     return (
-      <StepComponent
+      <NodeComponent
         showNext={showNextButton}
         showPrevious={showPreviousButton}
+        goToNext={goToNextStep}
+        goToPrevious={goToPreviousStep}
+        {...nodeProps}
       />
     );
   }

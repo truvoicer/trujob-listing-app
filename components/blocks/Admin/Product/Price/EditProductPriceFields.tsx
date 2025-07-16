@@ -319,7 +319,7 @@ function EditProductPriceFields({
     }
 
     const countrySelectValue = getCountrySelectValue();
-    console.log('EditProductPriceFields', countrySelectValue, values);
+    // console.log('EditProductPriceFields', countrySelectValue, values);
 
     return (
 
@@ -412,11 +412,9 @@ function EditProductPriceFields({
                                         : ''
                                 }
                                 onChange={(value) => {
-                                    console.log('valid_from', value);
                                     setFieldValue("valid_from", value);
                                 }}
                                 onSelect={(value => {
-                                    console.log('valid_from', value);
                                     setFieldValue("valid_from", value);
                                 })}
                             />
@@ -432,11 +430,9 @@ function EditProductPriceFields({
                                         : ''
                                 }
                                 onChange={(value) => {
-                                    console.log('valid_to', value);
                                     setFieldValue("valid_to", value);
                                 }}
                                 onSelect={(value => {
-                                    console.log('valid_to', value);
                                     setFieldValue("valid_to", value);
                                 })}
                             />

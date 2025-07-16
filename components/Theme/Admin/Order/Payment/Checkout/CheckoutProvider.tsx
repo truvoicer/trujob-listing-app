@@ -1,4 +1,4 @@
-import { Ref, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   CheckoutContext,
   CheckoutContextType,
@@ -10,9 +10,7 @@ import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddlewar
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { AppNotificationContext } from "@/contexts/AppNotificationContext";
-import { Order, UpdateOrderRequest } from "@/types/Order";
-import { PaymentGateway } from "@/types/PaymentGateway";
-import { Price } from "@/types/Price";
+import { UpdateOrderRequest } from "@/types/Order";
 
 
 export type CheckoutProviderProps = {
@@ -37,13 +35,13 @@ function CheckoutProvider({
   });
 
   const notificationContext = useContext(AppNotificationContext);
+  const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
   async function handleFetchOrder() {
     if (!orderId) {
-      console.error("Order ID is not provided");
       return;
     }
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
         orderId,
@@ -60,7 +58,7 @@ function CheckoutProvider({
   }
 
   async function handleFetchAvailablePaymentGateways() {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.sitePaymentGateway,
         'available',
@@ -79,19 +77,6 @@ function CheckoutProvider({
     });
   }
   async function fetchTransaction() {}
-  async function handleFetchPrice() {
-    if (typeof fetchPrice !== "function") {
-      console.error("fetchPrice is not a function");
-      return;
-    }
-    const response = await fetchPrice();
-    if (!response) {
-      return false;
-    }
-    updateCheckoutData({
-      price: response,
-    });
-  }
 
   async function handleFetchAvailableShippingMethods(orderId?: number) {
     let endpoint: string;
@@ -110,7 +95,7 @@ function CheckoutProvider({
         ),
       ]);
     }
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint,
       method: TruJobApiMiddleware.METHOD.GET,
       protectedReq: true,
@@ -130,7 +115,7 @@ function CheckoutProvider({
     orderId: number,
     shippingMethodId: number
   ) {
-    return await TruJobApiMiddleware.getInstance().resourceRequest({
+    return await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderShippingMethod.replace(
           ":orderId",
@@ -194,7 +179,7 @@ function CheckoutProvider({
   }
 
   async function handleFetchOrderSummary(orderId?: number) {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderSummary.replace(
           ":orderId",
@@ -229,9 +214,6 @@ function CheckoutProvider({
       case "availablePaymentGateways":
         await handleFetchAvailablePaymentGateways();
         break;
-      case "price":
-        await handleFetchPrice();
-        break;
       case "availableShippingMethods":
         await handleFetchAvailableShippingMethods(orderId);
         break;
@@ -250,7 +232,7 @@ function CheckoutProvider({
     orderId?: number,
     data: Record<string, unknown>,
   ) {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
@@ -268,8 +250,8 @@ function CheckoutProvider({
     }
     refreshEntity(orderId, "order");
   }
-  function removeOrderItem(orderId?: number, id: number) {
-    const response = TruJobApiMiddleware.getInstance().resourceRequest({
+  async function removeOrderItem(orderId?: number, id: number) {
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
@@ -289,12 +271,12 @@ function CheckoutProvider({
     }
     refreshEntity(orderId, "order");
   }
-  function updateOrderItem(
+  async function updateOrderItem(
     orderId?: number,
     id: number,
     data: Record<string, unknown>,
   ) {
-    const response = TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.orderItem.replace(
           ":orderId",
@@ -313,13 +295,15 @@ function CheckoutProvider({
       );
       return;
     }
+
+    // Optionally, refresh the order to
     refreshEntity(orderId, "order");
   }
   async function updateOrder(
     orderId: number,
     data: UpdateOrderRequest,
   ) {
-    const response = await TruJobApiMiddleware.getInstance().resourceRequest({
+    const response = await truJobApiMiddleware.resourceRequest({
       endpoint: UrlHelpers.urlFromArray([
         truJobApiConfig.endpoints.order,
         orderId,

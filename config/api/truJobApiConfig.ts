@@ -43,6 +43,7 @@ const config: ApiMiddlewareConfig = {
     shippingRestriction: "/shipping/method/:shippingMethodId/restriction",
     shippingRate: "/shipping/rate",
     shippingMethodRate: "/shipping/method/:shippingMethodId/rate",
+    productPriceType: "/product/:productId/price-type",
     productFollow: "/product/:productId/follow",
     productFeature: "/product/:productId/feature",
     productReview: "/product/:productId/review",

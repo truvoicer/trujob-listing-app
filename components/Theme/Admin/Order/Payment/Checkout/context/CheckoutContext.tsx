@@ -1,17 +1,17 @@
 import { Order, OrderSummary, UpdateOrderRequest } from "@/types/Order";
 import { PaymentGateway } from "@/types/PaymentGateway";
-import { Price } from "@/types/Price";
+import { PriceType } from "@/types/Price";
 import { ShippingMethod, ShippingRate } from "@/types/Shipping";
 import { createContext } from "react";
 
-export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'price' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary' | 'selectedShippingMethod';
+export type RefreshEntities = 'order' | 'transaction' | 'paymentMethod' | 'priceType' | 'availableShippingMethods' | 'availablePaymentGateways' | 'orderSummary' | 'selectedShippingMethod';
 
 export type CheckoutContextType = {
     [key: string]: unknown | PaymentGateway | null;
     currentStep: string | null;
     order: Order | null;
     orderSummary: OrderSummary | null; 
-    price: Price | null;
+    priceType: PriceType | null;
     transaction: Record<string, unknown> | null;
     availablePaymentGateways: PaymentGateway[] | null;
     selectedPaymentGateway: PaymentGateway | null;
@@ -30,7 +30,7 @@ export interface UpdateCheckoutContext {
     currentStep?: string | null;
     order?: Order | null;
     orderSummary?: OrderSummary | null; 
-    price?: Price | null;
+    priceType?: PriceType | null;
     transaction?: Record<string, unknown> | null;
     availablePaymentGateways?: PaymentGateway[] | null;
     selectedPaymentGateway?: PaymentGateway | null;
@@ -42,7 +42,7 @@ export const checkoutData = {
     currentStep: null,
     order: null,
     orderSummary: null,
-    price: null,
+    priceType: null,
     transaction: null,
     availablePaymentGateways: null,
     selectedPaymentGateway: null,

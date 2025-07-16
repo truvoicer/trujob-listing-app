@@ -4,8 +4,6 @@ import ManageAddress, {
   AddressItem,
 } from "../../../../../blocks/Admin/User/Address/ManageAddress";
 import React, { useContext, useEffect } from "react";
-import { LocaleHelpers } from "@/helpers/LocaleHelpers";
-import { MANAGE_ADDRESS_MODAL_ID } from "../Checkout/Checkout";
 import { FormikProps, FormikValues } from "formik";
 import { connect } from "react-redux";
 import { RootState } from "@/library/redux/store";
@@ -16,6 +14,7 @@ import {
 import { AppModalContext } from "@/contexts/AppModalContext";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
 import { Order } from "@/types/Order";
+import { MANAGE_ADDRESS_MODAL_ID } from "../Basket/Basket";
 
 export type ShippingProps = {
   session: SessionState;

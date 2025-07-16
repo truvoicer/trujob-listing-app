@@ -1,6 +1,5 @@
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { Suspense } from "react";
-import EditPriceType from "./EditPriceType";
 import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import DataManager, {
@@ -18,12 +17,22 @@ export const MANAGE_PRICE_TYPE_ID = "manage-price-type-modal";
 export interface ManagePriceTypeProps extends DataManageComponentProps {
   data?: Array<PriceType>;
   values?: Array<PriceType>;
+  fetchItemsRequest?: ({
+    post,
+    query,
+  }: {
+    post: Record<string, unknown>;
+    query: Record<string, unknown>;
+  }) => Promise<{
+    data: Array<Record<string, unknown>>;
+    links: Array<Record<string, unknown>>;
+    meta: Record<string, unknown>;
+  }>;
 }
 
 function ManagePriceType({
   columnHandler,
   isChild = false,
-  
   values,
   mode = "selector",
   data,
@@ -34,41 +43,40 @@ function ManagePriceType({
   paginationMode = "router",
   enablePagination = true,
   enableEdit = true,
+  fetchItemsRequest,
 }: ManagePriceTypeProps) {
-
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
-        columnHandler={columnHandler}        
+        columnHandler={columnHandler}
         isChild={isChild}
-        deleteBulkItemsRequest={async ({ ids }: { ids: any }) => {
-          return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: `${truJobApiConfig.endpoints.priceType}/bulk/destroy`,
-            method: ApiMiddleware.METHOD.DELETE,
-            protectedReq: true,
-            data: {
-              ids: ids,
-            },
-          });
-        }}
-        deleteItemRequest={async ({ item }: { item: any }) => {
-          return await TruJobApiMiddleware.getInstance().resourceRequest({
-            endpoint: UrlHelpers.urlFromArray([
-              truJobApiConfig.endpoints.priceType,
-              item.id,
-              "destroy",
-            ]),
-            method: ApiMiddleware.METHOD.DELETE,
-            protectedReq: true,
-          });
+        isCheckedHandler={async (
+          item: Record<string, unknown>,
+          values: Array<Record<string, unknown>>
+        ) => {
+          let checked: boolean = false;
+          if (Array.isArray(values)) {
+            checked = values.some(
+              async (value: Record<string, unknown>) => {
+                if (typeof value === "object") {
+                  return value?.name === item?.name;
+                }
+                return value === item.name;
+              }
+            );
+          }
+          return checked;
         }}
         fetchItemsRequest={async ({
           post,
           query,
         }: {
-          post?: Record<string, any>;
-          query?: Record<string, any>;
+          post?: Record<string, unknown>;
+          query?: Record<string, unknown>;
         }) => {
+          if (typeof fetchItemsRequest === "function") {
+            return await fetchItemsRequest({ post, query });
+          }
           return await TruJobApiMiddleware.getInstance().resourceRequest({
             endpoint: UrlHelpers.urlFromArray([
               truJobApiConfig.endpoints.priceType,
@@ -82,7 +90,6 @@ function ManagePriceType({
         mode={mode}
         operation={operation}
         id={MANAGE_PRICE_TYPE_ID}
-        editFormComponent={EditPriceType}
         values={values}
         data={data}
         rowSelection={rowSelection}
@@ -93,7 +100,6 @@ function ManagePriceType({
         enablePagination={enablePagination}
         title={"Manage price types"}
         columns={[
-          { label: "ID", key: "id" },
           { label: "Label", key: "label" },
           { label: "Name", key: "name" },
         ]}

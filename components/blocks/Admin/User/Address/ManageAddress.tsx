@@ -29,6 +29,7 @@ export const ADDRESS_DELETE_SUCCESS_NOTIFICATION_ID =
 export const CREATE_ADDRESS_MODAL_ID = "create-address-modal";
 export const UPDATE_ADDRESS_MODAL_ID = "update-address-modal";
 export const DELETE_ADDRESS_MODAL_ID = "delete-address-modal";
+export const MANAGE_ADDRESS_MODAL_ID = "manage-address-modal";
 
 export type AddressItem = {
   address: Address;

@@ -4,21 +4,8 @@ import { TaxRate } from "./Tax";
 import { User } from "./User";
 
 export type PriceType = {
-    id: number;
     name: string;
     label: string;
-    created_at: string;
-    updated_at: string;
-}
-
-export type CreatePriceType = {
-    name: string;
-    label: string;
-}
-export type UpdatePriceType = {
-    id: number;
-    name?: string;
-    label?: string;
 }
 
 export type Price = {
