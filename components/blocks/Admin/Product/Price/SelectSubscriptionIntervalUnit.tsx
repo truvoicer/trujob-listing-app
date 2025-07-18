@@ -3,7 +3,6 @@ import truJobApiConfig from "@/config/api/truJobApiConfig";
 import { ApiMiddleware } from "@/library/middleware/api/ApiMiddleware";
 import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { SubscriptionIntervalUnit } from "@/types/Subscription";
-import { FormikValues, useFormikContext } from "formik";
 import { useEffect, useState } from "react";
 
 export type SelectSubscriptionIntervalUnitProps = {
@@ -47,7 +46,7 @@ function SelectSubscriptionIntervalUnit({
         }
     }, [value, subscriptionIntervalUnits]);
     useEffect(() => {
-        if (typeof onChange === 'function') {
+        if (typeof onChange === 'function' && selectedSubscriptionIntervalUnit) {
             onChange(selectedSubscriptionIntervalUnit);
         }
     }, [selectedSubscriptionIntervalUnit]);

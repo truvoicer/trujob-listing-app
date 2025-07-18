@@ -76,6 +76,7 @@ const config: ApiMiddlewareConfig = {
     subscription: {
       tenureType: "/subscription/tenure-type",
       intervalUnit: "/subscription/interval-unit",
+      setupFeeFailureAction: "/subscription/setup-fee-failure-action",
     },
     session: {
       user: {

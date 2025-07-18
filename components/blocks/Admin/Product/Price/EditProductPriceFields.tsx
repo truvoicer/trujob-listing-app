@@ -33,6 +33,10 @@ import { findInObject, replaceInObject } from "@/helpers/utils";
 import SelectSubscriptionIntervalUnit from "./SelectSubscriptionIntervalUnit";
 import SelectSubscriptionTenureType from "./SelectSubscriptionTenureType";
 import { LocaleService } from "@/library/services/locale/LocaleService";
+import SelectSubscriptionSetupFeeFailureAction from "./SelectSubscriptionSetupFeeFailureAction";
+import TextInput from "@/components/Elements/TextInput";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 export type EditProductPriceFields = {
   operation: "edit" | "update" | "add" | "create";
@@ -336,14 +340,14 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
       return;
     }
     if (key.includes(".")) {
-        const currentItem = items[index];
-        const replace  = replaceInObject(currentItem, key, value);
-        if (!replace) {
-          console.warn("Failed to replace value in item", currentItem);
-          return;
-        }
-        items[index] = replace;
-        setFieldValue("items", items);
+      const currentItem = items[index];
+      const replace = replaceInObject(currentItem, key, value);
+      if (!replace) {
+        console.warn("Failed to replace value in item", currentItem);
+        return;
+      }
+      items[index] = replace;
+      setFieldValue("items", items);
       return;
     }
     items[index] = {
@@ -373,14 +377,14 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
   }
   const countrySelectValue = getCountrySelectValue();
   const defaultCurrency = LocaleService.getCurrency();
-
+  console.log("Values", values);
   return (
     <div className="row justify-content-center align-items-center">
       <div className="col-md-12 col-sm-12 col-12 align-self-center">
         <div className="row">
-            <div className="col-12">
-              <h2 className="h5 mt-5">Price Details</h2>
-            </div>
+          <div className="col-12">
+            <h2 className="h5 mt-5">Price Details</h2>
+          </div>
           <div className="col-12 col-md-6 mt-3">
             <div className="floating-input">
               <SelectedDisplay
@@ -505,9 +509,7 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
                 <CurrencyPriceInput
                   amountValue={values?.amount || ""}
                   currencyValue={
-                    values?.currency
-                      ? values?.currency
-                      : defaultCurrency
+                    values?.currency ? values?.currency : defaultCurrency
                   }
                   onAmountChange={(value) => {
                     setFieldValue("amount", value);
@@ -551,8 +553,8 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
                 </label>
                 <input
                   type="text"
-                    id="label"
-                    name="label"
+                  id="label"
+                  name="label"
                   className="form-control"
                   value={values?.label || ""}
                   onChange={handleChange}
@@ -575,21 +577,59 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
               </div>
             </div>
             <div className="col-12 col-md-6 mt-3">
-              <div className="floating-input">
-                <label className="fw-bold" htmlFor="setup_fee">
-                  Setup Fee
-                </label>
-                <CurrencyPriceInput
-                  amountValue={values?.setup_fee?.value || ""}
-                  currencyValue={values?.currency || defaultCurrency}
-                  onAmountChange={(value) => {
-                    setFieldValue("setup_fee.value", value);
-                  }}
-                  onCurrencyChange={(value) => {
-                    setFieldValue("setup_fee.currency", value);
-                  }}
-                />
+              <Checkbox
+                name={"has_setup_fee"}
+                placeholder="Has Setup Fee?"
+                label="Has Setup Fee?"
+                onChange={handleChange}
+                value={values?.has_setup_fee || false}
+              />
+            </div>
+            {values?.has_setup_fee && (
+              <div className="col-12 col-md-6 mt-3">
+                <div className="floating-input">
+                  <label className="fw-bold" htmlFor="setup_fee">
+                    Setup Fee
+                  </label>
+                  <CurrencyPriceInput
+                    amountValue={values?.setup_fee_value || ""}
+                    currencyValue={values?.setup_fee_currency || defaultCurrency}
+                    onAmountChange={(value) => {
+                      setFieldValue("setup_fee_value", value);
+                    }}
+                    onCurrencyChange={(value) => {
+                      setFieldValue("setup_fee_currency", value);
+                    }}
+                  />
+                </div>
               </div>
+            )}
+            <div className="col-12 col-md-6">
+              <SelectSubscriptionSetupFeeFailureAction
+                value={values?.setup_fee_failure_action || null}
+                onChange={(value) => {
+                  setFieldValue("setup_fee_failure_action", value);
+                }}
+              />
+            </div>
+            <div className="col-12 col-md-6 mt-3">
+              <Checkbox
+                name={"auto_bill_outstanding"}
+                placeholder="Auto Bill Outstanding?"
+                label="Auto Bill Outstanding?"
+                onChange={handleChange}
+                value={values?.auto_bill_outstanding || false}
+              />
+            </div>
+            <div className="col-12 col-md-6 mt-3">
+              <TextInput
+                name="payment_failure_threshold"
+                label="Payment Failure Threshold"
+                placeholder="Payment Failure Threshold"
+                value={values?.payment_failure_threshold || ""}
+                onChange={handleChange}
+                type="number"
+              />
             </div>
             <div className="col-12 mt-3">
               <h3 className="h3">Subscription Items</h3>
@@ -602,90 +642,121 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
             <div className="col-12 mt-3">
               {Array.isArray(values?.items) &&
                 values?.items?.map(
-                  (item: Record<string, unknown>, index: number) => (
-                    <div key={index} className="mb-3 border p-3 rounded">
-                      <div className="row">
-                        <div className="col-12 col-md-6">
-                          <SelectSubscriptionIntervalUnit
-                            value={item?.frequency?.interval_unit || null}
-                            onChange={(value) => {
-                              updateItem(index, "frequency.interval_unit", value);
-                            }}
-                          />
+                  (item: Record<string, unknown>, index: number) => {
+                    return (
+                      <div key={index} className="mb-3 border p-3 rounded position-relative">
+                        <Button
+                          variant="danger"
+                          className="position-absolute pointer"
+                          style={{
+                            top: -10,
+                            right: -10,
+                            zIndex: 1,
+                          }}
+                          onClick={() => {
+                            console.log("Removing item at index", index);
+                            const items = [...(values?.items || [])];
+                            items.splice(index, 1);
+                            setFieldValue("items", items);
+                          }}
+                        >
+                          <FontAwesomeIcon icon={faTrash} />
+                        </Button>
+                        <div className="row">
+                          <div className="col-12 col-md-6">
+                            <SelectSubscriptionIntervalUnit
+                              value={item?.frequency?.interval_unit || null}
+                              onChange={(value) => {
+                                updateItem(
+                                  index,
+                                  "frequency.interval_unit",
+                                  value
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="col-12 col-md-6">
+                            <label className="fw-bold">Interval Count</label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={item?.frequency?.interval_count || ""}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                updateItem(
+                                  index,
+                                  "frequency.interval_count",
+                                  e.target.value
+                                );
+                              }}
+                            />
+                          </div>
                         </div>
-                        <div className="col-12 col-md-6">
-                          <label className="fw-bold">Interval Count</label>
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={item?.frequency?.interval_count || ""}
-                            onChange={(
-                              e: React.ChangeEvent<HTMLInputElement>
-                            ) => {
-                              updateItem(
-                                index,
-                                "frequency.interval_count",
-                                e.target.value
-                              );
-                            }}
-                          />
+                        <div className="row mt-2">
+                          <div className="col-12 col-md-6">
+                            <SelectSubscriptionTenureType
+                              value={item?.tenure_type || null}
+                              onChange={(value) => {
+                                updateItem(index, "tenure_type", value);
+                              }}
+                            />
+                          </div>
+                          <div className="col-12 col-md-6">
+                            <label className="fw-bold">Sequence</label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={item?.sequence || ""}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                updateItem(index, "sequence", e.target.value);
+                              }}
+                            />
+                          </div>
+                        </div>
+                        <div className="row mt-2">
+                          <div className="col-12 col-md-6">
+                            <label className="fw-bold">Total Cycles</label>
+                            <input
+                              type="number"
+                              className="form-control"
+                              value={item?.total_cycles || ""}
+                              onChange={(
+                                e: React.ChangeEvent<HTMLInputElement>
+                              ) => {
+                                updateItem(
+                                  index,
+                                  "total_cycles",
+                                  e.target.value
+                                );
+                              }}
+                            />
+                          </div>
+                          <div className="col-12 col-md-6">
+                            <label className="fw-bold">Price</label>
+                            <CurrencyPriceInput
+                              amountValue={
+                                item?.price?.value ? item.price.value : ""
+                              }
+                              currencyValue={
+                                item?.price?.currency
+                                  ? item.price.currency
+                                  : defaultCurrency
+                              }
+                              onAmountChange={(value) => {
+                                updateItem(index, "price.value", value);
+                              }}
+                              onCurrencyChange={(value) => {
+                                updateItem(index, "price.currency", value);
+                              }}
+                            />
+                          </div>
                         </div>
                       </div>
-                      <div className="row mt-2">
-                        <div className="col-12 col-md-6">
-                         <SelectSubscriptionTenureType
-                            value={item?.tenure_type || null}
-                            onChange={(value) => {
-                              updateItem(index, "tenure_type", value);
-                            }}
-                          />
-                        </div>
-                        <div className="col-12 col-md-6">
-                          <label className="fw-bold">Sequence</label>
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={item?.sequence || ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              updateItem(index, "sequence", e.target.value);
-                            }}
-                          />
-                        </div>
-                      </div>
-                      <div className="row mt-2">
-                        <div className="col-12 col-md-6">
-                          <label className="fw-bold">Total Cycles</label>
-                          <input
-                            type="number"
-                            className="form-control"
-                            value={item?.total_cycles || ""}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              updateItem(index, "total_cycles", e.target.value);
-                            }}
-                          />
-                        </div>
-                        <div className="col-12 col-md-6">
-                          <label className="fw-bold">Price</label>
-                          <CurrencyPriceInput
-                            amountValue={
-                              item?.price?.value ? item.price.value : ""
-                            }
-                            currencyValue={
-                              item?.price?.currency
-                                ? item.price.currency
-                                : defaultCurrency
-                            }
-                            onAmountChange={(value) => {
-                              updateItem(index, "price.value", value);
-                            }}
-                            onCurrencyChange={(value) => {
-                              updateItem(index, "price.currency", value);
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  )
+                    );
+                  }
                 )}
             </div>
           </div>

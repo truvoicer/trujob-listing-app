@@ -47,7 +47,7 @@ function SelectSubscriptionTenureType({
         }
     }, [value, subscriptionTenureTypes]);
     useEffect(() => {
-        if (typeof onChange === 'function') {
+        if (typeof onChange === 'function' && selectedSubscriptionTenureType) {
             onChange(selectedSubscriptionTenureType);
         }
     }, [selectedSubscriptionTenureType]);

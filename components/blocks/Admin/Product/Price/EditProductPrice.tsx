@@ -20,6 +20,7 @@ import {
 import { DataTableContextType } from "@/components/Table/DataManager";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
+import { LocaleService } from "@/library/services/locale/LocaleService";
 
 export type EditProductPriceProps = {
   productId?: number;
@@ -46,8 +47,8 @@ function EditProductPrice({
   const dataTableContext = useContext(DataTableContext);
   const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
-  const country = getSiteCountryAction();
-  const currency = getSiteCurrencyAction();
+  const country = LocaleService.getCountry();
+  const currency = LocaleService.getCurrency();
 
   const initialValues: Price = {
     id: data?.id || 0,
@@ -63,10 +64,12 @@ function EditProductPrice({
     tax_rates: data?.tax_rates || [],
     discounts: data?.discounts || [],
     amount: data?.amount || 0,
-    setup_fee: {
-      value: data?.setup_fee?.value || 0,
-      currency: data?.setup_fee?.currency || currency || null,
-    },
+    has_setup_fee: data?.has_setup_fee || false,
+    setup_fee_value: data?.setup_fee_value || 0,
+    setup_fee_currency: data?.setup_fee_currency || currency || null,
+    auto_bill_outstanding: data?.auto_bill_outstanding || true,
+    setup_fee_failure_action: data?.setup_fee_failure_action || "CANCEL",
+    payment_failure_threshold: data?.payment_failure_threshold || 0,
     items: data?.items || [],
     label: data?.label || "",
     description: data?.description || "",
@@ -117,15 +120,33 @@ function EditProductPrice({
     if (values?.description) {
       requestData.description = values?.description;
     }
-    if (values?.setup_fee?.currency?.id) {
-      requestData.setup_fee = {
-        value: values.setup_fee.value || 0,
-        currency_id: values.setup_fee.currency.id,
-      };
+
+    if (values.hasOwnProperty("setup_fee_value")) {
+      requestData.setup_fee_value = values?.setup_fee_value || 0;
+    }
+    if (values?.setup_fee_currency) {
+      requestData.setup_fee_currency_id =
+        values?.setup_fee_currency?.id || currency?.id;
+    }
+    if (values.hasOwnProperty("has_setup_fee")) {
+      requestData.has_setup_fee = values?.has_setup_fee || false;
+    }
+
+    if (values.hasOwnProperty("auto_bill_outstanding")) {
+      requestData.auto_bill_outstanding = values?.auto_bill_outstanding;
+    }
+    if (values?.setup_fee_failure_action) {
+      requestData.setup_fee_failure_action = values?.setup_fee_failure_action;
+    }
+    if (values.hasOwnProperty("payment_failure_threshold")) {
+      requestData.payment_failure_threshold = values?.payment_failure_threshold;
     }
     if (Array.isArray(values?.items) && values?.items.length > 0) {
       requestData.items = values.items.map((item) => {
         const cloneItem: Record<string, unknown> = {};
+        if (item?.id) {
+          cloneItem.id = item.id;
+        }
         if (item?.price?.currency?.id) {
           cloneItem.price = {
             value: item.price.value || 0,
@@ -139,10 +160,10 @@ function EditProductPrice({
           cloneItem.tenure_type = item.tenure_type;
         }
         if (item.hasOwnProperty("sequence")) {
-          cloneItem.sequence = item.sequence;
+          cloneItem.sequence = parseInt(item.sequence);
         }
         if (item.hasOwnProperty("total_cycles")) {
-          cloneItem.total_cycles = item.total_cycles;
+          cloneItem.total_cycles = parseInt(item.total_cycles);
         }
         return cloneItem;
       });
@@ -170,6 +191,7 @@ function EditProductPrice({
       ...requestData,
       ...buildRequestData(values),
     };
+    console.log("Update Request Data", requestData, values);
     return requestData;
   }
 
@@ -262,6 +284,7 @@ function EditProductPrice({
     if (operation === "edit" || operation === "update") {
       requiredFields = {
         id: true,
+        has_setup_fee: true,
       };
     }
     return requiredFields;
@@ -306,6 +329,7 @@ function EditProductPrice({
             operation={operation}
             initialValues={initialValues}
             onSubmit={handleSubmit}
+            requiredFields={getRequiredFields()}
           >
             {() => {
               return <EditProductPriceFields operation={operation} />;
