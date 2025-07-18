@@ -37,7 +37,7 @@ function CheckoutProvider({
   const notificationContext = useContext(AppNotificationContext);
   const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
 
-  async function handleFetchOrder() {
+  async function handleFetchOrder(orderId?: number) {
     if (!orderId) {
       return;
     }
@@ -206,7 +206,7 @@ function CheckoutProvider({
   ) {
     switch (entity) {
       case "order":
-        await handleFetchOrder();
+        await handleFetchOrder(orderId);
         break;
       case "transaction":
         await fetchTransaction();
@@ -332,7 +332,6 @@ function CheckoutProvider({
   }
 
   useEffect(() => {
-    handleFetchOrder();
     handleFetchAvailablePaymentGateways();
   }, []);
 

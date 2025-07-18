@@ -11,6 +11,17 @@ export function findInObject(str, obj) {
     return str.split('.').reduce(findInObjectByIndex, obj)
 }
 
+export function replaceInObject(obj, key, value) {
+    if (!obj || !key) {
+        return obj;
+    }
+    const keys = key.split('.');
+    const lastKey = keys.pop();
+    const target = keys.reduce((o, k) => (o[k] = o[k] || {}), obj);
+    target[lastKey] = value;
+    return obj;
+}
+
 export const formatDate = (dateString, formatString = "Do MMMM YYYY") => {
     moment.updateLocale('en', {
         invalidDate : ""

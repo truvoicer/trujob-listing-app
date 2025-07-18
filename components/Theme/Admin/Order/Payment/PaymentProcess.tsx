@@ -114,7 +114,7 @@ function PaymentProcess({ productId }: PaymentProcess) {
       id: STEP_SUMMARY,
       title: "Order Summary",
       description: "Review your order details before proceeding to payment.",
-      component: Summary, // Placeholder for future component
+      component: { node: Summary },
       buttonNext: { text: "Continue to Payment Method" },
       buttonPrevious: { text: "Back to Shipping" },
       showNextButton: true,

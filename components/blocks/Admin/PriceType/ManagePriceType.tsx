@@ -45,28 +45,46 @@ function ManagePriceType({
   enableEdit = true,
   fetchItemsRequest,
 }: ManagePriceTypeProps) {
+  console.log("ManagePriceType", values)
   return (
     <Suspense fallback={<Loader />}>
       <DataManager
         columnHandler={columnHandler}
         isChild={isChild}
-        isCheckedHandler={async (
+        isCheckedHandler={(
           item: Record<string, unknown>,
           values: Array<Record<string, unknown>>
         ) => {
           let checked: boolean = false;
           if (Array.isArray(values)) {
             checked = values.some(
-              async (value: Record<string, unknown>) => {
+              (value: Record<string, unknown>) => {
                 if (typeof value === "object") {
+                  if (value?.name === null && item?.name === null) {
+                    return false;
+                  }
+                  if (value?.name === undefined && item?.name === undefined) {
+                    return false;
+                  }
+                  
                   return value?.name === item?.name;
                 }
+
+                  if (value === null && item?.name === null) {
+                    return false;
+                  }
+                  if (value === undefined && item?.name === undefined) {
+                    return false;
+                  }
+                  
                 return value === item.name;
               }
             );
           }
+          console.log("isCheckedHandler", {item, values, checked});
           return checked;
         }}
+        // checkCompareField="name"
         fetchItemsRequest={async ({
           post,
           query,

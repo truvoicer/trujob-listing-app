@@ -73,6 +73,10 @@ const config: ApiMiddlewareConfig = {
     checkToken: "/auth/token/user",
     tokenRefresh: "/auth/api-token/generate",
     enum: "/enum",
+    subscription: {
+      tenureType: "/subscription/tenure-type",
+      intervalUnit: "/subscription/interval-unit",
+    },
     session: {
       user: {
         show: "/session/user/show",

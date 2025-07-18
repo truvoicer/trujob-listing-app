@@ -464,7 +464,14 @@ export class ApiMiddleware {
       data,
     });
   }
-
+  handleServerErrorResponse(response: Response, data: any): void {
+    console.log("handleServerErrorResponse", { response, data });
+    this.errors.push({
+      code: "server_error",
+      message: data?.message || "Internal Server Error",
+      data,
+    });
+  }
   async handleResponse(
     encrypted: boolean,
     requestUrl: string,
@@ -491,6 +498,9 @@ export class ApiMiddleware {
         return false;
       case 422:
         this.handleUnProcessableResponse(responsePromise, responseData);
+        return false;
+      case 500:
+        this.handleServerErrorResponse(responsePromise, responseData);
         return false;
       default:
         return false;

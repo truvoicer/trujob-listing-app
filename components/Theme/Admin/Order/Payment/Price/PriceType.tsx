@@ -6,7 +6,7 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { AppModalContext } from "@/contexts/AppModalContext";
-import OrderSummary from "@/components/Theme/Admin/Order/OrderSummary";
+import OrderSummary from "@/components/Theme/Admin/Order/Summary/OrderSummary";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
 import { RootState } from "@/library/redux/store";
 import { SessionState } from "@/library/redux/reducers/session-reducer";

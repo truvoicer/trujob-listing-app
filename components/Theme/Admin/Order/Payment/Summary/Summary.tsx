@@ -1,5 +1,5 @@
 import Loader from "@/components/Loader";
-import OrderSummary from "@/components/Theme/Admin/Order/OrderSummary";
+import OrderSummary from "@/components/Theme/Admin/Order/Summary/OrderSummary";
 import { useContext, useEffect, useState } from "react";
 import { CheckoutContext } from "../Checkout/context/CheckoutContext";
 

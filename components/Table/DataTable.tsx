@@ -335,7 +335,9 @@ function DataTable({
                                             <input
                                                 type="radio"
                                                 checked={item?.checked || false}
-                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                                onChange={(
+                                                    e: React.ChangeEvent<HTMLInputElement>
+                                                ) => {
                                                     const checked = e.target.checked;
                                                     let newState = [...tableData];
                                                     newState = newState.map((item, tableDataItemIndex) => {
@@ -348,6 +350,7 @@ function DataTable({
                                                     if (!rowSelect) {
                                                         return;
                                                     }
+                                                    console.log('newState', newState);
                                                     setTableData(newState);
                                                     if (typeof onChange === 'function') {
                                                         onChange(newState);

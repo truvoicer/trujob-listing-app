@@ -3,12 +3,12 @@ import { OrderService } from "@/library/services/cashier/OrderService";
 import { Order } from "@/types/Order";
 import React, { useContext } from "react";
 
-export type OrderSummaryProps = {
+export type OneTimeOrderSummaryProps = {
     editable?: boolean;
 };
-function OrderSummary({
+function OneTimeOrderSummary({
     editable = false,
-}: OrderSummaryProps) {
+}: OneTimeOrderSummaryProps) {
     const checkoutContext = useContext(CheckoutContext) as CheckoutContextType;
     const orderService = new OrderService(checkoutContext.order);
     const order: Order | null = checkoutContext.order;
@@ -37,7 +37,7 @@ function OrderSummary({
                                             orderService.getOrderItemService()
                                             .getOrderItemFactory()
                                             .make(item?.order_itemable_type)
-                                            .renderOrderSummaryRow(
+                                            ?.renderOrderSummaryRow(
                                                 item,
                                                 index,
                                                 {
@@ -81,4 +81,4 @@ function OrderSummary({
         </div>
     );
 }
-export default OrderSummary;
+export default OneTimeOrderSummary;

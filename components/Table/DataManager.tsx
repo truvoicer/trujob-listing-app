@@ -6,7 +6,7 @@ import DataTable, {
 import React, { SetStateAction, useContext, useEffect, useState } from "react";
 import { ModalService } from "@/library/services/modal/ModalService";
 import { useSearchParams } from "next/navigation";
-import { isNotEmpty, isObject, isObjectEmpty } from "@/helpers/utils";
+import { isNotEmpty, isObject, isObjectEmpty, uCaseFirst } from "@/helpers/utils";
 import {
   DataTableContext,
   dataTableContextData,
@@ -56,10 +56,11 @@ export type DataManageComponentProps = {
   rowSelection?: boolean;
   multiRowSelection?: boolean;
   data?: Array<unknown>;
+  checkCompareField: string;
   isCheckedHandler?: (
     item: Record<string, unknown>,
     values: Array<Record<string, unknown>>
-  ) => boolean | Promise<boolean>;
+  ) => boolean;
   onRowSelect?: (
     item: DataTableItem,
     index: number,
@@ -77,14 +78,16 @@ export type DataManagerProps = {
   children?: React.ReactNode;
   isChild?: boolean;
   id: string;
+  itemLabel?: string;
   mode?: "selector" | "edit";
   operation?: "edit" | "update" | "add" | "create";
   values?: Array<unknown>;
   data?: Array<unknown>;
+  checkCompareField: string;
   isCheckedHandler?: (
     item: Record<string, unknown>,
     values: Array<Record<string, unknown>>
-  ) => boolean | Promise<boolean>;
+  ) => boolean;
   onChange: (tableData: Array<unknown>) => void;
   paginationMode?: "router" | "state";
   enablePagination?: boolean;
@@ -184,9 +187,12 @@ function DataManager({
   columnHandler,
   isChild = false,
   id,
+  itemLabel = "item",
+  itemPluralLabel = "items",
   operation,
   mode = "selector",
   values = [],
+  checkCompareField = "id",
   isCheckedHandler,
   data,
   rowSelection = false,
@@ -258,20 +264,45 @@ function DataManager({
   modalService.setKey("modal");
   confirmationService.setKey("confirmation");
 
+  function compareValuesForIsChecked(
+    value1: string | number | boolean | null | undefined | unknown,
+    value2: string | number | boolean | null | undefined | unknown
+  ): boolean {
+    if (value1 === null && value2 === null) {
+      return false;
+    }
+    if (value1 === undefined && value2 === undefined) {
+      return false;
+    }
+    return value1 === value2;
+  }
+
   function isChecked(
     item: Record<string, unknown>,
     values: Array<Record<string, unknown>>
   ): boolean {
     let checked: boolean = false;
     if (Array.isArray(values)) {
-      checked = values.some(async (value: Record<string, unknown>, index: number) => {
+      checked = values.some((value: Record<string, unknown>) => {
+        let returnVal: boolean = false;
         if (typeof isCheckedHandler === "function") {
-          return await isCheckedHandler(item, values);
+          returnVal = isCheckedHandler(item, values);
+        } else if (typeof value === "object") {
+          if (checkCompareField) {
+            returnVal = compareValuesForIsChecked(
+              item?.[checkCompareField],
+              value?.[checkCompareField]
+            );
+          } else {
+            returnVal = compareValuesForIsChecked(item?.id, value?.id);
+          }
         }
-        if (typeof value === "object") {
-          return value?.id === item?.id;
+        else if (checkCompareField) {
+          returnVal = compareValuesForIsChecked(item?.[checkCompareField], value);
+        } else {
+        returnVal = compareValuesForIsChecked(item?.id, value);
         }
-        return value === item.id;
+        return returnVal;
       });
     }
     return checked;
@@ -300,11 +331,8 @@ function DataManager({
       const response = await request({
         searchParams,
       });
-      
-      if (
-        typeof response === "object" &&
-        response?.data
-      ) {
+
+      if (typeof response === "object" && response?.data) {
         const data = response?.data || [];
         setDataTableContextState((prevState) => {
           const newState: Record<string, unknown> = { ...prevState };
@@ -369,7 +397,7 @@ function DataManager({
     }
   }
 
-  function getShippingMethodFormModalProps(index?: number) {
+  function getMethodFormModalProps(index?: number) {
     return {
       formProps: {
         operation: operation,
@@ -385,7 +413,6 @@ function DataManager({
         if (!formHelpers) {
           return;
         }
-        console.log(operation);
         if (!operation) {
           console.warn("Operation is required");
           return;
@@ -456,7 +483,7 @@ function DataManager({
     }
 
     const EditForm = editFormComponentData.component;
-    const modalProps = getShippingMethodFormModalProps(index);
+    const modalProps = getMethodFormModalProps(index);
 
     const items: Array<React.ReactNode> = [];
     if (enableEdit) {
@@ -469,7 +496,7 @@ function DataManager({
             e.stopPropagation();
             dataTableContextState.modal.show(
               {
-                title: "Edit Shipping method",
+                title: `Edit ${itemLabel.toLowerCase()}`,
                 component: (
                   <EditForm
                     dataTable={dataTableContextState}
@@ -498,10 +525,10 @@ function DataManager({
             e.stopPropagation();
             appModalContext.show(
               {
-                title: "Delete shipping method",
+                title: `Delete ${itemLabel}`,
                 component: (
                   <p>
-                    Are you sure you want to delete this item ({item?.title})?
+                    Are you sure you want to delete this {itemLabel.toLowerCase()} ({item?.title})?
                   </p>
                 ),
                 onOk: async () => {
@@ -511,9 +538,9 @@ function DataManager({
                         variant: "danger",
                         type: "toast",
                         title: "Error",
-                        component: <p>Shipping method ID is required</p>,
+                        component: <p>{uCaseFirst(itemLabel)} ID is required</p>,
                       },
-                      "shipping-method-delete-error"
+                      `${id}-notification-delete-error`
                     );
                     return;
                   }
@@ -530,9 +557,9 @@ function DataManager({
                         variant: "danger",
                         type: "toast",
                         title: "Error",
-                        component: <p>Failed to delete item</p>,
+                        component: <p>Failed to delete {itemLabel.toLowerCase()}</p>,
                       },
-                      "shipping-method-delete-error"
+                      `${id}-notification-delete-error`
                     );
                     return;
                   }
@@ -559,7 +586,7 @@ function DataManager({
     }
 
     const EditForm = editFormComponentData.component;
-    const modalProps = getShippingMethodFormModalProps(index);
+    const modalProps = getMethodFormModalProps(index);
     const items: Array<React.ReactNode> = [];
     if (enableEdit) {
       items.push(
@@ -572,7 +599,7 @@ function DataManager({
             e.stopPropagation();
             getDatatableContextState().modal.show(
               {
-                title: "Edit shipping method",
+                title: `Edit ${itemLabel.toLowerCase()}`,
                 component: (
                   <EditForm
                     dataTable={getDatatableContextState()}
@@ -603,15 +630,15 @@ function DataManager({
             e.preventDefault();
             dataTableContextState.modal.show(
               {
-                title: "Delete shipping method",
+                title: `Delete ${itemLabel.toLowerCase()}`,
                 component: (
                   <p>
-                    Are you sure you want to delete this shipping method (
+                    Are you sure you want to delete this {itemLabel.toLowerCase()} (
                     {item?.name} | {item?.label})?
                   </p>
                 ),
                 onOk: async () => {
-                  console.log("Delete shipping method", { operation, item });
+
                   if (!operation) {
                     console.warn("Operation is required");
                     return;
@@ -633,9 +660,9 @@ function DataManager({
                         variant: "danger",
                         type: "toast",
                         title: "Error",
-                        component: <p>Shipping method ID is required</p>,
+                        component: <p>{uCaseFirst(itemLabel)} ID is required</p>,
                       },
-                      "shipping-method-delete-error"
+                      `${id}-notification-delete-error`
                     );
                     return;
                   }
@@ -650,9 +677,9 @@ function DataManager({
                         variant: "danger",
                         type: "toast",
                         title: "Error",
-                        component: <p>Failed to delete shipping method</p>,
+                        component: <p>Failed to delete {itemLabel.toLowerCase()}</p>,
                       },
-                      "shipping-method-delete-error"
+                      `${id}-notification-delete-error`
                     );
                     return;
                   }
@@ -729,9 +756,6 @@ function DataManager({
       query[SORT_ORDER] = searchParams?.sort_order;
     }
 
-    if (isNotEmpty(searchParams?.shippingMethod)) {
-      query["shippingMethod"] = searchParams.shippingMethod;
-    }
     return query;
   }
   async function request({
@@ -767,10 +791,10 @@ function DataManager({
       return null;
     }
     const EditForm = editFormComponentData.component;
-    const modalProps = await getShippingMethodFormModalProps();
+    const modalProps = await getMethodFormModalProps();
     getDatatableContextState().modal.show(
       {
-        title: "Create shipping method",
+        title: `Create ${itemLabel.toLowerCase()}`,
         component: (
           <EditForm
             dataTable={dataTableContextState}
@@ -805,16 +829,16 @@ function DataManager({
             title: "Edit Menu",
             message: "Are you sure you want to delete selected items?",
             onOk: async () => {
-              console.log("Yes");
+
               if (!data?.length) {
                 notificationContext.show(
                   {
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>No items selected</p>,
+                    component: <p>No {itemPluralLabel.toLowerCase()} selected</p>,
                   },
-                  "shipping-method-bulk-delete-error"
+                  `${id}-bulk-notification-delete-error`
                 );
                 return;
               }
@@ -825,9 +849,9 @@ function DataManager({
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>Item IDs are required</p>,
+                    component: <p>{uCaseFirst(itemPluralLabel)} IDs are required</p>,
                   },
-                  "shipping-method-bulk-delete-error"
+                  `${id}-bulk-notification-delete-error`
                 );
                 return;
               }
@@ -842,9 +866,9 @@ function DataManager({
                     variant: "danger",
                     type: "toast",
                     title: "Error",
-                    component: <p>Failed to delete items</p>,
+                    component: <p>Failed to delete {itemPluralLabel.toLowerCase()}</p>,
                   },
-                  "shipping-method-bulk-delete-error"
+                  `${id}-bulk-notification-delete-error`
                 );
                 return;
               }
@@ -854,9 +878,9 @@ function DataManager({
                   variant: "success",
                   type: "toast",
                   title: "Success",
-                  component: <p>Shipping methods deleted successfully</p>,
+                  component: <p>{uCaseFirst(itemPluralLabel)} deleted successfully</p>,
                 },
-                "shipping-method-bulk-delete-success"
+                `${id}-bulk-notification-delete-success`
               );
               dataTableContextState.refresh();
             },
@@ -864,7 +888,7 @@ function DataManager({
               console.log("Cancel delete");
             },
           },
-          "delete-bulk-shipping-method-confirmation"
+          `delete-bulk-${id}-confirmation`
         );
       },
     });
@@ -878,7 +902,7 @@ function DataManager({
     if (someSet) {
       return;
     }
-    console.log("DataManager useEffect init", dataTableContextState.query);
+
     makeRequest();
   }, []);
 
