@@ -85,7 +85,7 @@ function PayPalSubscription({
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
         endpoint: UrlHelpers.urlFromArray([
           TruJobApiMiddleware.getConfig()
-            .endpoints.payPalOrder.replace(":orderId", order.id.toString())
+            .endpoints.paypal.order.replace(":orderId", order.id.toString())
             .replace(":transactionId", transaction.id.toString()),
           "store",
         ]),
@@ -93,6 +93,7 @@ function PayPalSubscription({
         protectedReq: true,
         encrypted: true,
       });
+      console.log("PayPal order creation response:", orderCreationResponse);
 
       if (orderCreationResponse?.data?.id) {
         handleSuccess("order", orderCreationResponse);
@@ -113,6 +114,90 @@ function PayPalSubscription({
       return Promise.reject(err); // Propagate error to PayPal SDK
     }
   }
+
+
+  async function onApprove(data: Record<string, unknown>) {
+    console.log("PayPal onApprove data:", data);
+    try {
+      if (!order?.id) {
+        handleError("approve", new Error("Order ID is not available"));
+      }
+      if (!transaction?.id) {
+        handleError("approve", new Error("Transaction ID is not available"));
+      }
+
+      const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
+        endpoint: UrlHelpers.urlFromArray([
+          TruJobApiMiddleware.getConfig()
+            .endpoints.paypal.order.replace(":orderId", order.id.toString())
+            .replace(":transactionId", transaction.id.toString()),
+          "approve",
+          "store",
+        ]),
+        method: TruJobApiMiddleware.METHOD.POST,
+        protectedReq: true,
+        encrypted: true,
+        data
+      });
+
+      if (orderCreationResponse) {
+        handleSuccess("approve", orderCreationResponse);
+      } else {
+        handleError(
+          "approve",
+          new Error("Failed to approve PayPal order"),
+          truJobApiMiddleware.getResponseData()
+        );
+      }
+    } catch (err: unknown) {
+      handleError(
+        "approve",
+        err instanceof Error ? err : new Error("Unknown error")
+      );
+    }
+  }
+
+  async function onCancel(data: Record<string, unknown>) {
+    console.log("PayPal onCancel data:", data);
+    try {
+      if (!order?.id) {
+        handleError("cancel", new Error("Order ID is not available"));
+      }
+      if (!transaction?.id) {
+        handleError("cancel", new Error("Transaction ID is not available"));
+      }
+
+      const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
+        endpoint: UrlHelpers.urlFromArray([
+          TruJobApiMiddleware.getConfig()
+            .endpoints.paypal.order.replace(":orderId", order.id.toString())
+            .replace(":transactionId", transaction.id.toString()),
+          "cancel",
+          "store",
+        ]),
+        method: TruJobApiMiddleware.METHOD.POST,
+        protectedReq: true,
+        encrypted: true,
+        data
+      });
+
+      if (orderCreationResponse) {
+        handleSuccess("cancel", orderCreationResponse);
+      } else {
+        handleError(
+          "cancel",
+          new Error("Failed to cancel PayPal order"),
+          truJobApiMiddleware.getResponseData()
+        );
+      }
+    } catch (err: unknown) {
+      handleError(
+        "cancel",
+        err instanceof Error ? err : new Error("Unknown error")
+      );
+    }
+  }
+
   useEffect(() => {
     sitePaymentGatewayRequest();
   }, []);
@@ -137,6 +222,7 @@ function PayPalSubscription({
         >
           <PayPalPaymentButtons
             createSubscription={createSubscription}
+            onApprove={onApprove}
             onSuccess={(type, data) => {
               console.log("PayPal payment successful:", type, data);
               if (typeof onSuccess === "function") {
@@ -149,12 +235,7 @@ function PayPalSubscription({
                 onError(type, error, data);
               }
             }}
-            onCancel={(type, data) => {
-              console.warn("PayPal payment cancelled:", type, data);
-              if (typeof onCancel === "function") {
-                onCancel(type, data);
-              }
-            }}
+            onCancel={onCancel}
           />
         </PayPalScriptProvider>
       ) : (

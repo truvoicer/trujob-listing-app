@@ -29,11 +29,25 @@ function PaymentDetail({
   ) {
     switch (paymentRequestType) {
       case 'capture':
-        console.log("Payment successful:", paymentRequestType, data);
+        console.log("Paypal capture successful:", paymentRequestType, data);
         if (typeof goToNext === "function") {
           goToNext();
         }
         break;  
+      case 'approve':
+        console.log("Paypal approval successful:", paymentRequestType, data);
+        if (typeof goToNext === "function") {
+          goToNext();
+        }
+        break;
+      case 'order':
+        console.log("Paypal order successfully:", paymentRequestType, data);
+        break;
+      case 'cancel':
+        console.warn("Paypal cancellation success:", paymentRequestType, data);
+        break;
+      default:
+        console.error("Paypal success: Unknown payment request type:", paymentRequestType);
     }
   }
 
@@ -42,13 +56,45 @@ function PaymentDetail({
     error: Error,
     data?: Record<string, unknown> | null
   ) {
-    console.error("Payment error:", paymentRequestType, error, data);
+
+    switch (paymentRequestType) {
+      case 'capture':
+        console.log("Paypal capture error:", paymentRequestType, data);
+        break;  
+      case 'approve':
+        console.log("Paypal approval error:", paymentRequestType, data);
+        break;
+      case 'order':
+        console.log("Paypal order error:", paymentRequestType, data);
+        break;
+      case 'cancel':
+        console.warn("Paypal error:", paymentRequestType, data);
+        break;
+      default:
+        console.error("Paypal error: Unknown payment request type:", paymentRequestType);
+    }
   }
   function onCancel(
     paymentRequestType: PaymentRequestType,
     data: Record<string, unknown>
   ) {
-    console.warn("Payment cancelled:", paymentRequestType, data);
+    
+    switch (paymentRequestType) {
+      case 'capture':
+        console.log("Paypal capture cancelled:", paymentRequestType, data);
+        break;  
+      case 'approve':
+        console.log("Paypal approval cancelled:", paymentRequestType, data);
+        break;
+      case 'order':
+        console.log("Paypal order cancelled:", paymentRequestType, data);
+        break;
+      case 'cancel':
+        console.warn("Paypal cancellation:", paymentRequestType, data);
+        break;
+      default:
+        console.error("Paypal cancel: Unknown payment request type:", paymentRequestType);
+    }
   }
   return (
     <div className="container">

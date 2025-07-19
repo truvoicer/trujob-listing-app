@@ -21,6 +21,7 @@ import { DataTableContextType } from "@/components/Table/DataManager";
 import { RequestHelpers } from "@/helpers/RequestHelpers";
 import { DataManagerService } from "@/library/services/data-manager/DataManagerService";
 import { LocaleService } from "@/library/services/locale/LocaleService";
+import moment from "moment";
 
 export type EditProductPriceProps = {
   productId?: number;
@@ -64,6 +65,7 @@ function EditProductPrice({
     tax_rates: data?.tax_rates || [],
     discounts: data?.discounts || [],
     amount: data?.amount || 0,
+    start_time: data?.start_time || moment().toISOString(),
     has_setup_fee: data?.has_setup_fee || false,
     setup_fee_value: data?.setup_fee_value || 0,
     setup_fee_currency: data?.setup_fee_currency || currency || null,
@@ -127,6 +129,9 @@ function EditProductPrice({
     if (values?.setup_fee_currency) {
       requestData.setup_fee_currency_id =
         values?.setup_fee_currency?.id || currency?.id;
+    }
+    if (values?.start_time) {
+      requestData.start_time = moment(values?.start_time).toISOString();
     }
     if (values.hasOwnProperty("has_setup_fee")) {
       requestData.has_setup_fee = values?.has_setup_fee || false;
@@ -284,7 +289,6 @@ function EditProductPrice({
     if (operation === "edit" || operation === "update") {
       requiredFields = {
         id: true,
-        has_setup_fee: true,
       };
     }
     return requiredFields;

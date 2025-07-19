@@ -1,29 +1,28 @@
-import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
-import { PaymentGateway } from "@/types/PaymentGateway";
-import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-
 import { useContext, useEffect, useState } from "react";
+import {
+  PaymentDetailsProps,
+  PaymentRequestType,
+} from "../../Service/PaymentService";
+import { PaymentGateway } from "@/types/PaymentGateway";
 import { CheckoutContext } from "../../../Checkout/context/CheckoutContext";
-import Loader from "@/components/Loader";
-import PayPalPaymentButtons from "./PayPalPaymentButtons";
+import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
+import { UrlHelpers } from "@/helpers/UrlHelpers";
 import { LocaleService } from "@/library/services/locale/LocaleService";
-import { PaymentDetailsProps, PaymentRequestType } from "../../Service/PaymentService";
+import { loadStripe } from "@stripe/stripe-js";
+import { CheckoutProvider, PaymentElement } from "@stripe/react-stripe-js";
+import Loader from "@/components/Loader";
 
-function PayPalOneTime({
-  onSuccess,
-  onError,
-  onCancel,
-}: PaymentDetailsProps) {
+function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
   const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(
+    null
+  );
+  const [stripePromise, setStripePromise] = useState<Promise<unknown> | null>(
     null
   );
   const checkoutContext = useContext(CheckoutContext);
   const transaction = checkoutContext?.transaction;
   const order = checkoutContext?.order;
   const truJobApiMiddleware = TruJobApiMiddleware.getInstance();
-
-
 
   async function sitePaymentGatewayRequest(): Promise<void> {
     if (!checkoutContext?.transaction?.payment_gateway?.id) {
@@ -46,7 +45,6 @@ function PayPalOneTime({
     setPaymentGateway(response.data);
   }
 
-
   function handleError(
     type: PaymentRequestType,
     error: Error,
@@ -58,14 +56,20 @@ function PayPalOneTime({
     }
   }
 
-  function handleSuccess(type: PaymentRequestType, data: Record<string, unknown>) {
+  function handleSuccess(
+    type: PaymentRequestType,
+    data: Record<string, unknown>
+  ) {
     console.log("PayPal success:", data);
     if (typeof onSuccess === "function") {
       onSuccess(type, data);
     }
   }
 
-  function handleCancel(type: PaymentRequestType, data: Record<string, unknown>) {
+  function handleCancel(
+    type: PaymentRequestType,
+    data: Record<string, unknown>
+  ) {
     console.warn("PayPal transaction cancelled:", data);
     if (typeof onCancel === "function") {
       onCancel(type, data);
@@ -179,7 +183,7 @@ function PayPalOneTime({
         method: TruJobApiMiddleware.METHOD.POST,
         protectedReq: true,
         encrypted: true,
-        data
+        data,
       });
 
       if (orderCreationResponse) {
@@ -199,9 +203,32 @@ function PayPalOneTime({
     }
   }
 
+  async function fetchClientSecret() {
+    if (!paymentGateway || !paymentGateway.site?.settings?.client_id) {
+      console.error("Payment gateway or client ID is not available");
+      return Promise.reject(
+        new Error("Payment gateway or client ID is not available")
+      );
+    }
+    return Promise.resolve(paymentGateway.site.settings.client_id as string);
+  }
+
   useEffect(() => {
     sitePaymentGatewayRequest();
   }, []);
+
+  useEffect(() => {
+    if (!paymentGateway) return;
+    if (!paymentGateway.site?.settings?.client_id) {
+      console.error(
+        "Stripe client ID is not available in payment gateway settings"
+      );
+      return;
+    }
+    setStripePromise(
+      loadStripe(paymentGateway.site.settings.client_id as string)
+    );
+  }, [paymentGateway]);
 
   const userCurrency = LocaleService.getUserCurrency();
 
@@ -210,34 +237,17 @@ function PayPalOneTime({
     paymentGateway,
     userCurrency
   );
+
   return (
     <>
+    
       {paymentGateway && paymentGateway?.site?.settings?.client_id ? (
-        <PayPalScriptProvider
-          options={{
-            clientId: paymentGateway.site.settings.client_id,
-            currency: userCurrency?.code,
-            intent: 'capture',
-          }}
-        >
-          <PayPalPaymentButtons
-            createOrder={createOrder}
-            onApprove={onApprove}
-            onSuccess={(type, data) => {
-              console.log("PayPal payment successful:", type, data);
-              if (typeof onSuccess === "function") {
-                onSuccess(type, data);
-              }
-            }}
-            onError={(type, error, data) => {
-              console.error("PayPal payment error:", type, error, data);
-              if (typeof onError === "function") {
-                onError(type, error, data);
-              }
-            }}
-            onCancel={onCancel}
-          />
-        </PayPalScriptProvider>
+        <CheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+          <form>
+            <PaymentElement />
+            <button>Submit</button>
+          </form>
+        </CheckoutProvider>
       ) : (
         <Loader />
       )}
@@ -245,4 +255,11 @@ function PayPalOneTime({
   );
 }
 
-export default PayPalOneTime;
+export default StripeOneTime;
+
+      </CheckoutProvider>
+    </>
+  );
+}
+
+export default StripeOneTime;

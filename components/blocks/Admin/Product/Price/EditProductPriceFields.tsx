@@ -37,6 +37,7 @@ import SelectSubscriptionSetupFeeFailureAction from "./SelectSubscriptionSetupFe
 import TextInput from "@/components/Elements/TextInput";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
+import DateInput from "@/components/Elements/DateInput";
 
 export type EditProductPriceFields = {
   operation: "edit" | "update" | "add" | "create";
@@ -577,6 +578,16 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
               </div>
             </div>
             <div className="col-12 col-md-6 mt-3">
+              <DateInput
+                name="start_time"
+                type="datetime-local"
+                placeholder="Start Time"
+                label="Start Time"
+                value={values?.start_time}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="col-12 col-md-6 mt-3">
               <Checkbox
                 name={"has_setup_fee"}
                 placeholder="Has Setup Fee?"
@@ -593,7 +604,9 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
                   </label>
                   <CurrencyPriceInput
                     amountValue={values?.setup_fee_value || ""}
-                    currencyValue={values?.setup_fee_currency || defaultCurrency}
+                    currencyValue={
+                      values?.setup_fee_currency || defaultCurrency
+                    }
                     onAmountChange={(value) => {
                       setFieldValue("setup_fee_value", value);
                     }}
@@ -644,7 +657,10 @@ function EditProductPriceFields({ operation, site }: EditProductPriceFields) {
                 values?.items?.map(
                   (item: Record<string, unknown>, index: number) => {
                     return (
-                      <div key={index} className="mb-3 border p-3 rounded position-relative">
+                      <div
+                        key={index}
+                        className="mb-3 border p-3 rounded position-relative"
+                      >
                         <Button
                           variant="danger"
                           className="position-absolute pointer"

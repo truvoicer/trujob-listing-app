@@ -1,6 +1,6 @@
 import React from "react";
 
-export type PaymentRequestType = "order" | "capture";
+export type PaymentRequestType = "order" | "capture" | "approve" | "cancel";
 export type PaymentDetailsProps = {
     onSuccess?: (paymentRequestType: PaymentRequestType, data: Record<string, unknown>) => void;
     onError?: (
