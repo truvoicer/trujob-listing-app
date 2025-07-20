@@ -19,7 +19,6 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
   const [stripePromise, setStripePromise] = useState<Promise<unknown> | null>(
     null
   );
-  const [checkoutSession, setCheckoutSession] = useState<Record<string, unknown> | null>(null);
   const checkoutContext = useContext(CheckoutContext);
   const transaction = checkoutContext?.transaction;
   const order = checkoutContext?.order;
@@ -77,15 +76,15 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
     }
   }
 
-  async function createOrder() {
+  async function fetchClientSecret() {
     try {
       if (!order?.id) {
         handleError("order", new Error("Order ID is not available"));
-        return;
+        return Promise.reject(new Error("Order ID is not available"));
       }
       if (!transaction?.id) {
         handleError("order", new Error("Transaction ID is not available"));
-        return;
+        return Promise.reject(new Error("Transaction ID is not available"));
       }
 
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
@@ -93,27 +92,33 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
           TruJobApiMiddleware.getConfig()
             .endpoints.stripe.order.replace(":orderId", order.id.toString())
             .replace(":transactionId", transaction.id.toString()),
-            'checkout-session',
+          "checkout-session",
           "store",
         ]),
         method: TruJobApiMiddleware.METHOD.POST,
         protectedReq: true,
         encrypted: true,
       });
-
-      if (orderCreationResponse?.data) {
+      console.log("Order creation response:", orderCreationResponse);
+      if (orderCreationResponse?.data?.client_secret) {
         handleSuccess("order", orderCreationResponse);
-        setCheckoutSession(orderCreationResponse.data);
+        return orderCreationResponse.data.client_secret; // Return the Stripe Checkout Session ID
       } else {
         handleError(
           "order",
           new Error("Failed to create PayPal order"),
           truJobApiMiddleware.getResponseData()
         );
+        return Promise.reject(
+          new Error("Failed to create PayPal order")
+        );
       }
     } catch (err) {
       handleError(
         "order",
+        err instanceof Error ? err : new Error("Unknown error")
+      );
+      return Promise.reject(
         err instanceof Error ? err : new Error("Unknown error")
       );
     }
@@ -203,22 +208,11 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
     }
   }
 
-  async function fetchClientSecret() {
-    if (!paymentGateway || !paymentGateway.site?.settings?.secret_key) {
-      console.error("Payment gateway or secret key is not available");
-      return Promise.reject(
-        new Error("Payment gateway or secret key is not available")
-      );
-    }
-    return Promise.resolve(paymentGateway.site.settings.secret_key as string);
-  }
 
   useEffect(() => {
     sitePaymentGatewayRequest();
   }, []);
-  useEffect(() => {
-    createOrder();
-  }, []);
+  
 
   useEffect(() => {
     if (!paymentGateway) return;
@@ -238,18 +232,19 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
   console.log(
     "stripe Details component rendered with payment gateway:",
     stripePromise,
-    checkoutSession
   );
 
   return (
     <>
-      {stripePromise && paymentGateway && paymentGateway?.site?.settings?.publishable_key ? (
-        <CheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
+      {stripePromise &&
+      paymentGateway &&
+      paymentGateway?.site?.settings?.publishable_key ? (
+        <CheckoutProvider
+          stripe={stripePromise}
+          options={{ fetchClientSecret }}
+        >
           <form>
-            <PaymentElement 
-
-
-            />
+            <PaymentElement />
             <button>Submit</button>
           </form>
         </CheckoutProvider>
