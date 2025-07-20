@@ -56,9 +56,9 @@ const config: ApiMiddlewareConfig = {
     productShippingMethod: "/product/:productId/shipping/method",
     paypal: {
       order: "/order/:orderId/transaction/:transactionId/payment-gateway/paypal",
-      capture: "/order/:orderId/transaction/:transactionId/payment-gateway/paypal/capture",
-      approve: "/order/:orderId/transaction/:transactionId/payment-gateway/paypal/approve",
-      cancel: "/order/:orderId/transaction/:transactionId/payment-gateway/paypal/cancel",
+    },
+    stripe: {
+      order: "/order/:orderId/transaction/:transactionId/payment-gateway/stripe",
     },
     settings: "/settings",
     menu: "/menu",

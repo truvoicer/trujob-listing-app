@@ -19,6 +19,7 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
   const [stripePromise, setStripePromise] = useState<Promise<unknown> | null>(
     null
   );
+  const [checkoutSession, setCheckoutSession] = useState<Record<string, unknown> | null>(null);
   const checkoutContext = useContext(CheckoutContext);
   const transaction = checkoutContext?.transaction;
   const order = checkoutContext?.order;
@@ -80,18 +81,19 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
     try {
       if (!order?.id) {
         handleError("order", new Error("Order ID is not available"));
-        return Promise.reject(new Error("Order ID is not available"));
+        return;
       }
       if (!transaction?.id) {
         handleError("order", new Error("Transaction ID is not available"));
-        return Promise.reject(new Error("Transaction ID is not available"));
+        return;
       }
 
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
         endpoint: UrlHelpers.urlFromArray([
           TruJobApiMiddleware.getConfig()
-            .endpoints.paypal.order.replace(":orderId", order.id.toString())
+            .endpoints.stripe.order.replace(":orderId", order.id.toString())
             .replace(":transactionId", transaction.id.toString()),
+            'checkout-session',
           "store",
         ]),
         method: TruJobApiMiddleware.METHOD.POST,
@@ -99,23 +101,21 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
         encrypted: true,
       });
 
-      if (orderCreationResponse?.data?.id) {
+      if (orderCreationResponse?.data) {
         handleSuccess("order", orderCreationResponse);
-        return orderCreationResponse.data.id; // Return the PayPal Order ID
+        setCheckoutSession(orderCreationResponse.data);
       } else {
         handleError(
           "order",
           new Error("Failed to create PayPal order"),
           truJobApiMiddleware.getResponseData()
         );
-        return Promise.reject(new Error("Failed to create PayPal order"));
       }
     } catch (err) {
       handleError(
         "order",
         err instanceof Error ? err : new Error("Unknown error")
       );
-      return Promise.reject(err); // Propagate error to PayPal SDK
     }
   }
 
@@ -204,60 +204,58 @@ function StripeOneTime({ onSuccess, onError, onCancel }: PaymentDetailsProps) {
   }
 
   async function fetchClientSecret() {
-    if (!paymentGateway || !paymentGateway.site?.settings?.client_id) {
-      console.error("Payment gateway or client ID is not available");
+    if (!paymentGateway || !paymentGateway.site?.settings?.secret_key) {
+      console.error("Payment gateway or secret key is not available");
       return Promise.reject(
-        new Error("Payment gateway or client ID is not available")
+        new Error("Payment gateway or secret key is not available")
       );
     }
-    return Promise.resolve(paymentGateway.site.settings.client_id as string);
+    return Promise.resolve(paymentGateway.site.settings.secret_key as string);
   }
 
   useEffect(() => {
     sitePaymentGatewayRequest();
   }, []);
+  useEffect(() => {
+    createOrder();
+  }, []);
 
   useEffect(() => {
     if (!paymentGateway) return;
-    if (!paymentGateway.site?.settings?.client_id) {
+    if (!paymentGateway.site?.settings?.publishable_key) {
       console.error(
         "Stripe client ID is not available in payment gateway settings"
       );
       return;
     }
     setStripePromise(
-      loadStripe(paymentGateway.site.settings.client_id as string)
+      loadStripe(paymentGateway.site.settings.publishable_key as string)
     );
   }, [paymentGateway]);
 
   const userCurrency = LocaleService.getUserCurrency();
 
   console.log(
-    "PayPalDetails component rendered with payment gateway:",
-    paymentGateway,
-    userCurrency
+    "stripe Details component rendered with payment gateway:",
+    stripePromise,
+    checkoutSession
   );
 
   return (
     <>
-    
-      {paymentGateway && paymentGateway?.site?.settings?.client_id ? (
+      {stripePromise && paymentGateway && paymentGateway?.site?.settings?.publishable_key ? (
         <CheckoutProvider stripe={stripePromise} options={{ fetchClientSecret }}>
           <form>
-            <PaymentElement />
+            <PaymentElement 
+
+
+            />
             <button>Submit</button>
           </form>
         </CheckoutProvider>
       ) : (
         <Loader />
       )}
-    </>
-  );
-}
-
-export default StripeOneTime;
-
-      </CheckoutProvider>
     </>
   );
 }

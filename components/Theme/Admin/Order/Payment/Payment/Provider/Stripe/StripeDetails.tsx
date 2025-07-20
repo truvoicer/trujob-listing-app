@@ -11,7 +11,7 @@ function StripeDetails({
 }: PaymentDetailsProps) {
   
   const checkoutContext = useContext(CheckoutContext);
-  
+  console.log("Checkout Context:", checkoutContext);
   function renderStripeDetail() {
     switch (checkoutContext?.order?.price_type) {
       case "subscription":

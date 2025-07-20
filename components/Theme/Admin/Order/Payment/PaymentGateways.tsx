@@ -34,7 +34,6 @@ function PaymentGateways({
     }
   }, [checkoutContext?.selectedPaymentGateway]);
 
-  console.log("Shipping component rendered with order:", checkoutContext);
   return (
     <div className="container">
       <div className="row">

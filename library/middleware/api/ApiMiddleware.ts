@@ -76,6 +76,9 @@ export type ApiMiddlewareConfig = {
     paypal: {
       order: "/order/:orderId/transaction/:transactionId/payment-gateway/paypal",
     },
+    stripe: {
+      order: "/order/:orderId/transaction/:transactionId/payment-gateway/stripe",
+    },
     settings: "/settings",
     menu: "/menu",
     menuItem: "/menu/%s/item",

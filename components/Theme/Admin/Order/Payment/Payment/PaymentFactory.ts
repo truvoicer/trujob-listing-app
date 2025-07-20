@@ -4,10 +4,7 @@ import { StripeService } from "./Service/StripeService";
 
 
 export class PaymentFactory {
-    
-    constructor() {
-        console.log("PaymentFactory initialized");
-    }
+
     static make(provider: string|null): PaymentService|null {
         switch (provider) {
             case 'paypal':
