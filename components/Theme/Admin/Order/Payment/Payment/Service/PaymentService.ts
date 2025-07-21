@@ -1,23 +1,27 @@
 import React from "react";
+import { PayPalPaymentDetailsProps } from "./PayPalService";
+import { StripePaymentDetailsProps, StripePaymentRequestType } from "./StripeService";
 
-export type PaymentRequestType = "order" | "capture" | "approve" | "cancel";
-export type PaymentDetailsProps = {
-    onSuccess?: (paymentRequestType: PaymentRequestType, data: Record<string, unknown>) => void;
-    onError?: (
-      paymentRequestType: PaymentRequestType,
-      error: Error,
-      data?: Record<string, unknown> | null
-    ) => void;
-    onCancel?: (paymentRequestType: PaymentRequestType, data: Record<string, unknown>) => void;
+export type PaymentRequestType = "order" | "capture";
+
+export type PaymentProps = {
+  onSuccess?: (
+    paymentRequestType: StripePaymentRequestType | PaymentRequestType,
+    data: Record<string, unknown>
+  ) => void;
+  onError?: (
+    paymentRequestType: StripePaymentRequestType | PaymentRequestType,
+    error: Error,
+    data?: Record<string, unknown> | null
+  ) => void;
+  onCancel?: (
+    paymentRequestType: StripePaymentRequestType | PaymentRequestType,
+    data: Record<string, unknown>
+  ) => void;
 };
-
-export class PaymentService {
-
-    public showDetails(props: PaymentDetailsProps): null|React.ReactNode {
-        return null;
-    }
-    public renderConfirmation(): null|React.ReactNode {
-        return null;
-    }
-
+export interface PaymentServiceInterface {
+  showDetails(
+    props: StripePaymentDetailsProps | PayPalPaymentDetailsProps
+  ): null | React.ReactNode;
+  renderConfirmation(): null | React.ReactNode;
 }

@@ -1,9 +1,15 @@
 import PayPalConfirmation from "../Provider/PayPal/PayPalConfirmation";
 import PayPalDetails from "../Provider/PayPal/PayPalDetails";
-import { PaymentDetailsProps, PaymentService } from "./PaymentService";
+import { PaymentServiceInterface } from "./PaymentService";
 
-export class PayPalService extends PaymentService {
-    public showDetails(props: PaymentDetailsProps): null|React.ReactNode {
+export type PayPalPaymentRequestType = "order" | "capture" | "approve" | "cancel";
+export type PayPalPaymentDetailsProps = {
+    showNext?: () => void;
+    showPrevious?: () => void;
+    goToNext?: () => void;
+};
+export class PayPalService implements PaymentServiceInterface {
+    public showDetails(props: PayPalPaymentDetailsProps): null|React.ReactNode {
         return <PayPalDetails {...props} />;
     }
 

@@ -1,33 +1,36 @@
 import { useContext } from "react";
 import { CheckoutContext } from "../../../Checkout/context/CheckoutContext";
-import { PaymentDetailsProps } from "../../Service/PaymentService";
-import StripeOneTime from "./StripeOneTime";
-import StripeSubscription from "./StripeSubscription";
+import StripeCheckout from "./StripeCheckout";
+
+import { StripePaymentDetailsProps } from "../../Service/StripeService";
 
 function StripeDetails({
-  onSuccess,
-  onError,
-  onCancel,
-}: PaymentDetailsProps) {
-  
+  showNext,
+  showPrevious,
+  goToNext,
+}: StripePaymentDetailsProps) {
   const checkoutContext = useContext(CheckoutContext);
+
   console.log("Checkout Context:", checkoutContext);
+
   function renderStripeDetail() {
     switch (checkoutContext?.order?.price_type) {
       case "subscription":
         return (
-          <StripeSubscription
-            onSuccess={onSuccess}
-            onError={onError}
-            onCancel={onCancel}
+          <StripeCheckout
+            checkoutType="subscription"
+            showNext={showNext}
+            showPrevious={showPrevious}
+            goToNext={goToNext}
           />
         );
       case "one_time":
         return (
-          <StripeOneTime
-            onSuccess={onSuccess}
-            onError={onError}
-            onCancel={onCancel}
+          <StripeCheckout
+            checkoutType="one_time"
+            showNext={showNext}
+            showPrevious={showPrevious}
+            goToNext={goToNext}
           />
         );
       default:
@@ -40,7 +43,6 @@ function StripeDetails({
   }
 
   return renderStripeDetail();
-
 }
 
 export default StripeDetails;

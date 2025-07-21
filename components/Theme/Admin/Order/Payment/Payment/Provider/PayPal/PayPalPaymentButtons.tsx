@@ -1,13 +1,10 @@
-import { UrlHelpers } from "@/helpers/UrlHelpers";
-import { TruJobApiMiddleware } from "@/library/middleware/api/TruJobApiMiddleware";
 import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
-
 import { useContext } from "react";
 import { CheckoutContext } from "../../../Checkout/context/CheckoutContext";
 import Loader from "@/components/Loader";
-import { PaymentDetailsProps, PaymentRequestType } from "../../Service/PaymentService";
+import { PayPalPaymentDetailsProps } from "../../Service/PayPalService";
 
-export type PayPalPaymentButtonsProps = PaymentDetailsProps & {
+export type PayPalPaymentButtonsProps = PayPalPaymentDetailsProps & {
   createOrder?: () => Promise<string>;
   createSubscription?: () => Promise<string>;
   onApprove?: (data: Record<string, unknown>) => void;
@@ -16,7 +13,7 @@ function PayPalPaymentButtons({
   createOrder,
   createSubscription,
   onApprove,
-}: PaymentDetailsProps & PayPalPaymentButtonsProps) {
+}: PayPalPaymentDetailsProps & PayPalPaymentButtonsProps) {
   const [{ isPending }] = usePayPalScriptReducer();
   const checkoutContext = useContext(CheckoutContext);
   function buildProps() {

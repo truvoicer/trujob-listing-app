@@ -1,11 +1,12 @@
-import { PaymentService } from "./Service/PaymentService";
+
+import { PaymentServiceInterface } from "./Service/PaymentService";
 import { PayPalService } from "./Service/PayPalService";
 import { StripeService } from "./Service/StripeService";
 
 
 export class PaymentFactory {
 
-    static make(provider: string|null): PaymentService|null {
+    static make(provider: string|null): PaymentServiceInterface|null {
         switch (provider) {
             case 'paypal':
                 return new PayPalService();

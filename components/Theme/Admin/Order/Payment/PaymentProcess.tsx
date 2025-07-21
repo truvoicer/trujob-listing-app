@@ -181,6 +181,8 @@ function PaymentProcess({ productId }: PaymentProcess) {
         "Provide the necessary payment information such as card number, expiration date, and CVV.",
       component: { node: PaymentDetail },
       buttonNext: undefined,
+      showNextButton: false,
+      showPreviousButton: false,
       buttonPrevious: { text: "Back to Payment Method" },
     },
     {

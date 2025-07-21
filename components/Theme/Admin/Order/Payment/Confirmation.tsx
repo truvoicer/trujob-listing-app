@@ -1,9 +1,7 @@
 
 import { useContext } from "react";
-import { PaymentGateway } from "@/types/PaymentGateway";
 import { CheckoutContext } from "./Checkout/context/CheckoutContext";
 import { PaymentFactory } from "./Payment/PaymentFactory";
-import { PaymentRequestType } from "./Payment/Service/PaymentService";
 import { StepperComponentProps } from "@/components/Elements/Stepper";
 
 export const PAYMENT_METHODS_FETCH_ERROR_NOTIFICATION_ID =

@@ -8,13 +8,13 @@ import { CheckoutContext } from "../../../Checkout/context/CheckoutContext";
 import Loader from "@/components/Loader";
 import PayPalPaymentButtons from "./PayPalPaymentButtons";
 import { LocaleService } from "@/library/services/locale/LocaleService";
-import { PaymentDetailsProps, PaymentRequestType } from "../../Service/PaymentService";
+import { PayPalPaymentDetailsProps, PayPalPaymentRequestType } from "../../Service/PayPalService";
 
 function PayPalOneTime({
-  onSuccess,
-  onError,
-  onCancel,
-}: PaymentDetailsProps) {
+  showNext,
+  showPrevious,
+  goToNext,
+}: PayPalPaymentDetailsProps) {
   const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(
     null
   );
@@ -46,40 +46,66 @@ function PayPalOneTime({
     setPaymentGateway(response.data);
   }
 
+  function onSuccess(
+    paymentRequestType: PayPalPaymentRequestType, 
+    data: Record<string, unknown>
+  ) {
+    switch (paymentRequestType) {
+      case 'capture':
+        console.log("Paypal capture successful:", paymentRequestType, data);
+        if (typeof goToNext === "function") {
+          goToNext();
+        }
+        break;  
+      case 'approve':
+        console.log("Paypal approval successful:", paymentRequestType, data);
+        if (typeof goToNext === "function") {
+          goToNext();
+        }
+        break;
+      case 'order':
+        console.log("Paypal order successfully:", paymentRequestType, data);
+        break;
+      case 'cancel':
+        console.warn("Paypal cancellation success:", paymentRequestType, data);
+        break;
+      default:
+        console.error("Paypal success: Unknown payment request type:", paymentRequestType);
+    }
+  }
 
-  function handleError(
-    type: PaymentRequestType,
+  function onError(
+    paymentRequestType: PayPalPaymentRequestType,
     error: Error,
     data?: Record<string, unknown> | null
   ) {
-    console.error("PayPal error:", error);
-    if (typeof onError === "function") {
-      onError(type, error, data);
+
+    switch (paymentRequestType) {
+      case 'capture':
+        console.log("Paypal capture error:", paymentRequestType, data);
+        break;  
+      case 'approve':
+        console.log("Paypal approval error:", paymentRequestType, data);
+        break;
+      case 'order':
+        console.log("Paypal order error:", paymentRequestType, data);
+        break;
+      case 'cancel':
+        console.warn("Paypal error:", paymentRequestType, data);
+        break;
+      default:
+        console.error("Paypal error: Unknown payment request type:", paymentRequestType);
     }
   }
-
-  function handleSuccess(type: PaymentRequestType, data: Record<string, unknown>) {
-    console.log("PayPal success:", data);
-    if (typeof onSuccess === "function") {
-      onSuccess(type, data);
-    }
-  }
-
-  function handleCancel(type: PaymentRequestType, data: Record<string, unknown>) {
-    console.warn("PayPal transaction cancelled:", data);
-    if (typeof onCancel === "function") {
-      onCancel(type, data);
-    }
-  }
-
+  
   async function createOrder() {
     try {
       if (!order?.id) {
-        handleError("order", new Error("Order ID is not available"));
+        onError("order", new Error("Order ID is not available"));
         return Promise.reject(new Error("Order ID is not available"));
       }
       if (!transaction?.id) {
-        handleError("order", new Error("Transaction ID is not available"));
+        onError("order", new Error("Transaction ID is not available"));
         return Promise.reject(new Error("Transaction ID is not available"));
       }
 
@@ -96,10 +122,10 @@ function PayPalOneTime({
       });
 
       if (orderCreationResponse?.data?.id) {
-        handleSuccess("order", orderCreationResponse);
+        onSuccess("order", orderCreationResponse);
         return orderCreationResponse.data.id; // Return the PayPal Order ID
       } else {
-        handleError(
+        onError(
           "order",
           new Error("Failed to create PayPal order"),
           truJobApiMiddleware.getResponseData()
@@ -107,7 +133,7 @@ function PayPalOneTime({
         return Promise.reject(new Error("Failed to create PayPal order"));
       }
     } catch (err) {
-      handleError(
+      onError(
         "order",
         err instanceof Error ? err : new Error("Unknown error")
       );
@@ -118,10 +144,10 @@ function PayPalOneTime({
   async function onApprove(data: Record<string, unknown>) {
     try {
       if (!order?.id) {
-        handleError("capture", new Error("Order ID is not available"));
+        onError("capture", new Error("Order ID is not available"));
       }
       if (!transaction?.id) {
-        handleError("capture", new Error("Transaction ID is not available"));
+        onError("capture", new Error("Transaction ID is not available"));
       }
 
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
@@ -142,16 +168,16 @@ function PayPalOneTime({
       });
 
       if (orderCreationResponse) {
-        handleSuccess("capture", orderCreationResponse);
+        onSuccess("capture", orderCreationResponse);
       } else {
-        handleError(
+        onError(
           "capture",
           new Error("Failed to capture PayPal order"),
           truJobApiMiddleware.getResponseData()
         );
       }
     } catch (err: unknown) {
-      handleError(
+      onError(
         "capture",
         err instanceof Error ? err : new Error("Unknown error")
       );
@@ -162,10 +188,10 @@ function PayPalOneTime({
     console.log("PayPal onCancel data:", data);
     try {
       if (!order?.id) {
-        handleError("cancel", new Error("Order ID is not available"));
+        onError("cancel", new Error("Order ID is not available"));
       }
       if (!transaction?.id) {
-        handleError("cancel", new Error("Transaction ID is not available"));
+        onError("cancel", new Error("Transaction ID is not available"));
       }
 
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
@@ -183,16 +209,16 @@ function PayPalOneTime({
       });
 
       if (orderCreationResponse) {
-        handleSuccess("cancel", orderCreationResponse);
+        onSuccess("cancel", orderCreationResponse);
       } else {
-        handleError(
+        onError(
           "cancel",
           new Error("Failed to cancel PayPal order"),
           truJobApiMiddleware.getResponseData()
         );
       }
     } catch (err: unknown) {
-      handleError(
+      onError(
         "cancel",
         err instanceof Error ? err : new Error("Unknown error")
       );
