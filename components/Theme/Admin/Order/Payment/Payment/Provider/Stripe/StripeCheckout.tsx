@@ -7,10 +7,18 @@ import { LocaleService } from "@/library/services/locale/LocaleService";
 import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutProvider } from "@stripe/react-stripe-js";
 import Loader from "@/components/Loader";
-import { StripePaymentDetailsProps, StripePaymentRequestType } from "../../Service/StripeService";
+import {
+  StripePaymentDetailsProps,
+  StripePaymentRequestType,
+} from "../../Service/StripeService";
 import StripeCheckoutForm from "./StripeCheckoutForm";
 
-function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: StripePaymentDetailsProps) {
+function StripeCheckout({
+  checkoutType,
+  showNext,
+  showPrevious,
+  goToNext,
+}: StripePaymentDetailsProps) {
   const [paymentGateway, setPaymentGateway] = useState<PaymentGateway | null>(
     null
   );
@@ -43,7 +51,6 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
     setPaymentGateway(response.data);
   }
 
-
   async function fetchClientSecret() {
     try {
       if (!order?.id) {
@@ -51,7 +58,10 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         return Promise.reject(new Error("Order ID is not available"));
       }
       if (!transaction?.id) {
-        onError("checkout-session", new Error("Transaction ID is not available"));
+        onError(
+          "checkout-session",
+          new Error("Transaction ID is not available")
+        );
         return Promise.reject(new Error("Transaction ID is not available"));
       }
 
@@ -68,9 +78,8 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         encrypted: true,
         data: {
           checkout_type: checkoutType,
-        }
+        },
       });
-
 
       if (orderCreationResponse?.data?.client_secret) {
         return orderCreationResponse.data.client_secret; // Return the Stripe Checkout Session ID
@@ -80,9 +89,7 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
           new Error("Failed to create Stripe order"),
           truJobApiMiddleware.getResponseData()
         );
-        return Promise.reject(
-          new Error("Failed to create Stripe order")
-        );
+        return Promise.reject(new Error("Failed to create Stripe order"));
       }
     } catch (err) {
       onError(
@@ -104,6 +111,11 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         console.error("Transaction ID is not available");
         return false;
       }
+      if (!data || !data.id) {
+        console.error("Data or ID is not available for approval request");
+        return false;
+      }
+      console.log("Sending approval request with data:", data);
 
       const orderCreationResponse = await truJobApiMiddleware.resourceRequest({
         endpoint: UrlHelpers.urlFromArray([
@@ -111,17 +123,18 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
             .endpoints.stripe.order.replace(":orderId", order.id.toString())
             .replace(":transactionId", transaction.id.toString()),
           "checkout-session",
-          'approve',
+          "approve",
           "store",
         ]),
         method: TruJobApiMiddleware.METHOD.POST,
         protectedReq: true,
         encrypted: true,
-        data,
+        data: {
+          id: data.id, // Use the 'id' field from the data object
+        }
       });
 
-
-      if (orderCreationResponse?.data?.client_secret) {
+      if (orderCreationResponse?.data?.status === "complete") {
         return true;
       } else {
         console.error(
@@ -135,7 +148,7 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         "Error saving successful Stripe request:",
         err instanceof Error ? err.message : "Unknown error"
       );
-        return false;
+      return false;
     }
   }
   async function sendCancelledRequest(data: Record<string, unknown>) {
@@ -155,7 +168,7 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
             .endpoints.stripe.order.replace(":orderId", order.id.toString())
             .replace(":transactionId", transaction.id.toString()),
           "checkout-session",
-          'cancel',
+          "cancel",
           "store",
         ]),
         method: TruJobApiMiddleware.METHOD.POST,
@@ -163,7 +176,6 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         encrypted: true,
         data,
       });
-
 
       if (orderCreationResponse?.data?.client_secret) {
         return true;
@@ -179,7 +191,7 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         "Error saving successful Stripe request:",
         err instanceof Error ? err.message : "Unknown error"
       );
-        return false;
+      return false;
     }
   }
 
@@ -190,7 +202,11 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
     let response: boolean | undefined;
     switch (paymentRequestType) {
       case "checkout-session":
-        console.log("Stripe checkout session successful:", paymentRequestType, data);
+        console.log(
+          "Stripe checkout session successful:",
+          paymentRequestType,
+          data
+        );
         response = await sendApprovalRequest(data);
         if (!response) {
           console.error("Failed to save successful Stripe request");
@@ -245,7 +261,11 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
     let response: boolean | undefined;
     switch (paymentRequestType) {
       case "checkout-session":
-        console.log("Stripe checkout session cancelled:", paymentRequestType, data);
+        console.log(
+          "Stripe checkout session cancelled:",
+          paymentRequestType,
+          data
+        );
         response = await sendCancelledRequest(data);
         if (!response) {
           console.error("Failed to save cancelled Stripe request");
@@ -267,9 +287,6 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
         );
     }
   }
-
-
-
 
   async function onCancel(data: Record<string, unknown>) {
     console.log("PayPal onCancel data:", data);
@@ -312,11 +329,9 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
     }
   }
 
-
   useEffect(() => {
     sitePaymentGatewayRequest();
   }, []);
-  
 
   useEffect(() => {
     if (!paymentGateway) return;
@@ -335,7 +350,7 @@ function StripeCheckout({ checkoutType, showNext, showPrevious, goToNext }: Stri
 
   console.log(
     "stripe Details component rendered with payment gateway:",
-    stripePromise,
+    stripePromise
   );
 
   return (
