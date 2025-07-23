@@ -139,7 +139,7 @@ function StripeCheckout({
       } else {
         console.error(
           "Failed to save successful Stripe request",
-          truJobApiMiddleware.getResponseData()
+          orderCreationResponse
         );
         return false;
       }
@@ -367,6 +367,9 @@ function StripeCheckout({
             onSuccess={onSuccess}
             onError={onError}
             onCancel={onCancel}
+            goToNext={goToNext}
+            showNext={showNext}
+            showPrevious={showPrevious}
           />
         </CheckoutProvider>
       ) : (

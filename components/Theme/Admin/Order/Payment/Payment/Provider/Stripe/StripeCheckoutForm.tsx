@@ -20,110 +20,15 @@ import { connect } from "react-redux";
 import { RootState } from "@/library/redux/store";
 import { PaymentProps } from "../../Service/PaymentService";
 
-//     {
-//     "_sdkVersion": "v1",
-//     "billingAddress": null,
-//     "businessName": "Truvoice sandbox",
-//     "canConfirm": false,
-//     "currency": "gbp",
-//     "discountAmounts": [],
-//     "email": "test@user.com",
-//     "id": "cs_test_a1e9VO7Xl4ScovdCwgfVPxyFHv87syZdUqF08VfZra43kHag50uqEbuM3R",
-//     "lastPaymentError": null,
-//     "lineItems": [
-//         {
-//             "id": "li_1RmuCCBTFXsqW11eIXtFSH8T",
-//             "name": "Voluptatem minus.",
-//             "total": {
-//                 "amount": "£178.17",
-//                 "minorUnitsAmount": 17817
-//             },
-//             "discount": {
-//                 "amount": "£0.00",
-//                 "minorUnitsAmount": 0
-//             },
-//             "subtotal": {
-//                 "amount": "£178.17",
-//                 "minorUnitsAmount": 17817
-//             },
-//             "taxExclusive": {
-//                 "amount": "£0.00",
-//                 "minorUnitsAmount": 0
-//             },
-//             "taxInclusive": {
-//                 "amount": "£0.00",
-//                 "minorUnitsAmount": 0
-//             },
-//             "unitAmount": {
-//                 "amount": "£178.17",
-//                 "minorUnitsAmount": 17817
-//             },
-//             "description": "Libero fuga id atque perferendis quae quaerat deleniti. Autem ratione totam rerum minus.",
-//             "quantity": 1,
-//             "discountAmounts": [],
-//             "taxAmounts": [],
-//             "recurring": null,
-//             "adjustableQuantity": null,
-//             "images": []
-//         }
-//     ],
-//     "livemode": false,
-//     "phoneNumber": null,
-//     "minorUnitsAmountDivisor": 100,
-//     "recurring": null,
-//     "savedPaymentMethods": null,
-//     "shipping": null,
-//     "shippingAddress": null,
-//     "shippingOptions": [],
-//     "status": {
-//         "type": "complete",
-//         "paymentStatus": "paid"
-//     },
-//     "tax": {
-//         "status": "ready"
-//     },
-//     "taxAmounts": [],
-//     "taxIdInfo": null,
-//     "total": {
-//         "subtotal": {
-//             "amount": "£178.17",
-//             "minorUnitsAmount": 17817
-//         },
-//         "taxExclusive": {
-//             "amount": "£0.00",
-//             "minorUnitsAmount": 0
-//         },
-//         "taxInclusive": {
-//             "amount": "£0.00",
-//             "minorUnitsAmount": 0
-//         },
-//         "shippingRate": {
-//             "amount": "£0.00",
-//             "minorUnitsAmount": 0
-//         },
-//         "discount": {
-//             "amount": "£0.00",
-//             "minorUnitsAmount": 0
-//         },
-//         "total": {
-//             "amount": "£178.17",
-//             "minorUnitsAmount": 17817
-//         },
-//         "appliedBalance": {
-//             "amount": "£0.00",
-//             "minorUnitsAmount": 0
-//         },
-//         "balanceAppliedToNextInvoice": false
-//     }
-// }
 export type StripeCheckoutFormProps = {
   session: SessionState; // Define the type of session if available
-} & PaymentProps;
+} & PaymentProps & {
+  goToNext?: () => void;
+};
 function StripeCheckoutForm({
   session,
   onSuccess,
-  onError,
-  onCancel,
+  goToNext,
 }: StripeCheckoutFormProps) {
   const checkoutContext = useContext(CheckoutContext);
   const checkout = useCheckout();
@@ -192,6 +97,9 @@ function StripeCheckoutForm({
             variant="primary"
             onClick={async (e: React.MouseEvent<HTMLButtonElement>) => {
               e.preventDefault();
+              if (typeof goToNext === "function") {
+                goToNext();
+              }
             }}
           >
             {"Previous Step"}
