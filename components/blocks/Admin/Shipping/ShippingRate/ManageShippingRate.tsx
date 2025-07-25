@@ -48,7 +48,7 @@ function ManageShippingRate({
                 ":shippingMethodId",
                 shippingMethodId.toString()
               ),
-              "bulk/delete",
+              "bulk/destroy",
             ]),
             method: ApiMiddleware.METHOD.DELETE,
             protectedReq: true,
